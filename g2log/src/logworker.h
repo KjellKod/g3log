@@ -7,13 +7,10 @@
  *
  * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
  * ********************************************* */
-
-
-#include <string>
 #include <memory>
 #include "g2log.h"
 
-class PrivateLogWorker;
+class LogWorkerImpl;
 
 /**
 * \param log_prefix is the 'name' of the binary, this give the log name 'LOG-'name'-...
@@ -31,7 +28,7 @@ public:
   std::string logFileName() const;
 
 private:
-  std::unique_ptr<PrivateLogWorker> background_worker_;
+  std::unique_ptr<LogWorkerImpl> pimpl_;
   const std::string log_file_with_path_;
 
   LogWorker(const LogWorker&) = delete; // no assignment, no copy

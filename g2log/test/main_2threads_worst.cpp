@@ -96,7 +96,7 @@ int main(int argc, char** argv)
   }
 
   oss.str("");
-  oss << "Number of values rounded to tenths of ms dumped to file: " << g_measurement_bucket_dump << std::endl;
+  oss << "Number of values rounted to milliseconds and put to [millisecond bucket] were dumped to file: " << g_measurement_bucket_dump << std::endl;
   oss << "Format:  bucket_of_ms, number_of_values_in_bucket";
   std::cout << oss.str() << std::endl;
 

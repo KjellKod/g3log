@@ -50,7 +50,7 @@ IF(UNIX)
      include_directories(/usr/include/justthread)   #not necessarily needed if it's in the path
 
      # add a ActiveObject library
-     set(ACTIVE_DIR ${LOG_SRC}/../../active-object_c++0x/src)
+     set(ACTIVE_DIR ${LOG_SRC})
      include_directories(${ACTIVE_DIR})
      MESSAGE("  ACTIVE_DIR = : ${ACTIVE_DIR}")
      SET(ACTIVE_CPP0xx_DIR "Release")
@@ -61,7 +61,7 @@ IF(UNIX)
      include_directories(src)
      include_directories(${LOG_SRC})
      #MESSAGE("  LOG_SRC = : ${LOG_SRC}")
-     add_library(lib_logger  ${LOG_SRC}/logworker.h ${LOG_SRC}/logworker.cpp ${LOG_SRC}/privatelogworker.cpp ${LOG_SRC}/privatelogworker.h ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp )
+     add_library(lib_logger  ${LOG_SRC}/logworker.h ${LOG_SRC}/logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp )
      set_target_properties(lib_logger PROPERTIES LINKER_LANGUAGE CXX)
      target_link_libraries(lib_logger lib_activeobject)
 
