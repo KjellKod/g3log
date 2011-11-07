@@ -25,6 +25,8 @@
 #include "logworker.h"
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
 #include <glog/logging.h>
+#else
+#error G2LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
 #endif
 
 

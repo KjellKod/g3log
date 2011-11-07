@@ -87,14 +87,14 @@ if (false == (boolean_expression))                                              
 For flags, width, precision etc please see the above references.
 EXAMPLES:
 {
-   LOG_F(INFO, "Characters: %c %c \n", 'a', 65);
-   LOG_F(INFO, "Decimals: %d %ld\n", 1977, 650000L);      // printing long
-   LOG_F(INFO, "Preceding with blanks: %10d \n", 1977);
-   LOG_F(INFO, "Preceding with zeros: %010d \n", 1977);
-   LOG_F(INFO, "Some different radixes: %d %x %o %#x %#o \n", 100, 100, 100, 100, 100);
-   LOG_F(INFO, "floats: %4.2f %+.0e %E \n", 3.1416, 3.1416, 3.1416);
-   LOG_F(INFO, "Width trick: %*d \n", 5, 10);
-   LOG_F(INFO, "%s \n", "A string");
+   LOGF(INFO, "Characters: %c %c \n", 'a', 65);
+   LOGF(INFO, "Decimals: %d %ld\n", 1977, 650000L);      // printing long
+   LOGF(INFO, "Preceding with blanks: %10d \n", 1977);
+   LOGF(INFO, "Preceding with zeros: %010d \n", 1977);
+   LOGF(INFO, "Some different radixes: %d %x %o %#x %#o \n", 100, 100, 100, 100, 100);
+   LOGF(INFO, "floats: %4.2f %+.0e %E \n", 3.1416, 3.1416, 3.1416);
+   LOGF(INFO, "Width trick: %*d \n", 5, 10);
+   LOGF(INFO, "%s \n", "A string");
    return 0;
 }
 And here is possible output
@@ -106,17 +106,17 @@ And here is possible output
 :      floats: 3.14 +3e+000 3.141600E+000
 :      Width trick:    10
 :      A string  \endverbatim */
-#define G2_LOG_F_INFO     g2::internal::LogMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,"INFO")
-#define G2_LOG_F_DEBUG    g2::internal::LogMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,"DEBUG")
-#define G2_LOG_F_WARNING  g2::internal::LogMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,"WARNING")
-#define G2_LOG_F_FATAL    g2::internal::LogContractMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,k_fatal_log_expression)
+#define G2_LOGF_INFO     g2::internal::LogMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,"INFO")
+#define G2_LOGF_DEBUG    g2::internal::LogMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,"DEBUG")
+#define G2_LOGF_WARNING  g2::internal::LogMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,"WARNING")
+#define G2_LOGF_FATAL    g2::internal::LogContractMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__,k_fatal_log_expression)
 
-// LOG_F(level,msg,...) is the API for the "printf" like log
-#define LOG_F(level, printf_like_message, ...)                 \
-  G2_LOG_F_##level.messageSave(printf_like_message, __VA_ARGS__);
+// LOGF(level,msg,...) is the API for the "printf" like log
+#define LOGF(level, printf_like_message, ...)                 \
+  G2_LOGF_##level.messageSave(printf_like_message, __VA_ARGS__);
 
 // conditional log printf syntax
-#define LOG_F_IF(level,boolean_expression, printf_like_message, ...) \
+#define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
   if(true == boolean_expression)                                     \
      G2_LOG_##level.messageSave(printf_like_message, __VA_ARGS__);
 

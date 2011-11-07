@@ -24,7 +24,7 @@ int main(int argc, char** argv)
   std::cout << "******    please see g2log/src/main.cpp and he finished log file to " << std::endl;
   std::cout << "******    follow what is done in this example\n\n" << std::endl;
 
-  LOG_F(INFO, "Hi log %d", 123);
+  LOGF(INFO, "Hi log %d", 123);
   LOG(INFO) << "Test SLOG INFO";
   LOG(DEBUG) << "Test SLOG DEBUG";
   LOG(INFO) << "one: " << 1;
@@ -34,32 +34,32 @@ int main(int argc, char** argv)
   LOG(DEBUG) << "pi double: " << pi_d;
   LOG(DEBUG) << "pi float: " << pi_f;
   LOG(DEBUG) << "pi float (width 10): " << std::setprecision(10) << pi_f;
-  LOG_F(INFO, "pi float printf:%f", pi_f);
+  LOGF(INFO, "pi float printf:%f", pi_f);
 
   //
   // START: LOG Entris that were in the article
   //
   //LOG(UNKNOWN_LEVEL) << "This log attempt will cause a compiler error";
   LOG(INFO) << "Simple to use with streaming syntax, easy as abc or " << 123;
-  LOG_F(WARNING, "Printf-style syntax is also %s", "available");
+  LOGF(WARNING, "Printf-style syntax is also %s", "available");
   // ....
   try
   {
-    LOG_F(FATAL, "FATAL has a special meaning. This %s will throw an exception", "message");
+    LOGF(FATAL, "FATAL has a special meaning. This %s will throw an exception", "message");
   }
   catch(...)
   {
     std::cout << "\n **** All good expected the 'FATAL has a special meaning' runtime exception\n\n\n" << std::endl;
   }
   LOG_IF(INFO, (1 < 2)) << "If true this text will be logged";
-  LOG_F_IF(INFO, (1<2), "if %d<%d : then this text will be logged", 1,2);
+  LOGF_IF(INFO, (1<2), "if %d<%d : then this text will be logged", 1,2);
   LOG_IF(FATAL, (2>3)) << "This message should NOT throw";
-  LOG_F(DEBUG, "This API is popular with some %s", "programmers");
-  LOG_F_IF(DEBUG, (1<2), "If true, then this %s will be logged", "message");
+  LOGF(DEBUG, "This API is popular with some %s", "programmers");
+  LOGF_IF(DEBUG, (1<2), "If true, then this %s will be logged", "message");
   {
     const std::string logging = "logging";
     // OK --- this WILL get a compiler warning
-    LOG_F(DEBUG, "Printf-type %s is the number 1 for many %s", logging.c_str());
+    LOGF(DEBUG, "Printf-type %s is the number 1 for many %s", logging.c_str());
   }
   CHECK(1 != 2); // true: won't throw
   try

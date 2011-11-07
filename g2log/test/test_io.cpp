@@ -106,9 +106,9 @@ TEST(LogTest, LOG_F)
   std::string file_content;
   {
     RestoreLogger logger;
-    LOG_F(INFO, std::string(t_info + "%d").c_str(), 123);
-    LOG_F(DEBUG, std::string(t_debug + "%f").c_str(), 1.123456);
-    LOG_F(WARNING, std::string(t_warning + "%s").c_str(), "yello");
+    LOGF(INFO, std::string(t_info + "%d").c_str(), 123);
+    LOGF(DEBUG, std::string(t_debug + "%f").c_str(), 1.123456);
+    LOGF(WARNING, std::string(t_warning + "%s").c_str(), "yello");
     logger.reset(); // force flush of logger
     file_content = readFileToText(logger.log_file_);
     SCOPED_TRACE("LOG_INFO");  // Scope exit be prepared for destructor failure
@@ -142,8 +142,8 @@ TEST(LogTest, LOG_F_IF)
   std::string file_content;
   {
     RestoreLogger logger;
-    LOG_F_IF(INFO, (2 == 2), std::string(t_info + "%d").c_str(), 123);
-    LOG_F_IF(DEBUG, (2 != 2), std::string(t_debug + "%f").c_str(), 1.123456);
+    LOGF_IF(INFO, (2 == 2), std::string(t_info + "%d").c_str(), 123);
+    LOGF_IF(DEBUG, (2 != 2), std::string(t_debug + "%f").c_str(), 1.123456);
     logger.reset(); // force flush of logger
     file_content = readFileToText(logger.log_file_);
     SCOPED_TRACE("LOG_IF");  // Scope exit be prepared for destructor failure
@@ -167,12 +167,12 @@ TEST(LogTest, LOG_IF)
   ASSERT_FALSE(verifyContent(file_content, t_debug2));
 }
 
-TEST(LogTest, LOG_F__FATAL)
+TEST(LogTest, LOGF__FATAL)
 {
   RestoreLogger logger;
   try
   {
-    LOG_F(FATAL, "This message should throw %d",0);
+    LOGF(FATAL, "This message should throw %d",0);
   }
   catch (std::exception const &e)
   {
@@ -221,12 +221,12 @@ TEST(LogTest, LOG_FATAL)
 }
 
 
-TEST(LogTest, LOG_F_IF__FATAL)
+TEST(LogTest, LOGF_IF__FATAL)
 {
   RestoreLogger logger;
   try
   {
-    LOG_F_IF(FATAL, (2<3), "This message%sshould throw"," ");
+    LOGF_IF(FATAL, (2<3), "This message%sshould throw"," ");
   }
   catch (std::exception const &e)
   {

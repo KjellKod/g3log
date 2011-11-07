@@ -19,7 +19,7 @@ const std::string title = "G2LOG";
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
 const std::string title = "GOOGLE__GLOG";
 #else
-const std::string title = not_defined_this_will_be_compiler_error;
+#error G2LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
 #endif
 
 const std::string  g_prefix_log_name = title + "-performance-2threads-WORST_LOG";
