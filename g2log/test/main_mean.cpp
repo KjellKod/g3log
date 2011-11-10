@@ -40,8 +40,6 @@ int main(int argc, char** argv)
   google::InitGoogleLogging(argv[0]);
 #endif
 
-
-
   auto start_time = std::chrono::steady_clock::now();
   doLogWrites(title);
   auto application_end_time = std::chrono::steady_clock::now();

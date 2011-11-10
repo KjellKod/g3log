@@ -22,7 +22,12 @@ public:
   virtual ~LogWorker();
 
   /// pushes in background thread (asynchronously) input messages to log file
-  void save(g2::internal::LogEntry);
+  void save(g2::internal::LogEntry entry);
+
+  /// Will push a fatal message on the queue, this is the last message to be processed
+  /// this way it's ensured that all existing entries were flushed before 'fatal'
+  /// Will abort the application!
+  void fatal(g2::internal::FatalMessage fatal_message);
 
   /// basically only needed for unit-testing or specific log management post logging
   std::string logFileName() const;
@@ -31,8 +36,8 @@ private:
   std::unique_ptr<LogWorkerImpl> pimpl_;
   const std::string log_file_with_path_;
 
-  LogWorker(const LogWorker&) = delete; // no assignment, no copy
-  LogWorker& operator=(const LogWorker&) = delete;
+  LogWorker(const LogWorker&); // c++11 feature not yet in vs2010 = delete;
+  LogWorker& operator=(const LogWorker&); // c++11 feature not yet in vs2010 = delete;
 };
 
 

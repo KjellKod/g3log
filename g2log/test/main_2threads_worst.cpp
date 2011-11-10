@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 
   oss.str("");
   oss << "Number of values rounted to milliseconds and put to [millisecond bucket] were dumped to file: " << g_measurement_bucket_dump << std::endl;
-  oss << "Format:  bucket_of_ms, number_of_values_in_bucket";
+  oss << "Format:  bucket_of_ms, number_of_values_in_bucket\n\n" << std::endl;
   std::cout << oss.str() << std::endl;
 
   for(auto iter = value_amounts.begin(); iter != value_amounts.end(); ++iter)

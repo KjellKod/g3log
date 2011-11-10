@@ -16,6 +16,8 @@
 
 namespace
 {
+const int k_wait_time = 5; // 5s wait between LOG/CHECK FATAL till we say it's too long time
+
 bool verifyContent(const std::string &total_text,std::string msg_to_find)
 {
   std::string content(total_text);
@@ -173,6 +175,7 @@ TEST(LogTest, LOGF__FATAL)
   try
   {
     LOGF(FATAL, "This message should throw %d",0);
+    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
@@ -200,6 +203,7 @@ TEST(LogTest, LOG_FATAL)
   try
   {
     LOG(FATAL) << "This message should throw";
+    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
@@ -227,6 +231,7 @@ TEST(LogTest, LOGF_IF__FATAL)
   try
   {
     LOGF_IF(FATAL, (2<3), "This message%sshould throw"," ");
+    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
@@ -255,6 +260,7 @@ TEST(LogTest, LOG_IF__FATAL)
   {
     LOG_IF(WARNING, (0 != t_info.compare(t_info))) << "This message should NOT be written";
     LOG_IF(FATAL, (0 != t_info.compare(t_info2))) << "This message should throw";
+    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
@@ -326,6 +332,7 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg)
   try
   {
     CHECK_F(1 >= 2, msg.c_str(), arg1.c_str(), arg2.c_str());
+    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {

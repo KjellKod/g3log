@@ -6,6 +6,7 @@
  * ********************************************* */
 
 #include "logworker.h"
+
 #include <iostream>
 #include <functional>
 #include <string>
@@ -16,8 +17,13 @@
 #include <iomanip>
 #include <ctime>
 
+ #if defined(YALLA)
+#include <stdexcept> // exceptions
+#endif
+
 #include "active.h"
 #include "g2log.h"
+#include "crashhandler.h"
 
 using namespace g2::internal;
 namespace
@@ -57,6 +63,7 @@ struct LogWorkerImpl
   ~LogWorkerImpl();
 
   void backgroundFileWrite(g2::internal::LogEntry message);
+  void backgroundExitFatal(g2::internal::FatalMessage fatal_message);
 
   std::string log_file_with_path_;
   std::unique_ptr<kjellkod::Active> bg_;
@@ -64,9 +71,8 @@ struct LogWorkerImpl
   g2::internal::time_point start_time_;
 
 private:
-  LogWorkerImpl& operator=(const LogWorkerImpl&) = delete; // no assignment, no copy
-  LogWorkerImpl(const LogWorkerImpl& other) = delete;
-
+  LogWorkerImpl& operator=(const LogWorkerImpl&); // c++11 feature not yet in vs2010 = delete;
+  LogWorkerImpl(const LogWorkerImpl& other); // c++11 feature not yet in vs2010 = delete;
 };
 
 
@@ -127,9 +133,24 @@ void LogWorkerImpl::backgroundFileWrite(LogEntry message)
   out << "\n" << t.year << "/" << setw(2) << t.month << "/" << setw(2) << t.day;
   out << " " << setw(2) << t.hour << ":"<< setw(2) << t.minute <<":"<< setw(2) << t.second;
   out << "." << chrono::duration_cast<microsecond>(timesnapshot - start_time_).count(); //microseconds
-  out << "\t" << message;
+  out << "\t" << message << std::flush;
 }
 
+void LogWorkerImpl::backgroundExitFatal(FatalMessage fatal_message)
+{
+  backgroundFileWrite(fatal_message.message_);
+
+ #if defined(YALLA)
+  // If running unit test - we simplify matters by not sending the signal, but
+  // by just throwing an exception
+  throw std::runtime_error(fatal_message.message_);
+  return;
+#endif
+
+  out.close();
+  exitWithDefaultSignalHandler(fatal_message.signal_id_);
+  perror("g2log exited after receiving FATAL trigger. Flush message status: "); // should never reach this point
+}
 
 
 
@@ -144,7 +165,7 @@ void LogWorkerImpl::backgroundFileWrite(LogEntry message)
  LogWorker::~LogWorker()
  {
    pimpl_.reset();
-   //std::cout << "\nLogWorker finished with log: " << log_file_with_path_ << std::endl << std::flush;
+   std::cout << "\nExiting, log location: " << log_file_with_path_ << std::endl << std::flush;
  }
 
  void LogWorker::save(g2::internal::LogEntry msg)
@@ -152,6 +173,10 @@ void LogWorkerImpl::backgroundFileWrite(LogEntry message)
    pimpl_->bg_->send(std::tr1::bind(&LogWorkerImpl::backgroundFileWrite, pimpl_.get(), msg));
  }
 
+ void LogWorker::fatal(g2::internal::FatalMessage fatal_message)
+ {
+   pimpl_->bg_->send(std::tr1::bind(&LogWorkerImpl::backgroundExitFatal, pimpl_.get(), fatal_message));
+ }
 
  std::string LogWorker::logFileName() const
  {

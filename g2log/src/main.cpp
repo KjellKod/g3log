@@ -10,13 +10,22 @@
 #include "logworker.h"
 #include <iomanip>
 
+namespace
+{
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+	const std::string path_to_log_file = "./";
+#else
+	const std::string path_to_log_file = "/tmp/";
+#endif
+}
+
 int main(int argc, char** argv)
 {
   double pi_d = 3.1415926535897932384626433832795;
   float pi_f = 3.1415926535897932384626433832795f;
 
 
-  LogWorker logger(argv[0], "/tmp/");
+  LogWorker logger(argv[0], path_to_log_file);
   g2::initializeLogging(&logger);
 
   std::cout << "****** A NUMBER of 'runtime exceptions' will be printed on this screen" << std::endl;
@@ -90,7 +99,7 @@ int main(int argc, char** argv)
     CHECK(1<2) << "SHOULD NOT SEE THIS MESSAGE";
     CHECK(1>2) << "Test to see if contract works: onetwothree: " << 123 << ". This should be inside an exception";
   }
-  catch(std::exception& exc)
+  catch(...)
   {
     std::cout << "\n*****  All good, the 'exception' was part of the example\n\n\n" << std::endl;
     return 0;

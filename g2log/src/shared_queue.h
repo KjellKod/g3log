@@ -29,8 +29,8 @@ class shared_queue
   mutable std::mutex m_;
   std::condition_variable data_cond_;
 
-  shared_queue& operator=(const shared_queue&) = delete;
-  shared_queue(const shared_queue& other) = delete;
+  shared_queue& operator=(const shared_queue&); // c++11 feature not yet in vs2010 = delete;
+  shared_queue(const shared_queue& other); // c++11 feature not yet in vs2010 = delete;
 
 public:
   shared_queue(){}

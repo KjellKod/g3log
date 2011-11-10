@@ -66,6 +66,7 @@ bool writeTextToFile(const std::string& filename, const std::string& msg, const 
     std::cerr << ss_error.str().c_str() << std::endl << std::flush;
     return false;
   }
+
   out << msg;
   return true;
 }

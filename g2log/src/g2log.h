@@ -23,8 +23,14 @@
 
 class LogWorker;
 
+#if !(defined(__PRETTY_FUNCTION__))
+#define __PRETTY_FUNCTION__   __FUNCTION__
+#endif
+
+
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod
 const int DEBUG = 0, INFO = 1, WARNING = 2, FATAL = 3;
+static const std::string k_os_signal_fatal_text = "OS_SIGNAL_FATAL";
 static const std::string k_fatal_log_expression = ""; // using LogContractMessage but no boolean expression
 
 // GCC Predefined macros: http://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
@@ -155,6 +161,28 @@ typedef std::chrono::duration<long,std::ratio<1, 1000> > millisecond;
 typedef std::chrono::duration<long long,std::ratio<1, 1000000> > microsecond;
 typedef const std::string& LogEntry;
 
+/** Trigger for flushing the message queue and exiting the applicaition
+    A thread that causes a FatalMessage will sleep forever until the
+    application has exited (after message flush) */
+struct FatalMessage
+{
+  enum FatalType {kReasonFatal, kReasonOS_FATAL_SIGNAL};
+  FatalMessage(std::string message, FatalType type, int signal_id);
+
+  std::string message_;
+  FatalType type_;
+  int signal_id_;
+};
+// Will trigger a FatalMessage sending
+struct FatalTrigger
+{
+  FatalTrigger(const FatalMessage& message);
+  ~FatalTrigger();
+  FatalMessage message_;
+};
+
+
+
 // Log message for 'printf-like' or stream logging, it's a temporary message constructions
 class LogMessage
 {
@@ -166,11 +194,15 @@ class LogMessage
 
     // The __attribute__ generates compiler warnings if illegal "printf" format
     // IMPORTANT: You muse enable the compiler flag '-Wall' for this to work!
-    // ref: http://www.unixwiz.net/techtips/gnu-c-attributes.html
-    //
+    // ref: http://www.unixwiz.net/techtips/gnu-c-attributes.html 
+	//
+	//If the compiler does not support attributes, disable them
+#ifndef __GNUC__
+#define  __attribute__(x)
+#endif
     // Coder note: Since it's C++ and not C EVERY CLASS FUNCTION always get a first
     // compiler given argument 'this' this must be supplied as well, hence '2,3'
-    // ref: http://www.codemaestro.com/reviews/18 -- ref KjellKod
+    // ref: http://www.codemaestro.com/reviews/18 -- ref KjellKod			
     void messageSave(const char *printf_like_message, ...)
         __attribute__((format(printf,2,3) ));
 

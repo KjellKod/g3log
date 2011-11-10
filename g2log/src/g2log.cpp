@@ -20,7 +20,10 @@
 #include <cstdio>    // vsnprintf
 #include <cassert>
 #include <mutex>
+
 #include "logworker.h"
+#include "crashhandler.h"
+#include <signal.h>
 
 namespace g2
 {
@@ -52,10 +55,17 @@ std::string splitFileName(const std::string& str)
 
 void initializeLogging(LogWorker *bgworker)
 {
+  static bool once_only_signalhandler = false;
   std::lock_guard<std::mutex> lock(internal::g_logging_init_mutex);
   CHECK(!internal::isLoggingInitialized());
   CHECK(bgworker != nullptr);
   internal::g_logger_instance = bgworker;
+
+  if(false == once_only_signalhandler)
+  {
+    installSignalHandler();
+    once_only_signalhandler = true;
+  }
 }
 
 LogWorker* shutDownLogging()
@@ -83,11 +93,11 @@ LogContractMessage::~LogContractMessage()
   std::ostringstream oss;
   if(0 == expression_.compare(k_fatal_log_expression))
   {
-    oss << "[  *******\tRUNTIME EXCEPTION caused by LOG(FATAL):\t";
+    oss << "\n[  *******\tEXIT trigger caused by LOG(FATAL): \n\t";
   }
   else
   {
-    oss << "\nRUNTIME EXCEPTION caused by broken Contract: [" << expression_ << "]\t";
+    oss << "\n[  *******\tEXIT trigger caused by broken Contract: CHECK(" << expression_ << ")\n\t";
   }
   log_entry_ = oss.str();
 }
@@ -103,11 +113,12 @@ LogMessage::LogMessage(const std::string &file, const int line, const std::strin
 
 LogMessage::~LogMessage()
 {
+  using namespace internal;
   std::ostringstream oss;
   const bool fatal = (0 == level_.compare("FATAL"));
-  oss << level_ << " [" << internal::splitFileName(file_);
+  oss << level_ << " [" << splitFileName(file_);
   if(fatal)
-    oss <<  " F: " << function_ ;
+    oss <<  " at: " << function_ ;
   oss << " L: " << line_ << "]\t";
 
   const std::string str(stream_.str());
@@ -117,22 +128,47 @@ LogMessage::~LogMessage()
   }
   log_entry_ += oss.str();
 
-  if(!internal::isLoggingInitialized() )
+  if(!isLoggingInitialized() )
   {
     std::cerr << "Did you forget to call g2::InitializeLogging(LogWorker*) in your main.cpp?" << std::endl;
     std::cerr << log_entry_ << std::endl << std::flush;
     throw std::runtime_error("Logger not initialized with g2::InitializeLogging(LogWorker*) for msg:\n" + log_entry_);
   }
 
-  internal::g_logger_instance->save(log_entry_); // message saved
-  if(fatal)
+
+  if(fatal) // os_fatal is handled by crashhandlers
   {
-    std::cerr  << log_entry_ << "\t*******  ]" << std::endl << std::flush;
-    throw std::runtime_error(log_entry_);
+    { // local scope - to trigger FatalMessage sending
+      FatalMessage::FatalType fatal_type(FatalMessage::kReasonFatal);
+      FatalMessage fatal_message(log_entry_, fatal_type, SIGABRT);
+      FatalTrigger trigger(fatal_message);
+      std::cerr  << log_entry_ << "\t*******  ]" << std::endl << std::flush;
+    } // will send to worker
   }
-
-
+  internal::g_logger_instance->save(log_entry_); // message saved
 }
+
+
+// represents the actual fatal message
+FatalMessage::FatalMessage(std::string message, FatalType type, int signal_id)
+  : message_(message)
+  , type_(type)
+  , signal_id_(signal_id){}
+
+// used to RAII trigger fatal message sending to LogWorker
+FatalTrigger::FatalTrigger(const FatalMessage &message)
+  : message_(message){}
+
+// at destruction, flushes fatal message to LogWorker
+FatalTrigger::~FatalTrigger()
+{
+  internal::g_logger_instance->fatal(message_);
+  #if !defined(YALLA) // don't sleep if unit-testing
+  // wait to die
+  while(true){std::this_thread::sleep_for(std::chrono::seconds(1));}
+#endif
+}
+
 
 
 void LogMessage::messageSave(const char *printf_like_message, ...)
