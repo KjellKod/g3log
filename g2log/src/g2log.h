@@ -30,7 +30,6 @@ class LogWorker;
 
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod
 const int DEBUG = 0, INFO = 1, WARNING = 2, FATAL = 3;
-static const std::string k_os_signal_fatal_text = "OS_SIGNAL_FATAL";
 static const std::string k_fatal_log_expression = ""; // using LogContractMessage but no boolean expression
 
 // GCC Predefined macros: http://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
