@@ -107,20 +107,15 @@ ENDIF(WIN32)
    #
    #
    # ---- Below g2log Performance -----
-   # create the the g2log MEAN_PERFORMANCE executable
-   add_executable(g2log-performance-mean test/main_mean.cpp test/performance.h)
-   set_target_properties(g2log-performance-mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-   target_link_libraries(g2log-performance-mean lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
-
    # create the the g2log TWO_THREADS_MEAN_PERFORMANCE executable
-   add_executable(g2log-performance-2threads_mean test/main_2threads_mean.cpp test/performance.h)
-   set_target_properties(g2log-performance-2threads_mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-   target_link_libraries(g2log-performance-2threads_mean lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+   add_executable(g2log-performance-threaded_mean test/main_threaded_mean.cpp test/performance.h)
+   set_target_properties(g2log-performance-threaded_mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
+   target_link_libraries(g2log-performance-threaded_mean lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
 
    # create the the g2log TWO_THREADS_WORST_CASE_PERFORMANCE executable
-   add_executable(g2log-performance-2threads_worst test/main_2threads_worst.cpp test/performance.h)
-   set_target_properties(g2log-performance-2threads_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-   target_link_libraries(g2log-performance-2threads_worst lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+   add_executable(g2log-performance-threaded_worst test/main_threaded_worst.cpp test/performance.h)
+   set_target_properties(g2log-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
+   target_link_libraries(g2log-performance-threaded_worst lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
 
 
 
@@ -129,24 +124,19 @@ IF(UNIX)
    #
    # ---- Below GOOGLE glog Performance -----
    # create the the GOOGLE MEAN_PERFORMANCE executable
-   # Generate the DEFINE (for glog) needed to differentiate between the glog and the g2log test
-   add_executable(google_glog-performance-mean test/main_mean.cpp test/performance.h)
-   set_target_properties(google_glog-performance-mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-   target_link_libraries(google_glog-performance-mean lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
+   add_executable(google_glog-performance-threaded_mean test/main_threaded_mean.cpp test/performance.h)
+   set_target_properties(google_glog-performance-threaded_mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
+   target_link_libraries(google_glog-performance-threaded_mean lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
 
    # create the the GOOGLE MEAN_PERFORMANCE executable
-   add_executable(google_glog-performance-2threads_mean test/main_2threads_mean.cpp test/performance.h)
-   set_target_properties(google_glog-performance-2threads_mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-   target_link_libraries(google_glog-performance-2threads_mean lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
+   add_executable(google_glog-performance-threaded_worst test/main_threaded_worst.cpp test/performance.h)
+   set_target_properties(google_glog-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
+   target_link_libraries(google_glog-performance-threaded_worst lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
 
-   # create the the GOOGLE MEAN_PERFORMANCE executable
-   add_executable(google_glog-performance-2threads_worst test/main_2threads_worst.cpp test/performance.h)
-   set_target_properties(google_glog-performance-2threads_worst  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-   target_link_libraries(google_glog-performance-2threads_worst lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
 
    # create the the TEST executable
    add_executable(g2log-unit_test ../test_main/test_main.cpp test/test_io.cpp)
-   add_library(lib_test_logger  ${LOG_SRC}/logworker.h ${LOG_SRC}/logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler.cpp)
+   add_library(lib_test_logger  ${LOG_SRC}/logworker.h ${LOG_SRC}/logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
    set_target_properties(lib_test_logger PROPERTIES LINKER_LANGUAGE CXX)
    set_target_properties(lib_test_logger PROPERTIES COMPILE_DEFINITIONS "YALLA=1")
    target_link_libraries(lib_test_logger lib_activeobject)
