@@ -53,7 +53,8 @@ IF(UNIX)
    MESSAGE("then run './g2log-example' or whatever performance test you feel like trying")
    MESSAGE("")
    set(PLATFORM_LINK_LIBRIES justthread rt)
-   set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
+   # -rdynamic is needed for correct stack dumps with demangling
+   set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
    set(G2_LOG_FILES ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
    include_directories("/usr/include/justthread")
 

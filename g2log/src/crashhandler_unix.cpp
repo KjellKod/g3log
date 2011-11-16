@@ -12,15 +12,17 @@
 #include <unistd.h>  // getpid,
 #include <execinfo.h>
 #include <ucontext.h>
+#include <cxxabi.h>
 #include <cstdlib>
 
 namespace
 {
-// simple dump of stack,. then exit through g2log background worker
+// Dump of stack,. then exit through g2log background worker
+// ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
 // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
 void crashHandler(int signal_number, siginfo_t *info, void *unused_context)
 {
-  const size_t max_dump_size = 100;
+  const size_t max_dump_size = 50;
   void* dump[max_dump_size];
   size_t size = backtrace(dump, max_dump_size);
   // overwrite sigaction with caller's address
@@ -30,11 +32,74 @@ void crashHandler(int signal_number, siginfo_t *info, void *unused_context)
   oss << "Received fatal signal: " << g2::internal::signalName(signal_number);
   oss << "(" << signal_number << ")" << std::endl;
   oss << "\tPID: " << getpid() << std::endl;
+
+  // Below is gcc specific demangling done. Just dumping the stack could be done with
+  //for(size_t idx = 1; idx < size && messages != nullptr; ++idx) // skip first frame, since that is here
+  //{
+  //  oss << "\tstack dump [" << idx << "]  " << messages[idx] << std::endl;
+  //}
+  // HOWEVER - thiw would give mangled symbols in the dump:
+  //./g2log-example(_ZN5__jss5__X469__invokerIvMN8kjellkod6ActiveEFvvEIPS3_EEclEv+0x24) [0x80630e0]
+  //
+  // Using the GCC abi demangle the mangled symbols will be 'demangled':
+  // ./g2log-example : g2::internal::LogMessage::messageSave(char const*, ...)+0x3a [0x805f3dc]
+  //
+  //
   // dump stack: skip first frame, since that is here
   for(size_t idx = 1; idx < size && messages != nullptr; ++idx)
   {
-    oss << "\tstack dump [" << idx << "]  " << messages[idx] << std::endl;
-  }
+    char *mangled_name = 0, *offset_begin = 0, *offset_end = 0;
+    // find parantheses and +address offset surrounding mangled name
+    for (char *p = messages[idx]; *p; ++p)
+    {
+      if (*p == '(')
+      {
+        mangled_name = p;
+      }
+      else if (*p == '+')
+      {
+        offset_begin = p;
+      }
+      else if (*p == ')')
+      {
+        offset_end = p;
+        break;
+      }
+    }
+
+    // if the line could be processed, attempt to demangle the symbol
+    if (mangled_name && offset_begin && offset_end &&
+        mangled_name < offset_begin)
+    {
+      *mangled_name++ = '\0';
+      *offset_begin++ = '\0';
+      *offset_end++ = '\0';
+
+      int status;
+      char * real_name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
+      // if demangling is successful, output the demangled function name
+      if (status == 0)
+      {
+        oss << "\tstack dump [" << idx << "]  " << messages[idx] << " : " << real_name << "+";
+        oss << offset_begin << offset_end << std::endl;
+      }
+      // otherwise, output the mangled function name
+      else
+      {
+        oss << "\tstack dump [" << idx << "]  " << messages[idx] << mangled_name << "+";
+        oss << offset_begin << offset_end << std::endl;
+      }
+      free(real_name); // mallocated by abi::__cxa_demangle(...)
+    }
+    // no demangling done -- just dump the whole line
+    else
+    {
+      oss << "\tstack dump [" << idx << "]  " << messages[idx] << std::endl;
+    }
+  } // END: for(size_t idx = 1; idx < size && messages != nullptr; ++idx)
+
+
+
   free(messages);
   { // Local scope, trigger send
     using namespace g2::internal;
@@ -50,6 +115,9 @@ void crashHandler(int signal_number, siginfo_t *info, void *unused_context)
   // wait to die -- will be inside the FatalTrigger
 }
 } // end anonymous namespace
+
+
+
 
 
 
@@ -79,7 +147,7 @@ std::string signalName(int signal_number)
   case SIGSEGV: return "SIGSEGV"; break;
   case SIGILL:  return "SIGILL"; break;
   case SIGTERM: return "SIGTERM"; break;
-default:
+  default:
     std::ostringstream oss;
     oss << "UNKNOWN SIGNAL(" << signal_number << ")";
     return oss.str();
@@ -91,12 +159,14 @@ default:
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
 void exitWithDefaultSignalHandler(int signal_number)
 {
+  std::cerr << "Exiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
   struct sigaction action;
   memset(&action, 0, sizeof(action));  //
   sigemptyset(&action.sa_mask);
   action.sa_handler = SIG_DFL; // take default action for the signal
   sigaction(signal_number, &action, NULL);
   kill(getpid(), signal_number);
+  abort(); // should never reach this
 }
 } // end g2::internal
 

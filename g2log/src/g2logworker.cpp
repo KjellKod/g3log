@@ -45,6 +45,24 @@ struct LogTime
   int minute; // [0-59]
   int second; // [0-60], 1 leap second
 };
+
+// check for filename validity -  filename should not be part of PATH
+bool isValidFilename(const std::string prefix_filename)
+{
+  std::string illegal_characters("/,|<>:#$%{}()[]\'\"^!?+* ");
+  size_t pos = prefix_filename.find_first_of(illegal_characters,0);
+  if(pos != std::string::npos)
+  {
+    std::cerr << "Illegal character [" << prefix_filename.at(pos) << "] in logname prefix: " << "[" << prefix_filename << "]" << std::endl;
+    return false;
+  }
+  else if (prefix_filename.empty())
+  {
+    std::cerr << "Empty filename prefix is not allowed" << std::endl;
+    return false;
+  }
+  return true;
+}
 }  // end anonymous namespace
 
 
@@ -80,11 +98,23 @@ g2LogWorkerImpl::g2LogWorkerImpl(const std::string& log_prefix, const std::strin
   , bg_(kjellkod::Active::createActive())
   , start_time_(std::chrono::steady_clock::now())
 {
+  std::string real_prefix = log_prefix;
+  // if through a debugger the debugger CAN just throw in the whole path
+  // replace the path delimiters (unix?)
+  std::remove( real_prefix.begin(), real_prefix.end(), '/');
+  std::remove( real_prefix.begin(), real_prefix.end(), '.');
+  if(!isValidFilename(real_prefix))
+  {
+    // illegal prefix, refuse to start
+    std::cerr << "g2log: forced abort due to illegal log prefix [" << log_prefix <<"]" << std::endl << std::flush;
+    abort();
+  }
+
   using namespace std;
   LogTime t;
   ostringstream oss_name;
   oss_name.fill('0');
-  oss_name << log_prefix << ".g2log.";
+  oss_name << real_prefix << ".g2log.";
   oss_name << t.year << setw(2) << t.month << setw(2) << t.day;
   oss_name << "-" << setw(2) << t.hour << setw(2) << t.minute << setw(2) << t.second;
   oss_name << ".log";
