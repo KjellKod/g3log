@@ -1,11 +1,11 @@
 /* *************************************************
- * Filename:logworker.cpp  Framework for Logging and Design By Contract
+ * Filename:g2LogWorker.cpp  Framework for Logging and Design By Contract
  * Created: 2011 by Kjell Hedström
  *
  * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
  * ********************************************* */
 
-#include "logworker.h"
+#include "g2logworker.h"
 
 #include <iostream>
 #include <functional>
@@ -16,10 +16,6 @@
 #include <cassert>
 #include <iomanip>
 #include <ctime>
-
- #if defined(YALLA)
-#include <stdexcept> // exceptions
-#endif
 
 #include "active.h"
 #include "g2log.h"
@@ -54,13 +50,13 @@ struct LogTime
 
 
 
-/** The actual background worker, while LogWorker gives the
-  * asynchronous API to put job in the background the LogWorkerImpl
+/** The actual background worker, while g2LogWorker gives the
+  * asynchronous API to put job in the background the g2LogWorkerImpl
   * does the actual background thread work */
-struct LogWorkerImpl
+struct g2LogWorkerImpl
 {
-  LogWorkerImpl(const std::string& log_prefix, const std::string& log_directory);
-  ~LogWorkerImpl();
+  g2LogWorkerImpl(const std::string& log_prefix, const std::string& log_directory);
+  ~g2LogWorkerImpl();
 
   void backgroundFileWrite(g2::internal::LogEntry message);
   void backgroundExitFatal(g2::internal::FatalMessage fatal_message);
@@ -71,15 +67,15 @@ struct LogWorkerImpl
   g2::internal::time_point start_time_;
 
 private:
-  LogWorkerImpl& operator=(const LogWorkerImpl&); // c++11 feature not yet in vs2010 = delete;
-  LogWorkerImpl(const LogWorkerImpl& other); // c++11 feature not yet in vs2010 = delete;
+  g2LogWorkerImpl& operator=(const g2LogWorkerImpl&); // c++11 feature not yet in vs2010 = delete;
+  g2LogWorkerImpl(const g2LogWorkerImpl& other); // c++11 feature not yet in vs2010 = delete;
 };
 
 
 
 //
-// Private API implementation : LogWorkerImpl
-LogWorkerImpl::LogWorkerImpl(const std::string& log_prefix, const std::string& log_directory)
+// Private API implementation : g2LogWorkerImpl
+g2LogWorkerImpl::g2LogWorkerImpl(const std::string& log_prefix, const std::string& log_directory)
   : log_file_with_path_(log_directory)
   , bg_(kjellkod::Active::createActive())
   , start_time_(std::chrono::steady_clock::now())
@@ -115,7 +111,7 @@ LogWorkerImpl::LogWorkerImpl(const std::string& log_prefix, const std::string& l
   out.fill('0');
 }
 
-LogWorkerImpl::~LogWorkerImpl()
+g2LogWorkerImpl::~g2LogWorkerImpl()
 {
   std::ostringstream ss_exit;
   time_t exit_time;
@@ -125,7 +121,7 @@ LogWorkerImpl::~LogWorkerImpl()
   out << ss_exit.str() << std::flush;
 }
 
-void LogWorkerImpl::backgroundFileWrite(LogEntry message)
+void g2LogWorkerImpl::backgroundFileWrite(LogEntry message)
 {
   using namespace std;
   LogTime t;
@@ -136,17 +132,9 @@ void LogWorkerImpl::backgroundFileWrite(LogEntry message)
   out << "\t" << message << std::flush;
 }
 
-void LogWorkerImpl::backgroundExitFatal(FatalMessage fatal_message)
+void g2LogWorkerImpl::backgroundExitFatal(FatalMessage fatal_message)
 {
   backgroundFileWrite(fatal_message.message_);
-
- #if defined(YALLA)
-  // If running unit test - we simplify matters by not sending the signal, but
-  // by just throwing an exception
-  throw std::runtime_error(fatal_message.message_);
-  return;
-#endif
-
   out.close();
   exitWithDefaultSignalHandler(fatal_message.signal_id_);
   perror("g2log exited after receiving FATAL trigger. Flush message status: "); // should never reach this point
@@ -154,31 +142,31 @@ void LogWorkerImpl::backgroundExitFatal(FatalMessage fatal_message)
 
 
 
-// BELOW LogWorker
+// BELOW g2LogWorker
 // Public API implementation
- LogWorker::LogWorker(const std::string& log_prefix, const std::string& log_directory)
-   :  pimpl_(new LogWorkerImpl(log_prefix, log_directory))
+ g2LogWorker::g2LogWorker(const std::string& log_prefix, const std::string& log_directory)
+   :  pimpl_(new g2LogWorkerImpl(log_prefix, log_directory))
    , log_file_with_path_(pimpl_->log_file_with_path_)
  {
  }
 
- LogWorker::~LogWorker()
+ g2LogWorker::~g2LogWorker()
  {
    pimpl_.reset();
    std::cout << "\nExiting, log location: " << log_file_with_path_ << std::endl << std::flush;
  }
 
- void LogWorker::save(g2::internal::LogEntry msg)
+ void g2LogWorker::save(g2::internal::LogEntry msg)
  {
-   pimpl_->bg_->send(std::tr1::bind(&LogWorkerImpl::backgroundFileWrite, pimpl_.get(), msg));
+   pimpl_->bg_->send(std::tr1::bind(&g2LogWorkerImpl::backgroundFileWrite, pimpl_.get(), msg));
  }
 
- void LogWorker::fatal(g2::internal::FatalMessage fatal_message)
+ void g2LogWorker::fatal(g2::internal::FatalMessage fatal_message)
  {
-   pimpl_->bg_->send(std::tr1::bind(&LogWorkerImpl::backgroundExitFatal, pimpl_.get(), fatal_message));
+   pimpl_->bg_->send(std::tr1::bind(&g2LogWorkerImpl::backgroundExitFatal, pimpl_.get(), fatal_message));
  }
 
- std::string LogWorker::logFileName() const
+ std::string g2LogWorker::logFileName() const
  {
    return log_file_with_path_;
  }

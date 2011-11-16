@@ -7,7 +7,7 @@
 
 #include <gtest/gtest.h>
 #include "g2log.h"
-#include "logworker.h"
+#include "g2logworker.h"
 #include <memory>
 #include <string>
 #include <fstream>
@@ -50,16 +50,17 @@ struct RestoreLogger
   void reset();
   std::string readFileToText();
 
-  std::unique_ptr<LogWorker> logger_;
+  std::unique_ptr<g2LogWorker> logger_;
   const std::string log_file_;
 
 };
 
 RestoreLogger::RestoreLogger()
-  : logger_(new LogWorker("UNIT_TEST_LOGGER", "./"))
+  : logger_(new g2LogWorker("UNIT_TEST_LOGGER", "./"))
   , log_file_(logger_->logFileName())
 {
   g2::initializeLogging(logger_.get());
+  g2::internal::changeFatalInitHandlerForUnitTesting();
 }
 
 RestoreLogger::~RestoreLogger()
@@ -175,13 +176,13 @@ TEST(LogTest, LOGF__FATAL)
   try
   {
     LOGF(FATAL, "This message should throw %d",0);
-    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
     logger.reset();
     std::string file_content = readFileToText(logger.log_file_);
-    if(verifyContent(e.what(), "RUNTIME EXCEPTION") &&
+    std::cerr << file_content << std::endl << std::flush;
+    if(verifyContent(e.what(), "EXIT trigger caused by ") &&
        verifyContent(file_content, "FATAL") &&
        verifyContent(file_content, "This message should throw"))
     {
@@ -203,13 +204,12 @@ TEST(LogTest, LOG_FATAL)
   try
   {
     LOG(FATAL) << "This message should throw";
-    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
     logger.reset();
     std::string file_content = readFileToText(logger.log_file_);
-    if(verifyContent(e.what(), "RUNTIME EXCEPTION") &&
+    if(verifyContent(e.what(), "EXIT trigger caused by ") &&
        verifyContent(file_content, "FATAL") &&
        verifyContent(file_content, "This message should throw"))
     {
@@ -231,13 +231,12 @@ TEST(LogTest, LOGF_IF__FATAL)
   try
   {
     LOGF_IF(FATAL, (2<3), "This message%sshould throw"," ");
-    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
     logger.reset();
     std::string file_content = readFileToText(logger.log_file_);
-    if(verifyContent(e.what(), "RUNTIME EXCEPTION") &&
+    if(verifyContent(e.what(), "EXIT trigger caused by ") &&
        verifyContent(file_content, "FATAL") &&
        verifyContent(file_content, "This message should throw"))
     {
@@ -260,13 +259,12 @@ TEST(LogTest, LOG_IF__FATAL)
   {
     LOG_IF(WARNING, (0 != t_info.compare(t_info))) << "This message should NOT be written";
     LOG_IF(FATAL, (0 != t_info.compare(t_info2))) << "This message should throw";
-    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
     logger.reset();
     std::string file_content = readFileToText(logger.log_file_);
-    if(verifyContent(e.what(), "RUNTIME EXCEPTION") &&
+    if(verifyContent(e.what(), "EXIT trigger caused by ") &&
        verifyContent(file_content, "FATAL") &&
        verifyContent(file_content, "This message should throw") &&
        (false == verifyContent(file_content, "This message should NOT be written")))
@@ -311,7 +309,7 @@ TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg)
   {
     logger.reset();
     std::string file_content = readFileToText(logger.log_file_);
-    if(verifyContent(e.what(), "RUNTIME EXCEPTION") &&
+    if(verifyContent(e.what(), "EXIT trigger caused by ") &&
        verifyContent(file_content, "FATAL"))
     {
       SUCCEED();
@@ -332,13 +330,12 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg)
   try
   {
     CHECK_F(1 >= 2, msg.c_str(), arg1.c_str(), arg2.c_str());
-    sleep(k_wait_time);
   }
   catch (std::exception const &e)
   {
     logger.reset();
     std::string file_content = readFileToText(logger.log_file_);
-    if(verifyContent(e.what(), "RUNTIME EXCEPTION") &&
+    if(verifyContent(e.what(), "EXIT trigger caused by ") &&
        verifyContent(file_content, "FATAL") &&
        verifyContent(file_content, msg2))
     {
@@ -364,7 +361,7 @@ TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg)
   {
     logger.reset();
     std::string file_content = readFileToText(logger.log_file_);
-    if(verifyContent(e.what(), "RUNTIME EXCEPTION") &&
+    if(verifyContent(e.what(), "EXIT trigger caused by ") &&
        verifyContent(file_content, "FATAL") &&
        verifyContent(file_content, msg2))
     {

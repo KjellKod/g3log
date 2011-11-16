@@ -5,9 +5,8 @@
  * PUBLIC DOMAIN and Not copy-writed
  * ********************************************* */
 
-#include "logworker.h"
+#include "g2logworker.h"
 #include "g2log.h"
-#include "logworker.h"
 #include <iomanip>
 
 namespace
@@ -25,13 +24,8 @@ int main(int argc, char** argv)
   float pi_f = 3.1415926535897932384626433832795f;
 
 
-  LogWorker logger(argv[0], path_to_log_file);
+  g2LogWorker logger(argv[0], path_to_log_file);
   g2::initializeLogging(&logger);
-
-  std::cout << "****** A NUMBER of 'runtime exceptions' will be printed on this screen" << std::endl;
-  std::cout << "******    that's all good and part of the 'example'. " << std::endl;
-  std::cout << "******    please see g2log/src/main.cpp and he finished log file to " << std::endl;
-  std::cout << "******    follow what is done in this example\n\n" << std::endl;
 
   LOGF(INFO, "Hi log %d", 123);
   LOG(INFO) << "Test SLOG INFO";
@@ -51,15 +45,6 @@ int main(int argc, char** argv)
   //LOG(UNKNOWN_LEVEL) << "This log attempt will cause a compiler error";
   LOG(INFO) << "Simple to use with streaming syntax, easy as abc or " << 123;
   LOGF(WARNING, "Printf-style syntax is also %s", "available");
-  // ....
-  try
-  {
-    LOGF(FATAL, "FATAL has a special meaning. This %s will throw an exception", "message");
-  }
-  catch(...)
-  {
-    std::cout << "\n **** All good expected the 'FATAL has a special meaning' runtime exception\n\n\n" << std::endl;
-  }
   LOG_IF(INFO, (1 < 2)) << "If true this text will be logged";
   LOGF_IF(INFO, (1<2), "if %d<%d : then this text will be logged", 1,2);
   LOG_IF(FATAL, (2>3)) << "This message should NOT throw";
@@ -68,42 +53,14 @@ int main(int argc, char** argv)
   {
     const std::string logging = "logging";
     // OK --- this WILL get a compiler warning
-    LOGF(DEBUG, "Printf-type %s is the number 1 for many %s", logging.c_str());
-  }
-  CHECK(1 != 2); // true: won't throw
-  try
-  {
-    CHECK(1 > 2) << "CHECK(false) will put this message to the throw exception message and our log";
-  }
-  catch(...)
-  {
-    std::cout << "\n **** All good expected the 'CHECK(false) will put ...' runtime exception\n\n\n" << std::endl;
-  }
-  //
-  // END: LOG Entris that were in the article
-  //
-  try
-  {
-    const std::string arg = "CHECK_F";
-    CHECK_F(1 > 2, "This is a test to see if %s works", arg.c_str());
-  }
-  catch(...)
-  {
-    std::cout << "\n **** All good expected the 'CHECK(1>2) This is a test ...' runtime exception\n\n\n" << std::endl;
+    LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
   }
 
 
-  try
-  {
-    std::cout << "\n\n***** Be ready the example will show a 'runtime exception' " << std::endl;
-    CHECK(1<2) << "SHOULD NOT SEE THIS MESSAGE";
-    CHECK(1>2) << "Test to see if contract works: onetwothree: " << 123 << ". This should be inside an exception";
-  }
-  catch(...)
-  {
-    std::cout << "\n*****  All good, the 'exception' was part of the example\n\n\n" << std::endl;
-    return 0;
-  }
-  std::cerr << "Unexpected ending, expected an exception" << std::endl << std::flush;
-  return 1;
+  std::cout << "\n\n***** Be ready this last example will 'abort' " << std::endl;
+  std::cout << "*****  please theck the logfile for all the LOGS and compare them to this example" << std::endl;
+  std::cout << "***** this file is g2log/src/main.cpp. The log file is: " << logger.logFileName() << std::endl;
+  std::cout << "************************************************************\n\n" << std::endl;
+  CHECK(1<2) << "SHOULD NOT SEE THIS MESSAGE";
+  CHECK(1>2) << "Test to see if contract works: onetwothree: " << 123 << ". This should be at the end of the log, and will exit this example";
 }

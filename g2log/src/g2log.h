@@ -21,7 +21,7 @@
 #include <cstdarg>
 #include <chrono>
 
-class LogWorker;
+class g2LogWorker;
 
 #if !(defined(__PRETTY_FUNCTION__))
 #define __PRETTY_FUNCTION__   __FUNCTION__
@@ -141,15 +141,15 @@ And here is possible output
   * --- Thanks for a great 2011 and good luck with 'g2' --- KjellKod */
 namespace g2
 {
-/** Should be called at very first startup of the software with \ref LogWorker pointer. Ownership of the \ref LogWorker is
+/** Should be called at very first startup of the software with \ref g2LogWorker pointer. Ownership of the \ref g2LogWorker is
 * the responsibilkity of the caller */
-void initializeLogging(LogWorker *logger);
+void initializeLogging(g2LogWorker *logger);
 
 /** Shutdown the logging by making the pointer to the background logger to nullptr
- * The \ref pointer to the LogWorker is owned by the instantniater \ref initializeLogging
+ * The \ref pointer to the g2LogWorker is owned by the instantniater \ref initializeLogging
  * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. This is
  * kept for test reasons and should normally not be used */
-LogWorker* shutDownLogging();
+g2LogWorker* shutDownLogging();
 
 
 // defined here but should't not have to be used outside the g2log
@@ -159,6 +159,13 @@ typedef std::chrono::steady_clock::time_point time_point;
 typedef std::chrono::duration<long,std::ratio<1, 1000> > millisecond;
 typedef std::chrono::duration<long long,std::ratio<1, 1000000> > microsecond;
 typedef const std::string& LogEntry;
+
+
+/** By default the g2log will call g2LogWorker::fatal(...) which will abort() the system after flushing
+ * the logs to file. This makes unit test of FATAL level cumbersome. A work around is to change the 'fatal call'
+ * which can be done here */
+void changeFatalInitHandlerForUnitTesting();
+
 
 /** Trigger for flushing the message queue and exiting the applicaition
     A thread that causes a FatalMessage will sleep forever until the

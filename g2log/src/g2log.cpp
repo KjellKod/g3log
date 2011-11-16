@@ -21,7 +21,7 @@
 #include <cassert>
 #include <mutex>
 
-#include "logworker.h"
+#include "g2logworker.h"
 #include "crashhandler.h"
 #include <signal.h>
 
@@ -34,7 +34,7 @@ const std::string kTruncatedWarningText = "[...truncated...]";
 }
 namespace internal
 {
-static LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
+static g2LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
 static std::mutex g_logging_init_mutex;
 bool isLoggingInitialized(){return g_logger_instance != nullptr; }
 
@@ -53,7 +53,7 @@ std::string splitFileName(const std::string& str)
 } // end namespace g2::internal
 
 
-void initializeLogging(LogWorker *bgworker)
+void initializeLogging(g2LogWorker *bgworker)
 {
   static bool once_only_signalhandler = false;
   std::lock_guard<std::mutex> lock(internal::g_logging_init_mutex);
@@ -68,20 +68,50 @@ void initializeLogging(LogWorker *bgworker)
   }
 }
 
-LogWorker* shutDownLogging()
+g2LogWorker* shutDownLogging()
 {
   std::lock_guard<std::mutex> lock(internal::g_logging_init_mutex);
   CHECK(internal::isLoggingInitialized());
-  LogWorker *backup = internal::g_logger_instance;
+  g2LogWorker *backup = internal::g_logger_instance;
   internal::g_logger_instance = nullptr;
   return backup;
 }
 
 
 
-
 namespace internal
 {
+
+// The default, initial, handling to send a 'fatal' event to g2logworker
+// the caller will stay here, eternally, until the software is aborted
+void callFatalInitial(FatalMessage message)
+{
+  internal::g_logger_instance->fatal(message);
+}
+// By default this function pointer goes to \ref callFatalInitial;
+void (*g_fatal_to_g2logworker_function_ptr)(FatalMessage) = callFatalInitial;
+
+
+
+// Replaces the g2log.cpp/g_fatal_to_g2logworker_function_ptr through
+// g2log::changeFatalInitHandler
+void unitTestFatalInitHandler(g2::internal::FatalMessage fatal_message)
+{
+  assert(internal::g_logger_instance != nullptr);
+  internal::g_logger_instance->save(fatal_message.message_); // calling 'save' instead of 'fatal'
+  throw std::runtime_error(fatal_message.message_);
+}
+
+// In case of unit-testing - a replacement 'fatal function' can be called
+void changeFatalInitHandlerForUnitTesting()
+{
+  g_fatal_to_g2logworker_function_ptr = unitTestFatalInitHandler;
+}
+
+
+
+
+
 LogContractMessage::LogContractMessage(const std::string &file, const int line,
                                        const std::string& function, const std::string &boolean_expression)
   : LogMessage(file, line, function, "FATAL")
@@ -130,9 +160,9 @@ LogMessage::~LogMessage()
 
   if(!isLoggingInitialized() )
   {
-    std::cerr << "Did you forget to call g2::InitializeLogging(LogWorker*) in your main.cpp?" << std::endl;
+    std::cerr << "Did you forget to call g2::InitializeLogging(g2LogWorker*) in your main.cpp?" << std::endl;
     std::cerr << log_entry_ << std::endl << std::flush;
-    throw std::runtime_error("Logger not initialized with g2::InitializeLogging(LogWorker*) for msg:\n" + log_entry_);
+    throw std::runtime_error("Logger not initialized with g2::InitializeLogging(g2LogWorker*) for msg:\n" + log_entry_);
   }
 
 
@@ -155,18 +185,17 @@ FatalMessage::FatalMessage(std::string message, FatalType type, int signal_id)
   , type_(type)
   , signal_id_(signal_id){}
 
-// used to RAII trigger fatal message sending to LogWorker
+// used to RAII trigger fatal message sending to g2LogWorker
 FatalTrigger::FatalTrigger(const FatalMessage &message)
   : message_(message){}
 
-// at destruction, flushes fatal message to LogWorker
+// at destruction, flushes fatal message to g2LogWorker
 FatalTrigger::~FatalTrigger()
 {
-  internal::g_logger_instance->fatal(message_);
-  #if !defined(YALLA) // don't sleep if unit-testing
-  // wait to die
+  // either we will stay here eternally, or it's in unit-test mode
+  // then we throw a std::runtime_error (and never hit sleep)
+  g_fatal_to_g2logworker_function_ptr(message_);
   while(true){std::this_thread::sleep_for(std::chrono::seconds(1));}
-#endif
 }
 
 

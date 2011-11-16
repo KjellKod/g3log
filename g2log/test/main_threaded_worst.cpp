@@ -26,6 +26,10 @@ const std::string g_path = "/tmp/";
 using namespace g2_test;
 
 
+//
+// OK: The code below isn't pretty but it works. Lots and lots of log entries
+// to keep track of!
+//
 int main(int argc, char** argv)
 {
   size_t number_of_threads =0;
@@ -57,7 +61,7 @@ int main(int argc, char** argv)
   oss.str(""); // clear the stream
 
 #if defined(G2LOG_PERFORMANCE)
-  LogWorker* logger = new LogWorker(g_prefix_log_name, g_path);
+  g2LogWorker* logger = new g2LogWorker(g_prefix_log_name, g_path);
   g2::initializeLogging(logger);
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
   google::InitGoogleLogging(argv[0]);

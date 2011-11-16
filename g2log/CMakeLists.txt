@@ -54,7 +54,7 @@ IF(UNIX)
    MESSAGE("")
    set(PLATFORM_LINK_LIBRIES justthread rt)
    set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
-   set(G2_LOG_FILES ${LOG_SRC}/logworker.h ${LOG_SRC}/logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
+   set(G2_LOG_FILES ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
    include_directories("/usr/include/justthread")
 
     # SETUP for GTEST
@@ -73,7 +73,7 @@ IF(WIN32)
    MESSAGE("then run 'Debug\\g2log-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
    set(PLATFORM_LINK_LIBRIES $ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/lib/justthread_vc10_mdd.lib)
-   set(G2_LOG_FILES ${LOG_SRC}/logworker.h ${LOG_SRC}/logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_win.cpp)
+   set(G2_LOG_FILES ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_win.cpp)
    include_directories("$ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/include")
 ENDIF(WIN32)
 
@@ -136,12 +136,10 @@ IF(UNIX)
 
    # create the the TEST executable
    add_executable(g2log-unit_test ../test_main/test_main.cpp test/test_io.cpp)
-   add_library(lib_test_logger  ${LOG_SRC}/logworker.h ${LOG_SRC}/logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
+   add_library(lib_test_logger  ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
    set_target_properties(lib_test_logger PROPERTIES LINKER_LANGUAGE CXX)
-   set_target_properties(lib_test_logger PROPERTIES COMPILE_DEFINITIONS "YALLA=1")
    target_link_libraries(lib_test_logger lib_activeobject)
    # For unit-test only, dont 'crash' by signals, instead just throw a std::runtime_error
-   set_target_properties(g2log-unit_test PROPERTIES COMPILE_DEFINITIONS "YALLA=1")
    target_link_libraries(g2log-unit_test lib_activeobject lib_test_logger gtest_160_lib justthread rt)
 ENDIF(UNIX)
 

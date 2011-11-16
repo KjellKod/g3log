@@ -46,7 +46,7 @@ void crashHandler(int signal_number, siginfo_t *info, void *unused_context)
     FatalMessage fatal_message(fatal_stream.str(),FatalMessage::kReasonOS_FATAL_SIGNAL, signal_number);
     FatalTrigger trigger(fatal_message);  std::ostringstream oss;
     std::cerr << fatal_message.message_ << std::endl << std::flush;
-  } // message sent to LogWorker
+  } // message sent to g2LogWorker
   // wait to die -- will be inside the FatalTrigger
 }
 } // end anonymous namespace
@@ -86,7 +86,7 @@ default:
   }
 }
 
-// Triggered by g2log::LogWorker after receiving a FATAL trigger
+// Triggered by g2log->g2LogWorker after receiving a FATAL trigger
 // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
 void exitWithDefaultSignalHandler(int signal_number)

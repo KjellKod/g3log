@@ -49,7 +49,7 @@ int main(int argc, char** argv)
   oss.str(""); // clear the stream
 
 #if defined(G2LOG_PERFORMANCE)
-  LogWorker* logger = new LogWorker(g_prefix_log_name, g_path);
+  g2LogWorker* logger = new g2LogWorker(g_prefix_log_name, g_path);
   g2::initializeLogging(logger);
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
   google::InitGoogleLogging(argv[0]);
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
   auto total_time_us = std::chrono::duration_cast<microsecond>(worker_end_time - start_time).count();
 
   oss << "\n" << g_iterations << " log entries took: [" << total_time_us / 1000000 << " s] to write to disk"<< std::endl;
-  oss << "[Application(2threads):\t\t:" << application_time_us/1000 << " ms]" << std::endl;
+  oss << "[Application(" << number_of_threads << "):\t\t:" << application_time_us/1000 << " ms]" << std::endl;
   oss << "[Background thread to finish\t:" << total_time_us/1000 << " ms]" << std::endl;
   oss << "\nAverage time per log entry:" << std::endl;
   oss << "[Application: " << application_time_us/(number_of_threads*g_iterations) << " us]" << std::endl;

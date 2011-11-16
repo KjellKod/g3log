@@ -22,7 +22,7 @@
 
 #if defined(G2LOG_PERFORMANCE)
 #include "g2log.h"
-#include "logworker.h"
+#include "g2logworker.h"
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
 #include <glog/logging.h>
 #else

@@ -15,7 +15,7 @@ std::string signalName(int signal_number);
 
 /** Re-"throw" a fatal signal, previously caught. This will exit the application
   * This is an internal only function. Do not use it elsewhere. It is triggered
-  * from g2log, LogWorker after flushing messages to file */
+  * from g2log, g2LogWorker after flushing messages to file */
 void exitWithDefaultSignalHandler(int signal_number);
 } // end g2::interal
 
