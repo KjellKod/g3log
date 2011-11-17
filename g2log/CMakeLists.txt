@@ -72,7 +72,7 @@ ENDIF(UNIX)
 #Visual Studio 2010
 IF(WIN32)   	
    MESSAGE("")
-   MESSAGE("cmake for Visual Studio 2010")
+   MESSAGE("Windows: Please run the command [cmake -G \"Visual Studio 10\" ..]")
    MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln'")
    MESSAGE("then run 'Debug\\g2log-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
@@ -140,6 +140,7 @@ ENDIF(WIN32)
 
    # 1. create the the example EXECUTABLE - hook in the test_example's CMakeLists.txt file
    if (USE_SIMPLE_EXAMPLE)
+      MESSAGE(" g2log-example option ON")
       include_directories (${DIR_EXAMPLE})
       add_executable(g2log-example ${DIR_EXAMPLE}/main.cpp)
       target_link_libraries(g2log-example lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
@@ -149,6 +150,7 @@ ENDIF(WIN32)
 
    # 2. create the g2log's performance tests
    if (USE_G2LOG_PERFORMANCE)
+      MESSAGE(" g2log performance tests option ON")
       include_directories (${DIR_PERFORMANCE}) 
       # MEAN PERFORMANCE TEST
       add_executable(g2log-performance-threaded_mean 
@@ -169,6 +171,7 @@ ENDIF(WIN32)
 
    # 3. create the Google glog's performance test
    if (USE_GOOGLE_GLOG_PERFORMANCE) 
+      MESSAGE(" Google's glog performance tests option ON")
       include_directories (${DIR_PERFORMANCE}) 
       # create the the GOOGLE MEAN_PERFORMANCE executable
      add_executable(google_glog-performance-threaded_mean ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
@@ -185,6 +188,7 @@ ENDIF(WIN32)
 
    # 4. create the unit tests for g2log --- ONLY TESTED THE UNIT TEST ON LINUX
    if (USE_G2LOG_UNIT_TEST)
+     MESSAGE(" g2log unit testing option ON")
     # SETUP for GTEST
       set(GTEST_DIR ../3rdParty/gtest/gtest-1.6.0__stripped)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)

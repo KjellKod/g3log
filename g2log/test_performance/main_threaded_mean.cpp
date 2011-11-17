@@ -17,9 +17,11 @@ const std::string title = "GOOGLE__GLOG";
 #error G2LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
 #endif
 
-
-
-const std::string g_path = "/tmp/";
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+	const std::string g_path = "./";
+#else
+	const std::string g_path = "/tmp/";
+#endif
 using namespace g2_test;
 
 int main(int argc, char** argv)
@@ -38,13 +40,13 @@ int main(int argc, char** argv)
   std::ostringstream thread_count_oss;
   thread_count_oss << number_of_threads;
   const std::string  g_prefix_log_name = title + "-performance-" + thread_count_oss.str() + "threads-MEAN_LOG";
-  const std::string  g_measurement_dump= "/tmp/" + g_prefix_log_name + "_RESULT.txt";
+  const std::string  g_measurement_dump= g_path + g_prefix_log_name + "_RESULT.txt";
 
   std::ostringstream oss;
   oss << "\n\n" << title << " performance " << number_of_threads << " threads MEAN times\n";
   oss << "Each thread running #: " << g_loop << " * " << g_iterations << " iterations of log entries" << std::endl;  // worst mean case is about 10us per log entry
   const size_t xtra_margin = 2;
-  oss << "*** It can take som time. Please wait: Approximate wait time is:  " <<number_of_threads*  (long long) (g_iterations * 10 * xtra_margin / 1000000 ) << " seconds" << std::endl;
+  oss << "*** It can take som time. Please wait: Approximate wait time on MY PC was:  " <<number_of_threads*  (long long) (g_iterations * 10 * xtra_margin / 1000000 ) << " seconds" << std::endl;
   writeTextToFile(g_measurement_dump, oss.str(), kAppend);
   oss.str(""); // clear the stream
 

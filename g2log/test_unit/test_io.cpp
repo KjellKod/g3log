@@ -289,6 +289,7 @@ TEST(LogTest, LOG_IF__FATAL__NO_THROW)
   }
   catch (std::exception const &e)
   {
+    std::cerr << e.what() << std::endl;
     logger.reset();
     ADD_FAILURE() << "Didn't throw exception as expected";
   }
@@ -387,6 +388,7 @@ TEST(CHECK, CHECK_ThatWontThrow)
   }
   catch (std::exception const &e)
   {
+    std::cerr << e.what() << std::endl;
     ADD_FAILURE() << "Should never have thrown";
   }
 
