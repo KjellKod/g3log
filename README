@@ -22,13 +22,21 @@ If you are interested in the performance or unit tests then you can
 enable the creation of them in the g2log/CMakeLists.txt file. See that file 
 for more details
 
---- Building ---
+--- Building on Linux ---
 cd g2log
 mkdir build
 cd build 
 cmake ..
 make
 
+--- Building on Windows ---
+Please use the "visual studio command prompt 2010"
+cd g2log
+mkdir build
+cd build
+cmake -G "Visual Studio 10"
+msbuild g2log-example.sln
+Debug\g2log-example.exe
 
 
       
@@ -45,9 +53,12 @@ About the Active Object
 --------------------
 Is made with standard C++ components with the help of the latest C++0x and std::thread features (thanks to justthread). For more details see www.kjellkod.cc/active-object-with-cpp0x. An example is provided. Other examples on pre C++0x Active Objects can also be found at www.kjellkod.cc (code page)
 
+If you like it (or not) it would be nice with some feedback. That way 
+I can improve g2log and it is also nice to see if someone is using it. 
+If you have ANY questions or problems please do not hesitate in contacting
+me on my blog or at <Hedstrom at KjellKod dot cc>
 
-Good luck. Any questions? Contact me on my blog
-or Hedstrom@kjellkod.cc
+Good luck :)
 
-Regards
-Kjell 
+Cheers
+Kjell (a.k.a. KjellKod)
