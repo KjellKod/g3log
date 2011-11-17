@@ -102,7 +102,7 @@ g2LogWorkerImpl::g2LogWorkerImpl(const std::string& log_prefix, const std::strin
   // if through a debugger the debugger CAN just throw in the whole path
   // replace the path delimiters (unix?)
   std::remove( real_prefix.begin(), real_prefix.end(), '/');
-  std::remove( real_prefix.begin(), real_prefix.end(), '.');
+  std::remove( real_prefix.begin(), real_prefix.end(), '\\');
   if(!isValidFilename(real_prefix))
   {
     // illegal prefix, refuse to start
@@ -165,6 +165,9 @@ void g2LogWorkerImpl::backgroundFileWrite(LogEntry message)
 void g2LogWorkerImpl::backgroundExitFatal(FatalMessage fatal_message)
 {
   backgroundFileWrite(fatal_message.message_);
+  backgroundFileWrite("Log flushed successfully to disk: exiting");
+  std::cout << "g2log exiting successfully after receiving fatal event" << std::endl;
+  std::cout << "Log file at: [" << log_file_with_path_ << "]\n" << std::endl << std::flush;
   out.close();
   exitWithDefaultSignalHandler(fatal_message.signal_id_);
   perror("g2log exited after receiving FATAL trigger. Flush message status: "); // should never reach this point

@@ -35,7 +35,7 @@ cd g2log
 mkdir build
 cd build
 cmake -G "Visual Studio 10" ..
-msbuild g2log-example.sln
+msbuild g2log_by_kjellkod.sln
 Debug\g2log-example.exe
 
 

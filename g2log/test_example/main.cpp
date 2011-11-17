@@ -26,6 +26,11 @@ int main(int argc, char** argv)
 
   g2LogWorker logger(argv[0], path_to_log_file);
   g2::initializeLogging(&logger);
+  std::cout << "*** This is an example of g2log " << std::endl;
+  std::cout << "*** It WILL exit by a FATAL trigger in the end" << std::endl;
+  std::cout << "*** Please see the generated log and compare to " << std::endl;
+  std::cout << "***    the code at g2log/test_example/main.cpp" << std::endl;
+  std::cout << "\n*** Log file: [" << logger.logFileName() << "]\n\n" << std::endl;
 
   LOGF(INFO, "Hi log %d", 123);
   LOG(INFO) << "Test SLOG INFO";
@@ -51,15 +56,16 @@ int main(int argc, char** argv)
   LOGF(DEBUG, "This API is popular with some %s", "programmers");
   LOGF_IF(DEBUG, (1<2), "If true, then this %s will be logged", "message");
   {
-    const std::string logging = "logging";
-    // OK --- this WILL get a compiler warning
-    LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
+    // OK --- on Ubunti this WILL get a compiler warning
+    // On windows it'll probably crash  std::cout << "\n\n***** Be ready on Windows this example will 'abort' " << std::endl;
+  std::cout << "\n\n***** Be ready this last example will 'abort' if on Windows" << std::endl;
+  std::cout << "************************************************************\n\n" << std::endl;
+  const std::string logging = "logging";
+  LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
   }
 
 
   std::cout << "\n\n***** Be ready this last example will 'abort' " << std::endl;
-  std::cout << "*****  please theck the logfile for all the LOGS and compare them to this example" << std::endl;
-  std::cout << "***** this file is g2log/src/main.cpp. The log file is: " << logger.logFileName() << std::endl;
   std::cout << "************************************************************\n\n" << std::endl;
   CHECK(1<2) << "SHOULD NOT SEE THIS MESSAGE";
   CHECK(1>2) << "Test to see if contract works: onetwothree: " << 123 << ". This should be at the end of the log, and will exit this example";

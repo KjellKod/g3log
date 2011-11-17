@@ -10,7 +10,7 @@
 #include <memory>
 #include "g2log.h"
 
-class g2LogWorkerImpl;
+struct g2LogWorkerImpl;
 
 /**
 * \param log_prefix is the 'name' of the binary, this give the log name 'LOG-'name'-...
