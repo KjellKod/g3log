@@ -34,7 +34,7 @@ Please use the "visual studio command prompt 2010"
 cd g2log
 mkdir build
 cd build
-cmake -G "Visual Studio 10"
+cmake -G "Visual Studio 10" ..
 msbuild g2log-example.sln
 Debug\g2log-example.exe
 
