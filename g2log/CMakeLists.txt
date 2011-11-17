@@ -3,6 +3,10 @@
 # 2011 @author Kjell Hedström, hedstrom@kjellkod.cc */
 #
 
+# Below are details for compiling on Windows and Linux
+# by default only an example g2log binary is created
+# the performance and unit tests creation can be enabled by switching their
+# OPTIONs from OFF to ON --- See below at around line 110
 
 # WINDOWS == README: Example how to setup environment + running an example
 # 1. please use the "Visual Studio Command Prompt 2010)"
@@ -40,6 +44,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (g2log_by_kjellkod)
 set(LOG_SRC ${g2log_by_kjellkod_SOURCE_DIR}/src)
+set(DIR_UNIT_TEST ${g2log_by_kjellkod_SOURCE_DIR}/test_unit)
+set(DIR_EXAMPLE ${g2log_by_kjellkod_SOURCE_DIR}/test_example)
+set(DIR_PERFORMANCE ${g2log_by_kjellkod_SOURCE_DIR}/test_performance)
+
 MESSAGE("  LOG_SRC = : ${LOG_SRC}")
 include_directories(${LOG_SRC})
 SET(ACTIVE_CPP0xx_DIR "Release")
@@ -53,18 +61,13 @@ IF(UNIX)
    MESSAGE("then run './g2log-example' or whatever performance test you feel like trying")
    MESSAGE("")
    set(PLATFORM_LINK_LIBRIES justthread rt)
+
    # -rdynamic is needed for correct stack dumps with demangling
    set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
-   set(G2_LOG_FILES ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
+   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
    include_directories("/usr/include/justthread")
-
-    # SETUP for GTEST
-   set(GTEST_DIR ../3rdParty/gtest/gtest-1.6.0__stripped)
-   set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
-   include_directories(${GTEST_INCLUDE_DIRECTORIES})
-   add_library(gtest_160_lib ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc)
-   enable_testing(true)
 ENDIF(UNIX)
+
 
 #Visual Studio 2010
 IF(WIN32)   	
@@ -74,13 +77,20 @@ IF(WIN32)
    MESSAGE("then run 'Debug\\g2log-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
    set(PLATFORM_LINK_LIBRIES $ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/lib/justthread_vc10_mdd.lib)
-   set(G2_LOG_FILES ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_win.cpp)
+   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
    include_directories("$ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/include")
 ENDIF(WIN32)
 
 
 
-# GENERIC STEPS
+   # GENERIC STEPS
+   # CODE SOURCES these + 
+   set(SRC_CPP ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.cpp)
+   set(SRC_H ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2log.h ${LOG_SRC}/crashhandler.h)
+   set(SRC_FILES ${SRC_CPP} ${SRC_H} ${SRC_PLATFORM_SPECIFIC})
+
+	
+
      # add a ActiveObject library
    add_library(lib_activeobject ${LOG_SRC}/active.cpp ${LOG_SRC}/active.h ${LOG_SRC}/shared_queue.h)
    set_target_properties(lib_activeobject PROPERTIES LINKER_LANGUAGE CXX)
@@ -89,58 +99,105 @@ ENDIF(WIN32)
    include_directories(src)
    include_directories(${LOG_SRC})
    MESSAGE("  LOG_SRC = : ${LOG_SRC}")
-   MESSAGE("  g2logger files: [${G2_LOG_FILES}]")
-   add_library(lib_g2logger  ${G2_LOG_FILES})
+   MESSAGE("  g2logger files: [${SRC_FILES}]")
+   add_library(lib_g2logger  ${SRC_FILES})
    set_target_properties(lib_g2logger PROPERTIES LINKER_LANGUAGE CXX)
    target_link_libraries(lib_g2logger lib_activeobject)
 
 
-   # create the the example EXECUTABLE
-   add_executable(g2log-example src/main.cpp)
-   target_link_libraries(g2log-example lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
 
+   # =========================================================
+   # OPTIONS: Turn OFF the ones that is of no interest to you
+   # ---- by default all is OFF: except 'g2log-example -----
+   # ---- the reason for this is that the other examples ---
+   # ---- were only thoroughly tested on Ubuntu, not windows-
+   # =========================================================
+   # 1. a simple test example 'g2log-example'
+   option (USE_SIMPLE_EXAMPLE 
+          "Create a simple binary that runs a few LOG calls" ON)
+
+   # 2. performance test (average + worst case) for KjellKod's g2log
+   option (USE_G2LOG_PERFORMANCE
+         "Create performance tests for g2log" OFF)
+
+   # 3. performance test for Google's glog
+   option (USE_GOOGLE_GLOG_PERFORMANCE
+         "Create performance tests for Google's glog (remember to install glog, snapshot available at g2log/3rdParty/glog)" OFF)
+
+   # 4. unit test for g2log
+   option (USE_G2LOG_UNIT_TEST
+          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" OFF)
+
+
+
+
+   # ========================================================
+   #
+   # BELOW : Creating executables depending on OPTIONS above
+   #
+   #  =======================================================
+   
+
+   # 1. create the the example EXECUTABLE - hook in the test_example's CMakeLists.txt file
+   if (USE_SIMPLE_EXAMPLE)
+      include_directories (${DIR_EXAMPLE})
+      add_executable(g2log-example ${DIR_EXAMPLE}/main.cpp)
+      target_link_libraries(g2log-example lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+   endif (USE_SIMPLE_EXAMPLE) 
+   # =========================
+
+
+   # 2. create the g2log's performance tests
+   if (USE_G2LOG_PERFORMANCE)
+      include_directories (${DIR_PERFORMANCE}) 
+      # MEAN PERFORMANCE TEST
+      add_executable(g2log-performance-threaded_mean 
+                    ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
+      # Turn on G2LOG performance flag
+      set_target_properties(g2log-performance-threaded_mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
+      target_link_libraries(g2log-performance-threaded_mean lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+
+     # WORST CASE PERFORMANCE TEST
+     add_executable(g2log-performance-threaded_worst ${DIR_PERFORMANCE}//main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
+     # Turn on G2LOG performance flag
+     set_target_properties(g2log-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
+     target_link_libraries(g2log-performance-threaded_worst lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+   endif (USE_G2LOG_PERFORMANCE)
+     # =========================
+
+
+
+   # 3. create the Google glog's performance test
+   if (USE_GOOGLE_GLOG_PERFORMANCE) 
+      include_directories (${DIR_PERFORMANCE}) 
+      # create the the GOOGLE MEAN_PERFORMANCE executable
+     add_executable(google_glog-performance-threaded_mean ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
+     set_target_properties(google_glog-performance-threaded_mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
+     target_link_libraries(google_glog-performance-threaded_mean lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
+
+   # create the the GOOGLE MEAN_PERFORMANCE executable
+     add_executable(google_glog-performance-threaded_worst ${DIR_PERFORMANCE}//main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
+     set_target_properties(google_glog-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
+     target_link_libraries(google_glog-performance-threaded_worst lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
+   endif (USE_GOOGLE_GLOG_PERFORMANCE)
+   # ===========================
+
+
+   # 4. create the unit tests for g2log --- ONLY TESTED THE UNIT TEST ON LINUX
+   if (USE_G2LOG_UNIT_TEST)
+    # SETUP for GTEST
+      set(GTEST_DIR ../3rdParty/gtest/gtest-1.6.0__stripped)
+      set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
+      include_directories(${GTEST_INCLUDE_DIRECTORIES})
+      add_library(gtest_160_lib ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc)
+      enable_testing(true)
+
+      add_executable(g2log-unit_test ../test_main/test_main.cpp ${DIR_UNIT_TEST}/test_io.cpp)
+      target_link_libraries(g2log-unit_test lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+   endif (USE_G2LOG_UNIT_TEST)
 
 
 
 	
-   #  Below are g2log unit testTEST
-   #    and PERFORMANCE comparisons between g2log and google's glog
-   #
-   #
-   # ---- Below g2log Performance -----
-   # create the the g2log TWO_THREADS_MEAN_PERFORMANCE executable
-   add_executable(g2log-performance-threaded_mean test/main_threaded_mean.cpp test/performance.h)
-   set_target_properties(g2log-performance-threaded_mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-   target_link_libraries(g2log-performance-threaded_mean lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
 
-   # create the the g2log TWO_THREADS_WORST_CASE_PERFORMANCE executable
-   add_executable(g2log-performance-threaded_worst test/main_threaded_worst.cpp test/performance.h)
-   set_target_properties(g2log-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-   target_link_libraries(g2log-performance-threaded_worst lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
-
-
-
-
-IF(UNIX)
-   #
-   # ---- Below GOOGLE glog Performance -----
-   # create the the GOOGLE MEAN_PERFORMANCE executable
-   add_executable(google_glog-performance-threaded_mean test/main_threaded_mean.cpp test/performance.h)
-   set_target_properties(google_glog-performance-threaded_mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-   target_link_libraries(google_glog-performance-threaded_mean lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
-
-   # create the the GOOGLE MEAN_PERFORMANCE executable
-   add_executable(google_glog-performance-threaded_worst test/main_threaded_worst.cpp test/performance.h)
-   set_target_properties(google_glog-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-   target_link_libraries(google_glog-performance-threaded_worst lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
-
-
-   # create the the TEST executable
-   add_executable(g2log-unit_test ../test_main/test_main.cpp test/test_io.cpp)
-   add_library(lib_test_logger  ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.h ${LOG_SRC}/g2log.cpp ${LOG_SRC}/crashhandler.h ${LOG_SRC}/crashhandler_unix.cpp)
-   set_target_properties(lib_test_logger PROPERTIES LINKER_LANGUAGE CXX)
-   target_link_libraries(lib_test_logger lib_activeobject)
-   # For unit-test only, dont 'crash' by signals, instead just throw a std::runtime_error
-   target_link_libraries(g2log-unit_test lib_activeobject lib_test_logger gtest_160_lib justthread rt)
-ENDIF(UNIX)
 
