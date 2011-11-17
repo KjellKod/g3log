@@ -3,19 +3,26 @@ HOW TO BUILD
 This g2log is a snapshot from KjellKod repository. 
 It contains what is needed to build example, unit test and performance test of g2log. 
 
-If you want to integrate g2log in your own software you need the following files
+If you want to integrate g2log in your own software you need 
+the following files
 g2log/src/
      g2log.cpp/h
-     logworker.cpp/h
-     privatelogworker.cpp/h
-
-active_object_c++0x/src
-      shared_queue.h
-      active.h/cpp
+     g2logworker.cpp/h
+     crashhandler.h (crashhandler_win.cpp or crashhandler_unix.cpp)
+     shared_queue.h
+     active.h/cpp
 
 
-BUILDING IT
+BUILDING g2log: 
 -----------
+The default is to build an example binary 'g2log-example'
+I suggest you start with that, run it and view the created log also.
+
+If you are interested in the performance or unit tests then you can 
+enable the creation of them in the g2log/CMakeLists.txt file. See that file 
+for more details
+
+--- Building ---
 cd g2log
 mkdir build
 cd build 
@@ -33,14 +40,10 @@ Both are needed to compile the unit test and the logger comparison tests
 gtest is included by the CMake and you don't need to do anything with it.
 glog is not included and must be installed if you want to run the comparison tests
 
-If you do NOT want to compile and run some tests, like the performance test, then you can always
-just comment them away from the CMake configuration.
 
-
-active-object_c++0x
+About the Active Object
 --------------------
-Is made with standard C++ components with the help of the latest C++0x and std::thread features (thanks to justthread). For more details
-See www.kjellkod.cc/active-object-with-cpp0x. An example is provided
+Is made with standard C++ components with the help of the latest C++0x and std::thread features (thanks to justthread). For more details see www.kjellkod.cc/active-object-with-cpp0x. An example is provided. Other examples on pre C++0x Active Objects can also be found at www.kjellkod.cc (code page)
 
 
 Good luck. Any questions? Contact me on my blog
