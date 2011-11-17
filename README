@@ -56,7 +56,8 @@ Is made with standard C++ components with the help of the latest C++0x and std::
 If you like it (or not) it would be nice with some feedback. That way 
 I can improve g2log and it is also nice to see if someone is using it. 
 If you have ANY questions or problems please do not hesitate in contacting
-me on my blog or at <Hedstrom at KjellKod dot cc>
+me on my blog http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asynchronous-loggers-taking-over/
+or at <Hedstrom at KjellKod dot cc>
 
 Good luck :)
 
