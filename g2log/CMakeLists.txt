@@ -66,7 +66,7 @@ IF(UNIX)
    set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
    include_directories("/usr/include/justthread")
-ENDIF(UNIX)
+   ENDIF(UNIX)
 
 
 #Visual Studio 2010
@@ -173,21 +173,38 @@ ENDIF(WIN32)
    if (USE_GOOGLE_GLOG_PERFORMANCE) 
       MESSAGE(" Google's glog performance tests option ON")
       include_directories (${DIR_PERFORMANCE}) 
-      # create the the GOOGLE MEAN_PERFORMANCE executable
-     add_executable(google_glog-performance-threaded_mean ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
-     set_target_properties(google_glog-performance-threaded_mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-     target_link_libraries(google_glog-performance-threaded_mean lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
+	#Linux is easy!
+    if(UNIX)
+       set(GLOG_LIB glog)
+	   # create the the GOOGLE MEAN_PERFORMANCE executable
+       add_executable(google_glog-performance-threaded_mean ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
+       set_target_properties(google_glog-performance-threaded_mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
+       target_link_libraries(google_glog-performance-threaded_mean lib_activeobject ${GLOG_LIB} ${PLATFORM_LINK_LIBRIES})
+	 
+       # create the the GOOGLE MEAN_PERFORMANCE executable
+       add_executable(google_glog-performance-threaded_worst ${DIR_PERFORMANCE}/main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
+       set_target_properties(google_glog-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
+  	   target_link_libraries(google_glog-performance-threaded_worst lib_activeobject  ${GLOG_LIB} ${PLATFORM_LINK_LIBRIES})
+	 endif(UNIX)
+	
+	 # GLOG on Linux is easy - but for Windows trickier,. and it doesn't work (as of yet)
+     if(WIN32)
+       MESSAGE("******************************************************")
+	   MESSAGE("*** SORRY- Google glog on windows is not preconfigured")
+	   MESSAGE("*** You have to do this yourself: ref CMakeLists.txt")
+       MESSAGE("******************************************************")
+	   MESSAGE("")
+	    #set(GLOG_DIR ../3rdParty/glog/glog-0.3.1)   
+        #include_directories(${GLOG_DIR}/src/windows)
+     endif(WIN32)	  
 
-   # create the the GOOGLE MEAN_PERFORMANCE executable
-     add_executable(google_glog-performance-threaded_worst ${DIR_PERFORMANCE}//main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
-     set_target_properties(google_glog-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-     target_link_libraries(google_glog-performance-threaded_worst lib_activeobject glog ${PLATFORM_LINK_LIBRIES})
+
    endif (USE_GOOGLE_GLOG_PERFORMANCE)
    # ===========================
 
 
    # 4. create the unit tests for g2log --- ONLY TESTED THE UNIT TEST ON LINUX
-   if (USE_G2LOG_UNIT_TEST)
+   if (USE_G2LOG_UNIT_TEST)  
      MESSAGE(" g2log unit testing option ON")
     # SETUP for GTEST
       set(GTEST_DIR ../3rdParty/gtest/gtest-1.6.0__stripped)
