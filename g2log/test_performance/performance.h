@@ -1,8 +1,8 @@
-/* *************************************************
- * Filename: performance_io.cpp
- * Created: 2011 by Kjell Hedström
- *
- * PUBLIC DOMAIN and Not copy-writed
+/** ==========================================================================
+* 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
  * ********************************************* */
 
 #ifndef PERFORMANCE_G2_TEST_H_

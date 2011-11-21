@@ -1,9 +1,8 @@
-/* *************************************************
- * Filename:test_main.cpp  Framework for Logging and Design By Contract
- * Created: 2011 by Kjell Hedström
- *
- * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
- * ********************************************* */
+/** ==========================================================================
+* 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
 
 #include <gtest/gtest.h>
 #include <iostream>

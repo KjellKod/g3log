@@ -45,7 +45,8 @@ CONTENTS
 3rdParty -- gtest, glog. 
 -----------------------
 Both are needed to compile the unit test and the logger comparison tests
-gtest is included by the CMake and you don't need to do anything with it.
+Gtest must be unpacked before used, but it IS included by the CMake and you don't need to do install or compile it in any other way than through the g2log cmake setup.
+
 glog is not included and must be installed if you want to run the comparison tests
 
 

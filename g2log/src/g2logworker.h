@@ -1,12 +1,17 @@
 #ifndef G2_LOG_WORKER_H_
 #define G2_LOG_WORKER_H_
-
-/* *************************************************
+/** ==========================================================================
+ * 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+ * with no warranties. This code is yours to share, use and modify with no
+ * strings attached and no restrictions or obligations.
+ * ============================================================================
  * Filename:g2logworker.h  Framework for Logging and Design By Contract
  * Created: 2011 by Kjell Hedström
  *
  * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
  * ********************************************* */
+
+
 #include <memory>
 #include "g2log.h"
 

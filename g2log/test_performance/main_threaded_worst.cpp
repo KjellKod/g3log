@@ -1,9 +1,8 @@
-/* *************************************************
-// * Filename: g2log-main_mean.cpp
-// * Created: 2011 by Kjell Hedström
-// *
-// * PUBLIC DOMAIN and Not copy-writed
-// * ********************************************* */
+/** ==========================================================================
+* 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
 
 // through CMakeLists.txt   #define of GOOGLE_GLOG_PERFORMANCE and G2LOG_PERFORMANCE
 #include "performance.h"

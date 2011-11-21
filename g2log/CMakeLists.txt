@@ -1,7 +1,13 @@
 # CMakeLists.txt cmake configuration for g2log test
 # g2log is a KjellKod Logger
 # 2011 @author Kjell Hedström, hedstrom@kjellkod.cc */
-#
+# / #==================================================================
+# 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
+#    risk and comes  with no warranties. 
+# 
+# This code is yours to share, use and modify with no strings attached
+#   and no restrictions or obligations.
+* =====================================================================*/
 
 # Below are details for compiling on Windows and Linux
 # by default only an example g2log binary is created
