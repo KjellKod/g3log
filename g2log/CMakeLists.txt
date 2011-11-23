@@ -1,13 +1,13 @@
 # CMakeLists.txt cmake configuration for g2log test
 # g2log is a KjellKod Logger
 # 2011 @author Kjell Hedström, hedstrom@kjellkod.cc 
-# / #==================================================================
+# ==================================================================
 # 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
 #    risk and comes  with no warranties. 
 # 
 # This code is yours to share, use and modify with no strings attached
 #   and no restrictions or obligations.
-# =====================================================================
+# ===================================================================
 
 # Below are details for compiling on Windows and Linux
 # by default only an example g2log binary is created
@@ -112,12 +112,16 @@ ENDIF(WIN32)
 
 
 
-   # =========================================================
+   # ============================================================================
    # OPTIONS: Turn OFF the ones that is of no interest to you
    # ---- by default all is OFF: except 'g2log-example -----
-   # ---- the reason for this is that the other examples ---
-   # ---- were only thoroughly tested on Ubuntu, not windows-
-   # =========================================================
+   # ---- the reason for this is that 
+   # ----- 1) the performance tests were only thoroughly tested on Ubuntu, not windows-
+   #           (g2log windows/linux, but Google's glog only on linux)
+   #
+   #       2) The unit test were tested windows/linux,. but must be unzipped
+   #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
+   # ============================================================================
    # 1. a simple test example 'g2log-example'
    option (USE_SIMPLE_EXAMPLE 
           "Create a simple binary that runs a few LOG calls" ON)
