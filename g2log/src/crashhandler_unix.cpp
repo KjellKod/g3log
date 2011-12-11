@@ -31,26 +31,13 @@ void crashHandler(int signal_number, siginfo_t *info, void *unused_context)
   const size_t max_dump_size = 50;
   void* dump[max_dump_size];
   size_t size = backtrace(dump, max_dump_size);
-  // overwrite sigaction with caller's address
-  char** messages = backtrace_symbols(dump, size);
+  char** messages = backtrace_symbols(dump, size); // overwrite sigaction with caller's address
 
   std::ostringstream oss;
   oss << "Received fatal signal: " << g2::internal::signalName(signal_number);
   oss << "(" << signal_number << ")" << std::endl;
   oss << "\tPID: " << getpid() << std::endl;
 
-  // Below is gcc specific demangling done. Just dumping the stack could be done with
-  //for(size_t idx = 1; idx < size && messages != nullptr; ++idx) // skip first frame, since that is here
-  //{
-  //  oss << "\tstack dump [" << idx << "]  " << messages[idx] << std::endl;
-  //}
-  // HOWEVER - thiw would give mangled symbols in the dump:
-  //./g2log-example(_ZN5__jss5__X469__invokerIvMN8kjellkod6ActiveEFvvEIPS3_EEclEv+0x24) [0x80630e0]
-  //
-  // Using the GCC abi demangle the mangled symbols will be 'demangled':
-  // ./g2log-example : g2::internal::LogMessage::messageSave(char const*, ...)+0x3a [0x805f3dc]
-  //
-  //
   // dump stack: skip first frame, since that is here
   for(size_t idx = 1; idx < size && messages != nullptr; ++idx)
   {
@@ -97,9 +84,9 @@ void crashHandler(int signal_number, siginfo_t *info, void *unused_context)
       }
       free(real_name); // mallocated by abi::__cxa_demangle(...)
     }
-    // no demangling done -- just dump the whole line
     else
     {
+	  // no demangling done -- just dump the whole line
       oss << "\tstack dump [" << idx << "]  " << messages[idx] << std::endl;
     }
   } // END: for(size_t idx = 1; idx < size && messages != nullptr; ++idx)

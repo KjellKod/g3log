@@ -137,7 +137,7 @@ int main(int argc, char** argv)
   delete [] threads_result; // finally get rid of them
 
   std::sort (all_measurements.begin(), all_measurements.end());
-  std::map<size_t, size_t> value_amounts;
+  std::map<long long, long long> value_amounts;
   // for(long long& idx : all_measurements) --- didn't work?!
   for(auto iter = all_measurements.begin(); iter != all_measurements.end(); ++iter)
   {

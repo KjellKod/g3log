@@ -3,8 +3,6 @@
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
 * ============================================================================*/
- * ********************************************* */
-
 #ifndef PERFORMANCE_G2_TEST_H_
 #define PERFORMANCE_G2_TEST_H_
 
