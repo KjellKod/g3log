@@ -29,6 +29,7 @@
 #include "g2logworker.h"
 #include "crashhandler.h"
 #include <signal.h>
+#include <thread>
 
 namespace g2
 {

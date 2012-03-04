@@ -91,9 +91,6 @@ ENDIF(MSVC10)
 
 # Visual Studio 2011 -- BETA: std::thread etc are included with the Visual Studio package =)
 #                             so just::thread dependency is no longer needed (see next line: "important")
-#   
-# IMPORTANT: At the moment all compiles except g2log.cpp, L:203 std::this_thread::sleep_for
-#            If you're using VS2011,. just replace that for a normal sleep
 IF(MSVC11)   	
    MESSAGE("")
    MESSAGE("Windows: Please run the command [cmake -G \"Visual Studio 11\" ..]")
