@@ -90,7 +90,6 @@ IF(MSVC10)
 ENDIF(MSVC10)
 
 # Visual Studio 2011 -- BETA: std::thread etc are included with the Visual Studio package =)
-#                             so just::thread dependency is no longer needed (see next line: "important")
 IF(MSVC11)   	
    MESSAGE("")
    MESSAGE("Windows: Please run the command [cmake -G \"Visual Studio 11\" ..]")
