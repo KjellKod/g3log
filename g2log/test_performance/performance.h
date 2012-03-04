@@ -28,8 +28,10 @@
 #endif
 
 
-//typedef std::chrono::duration<long, std::ratio<1, 1000> > millisecond;
-typedef std::chrono::duration<long long, std::ratio<1, 1000000> > microsecond;
+// typedef std::chrono::steady_clock::time_point time_point;
+// typedef std::chrono::duration<long,std::ratio<1, 1000> > millisecond;
+// typedef std::chrono::duration<long long,std::ratio<1, 1000000> > microsecond;
+// typedef std::chrono::duration<long long, std::ratio<1, 1000000> > microsecond;
 namespace g2_test
 {
 enum WriteMode

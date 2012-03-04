@@ -26,6 +26,7 @@
 #include "crashhandler.h"
 
 using namespace g2::internal;
+
 namespace
 {
 struct LogTime
@@ -34,7 +35,7 @@ struct LogTime
   {
     time_t current_time = time(nullptr);
     ctime(&current_time); // fill with time right now
-    struct tm* ptm = localtime(&current_time); // fill time struct with data
+    struct tm* ptm = ::localtime(&current_time); // fill time struct with data
     year = ptm->tm_year + 1900;
     month = (ptm->tm_mon) +1;
     day = ptm->tm_mday;

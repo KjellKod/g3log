@@ -46,5 +46,30 @@ private:
 };
 
 
+/* Possible improvement --- for making localtime thread safe
+   Is there really no C++11 localtime replacement?! 
+
+// localtime_r (POSIX) or localtime_s (WIN) thanks to http://stackoverflow.com/questions/7313919/c11-alternative-to-localtime-r
+namespace query {
+    char localtime_r( ... );
+
+    struct has_localtime_r
+        { enum { value = sizeof localtime_r( std::declval< std::time_t * >(), std::declval< std::tm * >() )
+                        == sizeof( std::tm * ) }; };
+
+
+    template< bool available > struct safest_localtime {
+        static std::tm *call( std::time_t const *t, std::tm *r )
+            { return localtime_r( t, r ); }
+    };
+
+    template<> struct safest_localtime< false > {
+        static std::tm *call( std::time_t const *t, std::tm *r )
+            { return std::localtime( t ); }
+    };
+}
+std::tm *localtime( std::time_t const *t, std::tm *r )
+    { return query::safest_localtime< query::has_localtime_r::value >().call( t, r ); }
+    */
 
 #endif // LOG_WORKER_H_

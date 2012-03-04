@@ -20,6 +20,8 @@
 #    mkdir build
 #    cd build;
 # 3. cmake -G "Visual Studio 10" ..
+# ALTERNATIVE: cmake -G "Visual Studio 11" ..
+#              the "Visual Studio 11" .. does not require just::thread!
 # 4. msbuild g2log_by_kjellkod.sln
 # 5. Debug\g2log-example.exe
 #
@@ -76,7 +78,7 @@ IF(UNIX)
 
 
 #Visual Studio 2010
-IF(WIN32)   	
+IF(MSVC10)   	
    MESSAGE("")
    MESSAGE("Windows: Please run the command [cmake -G \"Visual Studio 10\" ..]")
    MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln'")
@@ -85,8 +87,21 @@ IF(WIN32)
    set(PLATFORM_LINK_LIBRIES $ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/lib/justthread_vc10_mdd.lib)
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
    include_directories("$ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/include")
-ENDIF(WIN32)
+ENDIF(MSVC10)
 
+# Visual Studio 2011 -- BETA: std::thread etc are included with the Visual Studio package =)
+#                             so just::thread dependency is no longer needed (see next line: "important")
+#   
+# IMPORTANT: At the moment all compiles except g2log.cpp, L:203 std::this_thread::sleep_for
+#            If you're using VS2011,. just replace that for a normal sleep
+IF(MSVC11)   	
+   MESSAGE("")
+   MESSAGE("Windows: Please run the command [cmake -G \"Visual Studio 11\" ..]")
+   MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln'")
+   MESSAGE("then run 'Debug\\g2log-example.exe'  or whatever performance test you feel like trying")
+   MESSAGE("")
+   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
+ENDIF(MSVC11)
 
 
    # GENERIC STEPS
