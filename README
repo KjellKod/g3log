@@ -3,6 +3,13 @@ HOW TO BUILD
 This g2log is a snapshot from KjellKod repository. 
 It contains what is needed to build example, unit test and performance test of g2log. 
 
+justthread C++11 thread library is no longer needed. 
+On Windows it is enough to use Visual Studio 11  (2012)
+On Linux it is enough to use gcc4.7. 
+The CMakeFile.txt is updated to reflect that, the justthread parts is 
+commented away in case someone still needs that.
+
+
 If you want to integrate g2log in your own software you need 
 the following files
 g2log/src/
@@ -15,12 +22,11 @@ g2log/src/
 
 BUILDING g2log: 
 -----------
-The default is to build an example binary 'g2log-example'
+The default is to build an example binary 'g2log-FATAL'
 I suggest you start with that, run it and view the created log also.
 
 If you are interested in the performance or unit tests then you can 
-enable the creation of them in the g2log/CMakeLists.txt file. See that file 
-for more details
+enable the creation of them in the g2log/CMakeLists.txt file. See that file for more details
 
 --- Building on Linux ---
 cd g2log
@@ -30,13 +36,13 @@ cmake ..
 make
 
 --- Building on Windows ---
-Please use the "visual studio command prompt 2010"
+Please use the Visual Studio 11 (2012) command prompt "Developer command prompt"
 cd g2log
 mkdir build
 cd build
-cmake -G "Visual Studio 10" ..
-msbuild g2log_by_kjellkod.sln
-Debug\g2log-example.exe
+cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 11" ..
+msbuild g2log_by_kjellkod.sln /p:Configuration=Release
+Release\g2log-FATAL.exe
 
 
       

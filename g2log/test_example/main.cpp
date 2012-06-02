@@ -7,6 +7,7 @@
 #include "g2logworker.h"
 #include "g2log.h"
 #include <iomanip>
+#include <thread>
 
 namespace
 {
@@ -57,14 +58,15 @@ int main(int argc, char** argv)
   {
     // OK --- on Ubunti this WILL get a compiler warning
     // On windows it'll probably crash  std::cout << "\n\n***** Be ready on Windows this example will 'abort' " << std::endl;
-  std::cout << "\n\n***** Be ready this last example will 'abort' if on Windows" << std::endl;
-  std::cout << "************************************************************\n\n" << std::endl;
+  std::cout << "\n\n***** Be ready this last example may 'abort' if on Windows/Linux_gcc4.7 " << std::endl << std::flush;
+  std::cout << "************************************************************\n\n" << std::endl << std::flush;
+  std::this_thread::sleep_for(std::chrono::seconds(1));
   const std::string logging = "logging";
   LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
   }
 
 
-  std::cout << "\n\n***** Be ready this last example will 'abort' " << std::endl;
+  std::cout << "\n\n***** Be ready this last example will trigger 'abort' " << std::endl;
   std::cout << "************************************************************\n\n" << std::endl;
   CHECK(1<2) << "SHOULD NOT SEE THIS MESSAGE";
   CHECK(1>2) << "Test to see if contract works: onetwothree: " << 123 << ". This should be at the end of the log, and will exit this example";

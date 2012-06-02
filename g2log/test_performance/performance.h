@@ -21,17 +21,18 @@
 #if defined(G2LOG_PERFORMANCE)
 #include "g2log.h"
 #include "g2logworker.h"
+using namespace g2::internal;
+
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
 #include <glog/logging.h>
 #else
 #error G2LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
 #endif
 
+typedef std::chrono::steady_clock::time_point time_point;
+typedef std::chrono::duration<long,std::ratio<1, 1000> > millisecond;
+typedef std::chrono::duration<long long,std::ratio<1, 1000000> > microsecond;
 
-// typedef std::chrono::steady_clock::time_point time_point;
-// typedef std::chrono::duration<long,std::ratio<1, 1000> > millisecond;
-// typedef std::chrono::duration<long long,std::ratio<1, 1000000> > microsecond;
-// typedef std::chrono::duration<long long, std::ratio<1, 1000000> > microsecond;
 namespace g2_test
 {
 enum WriteMode
@@ -83,6 +84,8 @@ long long mean(const std::vector<long long> &v)
 void measurePeakDuringLogWrites(const std::string& title, std::vector<long long>& result);
 inline void measurePeakDuringLogWrites(const std::string& title, std::vector<long long>& result)
 {
+
+
 #if defined(G2LOG_PERFORMANCE)
   std::cout << "G2LOG (" << title << ") WORST_PEAK PERFORMANCE TEST" << std::endl;
 #elif defined(GOOGLE_GLOG_PERFORMANCE)

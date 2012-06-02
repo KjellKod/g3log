@@ -14,42 +14,33 @@
 # the performance and unit tests creation can be enabled by switching their
 # OPTIONs from OFF to ON --- See below at around line 110
 
+# 2012-05-29: justthread is no longer necessary on Windows (vs2011) and
+#             linux (gcc4.7.1)
+
+
 # WINDOWS == README: Example how to setup environment + running an example
 # 1. please use the "Visual Studio Command Prompt 2010)"
 # 2. from the g2log folder
 #    mkdir build
 #    cd build;
-# 3. cmake -G "Visual Studio 10" ..
-# ALTERNATIVE: cmake -G "Visual Studio 11" ..
+# 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 11" ..
 #              the "Visual Studio 11" .. does not require just::thread!
-# 4. msbuild g2log_by_kjellkod.sln
-# 5. Debug\g2log-example.exe
+# 4. msbuild g2log_by_kjellkod.sln /p:Configuration=Release
+# 5. Release\g2log-FATAL-example.exe
 #
-
-# LINUX == README: Example how to setup environment + running tests for ===============
-# 1. Install gtest
-#    cmake
-#    make
-#    make install (possibly as root)
 #
-# 2. update path to libraries
-#    sudo /sbin/ldconfig -v   | grep gtest
-#
-#    the grep is only to verify that it works. It should give something like
-#   ... other stuff ...
-#      	libgtest.so.0 -> libgtest.so.0.0.0
-#	libgtest_main.so.0 -> libgtest_main.so.0.0.0
-#
-# 3. LINUX:To try this out from folder g2log:
+# . LINUX:To try this out from folder g2log:
 #    mkdir build
 #    cd build
 #    cmake ..    # create makefiles in g2log/build directory
 #    make    # link active_object, g2log and example code to get an "example" executable
-#     ./g2log-example
-#   
+#     ./g2log-FATAL-example
 # ============================================================================
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.8)
+ENABLE_LANGUAGE(CXX)
+set(CMAKE_BUILD_TYPE Release)
+
 project (g2log_by_kjellkod)
 set(LOG_SRC ${g2log_by_kjellkod_SOURCE_DIR}/src)
 set(DIR_UNIT_TEST ${g2log_by_kjellkod_SOURCE_DIR}/test_unit)
@@ -66,35 +57,42 @@ IF(UNIX)
    MESSAGE("")
    MESSAGE("cmake for *NIX ")
    MESSAGE("if cmake finishes OK, do make")
-   MESSAGE("then run './g2log-example' or whatever performance test you feel like trying")
+   MESSAGE("then run './g2log-FATAL-example' or whatever performance test you feel like trying")
    MESSAGE("")
-   set(PLATFORM_LINK_LIBRIES justthread rt)
+   set(PLATFORM_LINK_LIBRIES rt)
+   # justthread not needed from gcc4.7.1
+   #           set(PLATFORM_LINK_LIBRIES justthread rt)
 
    # -rdynamic is needed for correct stack dumps with demangling
-   set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
+   # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
+   set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
-   include_directories("/usr/include/justthread")
+
+   # -- justthread not needed for gcc4.7.1
+   #     set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
+   # -- justhtread not needed for gcc4.7.1
+   #               include_directories("/usr/include/justthread")
    ENDIF(UNIX)
 
 
-#Visual Studio 2010
+#Visual Studio 2010 -- must use justthread
 IF(MSVC10)   	
    MESSAGE("")
-   MESSAGE("Windows: Please run the command [cmake -G \"Visual Studio 10\" ..]")
-   MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln'")
-   MESSAGE("then run 'Debug\\g2log-example.exe'  or whatever performance test you feel like trying")
+   MESSAGE("Windows: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 10\" ..]")
+   MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln /p:Configuration=Release'")
+   MESSAGE("then run 'Release\\g2log-FATAL-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
    set(PLATFORM_LINK_LIBRIES $ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/lib/justthread_vc10_mdd.lib)
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
    include_directories("$ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/include")
 ENDIF(MSVC10)
 
-# Visual Studio 2011 -- BETA: std::thread etc are included with the Visual Studio package =)
+# Visual Studio 2011 -- std::thread etc are included with the Visual Studio package, so justthread dependencies are removed
 IF(MSVC11)   	
    MESSAGE("")
-   MESSAGE("Windows: Please run the command [cmake -G \"Visual Studio 11\" ..]")
-   MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln'")
-   MESSAGE("then run 'Debug\\g2log-example.exe'  or whatever performance test you feel like trying")
+   MESSAGE("Windows: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 11\" ..]")
+   MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln /p:Configuration=Release'")
+   MESSAGE("then run 'Release\\g2log-FATAL-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
 ENDIF(MSVC11)
@@ -125,7 +123,7 @@ ENDIF(MSVC11)
 
    # ============================================================================
    # OPTIONS: Turn OFF the ones that is of no interest to you
-   # ---- by default all is OFF: except 'g2log-example -----
+   # ---- by default all is OFF: except 'g2log-FATAL-example -----
    # ---- the reason for this is that 
    # ----- 1) the performance tests were only thoroughly tested on Ubuntu, not windows-
    #           (g2log windows/linux, but Google's glog only on linux)
@@ -133,9 +131,10 @@ ENDIF(MSVC11)
    #       2) The unit test were tested windows/linux,. but must be unzipped
    #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
    # ============================================================================
-   # 1. a simple test example 'g2log-example'
+   # 1. a simple test example 'g2log-FATAL-example'
    option (USE_SIMPLE_EXAMPLE 
-          "Create a simple binary that runs a few LOG calls" ON)
+          "Create  simple binaries that runs a few LOG calls" ON)
+
 
    # 2. performance test (average + worst case) for KjellKod's g2log
    option (USE_G2LOG_PERFORMANCE
@@ -152,19 +151,17 @@ ENDIF(MSVC11)
 
 
 
-   # ========================================================
+   # ===============================================================================================
    #
    # BELOW : Creating executables depending on OPTIONS above
    #
-   #  =======================================================
-   
-
+   #  ==============================================================================================
    # 1. create the the example EXECUTABLE - hook in the test_example's CMakeLists.txt file
    if (USE_SIMPLE_EXAMPLE)
-      MESSAGE(" g2log-example option ON")
+      MESSAGE(" g2log-FATAL-example option ON")
       include_directories (${DIR_EXAMPLE})
-      add_executable(g2log-example ${DIR_EXAMPLE}/main.cpp)
-      target_link_libraries(g2log-example lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+      add_executable(g2log-FATAL-example ${DIR_EXAMPLE}/main.cpp)
+      target_link_libraries(g2log-FATAL-example lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_SIMPLE_EXAMPLE) 
    # =========================
 
@@ -221,7 +218,7 @@ ENDIF(MSVC11)
 
 
    endif (USE_GOOGLE_GLOG_PERFORMANCE)
-   # ===========================
+   # ===============================================================================================
 
 
    # 4. create the unit tests for g2log --- ONLY TESTED THE UNIT TEST ON LINUX

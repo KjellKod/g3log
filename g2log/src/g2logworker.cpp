@@ -13,6 +13,7 @@
 
 #include <iostream>
 #include <functional>
+#include <algorithm>
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -29,6 +30,11 @@ using namespace g2::internal;
 
 namespace
 {
+typedef std::chrono::steady_clock::time_point time_point;
+typedef std::chrono::duration<long,std::ratio<1, 1000> > millisecond;
+typedef std::chrono::duration<long long,std::ratio<1, 1000000> > microsecond;
+
+
 struct LogTime
 {
   LogTime()
@@ -87,7 +93,7 @@ struct g2LogWorkerImpl
   std::string log_file_with_path_;
   std::unique_ptr<kjellkod::Active> bg_;
   std::ofstream out;
-  g2::internal::time_point start_time_;
+  time_point start_time_;
 
 private:
   g2LogWorkerImpl& operator=(const g2LogWorkerImpl&); // c++11 feature not yet in vs2010 = delete;
@@ -196,12 +202,12 @@ void g2LogWorkerImpl::backgroundExitFatal(FatalMessage fatal_message)
 
  void g2LogWorker::save(g2::internal::LogEntry msg)
  {
-   pimpl_->bg_->send(std::tr1::bind(&g2LogWorkerImpl::backgroundFileWrite, pimpl_.get(), msg));
+   pimpl_->bg_->send(std::bind(&g2LogWorkerImpl::backgroundFileWrite, pimpl_.get(), msg));
  }
 
  void g2LogWorker::fatal(g2::internal::FatalMessage fatal_message)
  {
-   pimpl_->bg_->send(std::tr1::bind(&g2LogWorkerImpl::backgroundExitFatal, pimpl_.get(), fatal_message));
+   pimpl_->bg_->send(std::bind(&g2LogWorkerImpl::backgroundExitFatal, pimpl_.get(), fatal_message));
  }
 
  std::string g2LogWorker::logFileName() const
