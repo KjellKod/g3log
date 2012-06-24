@@ -19,7 +19,7 @@
 
 
 # WINDOWS == README: Example how to setup environment + running an example
-# 1. please use the "Visual Studio Command Prompt 2010)"
+# 1. please use the "Visual Studio Command Prompt)"
 # 2. from the g2log folder
 #    mkdir build
 #    cd build;
@@ -74,6 +74,17 @@ IF(UNIX)
    #               include_directories("/usr/include/justthread")
    ENDIF(UNIX)
 
+   
+   
+   if (MSVC)
+      # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
+      #          add_definition(-D_VARIADIC_MAX=10)
+	  # https://github.com/anhstudios/swganh/pull/186/files 
+      ADD_DEFINITIONS (/D_VARIADIC_MAX=10)
+      MESSAGE(STATUS "- MSVC: Set variadic max to 10 for MSVC compatibility")
+	  # Remember to set set target properties if using GTEST similar to done below on target "unit_test"
+	  # "set_target_properties(unit_test  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0") 
+   endif ()
 
 #Visual Studio 2010 -- must use justthread
 IF(MSVC10)   	
@@ -146,7 +157,7 @@ ENDIF(MSVC11)
 
    # 4. unit test for g2log
    option (USE_G2LOG_UNIT_TEST
-          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" OFF)
+          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" ON)
 
 
 
@@ -232,6 +243,8 @@ ENDIF(MSVC11)
       enable_testing(true)
 
       add_executable(g2log-unit_test ../test_main/test_main.cpp ${DIR_UNIT_TEST}/test_io.cpp)
+	  set_target_properties(g2log-unit_test  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")
+      set_target_properties(g2log-unit_test  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
       target_link_libraries(g2log-unit_test lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
    endif (USE_G2LOG_UNIT_TEST)
 
