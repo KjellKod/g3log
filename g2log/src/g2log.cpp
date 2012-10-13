@@ -7,7 +7,7 @@
  * Filename:g2log.cpp  Framework for Logging and Design By Contract
  * Created: 2011 by Kjell Hedström
  *
- * PUBLIC DOMAIN and Not copywrited since it was built on public-domain software and influenced
+ * PUBLIC DOMAIN and Not copywrited since it was built on public-domain software and at least in "spirit" influenced
  * from the following sources
  * 1. kjellkod.cc ;)
  * 2. Dr.Dobbs, Petru Marginean:  http://drdobbs.com/article/printableArticle.jhtml?articleId=201804215&dept_url=/cpp/

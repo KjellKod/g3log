@@ -9,7 +9,7 @@
 * the help from the std::thread library from JustSoftwareSolutions
 * ref: http://www.stdthread.co.uk/doc/headers/mutex.html
 *
-* This exampel  was inspired by Anthony Williams lock-based data structures in
+* This exampel  was totally inspired by Anthony Williams lock-based data structures in
 * Ref: "C++ Concurrency In Action" http://www.manning.com/williams */
 
 #ifndef SHARED_QUEUE
@@ -47,7 +47,7 @@ public:
     if(queue_.empty()){
       return false;
     }
-    popped_item=queue_.front();
+    popped_item=std::move(queue_.front());
     queue_.pop();
     return true;
   }
@@ -59,7 +59,7 @@ public:
     { //                       The 'while' loop below is equal to
       data_cond_.wait(lock);  //data_cond_.wait(lock, [](bool result){return !queue_.empty();});
     }
-    popped_item=queue_.front();
+    popped_item=std::move(queue_.front());
     queue_.pop();
   }
 

@@ -12,11 +12,31 @@
 namespace
 {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-	const std::string path_to_log_file = "./";
+const std::string path_to_log_file = "./";
 #else
-	const std::string path_to_log_file = "/tmp/";
+const std::string path_to_log_file = "/tmp/";
 #endif
 }
+
+namespace example_fatal
+{
+void killWithContractFailureIfNonEqual(int first, int second)
+{
+  CHECK(first == second) << "Test to see if contract works: onetwothree: " << 123 << ". This should be at the end of the log, and will exit this example";
+}
+
+// on Ubunti this caused get a compiler warning with gcc4.6
+// from gcc 4.7.2 (at least) it causes a crash (as expected)
+// On windows it'll probably crash too.
+void tryToKillWithIllegalPrintout()
+{
+  std::cout << "\n\n***** Be ready this last example may 'abort' if on Windows/Linux_gcc4.7 " << std::endl << std::flush;
+  std::cout << "************************************************************\n\n" << std::endl << std::flush;
+  std::this_thread::sleep_for(std::chrono::seconds(1));
+  const std::string logging = "logging";
+  LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
+}
+} // example fatal
 
 int main(int argc, char** argv)
 {
@@ -26,11 +46,12 @@ int main(int argc, char** argv)
 
   g2LogWorker logger(argv[0], path_to_log_file);
   g2::initializeLogging(&logger);
+  std::future<std::string> log_file_name = logger.logFileName();
   std::cout << "*** This is an example of g2log " << std::endl;
   std::cout << "*** It WILL exit by a FATAL trigger in the end" << std::endl;
   std::cout << "*** Please see the generated log and compare to " << std::endl;
   std::cout << "***    the code at g2log/test_example/main.cpp" << std::endl;
-  std::cout << "\n*** Log file: [" << logger.logFileName() << "]\n\n" << std::endl;
+  std::cout << "\n*** Log file: [" << log_file_name.get() << "]\n\n" << std::endl;
 
   LOGF(INFO, "Hi log %d", 123);
   LOG(INFO) << "Test SLOG INFO";
@@ -55,19 +76,22 @@ int main(int argc, char** argv)
   LOG_IF(FATAL, (2>3)) << "This message should NOT throw";
   LOGF(DEBUG, "This API is popular with some %s", "programmers");
   LOGF_IF(DEBUG, (1<2), "If true, then this %s will be logged", "message");
-  {
-    // OK --- on Ubunti this WILL get a compiler warning
-    // On windows it'll probably crash  std::cout << "\n\n***** Be ready on Windows this example will 'abort' " << std::endl;
-  std::cout << "\n\n***** Be ready this last example may 'abort' if on Windows/Linux_gcc4.7 " << std::endl << std::flush;
-  std::cout << "************************************************************\n\n" << std::endl << std::flush;
-  std::this_thread::sleep_for(std::chrono::seconds(1));
-  const std::string logging = "logging";
-  LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
-  }
+  // OK --- on Ubunti this caused get a compiler warning with gcc4.6
+  // from gcc 4.7.2 (at least) it causes a crash (as expected)
+  // On windows itll probably crash
+  // ---- IF you want to try 'FATAL' contract failure please comment away
+  // ----- the 'illegalPrinout' call below
+  example_fatal::tryToKillWithIllegalPrintout();
 
 
-  std::cout << "\n\n***** Be ready this last example will trigger 'abort' " << std::endl;
-  std::cout << "************************************************************\n\n" << std::endl;
-  CHECK(1<2) << "SHOULD NOT SEE THIS MESSAGE";
-  CHECK(1>2) << "Test to see if contract works: onetwothree: " << 123 << ". This should be at the end of the log, and will exit this example";
+
+  CHECK(1<2) << "SHOULD NOT SEE THIS MESSAGE"; // non-failure contract
+
+  std::cout << "\n\n***** Be ready this last example WILL trigger 'abort' (if not done earlier)" << std::endl;
+  // exit by contract failure. See the dumped log, the function
+  // that caused the fatal exit should be shown in the stackdump
+  int smaller = 1;
+  int larger = 2;
+  example_fatal::killWithContractFailureIfNonEqual(smaller, larger);
 }
+

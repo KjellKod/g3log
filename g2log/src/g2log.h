@@ -8,7 +8,7 @@
  * Created: 2011 by Kjell Hedström
  *
  * PUBLIC DOMAIN and Not copywrited since it was built on public-domain software and influenced
- * from the following sources
+ * at least in "spirit" from the following sources
  * 1. kjellkod.cc ;)
  * 2. Dr.Dobbs, Petru Marginean:  http://drdobbs.com/article/printableArticle.jhtml?articleId=201804215&dept_url=/cpp/
  * 3. Dr.Dobbs, Michael Schulze: http://drdobbs.com/article/printableArticle.jhtml?articleId=225700666&dept_url=/cpp/
@@ -162,14 +162,14 @@ namespace internal
 {
   typedef const std::string& LogEntry;
 
-
 /** By default the g2log will call g2LogWorker::fatal(...) which will abort() the system after flushing
  * the logs to file. This makes unit test of FATAL level cumbersome. A work around is to change the 'fatal call'
  * which can be done here */
 void changeFatalInitHandlerForUnitTesting();
 
+// TODO: LogEntry och FatalMessage borde kunna slås ihop till samma!
 
-/** Trigger for flushing the message queue and exiting the applicaition
+/** Trigger for flushing the message queue and exiting the application
     A thread that causes a FatalMessage will sleep forever until the
     application has exited (after message flush) */
 struct FatalMessage
@@ -195,22 +195,22 @@ struct FatalTrigger
 class LogMessage
 {
   public:
-    LogMessage(const std::string &file, const int line, const std::string& function_, const std::string &level);
+    LogMessage(const std::string &file, const int line, const std::string& function, const std::string &level);
     virtual ~LogMessage(); // at destruction will flush the message
 
     std::ostringstream& messageStream(){return stream_;}
 
     // The __attribute__ generates compiler warnings if illegal "printf" format
     // IMPORTANT: You muse enable the compiler flag '-Wall' for this to work!
-    // ref: http://www.unixwiz.net/techtips/gnu-c-attributes.html 
-	//
-	//If the compiler does not support attributes, disable them
+    // ref: http://www.unixwiz.net/techtips/gnu-c-attributes.html
+        //
+        //If the compiler does not support attributes, disable them
 #ifndef __GNUC__
 #define  __attribute__(x)
 #endif
     // Coder note: Since it's C++ and not C EVERY CLASS FUNCTION always get a first
     // compiler given argument 'this' this must be supplied as well, hence '2,3'
-    // ref: http://www.codemaestro.com/reviews/18 -- ref KjellKod			
+    // ref: http://www.codemaestro.com/reviews/18 -- ref KjellKod
     void messageSave(const char *printf_like_message, ...)
         __attribute__((format(printf,2,3) ));
 
