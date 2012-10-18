@@ -139,11 +139,11 @@ gtest is needed for the unit tests.
 glog is only needed if you want to run the glog vs g2log comparison tests
 
 gtest is enabled as a DEFAULT option in the CmakeFiles.txt file. If the unit test
-is not important for you then please DISABLE that option. 
+is not important for you then just DISABLE that option.  By default the gtest zipped
+ library must be UNPACKED before it is used (compilation)
 
-By default the gtest zipped library must be unpacked before it is used (compilation)
-It IS included by the CMake and you don't need to do install or compile it in any
- other way than through the g2log cmake setup.
+gtest It IS included by the CMake and you don't need to do install or compile it in
+ any other way than through the g2log cmake setup.
 
 glog is not included and must be installed ONLY IF you want to run the comparison tests
 
