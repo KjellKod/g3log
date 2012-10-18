@@ -1,21 +1,26 @@
 EXAMPLE USAGE OF G2LOG
 =======================
 Optional to use either streaming or printf-like syntax
-    LOG(INFO) << "Simple to use with streaming syntax, easy as ABC or " << 123;
+    LOG(INFO) << "As Easy as ABC or " << 123;
     or 
     LOGF(WARNING, "Printf-style syntax is also %s", "available");
 
 
 Conditional logging
     int less = 1; int more = 2
-    LOG_IF(INFO, (less<more)) <<"If "<< less<< "<" << more<< ", then this text will be logged";
-    or
+    LOG_IF(INFO, (less<more)) <<"If [true], then this text will be logged";
+    
+    // or with printf-like syntax
     LOGF_IF(INFO, (less<more), "if %d<%d then this text will be logged", less,more);
 
 
 Design-by-Contract
-    CHECK(less != more); // true: won't be FATAL
-    CHECK(less > more) << "CHECK(false) will trigger a FATAL message, put it on log, then exit";
+CHECK(false) will trigger a "fatal" message. It will be logged, and then the 
+application will exit.
+
+    CHECK(less != more); // not FATAL
+    CHECK(less > more) << "CHECK(false) triggers a FATAL message");
+
 
 
 
@@ -33,33 +38,34 @@ G2log is an asynchronous, "crash safe" logger and design-by-contract library.
 What this means in practice is that 
 
 1. All the slow I/O disk access is done in a background thread. This ensures that the
- other parts of the software can immediately continue with their work after making a log
- entry. 
+ other parts of the software can immediately continue with their work after making a
+ log entry. 
 
 2. g2log provides logging, Design-by-Contract [#CHECK], and flush of log to file at
  shutdown. Buffered logs will be written to file before the application shuts down.
 
 3. It is thread safe, so using it from multiple threads is completely fine. 
 
-4. It is CRAsH SAFE, in that it will catch certain fatal signals, so if your application
- crashes due to, say a segmentation fault, SIGSEGV,  or some other fatal signals it will
- log and save to file this crash and all previously buffered log entries before exiting.
+4. It is CRAsH SAFE, in that it will catch certain fatal signals, so if your application  crashes due to, say a segmentation fault, SIGSEGV,  or some other fatal
+ signals it will  log and save to file this crash and all previously buffered log
+ entries before exiting.
 
  
-5. It is cross platform. For now, tested on Windows7 ad Ubuntu
+5. It is cross platform. For now, tested on Windows7 and Ubuntu
 
-6. On Ubuntu a caught fatal signal will generate a stack dump to the log. This is not yet
- available on Windows due to the platforms complexity when traversing the stack. Stack
- dump on Windows will be released later and a beta is available on request. 
+6. On Ubuntu a caught fatal signal will generate a stack dump to the log. This is
+ not yet available on Windows due to the platforms complexity when traversing the
+ stack. Stack dump on Windows will be released later and a beta is available on
+ request. 
 
 7. G2log is used in commercial products as well as hobby projects since early 2011.
-The code is given for free as public domain. This gives the option to change, use, and do
- whatever with it, no strings attached.
+The code is given for free as public domain. This gives the option to change, use,
+ and do whatever with it, no strings attached.
 
 8. The stable version of g2log is available at https://bitbucket.org/KjellKod/g2log
    The in-development g2log where new features are tried out is available at 
-   https://bitbucket.org/KjellKod/g2log-dev ongoing and released features can be seen at
-   https://bitbucket.org/KjellKod/g2log-dev/wiki/Home
+   https://bitbucket.org/KjellKod/g2log-dev ongoing and released features can be   
+   seen at https://bitbucket.org/KjellKod/g2log-dev/wiki/Home
 
 
 
@@ -76,7 +82,8 @@ LATEST CHANGES
   x64 Ubuntu 12...: gcc 4.7.2
   x64 Windows7: Visual Studio 2012 Professional
 
-  NOTE: It does NOT work with "Visual Studio 11 Beta" (not as C++11 compliant as VS2012)
+  NOTE: It does NOT work with "Visual Studio 11 Beta" (not as C++11 compliant 
+  as VS2012)
 
 
 
@@ -86,15 +93,15 @@ This g2log is a snapshot from KjellKod repository.
 It contains what is needed to build example, unit test and performance test of g2log. 
 
 justthread C++11 thread library is no longer needed. 
-On Windows it is enough to use Visual Studio 11  (2012)
-On Linux it is enough to use gcc4.7.2.  The CMakeFile.txt 
-is updated to reflect that, the justthread parts is 
-commented away in case someone still needs that.
-If you do not have gcc 4.7.2
+* On Windows it is enough to  use Visual Studio 11  (2012). 
+* On Linux it is enough to use gcc4.7.2.  
 
+The CMakeFile.txt is updated to reflect that, the justthread parts is commented 
+away in case someone still needs that. 
 
-If you want to integrate g2log in your own software you need 
-the files under g2log/src
+If you want to integrate g2log in your own software you need the files under 
+g2log/src
+
 
 
 BUILDING g2log: 
@@ -103,7 +110,8 @@ The default is to build an example binary 'g2log-FATAL'
 I suggest you start with that, run it and view the created log also.
 
 If you are interested in the performance or unit tests then you can 
-enable the creation of them in the g2log/CMakeLists.txt file. See that file for more details
+enable the creation of them in the g2log/CMakeLists.txt file. See that file for 
+more details
 
 --- Building on Linux ---
 cd g2log
@@ -135,12 +143,16 @@ glog is not included and must be installed if you want to run the comparison tes
 
 About the Active Object
 --------------------
-Is made with standard C++ components with the help of the latest C++11 and std::thread features (thanks to justthread). For more details see www.kjellkod.cc/active-object-with-cpp0x. An example is provided. Other examples on pre C++0x Active Objects can also be found at www.kjellkod.cc (code page)
+Is made with standard C++ components with the help of the latest C++11 and std::thread features (thanks to justthread). For more details see 
+www.kjellkod.cc/active-object-with-cpp0x. 
 
-If you like it (or not) it would be nice with some feedback. That way 
-I can improve g2log and it is also nice to see if someone is using it. 
-If you have ANY questions or problems please do not hesitate in contacting
-me on my blog http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asynchronous-loggers-taking-over/
+An example is provided. Other examples on pre C++0x Active Objects can also be 
+found at www.kjellkod.cc (code page)
+
+If you like it (or not) it would be nice with some feedback. That way I can 
+improve g2log and it is also nice to see if someone is using it. If you have 
+ANY questions or problems please do not hesitate in contacting me on my blog 
+http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asynchronous-loggers-taking-over/
 or at <Hedstrom at KjellKod dot cc>
 
 Good luck :)
