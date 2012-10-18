@@ -135,13 +135,20 @@ CONTENTS
 ===========================
 3rdParty -- gtest, glog. 
 -----------------------
-Both are needed to compile the unit test and the logger comparison tests
-Gtest must be unpacked before used, but it IS included by the CMake and you don't need to do install or compile it in any other way than through the g2log cmake setup.
+gtest is needed for the unit tests. 
+glog is only needed if you want to run the glog vs g2log comparison tests
 
-glog is not included and must be installed if you want to run the comparison tests
+gtest is enabled as a DEFAULT option in the CmakeFiles.txt file. If the unit test
+is not important for you then please DISABLE that option. 
+
+By default the gtest zipped library must be unpacked before it is used (compilation)
+It IS included by the CMake and you don't need to do install or compile it in any
+ other way than through the g2log cmake setup.
+
+glog is not included and must be installed ONLY IF you want to run the comparison tests
 
 
-About the Active Object
+About the A ctive Object
 --------------------
 Is made with standard C++ components with the help of the latest C++11 and std::thread features (thanks to justthread). For more details see 
 www.kjellkod.cc/active-object-with-cpp0x. 
