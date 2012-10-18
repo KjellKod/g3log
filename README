@@ -1,6 +1,6 @@
 EXAMPLE USAGE OF G2LOG
 =======================
-**Optional to use either streaming or printf-like syntax**
+Optional to use either streaming or printf-like syntax
     LOG(INFO) << "Simple to use with streaming syntax, easy as ABC or " << 123;
     or 
     LOGF(WARNING, "Printf-style syntax is also %s", "available");
