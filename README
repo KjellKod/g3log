@@ -145,7 +145,7 @@ is not important for you then just DISABLE that option.  By default the gtest zi
 gtest It IS included by the CMake and you don't need to do install or compile it in
  any other way than through the g2log cmake setup.
 
-glog is not included and must be installed ONLY IF you want to run the comparison tests
+Google's glog is not included and must be installed ONLY IF you want to run the comparison tests
 
 
 About the A ctive Object
