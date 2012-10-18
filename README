@@ -21,28 +21,40 @@ Design-by-Contract
 
 WHAT IS G2LOG?
 ====================
-In depth information can be found at http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logger-using-Cplus
+In depth information can be found at 
+http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logger-using-Cplus
 
 
 
 Or just read the short summary below:
 -------------------------------------
 
-G2log is an asynchronous, "crash safe" logger and design-by-contract library. What this means in practice is that 
+G2log is an asynchronous, "crash safe" logger and design-by-contract library. 
+What this means in practice is that 
 
-1. All the slow I/O disk access is done in a background thread. This ensures that the other parts of the software can immediately continue with their work after making a log entry. 
+1. All the slow I/O disk access is done in a background thread. This ensures that the
+ other parts of the software can immediately continue with their work after making a log
+ entry. 
 
-2. g2log provides logging, Design-by-Contract [#CHECK], and flush of log to file at shutdown. Buffered logs will be written to file before the application shuts down.
+2. g2log provides logging, Design-by-Contract [#CHECK], and flush of log to file at
+ shutdown. Buffered logs will be written to file before the application shuts down.
+
 3. It is thread safe, so using it from multiple threads is completely fine. 
 
-4. It is CRAsH SAFE, in that it will catch certain fatal signals, so if your application crashes due to, say a segmentation fault, SIGSEGV,  or some other fatal signals it will log and save to file this crash and all previously buffered log entries before exiting.
+4. It is CRAsH SAFE, in that it will catch certain fatal signals, so if your application
+ crashes due to, say a segmentation fault, SIGSEGV,  or some other fatal signals it will
+ log and save to file this crash and all previously buffered log entries before exiting.
+
  
 5. It is cross platform. For now, tested on Windows7 ad Ubuntu
 
-6. On Ubuntu a caught fatal signal will generate a stack dump to the log. This is not yet available on Windows due to the platforms complexity when traversing the stack. Stack dump on Windows will be released later and a beta is available on request. 
+6. On Ubuntu a caught fatal signal will generate a stack dump to the log. This is not yet
+ available on Windows due to the platforms complexity when traversing the stack. Stack
+ dump on Windows will be released later and a beta is available on request. 
 
-7. G2log is used in commercial products as well as hobby projects since early 2011. 
-The code is given for free as public domain. This gives the option to change, use, and do whatever with it, no strings attached.
+7. G2log is used in commercial products as well as hobby projects since early 2011.
+The code is given for free as public domain. This gives the option to change, use, and do
+ whatever with it, no strings attached.
 
 8. The stable version of g2log is available at https://bitbucket.org/KjellKod/g2log
    The in-development g2log where new features are tried out is available at 
