@@ -169,7 +169,7 @@ ENDIF(MSVC11)
 
    # 4. unit test for g2log
    option (USE_G2LOG_UNIT_TEST
-          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" ON)
+          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" OFF)
 
 
 
