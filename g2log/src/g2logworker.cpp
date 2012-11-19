@@ -58,17 +58,17 @@ bool isValidFilename(const std::string prefix_filename)
 
 
 // Clean up the path if put in by mistake in the prefix
-std::string prefixSanityFix(const std::string& prefix)
+std::string prefixSanityFix(std::string prefix)
 {
-  std::string real_prefix = prefix;
-  std::remove( real_prefix.begin(), real_prefix.end(), '/');
-  std::remove( real_prefix.begin(), real_prefix.end(), '\\');
-  std::remove( real_prefix.begin(), real_prefix.end(), '.');
-  if(!isValidFilename(real_prefix))
+  prefix.erase(std::remove_if(prefix.begin(), prefix.end(), ::isspace), prefix.end());
+  prefix.erase(std::remove( prefix.begin(), prefix.end(), '/'), prefix.end()); // '/'
+  prefix.erase(std::remove( prefix.begin(), prefix.end(), '\\'), prefix.end()); // '\\'
+  prefix.erase(std::remove( prefix.begin(), prefix.end(), '.'), prefix.end());  // '.'
+  if(!isValidFilename(prefix))
   {
     return "";
   }
-  return real_prefix;
+  return prefix;
 }
 
 
