@@ -26,18 +26,19 @@ namespace g2 { namespace internal {
   // return value is SIMPLIFIED to only return a std::string
   std::string put_time(const struct tm* tmb, const char* c_time_format)
   {
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
     std::ostringstream oss;
     oss.fill('0');
     oss << std::put_time(const_cast<struct tm*>(tmb), c_time_format); // BOGUS hack done for VS2012: C++11 non-conformant since it SHOULD take a "const struct tm*  "
     return oss.str();
 #else    // LINUX
     const size_t size = 1024;
-    char buffer[size]; // OBS: kolla om inte std::put_time finns. This is way more buffer space then we need
-    auto success = std::strftime(buffer, size, c_time_format, tmb); // Ta över denna funktion till BitBucket/code/g2log sen då denna är utvecklingsbranchen
+    char buffer[size]; // IMPORTANT: check now and then for when gcc will implement std::put_time finns. 
+    //                    ... also ... This is way more buffer space then we need
+    auto success = std::strftime(buffer, size, c_time_format, tmb); 
     if (0 == success)
-      return c_time_format; // error return result indeterminate due to buffer overflow - should throw instead?
-    return buffer; // implicit conversion to std::string
+      return c_time_format; // For this hack it is OK but in case of more permanent we really should throw here, or even assert
+    return buffer; 
 #endif
   }
 } // internal
