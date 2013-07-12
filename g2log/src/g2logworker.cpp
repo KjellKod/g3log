@@ -73,23 +73,24 @@ std::string prefixSanityFix(std::string prefix)
 
 
 std::string pathSanityFix(std::string path, std::string file_name) {
-	// Unify the delimeters,. maybe sketchy solution but it seems to work
-	// on at least win7 + ubuntu. All bets are off for older windows
-	std::replace(path.begin(), path.end(), '\\', '/');
+        // Unify the delimeters,. maybe sketchy solution but it seems to work
+        // on at least win7 + ubuntu. All bets are off for older windows
+        std::replace(path.begin(), path.end(), '\\', '/');
 
-	// clean up in case of multiples
-	auto contains_end = [&](std::string& in) -> bool { 
-		size_t size = in.size();
-		if(!size) return false;
-		char end = in[size-1]; 
-		return (end == '/' || end == ' '); 
-	}; 
+        // clean up in case of multiples
+        auto contains_end = [&](std::string& in) -> bool {
+                size_t size = in.size();
+                if(!size) return false;
+                char end = in[size-1];
+                return (end == '/' || end == ' ');
+        };
 
-    while(contains_end(path))
-		path.erase(path.size()-1);
-	path.insert(path.end(), '/'); // works on both unix and windows (win7, ubuntu)
-	path.insert(path.size(), file_name);
-	return path;
+    while(contains_end(path)) { path.erase(path.size()-1); }
+    if(!path.empty()) {
+       path.insert(path.end(), '/');
+    }
+    path.insert(path.size(), file_name);
+    return path;
 }
 
 
@@ -189,7 +190,12 @@ g2LogWorkerImpl::g2LogWorkerImpl(const std::string& log_prefix, const std::strin
   std::string file_name = createLogFileName(log_prefix_backup_);
   log_file_with_path_ = pathSanityFix(log_file_with_path_, file_name);
   outptr_ = createLogFile(log_file_with_path_);
-  assert((nullptr != outptr_) && "cannot open log file at startup");
+  if(!outptr_) {
+    std::cerr << "Cannot write logfile to location, attempting current directory" << std::endl;
+    log_file_with_path_ = file_name;
+    outptr_ = createLogFile(log_file_with_path_);
+  }
+  assert((outptr_) && "cannot open log file at startup");
 }
 
 

@@ -109,6 +109,7 @@ std::string changeDirectoryOrName(std::string new_file_to_create)
 
 TEST(TestOf_GetFileName, Expecting_ValidLogFile)
 {
+
   LOG(INFO) << "test_filechange, Retrieving file name: ";
   ASSERT_NE(g_logger_ptr, nullptr);
   std::future<std::string> f_get_old_name = g_logger_ptr->logFileName();
