@@ -7,6 +7,8 @@
 #include <gtest/gtest.h>
 #include "g2log.h"
 #include "g2logworker.h"
+#include "testing_helpers.h"
+
 #include <memory>
 #include <string>
 #include <fstream>
@@ -40,43 +42,9 @@ namespace
 	}
 } // end anonymous namespace
 
-// RAII temporarily replace of logger
-// and restoration of original logger at scope end
-struct RestoreLogger
-{
-	RestoreLogger();
-	~RestoreLogger();
-	void reset();
 
-	std::unique_ptr<g2LogWorker> logger_;
-	std::string logFile(){return log_file_;}
-private:
-	std::string log_file_;
 
-};
 
-RestoreLogger::RestoreLogger()
-	: logger_(new g2LogWorker("UNIT_TEST_LOGGER", log_directory))
-{
-	g2::initializeLogging(logger_.get());
-	g2::internal::changeFatalInitHandlerForUnitTesting();
-
-	std::future<std::string> filename(logger_->logFileName());
-	EXPECT_TRUE(filename.valid());
-	log_file_ = filename.get();
-}
-
-RestoreLogger::~RestoreLogger()
-{
-	reset();
-	g2::shutDownLogging();
-	EXPECT_EQ(0, remove(log_file_.c_str()));
-}
-
-void RestoreLogger::reset()
-{
-	logger_.reset();
-}
 
 
 
@@ -85,7 +53,7 @@ TEST(LOGTest, LOG)
 {
 	std::string file_content;
 	{
-		RestoreLogger logger;
+		RestoreLogger logger(log_directory);
 		LOG(INFO) << "test LOG(INFO)";
 		logger.reset(); // force flush of logger
 		file_content = readFileToText(logger.logFile());
@@ -109,7 +77,7 @@ TEST(LogTest, LOG_F)
 {	
 	std::string file_content;
 	{
-		RestoreLogger logger;
+		RestoreLogger logger(log_directory);
 		std::cout << "logfilename: " << logger.logFile() << std::flush << std::endl;
 
 		LOGF(INFO, std::string(t_info + "%d").c_str(), 123);
@@ -132,7 +100,7 @@ TEST(LogTest, LOG)
 {
 	std::string file_content;
 	{
-		RestoreLogger logger;
+		RestoreLogger logger(log_directory);
 		LOG(INFO) << t_info   << 123;
 		LOG(DEBUG) <<  t_debug  << std::setprecision(7) << 1.123456f;
 		LOG(WARNING) << t_warning << "yello";
@@ -150,7 +118,7 @@ TEST(LogTest, LOG_F_IF)
 {
 	std::string file_content;
 	{
-		RestoreLogger logger;
+		RestoreLogger logger(log_directory);
 		LOGF_IF(INFO, (2 == 2), std::string(t_info + "%d").c_str(), 123);
 		LOGF_IF(DEBUG, (2 != 2), std::string(t_debug + "%f").c_str(), 1.123456);
 		logger.reset(); // force flush of logger
@@ -165,7 +133,7 @@ TEST(LogTest, LOG_IF)
 {
 	std::string file_content;
 	{
-		RestoreLogger logger;
+		RestoreLogger logger(log_directory);
 		LOG_IF(INFO, (2 == 2))  << t_info   << 123;
 		LOG_IF(DEBUG, (2 != 2)) <<  t_debug  << std::setprecision(7) << 1.123456f;
 		logger.reset(); // force flush of logger
@@ -178,7 +146,7 @@ TEST(LogTest, LOG_IF)
 
 TEST(LogTest, LOGF__FATAL)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	try
 	{
 		LOGF(FATAL, "This message should throw %d",0);
@@ -206,7 +174,7 @@ TEST(LogTest, LOGF__FATAL)
 
 TEST(LogTest, LOG_FATAL)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	try
 	{
 		LOG(FATAL) << "This message should throw";
@@ -233,7 +201,7 @@ TEST(LogTest, LOG_FATAL)
 
 TEST(LogTest, LOGF_IF__FATAL)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	try
 	{
 		LOGF_IF(FATAL, (2<3), "This message%sshould throw"," ");
@@ -260,7 +228,7 @@ TEST(LogTest, LOGF_IF__FATAL)
 
 TEST(LogTest, LOG_IF__FATAL)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	try
 	{
 		LOG_IF(WARNING, (0 != t_info.compare(t_info))) << "This message should NOT be written";
@@ -288,7 +256,7 @@ TEST(LogTest, LOG_IF__FATAL)
 
 TEST(LogTest, LOG_IF__FATAL__NO_THROW)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	try
 	{
 		LOG_IF(FATAL, (2>3)) << "This message%sshould NOT throw";
@@ -307,7 +275,7 @@ TEST(LogTest, LOG_IF__FATAL__NO_THROW)
 // CHECK_F
 TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	try
 	{
 		CHECK(1 == 2);
@@ -329,7 +297,7 @@ TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg)
 
 TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	std::string msg = "This message is added to throw %s and %s";
 	std::string msg2 = "This message is added to throw message and log";
 	std::string arg1 = "message";
@@ -355,7 +323,7 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg)
 
 TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	std::string msg = "This message is added to throw %s and %s";
 	std::string msg2 = "This message is added to throw message and log";
 	std::string arg1 = "message";
@@ -382,7 +350,7 @@ TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg)
 
 TEST(CHECK, CHECK_ThatWontThrow)
 {
-	RestoreLogger logger;
+	RestoreLogger logger(log_directory);
 	std::string msg = "This %s should never appear in the %s";
 	std::string msg2 = "This message should never appear in the log";
 	std::string arg1 = "message";

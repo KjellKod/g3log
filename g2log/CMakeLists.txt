@@ -113,10 +113,19 @@ ENDIF(MSVC11)
 
 
    # GENERIC STEPS
-   # CODE SOURCES these +
-   set(SRC_CPP ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.cpp ${LOG_SRC}/g2time.cpp)
-   set(SRC_H ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2log.h ${LOG_SRC}/crashhandler.h ${LOG_SRC}/g2time.h ${LOG_SRC}/g2future.h)
-   set(SRC_FILES ${SRC_CPP} ${SRC_H} ${SRC_PLATFORM_SPECIFIC})
+   set(CPP_H_FILES g2logworker.cpp g2logworker.h 
+                   g2log.cpp g2log.h g2time.cpp g2time.h
+                   g2future.h std2_make_unique.hpp)
+   FOREACH(file ${CPP_H_FILES}) 
+     set(SRC_FILES ${SRC_FILES} ${LOG_SRC}/${file})
+   ENDFOREACH(file ${CPP_H_FILES})
+   set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
+
+#
+#   set(SRC_CPP ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.cpp ${LOG_SRC}/g2time.cpp)
+#   set(SRC_H ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2log.h ${LOG_SRC}/crashhandler.h ${LOG_SRC}/g2time.h ${LOG_SRC}/g2future.h ${LOG_SRC}/std2_make_unique.hpp)
+#   set(SRC_FILES ${SRC_CPP} ${SRC_H} ${SRC_PLATFORM_SPECIFIC})
+
 
      # add a ActiveObject library
    add_library(lib_activeobject ${LOG_SRC}/active.cpp ${LOG_SRC}/active.h ${LOG_SRC}/shared_queue.h)
@@ -248,12 +257,13 @@ ENDIF(MSVC11)
 
       
       SET(tests_to_run test_filechange test_io test_configuration test_sink)
+      SET(helper ${DIR_UNIT_TEST}/testing_helpers.h ${DIR_UNIT_TEST}/testing_helpers.cpp)
       FOREACH(test ${tests_to_run} )
  #        SET(all_tests  ${all_tests} ${DIR_UNIT_TEST}/${test}.cpp )
          IF(${test} STREQUAL "test_filechange")
              add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp)
          ELSE()
-             add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp)
+             add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
          ENDIF(${test} STREQUAL "test_filechange")
 
          set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
