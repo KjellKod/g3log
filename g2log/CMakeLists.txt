@@ -30,12 +30,13 @@
 # 5. Release\g2log-FATAL-example.exe
 #
 #
-# . LINUX:To try this out from folder g2log:
+# >>. LINUX:To try this out from folder g2log:
 #    mkdir build
 #    cd build
-#    cmake ..    # create makefiles in g2log/build directory
-#    make    # link active_object, g2log and example code to get an "example" executable
-#     ./g2log-FATAL-example
+# >> create makefiles in g2log/build directory
+#    cmake ..                              // for debug builds OR    
+# >> Alternatively: for release    cmake -DCMAKE_BUILD_TYPE=Release ..   
+#    make                      # links active, g2log and example code:  g2log-FATAL-example
 # ============================================================================
 
 cmake_minimum_required (VERSION 2.8)
@@ -70,18 +71,10 @@ IF(UNIX)
    MESSAGE("then run './g2log-FATAL-example' or whatever performance test you feel like trying")
    MESSAGE("")
    set(PLATFORM_LINK_LIBRIES rt)
-   # justthread not needed from gcc4.7.1
-   #           set(PLATFORM_LINK_LIBRIES justthread rt)
-
    # -rdynamic is needed for correct stack dumps with demangling
    # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
    set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
-
-   # -- justthread not needed for gcc4.7.1
-   #     set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++0x ${CMAKE_CXX_FLAGS_DEBUG} -pthread -I/usr/include/justthread")
-   # -- justhtread not needed for gcc4.7.1
-   #               include_directories("/usr/include/justthread")
    ENDIF(UNIX)
 
    if (MSVC)
@@ -125,18 +118,13 @@ ENDIF(MSVC11)
    set(SRC_H ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2log.h ${LOG_SRC}/crashhandler.h ${LOG_SRC}/g2time.h ${LOG_SRC}/g2future.h)
    set(SRC_FILES ${SRC_CPP} ${SRC_H} ${SRC_PLATFORM_SPECIFIC})
 
-
-
      # add a ActiveObject library
    add_library(lib_activeobject ${LOG_SRC}/active.cpp ${LOG_SRC}/active.h ${LOG_SRC}/shared_queue.h)
    set_target_properties(lib_activeobject PROPERTIES LINKER_LANGUAGE CXX)
 
 
-
    # add a g2log library
    include_directories(src)
-   include_directories(${LOG_SRC})
-   MESSAGE("  LOG_SRC = : ${LOG_SRC}")
    MESSAGE("  g2logger files: [${SRC_FILES}]")
    add_library(lib_g2logger  ${SRC_FILES})
    set_target_properties(lib_g2logger PROPERTIES LINKER_LANGUAGE CXX)
@@ -165,11 +153,11 @@ ENDIF(MSVC11)
 
    # 3. performance test for Google's glog
    option (USE_GOOGLE_GLOG_PERFORMANCE
-         "Create performance tests for Google's glog (remember to install glog, snapshot available at g2log/3rdParty/glog)" OFF)
+         "Create performance tests for Google's glog (remember to install glog, snapshot available at g2log/3rdParty/glog)" ON)
 
    # 4. unit test for g2log
    option (USE_G2LOG_UNIT_TEST
-          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" OFF)
+          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" ON)
 
 
 
@@ -180,16 +168,18 @@ ENDIF(MSVC11)
    #
    #  ==============================================================================================
    # 1. create the the example EXECUTABLE - hook in the test_example's CMakeLists.txt file
+   # =========================
    if (USE_SIMPLE_EXAMPLE)
       MESSAGE(" g2log-FATAL-example option ON")
       include_directories (${DIR_EXAMPLE})
       add_executable(g2log-FATAL-example ${DIR_EXAMPLE}/main.cpp)
       target_link_libraries(g2log-FATAL-example lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_SIMPLE_EXAMPLE)
-   # =========================
+
 
 
    # 2. create the g2log's performance tests
+   # =========================
    if (USE_G2LOG_PERFORMANCE)
       MESSAGE(" g2log performance tests option ON")
       include_directories (${DIR_PERFORMANCE})
@@ -201,16 +191,16 @@ ENDIF(MSVC11)
       target_link_libraries(g2log-performance-threaded_mean lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
 
      # WORST CASE PERFORMANCE TEST
-     add_executable(g2log-performance-threaded_worst ${DIR_PERFORMANCE}//main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
+     add_executable(g2log-performance-threaded_worst ${DIR_PERFORMANCE}/main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
      # Turn on G2LOG performance flag
      set_target_properties(g2log-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
      target_link_libraries(g2log-performance-threaded_worst lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_G2LOG_PERFORMANCE)
-     # =========================
 
 
 
    # 3. create the Google glog's performance test
+   # =========================
    if (USE_GOOGLE_GLOG_PERFORMANCE)
       MESSAGE(" Google's glog performance tests option ON")
       include_directories (${DIR_PERFORMANCE})
@@ -238,13 +228,11 @@ ENDIF(MSVC11)
             #set(GLOG_DIR ../3rdParty/glog/glog-0.3.1)
         #include_directories(${GLOG_DIR}/src/windows)
      endif(WIN32)
-
-
    endif (USE_GOOGLE_GLOG_PERFORMANCE)
-   # ===============================================================================================
 
 
    # 4. create the unit tests for g2log --- ONLY TESTED THE UNIT TEST ON LINUX
+   # =========================
    if (USE_G2LOG_UNIT_TEST)
      MESSAGE(" g2log unit testing option ON")
     # SETUP for GTEST
@@ -254,20 +242,34 @@ ENDIF(MSVC11)
       add_library(gtest_160_lib ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc)
       enable_testing(true)
 
-      add_executable(g2log-unit_test ../test_main/test_main.cpp ${DIR_UNIT_TEST}/test_io.cpp ${DIR_UNIT_TEST}/test_configuration.cpp)
       # obs see this: http://stackoverflow.com/questions/9589192/how-do-i-change-the-number-of-template-arguments-supported-by-msvcs-stdtupl
-      set_target_properties(g2log-unit_test  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")
-      # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
-      set_target_properties(g2log-unit_test  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-      target_link_libraries(g2log-unit_test lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+     # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
+  
+
+      
+      SET(tests_to_run test_filechange test_io test_configuration test_sink)
+      FOREACH(test ${tests_to_run} )
+ #        SET(all_tests  ${all_tests} ${DIR_UNIT_TEST}/${test}.cpp )
+         IF(${test} STREQUAL "test_filechange")
+             add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp)
+         ELSE()
+             add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp)
+         ENDIF(${test} STREQUAL "test_filechange")
+
+         set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
+         set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
+         target_link_libraries(${test} lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+      ENDFOREACH(test)
+    
 
 
-      add_executable(g2log-unit_test_filechange ${DIR_UNIT_TEST}/test_filechange.cpp)
-      set_target_properties(g2log-unit_test_filechange  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")
-      set_target_properties(g2log-unit_test_filechange  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-          target_link_libraries(g2log-unit_test_filechange lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+#      add_executable(test_ALL  ${all_tests})
+#
+#      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
+#      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
+#     target_link_libraries(${test_ALL}  lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
 
-          endif (USE_G2LOG_UNIT_TEST)
+endif (USE_G2LOG_UNIT_TEST)
 
 
 
