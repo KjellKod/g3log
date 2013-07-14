@@ -74,10 +74,9 @@ void initializeLogging(g2LogWorker *bgworker)
   }
 }
 
-g2LogWorker* shutDownLogging()
+g2LogWorker* shutDownLogging() // safe to call multiple times
 {
   std::lock_guard<std::mutex> lock(internal::g_logging_init_mutex);
-  CHECK(internal::isLoggingInitialized());
   g2LogWorker *backup = internal::g_logger_instance;
   internal::g_logger_instance = nullptr;
   return backup;

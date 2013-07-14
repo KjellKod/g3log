@@ -77,67 +77,42 @@ IF(UNIX)
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
    ENDIF(UNIX)
 
-   if (MSVC)
+ 
+# Visual Studio 2011 -- std::thread etc are included with the Visual Studio package, so justthread dependencies are removed
+IF(MSVC)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
-          # https://github.com/anhstudios/swganh/pull/186/files
+      # https://github.com/anhstudios/swganh/pull/186/files
       ADD_DEFINITIONS (/D_VARIADIC_MAX=10)
       MESSAGE(STATUS "- MSVC: Set variadic max to 10 for MSVC compatibility")
-          # Remember to set set target properties if using GTEST similar to done below on target "unit_test"
-          # "set_target_properties(unit_test  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-   endif ()
-
-
-#Visual Studio 2010 -- must use justthread. For now hardcoded for x64
-IF(MSVC10)
-   MESSAGE("")
-   MESSAGE("Windows: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 10\" ..]")
-   MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln /p:Configuration=Release'")
-   MESSAGE("then run 'Release\\g2log-FATAL-example.exe'  or whatever performance test you feel like trying")
-   MESSAGE("")
-   set(PLATFORM_LINK_LIBRIES $ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/lib/justthread_vc10_mdd.lib)
-   #set(PLATFORM_LINK_LIBRIES $ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/lib/justthread_vc10x64_mdd.lib)
-   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
-   include_directories("$ENV{PROGRAMFILES}/JustSoftwareSolutions/JustThread/include")
-ENDIF(MSVC10)
-
-# Visual Studio 2011 -- std::thread etc are included with the Visual Studio package, so justthread dependencies are removed
-IF(MSVC11)
+      # Remember to set set target properties if using GTEST similar to done below on target "unit_test"
+      # "set_target_properties(unit_test  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
    MESSAGE("")
    MESSAGE("Windows: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 11\" ..]")
    MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln /p:Configuration=Release'")
    MESSAGE("then run 'Release\\g2log-FATAL-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
-ENDIF(MSVC11)
+ENDIF(MSVC)
+
+
 
 
    # GENERIC STEPS
-   set(CPP_H_FILES g2logworker.cpp g2logworker.h 
-                   g2log.cpp g2log.h g2time.cpp g2time.h
-                   g2future.h std2_make_unique.hpp)
-   FOREACH(file ${CPP_H_FILES}) 
-     set(SRC_FILES ${SRC_FILES} ${LOG_SRC}/${file})
-   ENDFOREACH(file ${CPP_H_FILES})
+   file(GLOB SRC_FILES ${LOG_SRC}/*.h ${LOG_SRC}/*.hpp ${LOG_SRC}/*.cpp )
+   if(MSVC) 
+         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
+   else()     
+         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_win.cpp)
+   endif(MSVC)
+
    set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
 
-#
-#   set(SRC_CPP ${LOG_SRC}/g2logworker.cpp ${LOG_SRC}/g2log.cpp ${LOG_SRC}/g2time.cpp)
-#   set(SRC_H ${LOG_SRC}/g2logworker.h ${LOG_SRC}/g2log.h ${LOG_SRC}/crashhandler.h ${LOG_SRC}/g2time.h ${LOG_SRC}/g2future.h ${LOG_SRC}/std2_make_unique.hpp)
-#   set(SRC_FILES ${SRC_CPP} ${SRC_H} ${SRC_PLATFORM_SPECIFIC})
-
-
-     # add a ActiveObject library
-   add_library(lib_activeobject ${LOG_SRC}/active.cpp ${LOG_SRC}/active.h ${LOG_SRC}/shared_queue.h)
-   set_target_properties(lib_activeobject PROPERTIES LINKER_LANGUAGE CXX)
-
-
-   # add a g2log library
-   include_directories(src)
+   # Create the g2log library
+   include_directories(${LOG_SRC})
    MESSAGE("  g2logger files: [${SRC_FILES}]")
    add_library(lib_g2logger  ${SRC_FILES})
    set_target_properties(lib_g2logger PROPERTIES LINKER_LANGUAGE CXX)
-   target_link_libraries(lib_g2logger lib_activeobject)
 
 
 
@@ -152,21 +127,19 @@ ENDIF(MSVC11)
    #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
    # ============================================================================
    # 1. a simple test example 'g2log-FATAL-example'
-   option (USE_SIMPLE_EXAMPLE
-          "Create  simple binaries that runs a few LOG calls" ON)
-
+   option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash) example " ON)
 
    # 2. performance test (average + worst case) for KjellKod's g2log
-   option (USE_G2LOG_PERFORMANCE
-         "Create performance tests for g2log" OFF)
+   option (USE_G2LOG_PERFORMANCE "g2log performance test" OFF)
 
    # 3. performance test for Google's glog
-   option (USE_GOOGLE_GLOG_PERFORMANCE
-         "Create performance tests for Google's glog (remember to install glog, snapshot available at g2log/3rdParty/glog)" ON)
+   #    remember to install glog, snapshot available at g2log/3rdParty/glog
+   option (USE_GOOGLE_GLOG_PERFORMANCE  "Google's glog performance test" OFF) 
+   
 
    # 4. unit test for g2log
-   option (USE_G2LOG_UNIT_TEST
-          "Create unit test for g2log (remember to unzip Google's gtest framework, available at g2log/3rdParty/gtest)" ON)
+   #    remember to unzip gtest at g2log/3rdParty/gtest
+   option (USE_G2LOG_UNIT_TEST "g2log unit tests" ON)
 
 
 
@@ -182,7 +155,7 @@ ENDIF(MSVC11)
       MESSAGE(" g2log-FATAL-example option ON")
       include_directories (${DIR_EXAMPLE})
       add_executable(g2log-FATAL-example ${DIR_EXAMPLE}/main.cpp)
-      target_link_libraries(g2log-FATAL-example lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-FATAL-example lib_g2logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_SIMPLE_EXAMPLE)
 
 
@@ -197,13 +170,13 @@ ENDIF(MSVC11)
                     ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
       # Turn on G2LOG performance flag
       set_target_properties(g2log-performance-threaded_mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-      target_link_libraries(g2log-performance-threaded_mean lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-performance-threaded_mean lib_g2logger ${PLATFORM_LINK_LIBRIES})
 
      # WORST CASE PERFORMANCE TEST
      add_executable(g2log-performance-threaded_worst ${DIR_PERFORMANCE}/main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
      # Turn on G2LOG performance flag
      set_target_properties(g2log-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-     target_link_libraries(g2log-performance-threaded_worst lib_activeobject lib_g2logger ${PLATFORM_LINK_LIBRIES})
+     target_link_libraries(g2log-performance-threaded_worst  lib_g2logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_G2LOG_PERFORMANCE)
 
 
@@ -216,26 +189,24 @@ ENDIF(MSVC11)
         #Linux is easy!
     if(UNIX)
        set(GLOG_LIB glog)
-           # create the the GOOGLE MEAN_PERFORMANCE executable
+       # create the the GOOGLE MEAN_PERFORMANCE executable
        add_executable(google_glog-performance-threaded_mean ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
        set_target_properties(google_glog-performance-threaded_mean  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-       target_link_libraries(google_glog-performance-threaded_mean lib_activeobject ${GLOG_LIB} ${PLATFORM_LINK_LIBRIES})
+       target_link_libraries(google_glog-performance-threaded_mean ${GLOG_LIB} ${PLATFORM_LINK_LIBRIES})
 
        # create the the GOOGLE MEAN_PERFORMANCE executable
        add_executable(google_glog-performance-threaded_worst ${DIR_PERFORMANCE}/main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
        set_target_properties(google_glog-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "GOOGLE_GLOG_PERFORMANCE=1")
-           target_link_libraries(google_glog-performance-threaded_worst lib_activeobject  ${GLOG_LIB} ${PLATFORM_LINK_LIBRIES})
-         endif(UNIX)
+       target_link_libraries(google_glog-performance-threaded_worst  ${GLOG_LIB} ${PLATFORM_LINK_LIBRIES})
+     endif(UNIX)
 
-         # GLOG on Linux is easy - but for Windows trickier,. and it doesn't work (as of yet)
+     # GLOG on Linux is easy - but for Windows trickier,. and it doesn't work (as of yet)
      if(WIN32)
        MESSAGE("******************************************************")
-           MESSAGE("*** SORRY- Google glog on windows is not preconfigured")
-           MESSAGE("*** You have to do this yourself: ref CMakeLists.txt")
+       MESSAGE("*** SORRY- Google glog on windows is not preconfigured")
+       MESSAGE("*** You have to do this yourself: ref CMakeLists.txt")
        MESSAGE("******************************************************")
-           MESSAGE("")
-            #set(GLOG_DIR ../3rdParty/glog/glog-0.3.1)
-        #include_directories(${GLOG_DIR}/src/windows)
+       MESSAGE("")
      endif(WIN32)
    endif (USE_GOOGLE_GLOG_PERFORMANCE)
 
@@ -244,32 +215,40 @@ ENDIF(MSVC11)
    # =========================
    if (USE_G2LOG_UNIT_TEST)
      MESSAGE(" g2log unit testing option ON")
-    # SETUP for GTEST
       set(GTEST_DIR ../3rdParty/gtest/gtest-1.6.0__stripped)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
       include_directories(${GTEST_INCLUDE_DIRECTORIES})
       add_library(gtest_160_lib ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc)
       enable_testing(true)
 
-      # obs see this: http://stackoverflow.com/questions/9589192/how-do-i-change-the-number-of-template-arguments-supported-by-msvcs-stdtupl
+     # obs see this: http://stackoverflow.com/questions/9589192/how-do-i-change-the-number-of-template-arguments-supported-by-msvcs-stdtupl
      # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
   
 
-      
       SET(tests_to_run test_filechange test_io test_configuration test_sink)
       SET(helper ${DIR_UNIT_TEST}/testing_helpers.h ${DIR_UNIT_TEST}/testing_helpers.cpp)
-      FOREACH(test ${tests_to_run} )
- #        SET(all_tests  ${all_tests} ${DIR_UNIT_TEST}/${test}.cpp )
-         IF(${test} STREQUAL "test_filechange")
-             add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp)
-         ELSE()
-             add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
-         ENDIF(${test} STREQUAL "test_filechange")
+      include_directories(${DIR_UNIT_TEST})
 
+      FOREACH(test ${tests_to_run} )
+        SET(all_tests  ${all_tests} ${DIR_UNIT_TEST}/${test}.cpp )
+        IF(${test} STREQUAL "test_filechange")
+           add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
+         ELSE()
+           add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
+         ENDIF(${test} STREQUAL "test_filechange")
          set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
          set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-         target_link_libraries(${test} lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+         target_link_libraries(${test} lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
       ENDFOREACH(test)
+
+      add_executable(test_ALL  ${all_tests} ${DIR_UNIT_TEST}/test_filechange.cpp ${helper})  
+      set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
+      set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
+      target_link_libraries(test_ALL   lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+
+
+
+
     
 
 
@@ -277,7 +256,7 @@ ENDIF(MSVC11)
 #
 #      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
 #      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-#     target_link_libraries(${test_ALL}  lib_activeobject lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+#     target_link_libraries(${test_ALL}   lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
 
 endif (USE_G2LOG_UNIT_TEST)
 

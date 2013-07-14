@@ -11,6 +11,8 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <mutex>
+#include <algorithm>
 class g2LogWorker;
 
 
@@ -20,30 +22,54 @@ class g2LogWorker;
 //   ScopedCout guard(&buffer);
 //   cout << "Hello World";
 //   ASSERT_STREQ(buffer.str().c_str(), "Hello World"); 
-class ScopedCout
+
+class ScopedCout {
+  std::streambuf* _old_cout;
+public:
+  explicit ScopedCout(std::stringstream* buffer);
+  ~ScopedCout();
+};
+
+
+namespace testing_helper__cleaner {
+  bool removeFile(std::string path_to_file);
+}
+
+class LogFileCleaner // RAII cluttering files cleanup
 {
-   std::streambuf*  _old_cout;
-   public:
-    explicit ScopedCout(std::stringstream*  buffer);
-    ~ScopedCout();
+private:
+  std::vector<std::string> logs_to_clean_;
+  std::mutex g_mutex;
+public:
+  size_t size();
+
+  LogFileCleaner() {
+  }
+  virtual ~LogFileCleaner();
+  void addLogToClean(std::string path_to_log);
 };
 
 
 
 // RAII temporarily replace of logger
 // and restoration of original logger at scope end
-struct RestoreLogger
-{
-	explicit RestoreLogger(std::string directory);
-	~RestoreLogger();
-	void reset();
 
-	std::unique_ptr<g2LogWorker> logger_;
-	std::string logFile(){return log_file_;}
+struct RestoreLogger {
+  explicit RestoreLogger(std::string directory);
+  ~RestoreLogger();
+  void reset();
+
+  std::unique_ptr<g2LogWorker> logger_;
+
+  std::string logFile() {
+    return log_file_;
+  }
 private:
-	std::string log_file_;
+  std::string log_file_;
 
 };
+
+
 
 #endif	/* TEST_HELPER__RESTORE_LOGGER_H */
 
