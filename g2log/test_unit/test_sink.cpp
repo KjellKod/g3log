@@ -27,20 +27,17 @@ public:
 };
 
 
-TEST(SinkBasics, RAII_CoutSink) {
-  std::unique_ptr<CoutSink> ptr = nullptr;
-  {
-    ptr = CoutSink::createSink();
-    ASSERT_FALSE(nullptr == ptr);
-  }
+TEST(SinkBasics, UniquePtr_CoutSink) {
+  auto ptr = CoutSink::createSink();
+  ASSERT_FALSE(nullptr == ptr);
+  ptr.release();
   ASSERT_TRUE(nullptr == ptr);
 }
 
 TEST(SinkToLogger, AddSink_Expect_return_Handle) {
-    auto ptr = CoutSink::createSink();
-    RestoreLogger raii_logger;
-    auto handler = raii_logger.callToLogger(&addSink, CoutSink::createSink());
-    ASSERT_FALSE(nullptr == handler);
+    //auto ptr = CoutSink::createSink();
+    //RestoreLogger raii_logger;
+    //auto handler = raii_logger.callToLogger(&addSink, CoutSink::createSink());
+    //ASSERT_FALSE(nullptr == handler);
+  ASSERT_FALSE(true);
 }
-
-
