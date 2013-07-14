@@ -13,8 +13,7 @@
 #include <iostream>
 #include <mutex>
 #include <algorithm>
-class g2LogWorker;
-
+#include "g2logworker.h"
 
 // After initializing ScopedCout all std::couts is redirected to the buffer
 // Example: 
@@ -58,12 +57,17 @@ struct RestoreLogger {
   explicit RestoreLogger(std::string directory);
   ~RestoreLogger();
   void reset();
-
+  
   std::unique_ptr<g2LogWorker> logger_;
 
-  std::string logFile() {
-    return log_file_;
+  template<typename Call, typename ... Args >
+          typename std::result_of<Call(Args...)>::type callToLogger(Call call, Args&&... args) {
+    auto func = std::bind(call, logger_.get(), std::forward<Args>(args)...);
+    return func();
   }
+  
+
+  std::string logFile() { return log_file_;  }
 private:
   std::string log_file_;
 
