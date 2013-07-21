@@ -55,8 +55,8 @@ private:
 //  ...
 //  auto msg_call=[=](){return ("Hello from the Background");};
 //  auto future_msg = g2::spawn_task(msg_lambda, bgWorker.get());
-template <typename Func>
-std::future<typename std::result_of<Func()>::type> spawn_task(Func func, kjellkod::Active* worker)
+template <typename Func, class BgWorker>
+std::future<typename std::result_of<Func()>::type> spawn_task(Func func, BgWorker* worker)
 {
   typedef typename std::result_of<Func()>::type result_type;
   typedef std::packaged_task<result_type()> task_type;

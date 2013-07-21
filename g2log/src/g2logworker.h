@@ -37,6 +37,7 @@ public:
   /// Will abort the application!
   void fatal(g2::internal::FatalMessage fatal_message);
 
+  /// DEPRECATED - SHOULD BE Called through a sink handler instead
   /// Attempt to change the current log file to another name/location.
   /// returns filename with full path if successful, else empty string
   std::future<std::string> changeLogFile(const std::string& log_directory);

@@ -25,6 +25,8 @@
 #include <iostream>
 #include <cstdarg>
 #include <chrono>
+#include "g2logmessage.h"
+
 
 class g2LogWorker;
 
@@ -160,8 +162,6 @@ g2LogWorker* shutDownLogging();
 // defined here but should't not have to be used outside the g2log
 namespace internal
 {
-  typedef const std::string& LogEntry;
-
 /** By default the g2log will call g2LogWorker::fatal(...) which will abort() the system after flushing
  * the logs to file. This makes unit test of FATAL level cumbersome. A work around is to change the 'fatal call'
  * which can be done here */

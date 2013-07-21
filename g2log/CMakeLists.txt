@@ -127,7 +127,7 @@ ENDIF(MSVC)
    #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
    # ============================================================================
    # 1. a simple test example 'g2log-FATAL-example'
-   option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash) example " ON)
+   option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash) example " OFF)
 
    # 2. performance test (average + worst case) for KjellKod's g2log
    option (USE_G2LOG_PERFORMANCE "g2log performance test" OFF)
