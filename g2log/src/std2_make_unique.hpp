@@ -15,6 +15,9 @@
  * auto an_int_array = make_unique<int[]>(11, 22, 33);
  * ********************************************* */
 
+#ifndef STD2_MAKE_UNIQUE_HPP_
+#define STD2_MAKE_UNIQUE_HPP_
+
 #include <memory>
 #include <utility>
 #include <type_traits>
@@ -42,5 +45,5 @@ namespace std2 {
   }
 }
 
-
+#endif
 

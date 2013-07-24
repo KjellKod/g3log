@@ -3,6 +3,7 @@
 #include "testing_helpers.h"
 #include "g2log.h"
 #include "g2logworker.h"
+#include "g2filesink.h"
 #include "std2_make_unique.hpp"
 
 using namespace std;
@@ -25,8 +26,9 @@ RestoreLogger::RestoreLogger(std::string directory)
   oldworker = g2::shutDownLogging();
   g2::initializeLogging(logger_.get());
   g2::internal::changeFatalInitHandlerForUnitTesting();
-
-  std::future<std::string> filename(logger_->logFileName());
+  
+  auto filehandler = logger_->getFileSinkHandle();
+  auto filename = filehandler->call(&g2FileSink::logFileName);
   if (!filename.valid()) ADD_FAILURE();
   log_file_ = filename.get();
 }

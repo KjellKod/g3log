@@ -121,9 +121,13 @@ namespace g2 {
     auto h1 = worker.addSink(CoutSink::createSink(), &CoutSink::save);
     auto h2 = worker.addSink(std2::make_unique<StringSink>(), &StringSink::append);
     worker.save("Hello World!");
+    
+    
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     auto first =  h1->call(&CoutSink::string);
     auto second = h2->call(&StringSink::string);
+    
+    
     ASSERT_EQ("Hello World!", first.get());
     ASSERT_EQ("Hello World!", second.get());
   }
