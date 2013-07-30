@@ -27,7 +27,7 @@
 #include <mutex>
 
 #include "g2logworker.h"
-#include "crashhandler.h"
+#include "crashhandler.hpp"
 #include <signal.h>
 #include <thread>
 

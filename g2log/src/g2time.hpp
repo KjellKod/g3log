@@ -1,5 +1,5 @@
-#ifndef G2_TIME_H_
-#define G2_TIME_H_
+#ifndef G2_TIME_HPP_
+#define G2_TIME_HPP_
 /** ==========================================================================
 * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
@@ -22,6 +22,12 @@
 
 namespace g2
 {
+  namespace internal
+  {
+    static const std::string date_formatted = "%Y/%m/%d";
+    static const std::string time_formatted = "%H:%M:%S";
+  }
+    
   typedef std::chrono::steady_clock::time_point steady_time_point;
   typedef std::chrono::time_point<std::chrono::system_clock>  system_time_point;
   typedef std::chrono::milliseconds milliseconds;

@@ -25,7 +25,7 @@
 #include <iostream>
 #include <cstdarg>
 #include <chrono>
-#include "g2logmessage.h"
+#include "g2logmessage.hpp"
 
 
 class g2LogWorker;

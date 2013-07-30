@@ -11,7 +11,7 @@
 #include "g2sink.h"
 #include "g2sinkwrapper.h"
 #include "g2sinkhandle.h"
-#include "g2logmessage.h"
+#include "g2logmessage.hpp"
 
 
 using namespace std;

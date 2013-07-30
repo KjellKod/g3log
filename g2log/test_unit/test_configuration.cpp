@@ -13,7 +13,7 @@
 #include <exception>
 #include <functional>
 #include <memory>
-#include "g2time.h"
+#include "g2time.hpp"
 #include "g2future.h"
 
 TEST(Configuration, LOG)

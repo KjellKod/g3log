@@ -8,7 +8,7 @@
 #ifndef G2SINKWRAPPER_IPP
 #define	G2SINKWRAPPER_IPP
 
-#include "g2logmessage.h"
+#include "g2logmessage.hpp"
 
 namespace g2 {
   namespace internal {

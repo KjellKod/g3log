@@ -51,13 +51,15 @@
 //  std::string changeDirectoryOrName(std::string new_file_to_create) {
 //    static std::mutex m;
 //    static int count;
+//    std::string add_count;
 //    std::lock_guard<std::mutex> lock(m);
 //    {
-//      std::string add_count = std::to_string(++count) + "_";
+//      add_count = std::to_string(++count) + "_";
 //      auto new_log = g_logger_ptr->changeLogFile(new_file_to_create + add_count).get();
 //      if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
 //      return new_log;
 //    }
+//    return add_count;
 //  }
 //} // anonymous
 //

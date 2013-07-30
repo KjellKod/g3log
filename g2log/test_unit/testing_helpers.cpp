@@ -3,7 +3,7 @@
 #include "testing_helpers.h"
 #include "g2log.h"
 #include "g2logworker.h"
-#include "g2filesink.h"
+#include "g2filesink.hpp"
 #include "std2_make_unique.hpp"
 
 using namespace std;
@@ -21,14 +21,15 @@ ScopedCout::~ScopedCout() {
 }
 
 RestoreLogger::RestoreLogger(std::string directory)
-: logger_(std2::make_unique<g2LogWorker>("UNIT_TEST_LOGGER", directory)) {
+: logger_(g2LogWorker::createWithNoSink()) {
+  using namespace g2;
+  auto filehandler = logger_->addSink(std2::make_unique<g2FileSink>("UNIT_TEST_LOGGER", directory), &g2FileSink::fileWrite);
 
   oldworker = g2::shutDownLogging();
-  g2::initializeLogging(logger_.get());
-  g2::internal::changeFatalInitHandlerForUnitTesting();
+  initializeLogging(logger_.get());
+  internal::changeFatalInitHandlerForUnitTesting();
   
-  auto filehandler = logger_->getFileSinkHandle();
-  auto filename = filehandler->call(&g2FileSink::logFileName);
+  auto filename = filehandler->call(&g2FileSink::fileName);
   if (!filename.valid()) ADD_FAILURE();
   log_file_ = filename.get();
 }

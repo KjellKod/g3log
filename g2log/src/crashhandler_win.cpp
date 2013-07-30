@@ -4,7 +4,7 @@
 * strings attached and no restrictions or obligations.
 * ============================================================================*/
 
-#include "crashhandler.h"
+#include "crashhandler.hpp"
 #include "g2log.h"
 
 #include <csignal>
