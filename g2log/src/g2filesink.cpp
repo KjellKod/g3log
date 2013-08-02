@@ -24,7 +24,7 @@ namespace g2 {
 
     if (!_outptr) {
       std::cerr << "Cannot write log file to location, attempting current directory" << std::endl;
-      _log_file_with_path = file_name;
+      _log_file_with_path = "./" + file_name;
       _outptr = createLogFile(_log_file_with_path);
     }
     assert(_outptr  && "cannot open log file at startup");
