@@ -30,21 +30,17 @@ namespace {
     std::ifstream in;
     in.open(filename.c_str(), std::ios_base::in);
     if (!in.is_open()) {
-      return ""; // error just return empty string - test will 'fault'
+      return {}; // error just return empty string - test will 'fault'
     }
     std::ostringstream oss;
     oss << in.rdbuf();
-    std::string content(oss.str());
-    return content;
+    return oss.str();
   }
 } // end anonymous namespace
 
 
 
-
-
-
-
+using namespace testing_helpers;
 // LOG
 TEST(IO_RestoreLogger, Expecting_Fine_To_ShutDownMultipleTimes) 
 {

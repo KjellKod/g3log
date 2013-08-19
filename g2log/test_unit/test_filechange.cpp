@@ -19,7 +19,7 @@
 #include "g2logworker.h"
 #include "testing_helpers.h"
 
-using namespace testing_helper__cleaner;
+using namespace testing_helpers;
 
 
 namespace { // anonymous
@@ -28,9 +28,7 @@ namespace { // anonymous
   g2LogWorker* g_logger_ptr = nullptr;
   g2::SinkHandle<g2::g2FileSink>* g_filesink_handler = nullptr;
   LogFileCleaner* g_cleaner_ptr = nullptr;
-  
-  
-  
+
   bool isTextAvailableInContent(const std::string &total_text, std::string msg_to_find) {
     std::string content(total_text);
     size_t location = content.find(msg_to_find);
@@ -64,19 +62,18 @@ namespace { // anonymous
     return add_count;
   }
 
- std::string setLogName(std::string new_file_to_create) {
+  std::string setLogName(std::string new_file_to_create) {
     auto future_new_log = g_filesink_handler->call(&g2::g2FileSink::changeLogFile, new_file_to_create);
     auto new_log = future_new_log.get();
     if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
     return new_log;
   }
-  
+
   std::string getLogName() {
-    return g_filesink_handler->call(&g2::g2FileSink::fileName).get();  
+    return g_filesink_handler->call(&g2::g2FileSink::fileName).get();
   }
 
 } // anonymous
-
 
 TEST(TestOf_GetFileName, Expecting_ValidLogFile) {
 
@@ -86,14 +83,14 @@ TEST(TestOf_GetFileName, Expecting_ValidLogFile) {
 }
 
 TEST(TestOf_ChangingLogFile, Expecting_NewLogFileUsed) {
-  auto old_log =  g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+  auto old_log = getLogName();
   std::string name = setLogNameAndAddCount(name_path_1);
   auto new_log = setLogName(name);
   ASSERT_NE(old_log, new_log);
 }
 
 TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
-  auto old_log =  g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+  auto old_log = g_filesink_handler->call(&g2::g2FileSink::fileName).get();
   if (!old_log.empty()) g_cleaner_ptr->addLogToClean(old_log);
 
   LOG(INFO) << "SoManyThreadsAllDoingChangeFileName";
@@ -113,32 +110,36 @@ TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
 
 TEST(TestOf_IllegalLogFileName, Expecting_NoChangeToOriginalFileName) {
   std::string original = getLogName();
-  std::cerr << "Below WILL print 'FiLE ERROR'. This is part of the testing and perfectly OK" << std::endl;
-  std::cerr << "****" << std::endl;
   auto perhaps_a_name = setLogName("XY:/"); // does not exist
   ASSERT_TRUE(perhaps_a_name.empty());
-  std::cerr << "****" << std::endl;
   std::string post_illegal = getLogName();
   ASSERT_STREQ(original.c_str(), post_illegal.c_str());
 }
+
 
 int main(int argc, char *argv[]) {
   LogFileCleaner cleaner;
   g_cleaner_ptr = &cleaner;
   int return_value = 1;
-
+  std::stringstream cerrDump;
+  
   std::string last_log_file;
   {
-    auto pair = g2LogWorker::createWithDefaultFileSink("ReplaceLogFile", name_path_2);
+    
+    testing_helpers::ScopedOut scopedCerr(std::cerr, &cerrDump);
+
+    auto pair = g2LogWorker::createWithDefaultFileSink("ReplaceLogFile", name_path_1);
     //g2LogWorker logger("ReplaceLogFile", name_path_2);
-    testing::InitGoogleTest(&argc, argv);
     g_logger_ptr = pair.first.get(); // ugly but fine for this test
     g_filesink_handler = pair.second.get();
-    
     g2::initializeLogging(g_logger_ptr);
-    cleaner.addLogToClean(g_filesink_handler->call(&g2::g2FileSink::fileName).get());
+    LOG(INFO) << "test_filechange demo*" << std::endl;
+    
+    testing::InitGoogleTest(&argc, argv);
     return_value = RUN_ALL_TESTS();
+
     last_log_file = g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+    std::cout << "log file at: " << last_log_file << std::endl;
     //g2::shutDownLogging();
   }
   std::cout << "FINISHED WITH THE TESTING" << std::endl;

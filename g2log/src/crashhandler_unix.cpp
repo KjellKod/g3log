@@ -152,7 +152,7 @@ std::string signalName(int signal_number)
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
 void exitWithDefaultSignalHandler(int signal_number)
 {
-  std::cerr << "Exiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
+  std::cerr << "\nExiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
   struct sigaction action;
   memset(&action, 0, sizeof(action));  //
   sigemptyset(&action.sa_mask);

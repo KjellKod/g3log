@@ -127,7 +127,7 @@ ENDIF(MSVC)
    #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
    # ============================================================================
    # 1. a simple test example 'g2log-FATAL-example'
-   option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash) example " OFF)
+   option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash) example " ON)
 
    # 2. performance test (average + worst case) for KjellKod's g2log
    option (USE_G2LOG_PERFORMANCE "g2log performance test" OFF)
@@ -225,7 +225,7 @@ ENDIF(MSVC)
      # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
   
 
-      SET(tests_to_run test_filechange test_io test_configuration test_sink)
+      SET(tests_to_run test_filechange test_io test_configuration test_sink_concept test_sink)
       SET(helper ${DIR_UNIT_TEST}/testing_helpers.h ${DIR_UNIT_TEST}/testing_helpers.cpp)
       include_directories(${DIR_UNIT_TEST})
 
