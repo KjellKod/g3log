@@ -46,7 +46,7 @@ namespace g2 {
       virtual ~Sink() {   _bg.reset();    }
 
       void send(LogEntry msg) override {
-        _bg->send([ = ]{_default_log_call(msg);});
+        _bg->send([this, msg]{_default_log_call(msg);});
       }
 
       template<typename Call, typename... Args>
