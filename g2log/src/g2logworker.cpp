@@ -34,8 +34,7 @@ struct g2LogWorkerImpl {
   g2LogWorkerImpl() : _bg(kjellkod::Active::createActive()) {  }
 
   ~g2LogWorkerImpl() {
-    _bg.reset();
-    _sinks.clear();
+    _bg->send([this]{_sinks.clear(); });
   }
 
   void bgSave(g2::internal::LogEntry msg) {
@@ -44,19 +43,18 @@ struct g2LogWorkerImpl {
     }
 
     if (_sinks.empty()) {
-      std::ostringstream err_msg;
-      err_msg << "g2logworker has no sinks. Message: [" << msg << "]" << std::endl;
-      std::cerr << err_msg.str();
+      std::string err_msg{"g2logworker has no sinks. Message: ["};
+      err_msg.append(msg).append({"]\n"});
+      std::cerr << err_msg;
     }
   }
 
   void bgFatal(g2::internal::FatalMessage fatal_message) {
     auto entry = fatal_message.message_;
     bgSave(entry);
-    std::ostringstream end_message;
-    end_message << "Exiting after fatal event. Log flushed sucessfully t disk.\n";
-    bgSave(end_message.str());
-    std::cerr << "g2log sinks are flushed. Now exiting after receiving fatal event" << std::endl;
+    std::string end_message{"Exiting after fatal event. Log flushed sucessfully to disk.\n"};
+    bgSave(end_message);
+    std::cerr << "g2log sinks are flushed. Now exiting after receiving fatal event\n" << std::flush;
 
     _sinks.clear(); // flush all queues
     exitWithDefaultSignalHandler(fatal_message.signal_id_);

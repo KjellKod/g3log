@@ -59,7 +59,25 @@ public:
     addWrappedSink(sink);
     return std2::make_unique < SinkHandle < T >> (sink);
   }
-};
-
-
+};  
+//problemet är att det verkar inte som om min sink avslutas. är det p.g.a. shared_ptr_
+//printout från g2FileSink borde synas
+//Tips. Gör unit test massvis med loggers som tar in bolean ref som sätts i destruktorn        
+//
+//1. fixa filechange testet först
+//2. sen jämför mitt andra projekt och wrapper.h .     
+//        speciellt main, addSink och de underliggande funktionerna
+//        
+//3) ha worker i wrapper som en unik inte shared klass.
+//        
+//        När allt är klart: 
+//        a) överväg att istället för pair ha en strukt med namnet
+//        defaultlogger med samma API som dagens logger. 
+//    
+//b) andra logger creation skapar inte en DefaultLogger utan en 
+//Logger
+//
+//4) n när allt fungerar bör namnen ändras. 
+//filnamnen borde heta g2...
+//klassnamnen borde heta g2::whatever  inte g2::g2Whate
 #endif // LOG_WORKER_H_
