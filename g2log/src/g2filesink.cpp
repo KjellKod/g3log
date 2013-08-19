@@ -34,12 +34,12 @@ namespace g2 {
   
 
   g2FileSink::~g2FileSink() {
-
-    std::ostringstream ss_exit;
-    ss_exit << "\n\t\tg2log g2FileSink shutdown at: " << localtime_formatted(systemtime_now(), internal::time_formatted);
-    filestream() << ss_exit.str() << std::flush;
-    ss_exit << "\nLog file at: [" << _log_file_with_path << "]\n" << std::endl;
-    std::cerr << ss_exit << std::flush;
+    std::string exit_msg {"\n\t\tg2log g2FileSink shutdown at: "};
+    exit_msg.append(localtime_formatted(systemtime_now(), internal::time_formatted));
+    filestream() << exit_msg << std::flush;
+    
+    exit_msg.append({"\nLog file at: ["}).append(_log_file_with_path).append({"]\n\n"});
+    std::cerr << exit_msg << std::flush;
   }
 
   void g2FileSink::fileWrite(internal::LogEntry message) {
