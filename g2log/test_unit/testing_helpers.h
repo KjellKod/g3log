@@ -5,36 +5,47 @@
  * Created on July 13, 2013, 4:46 PM
  */
 
-#ifndef TEST_HELPER__RESTORE_LOGGER_H
-#define	TEST_HELPER__RESTORE_LOGGER_H
+#pragma once
 
 #include <memory>
 #include <string>
-#include <iostream>
 #include <mutex>
 #include <algorithm>
 #include "g2logworker.h"
 
-// After initializing ScopedCout all std::couts is redirected to the buffer
-// Example: 
-//   stringstream buffer;   
-//   ScopedCout guard(&buffer);
-//   cout << "Hello World";
-//   ASSERT_STREQ(buffer.str().c_str(), "Hello World"); 
+namespace testing_helpers {
 
-class ScopedCout {
+   bool removeFile(std::string path_to_file);
+   
+/** After initializing ScopedCout all std::couts is redirected to the buffer
+ @verbatim
+ Example: 
+  stringstream buffer;   
+  ScopedCout guard(&buffer);
+  cout << "Hello World";
+  ASSERT_STREQ(buffer.str().c_str(), "Hello World"); */
+class ScopedOut {
+  std::ostream& _out_type;
   std::streambuf* _old_cout;
 public:
-  explicit ScopedCout(std::stringstream* buffer);
-  ~ScopedCout();
+  explicit ScopedOut(std::ostream& out_type, std::stringstream* buffer)
+     : _out_type(out_type)
+     , _old_cout(_out_type.rdbuf()) {
+      _out_type.rdbuf(buffer->rdbuf());
+     }
+      
+  virtual ~ScopedOut() {
+      _out_type.rdbuf(_old_cout);
+   }
 };
 
+ 
+ 
+ 
 
-namespace testing_helper__cleaner {
-  bool removeFile(std::string path_to_file);
-}
 
-class LogFileCleaner // RAII cluttering files cleanup
+/// RAII cluttering files cleanup
+class LogFileCleaner 
 {
 private:
   std::vector<std::string> logs_to_clean_;
@@ -50,14 +61,12 @@ public:
 
 
 
-// RAII temporarily replace of logger
-// and restoration of original logger at scope end
-
+/** RAII temporarily replace of logger
+ *  and restoration of original logger at scope end*/
 struct RestoreLogger {
   explicit RestoreLogger(std::string directory);
   ~RestoreLogger();
-  void reset();
-  
+  void reset();  
   std::unique_ptr<g2LogWorker> logger_;
 
   template<typename Call, typename ... Args >
@@ -66,14 +75,12 @@ struct RestoreLogger {
     return func();
   }
   
-
   std::string logFile() { return log_file_;  }
 private:
   std::string log_file_;
-
 };
+} // testing_helpers
 
 
 
-#endif	/* TEST_HELPER__RESTORE_LOGGER_H */
 
