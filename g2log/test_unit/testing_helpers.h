@@ -63,9 +63,9 @@ public:
 
 /** RAII temporarily replace of logger
  *  and restoration of original logger at scope end*/
-struct RestoreLogger {
-  explicit RestoreLogger(std::string directory);
-  ~RestoreLogger();
+struct RestoreFileLogger {
+  explicit RestoreFileLogger(std::string directory);
+  ~RestoreFileLogger();
   void reset();  
   std::unique_ptr<g2LogWorker> logger_;
 
@@ -78,6 +78,16 @@ struct RestoreLogger {
   std::string logFile() { return log_file_;  }
 private:
   std::string log_file_;
+};
+
+
+struct ScopedLogger {
+    ScopedLogger();
+    virtual ~ScopedLogger();
+    
+    g2LogWorker* get();
+    g2LogWorker* _previousWorker;
+    std::unique_ptr<g2LogWorker> _currentWorker;
 };
 } // testing_helpers
 

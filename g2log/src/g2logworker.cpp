@@ -22,7 +22,6 @@
 #include "g2future.h"
 #include "crashhandler.hpp"
 
-
 using namespace g2;
 using namespace g2::internal;
 
@@ -102,6 +101,5 @@ void g2LogWorker::addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> sink
   
   std::unique_ptr<g2LogWorker> g2LogWorker::createWithNoSink() 
   {
-    std::unique_ptr<g2LogWorker> logger(new g2LogWorker());
-    return logger;
+    return std::unique_ptr<g2LogWorker>(new g2LogWorker);
   }

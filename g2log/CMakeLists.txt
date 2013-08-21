@@ -225,26 +225,32 @@ ENDIF(MSVC)
      # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
   
 
-      SET(tests_to_run test_filechange test_io test_configuration test_sink_concept test_sink)
+      SET(tests_to_run test_filechange test_io test_configuration test_concept_sink test_sink)
       SET(helper ${DIR_UNIT_TEST}/testing_helpers.h ${DIR_UNIT_TEST}/testing_helpers.cpp)
       include_directories(${DIR_UNIT_TEST})
 
       FOREACH(test ${tests_to_run} )
         SET(all_tests  ${all_tests} ${DIR_UNIT_TEST}/${test}.cpp )
-        IF(${test} STREQUAL "test_filechange")
+         IF(${test} STREQUAL "test_filechange")
            add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
+
+         ELSEIF(${test} STREQUAL "test_sink")
+           add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
+           MESSAGE("*****************************************************")
+
          ELSE()
            add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
          ENDIF(${test} STREQUAL "test_filechange")
+
          set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
          set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
          target_link_libraries(${test} lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
       ENDFOREACH(test)
 
-      add_executable(test_ALL  ${all_tests} ${DIR_UNIT_TEST}/test_filechange.cpp ${helper})  
-      set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
-      set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-      target_link_libraries(test_ALL   lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+      #add_executable(test_ALL  ${all_tests} ${DIR_UNIT_TEST}/test_filechange.cpp ${helper})  
+      #set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
+      #set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
+      #target_link_libraries(test_ALL   lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
 
 
 

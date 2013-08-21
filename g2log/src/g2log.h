@@ -153,7 +153,7 @@ namespace g2
 void initializeLogging(g2LogWorker *logger);
 
 /** Shutdown the logging by making the pointer to the background logger to nullptr
- * The \ref pointer to the g2LogWorker is owned by the instantniater \ref initializeLogging
+ * The \ref pointer to the g2LogWorker is owned by the instantiated \ref initializeLogging
  * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. This is
  * kept for test reasons and should normally not be used */
 g2LogWorker* shutDownLogging();

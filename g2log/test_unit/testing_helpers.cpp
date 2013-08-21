@@ -21,7 +21,7 @@ namespace testing_helpers {
    }
 
 
-   RestoreLogger::RestoreLogger(std::string directory)
+   RestoreFileLogger::RestoreFileLogger(std::string directory)
    : logger_(g2LogWorker::createWithNoSink()) {
       using namespace g2;
       auto filehandler = logger_->addSink(std2::make_unique<g2FileSink>("UNIT_TEST_LOGGER", directory), &g2FileSink::fileWrite);
@@ -35,15 +35,15 @@ namespace testing_helpers {
       log_file_ = filename.get();
    }
 
-   RestoreLogger::~RestoreLogger() {
-      reset();
+   RestoreFileLogger::~RestoreFileLogger() {
       g2::shutDownLogging();
+      reset();
       if (nullptr != oldworker) g2::initializeLogging(oldworker);
       if (!removeFile(log_file_))
          ADD_FAILURE();
    }
 
-   void RestoreLogger::reset() {
+   void RestoreFileLogger::reset() {
       logger_.reset();
    }
 
@@ -70,5 +70,24 @@ namespace testing_helpers {
             logs_to_clean_.push_back(path_to_log);
       }
    }
+   ScopedLogger::ScopedLogger()
+  : _previousWorker(g2::shutDownLogging())
+   , _currentWorker(g2LogWorker::createWithNoSink()) {
+     g2::initializeLogging(_currentWorker.get());
+  }
+
+  ScopedLogger::~ScopedLogger() {
+    g2::shutDownLogging();
+    
+    if (nullptr != oldworker) {
+      g2::initializeLogging(oldworker);
+    }
+  }
+  
+   g2LogWorker*  ScopedLogger::get() {
+     return _currentWorker.get();
+   }
+
+
 
 } // testing_helpers
