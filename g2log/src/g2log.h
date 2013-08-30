@@ -157,7 +157,7 @@ void initializeLogging(g2LogWorker *logger);
  * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. This is
  * kept for test reasons and should normally not be used */
 g2LogWorker* shutDownLogging();
-
+g2LogWorker* HackToBeRemoved();
 
 // defined here but should't not have to be used outside the g2log
 namespace internal

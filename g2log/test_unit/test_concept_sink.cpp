@@ -5,6 +5,7 @@
 #include <vector>
 #include <thread>
 #include <chrono>
+#include <atomic>
 
 #include "testing_helpers.h"
 #include "std2_make_unique.hpp"
@@ -21,17 +22,29 @@ using namespace testing_helpers;
 class CoutSink {
   stringstream buffer;
   unique_ptr<ScopedOut> scope_ptr;
-  
-  CoutSink() : scope_ptr(std2::make_unique<ScopedOut>(std::cout, &buffer)) {  }
+
+  CoutSink() : scope_ptr(std2::make_unique<ScopedOut>(std::cout, &buffer)) {
+  }
 public:
-  void clear() {  buffer.str("");  }
-  std::string string() {    return buffer.str();  }
-  void save(g2::internal::LogEntry msg) { std::cout << msg;  }
 
-  virtual ~CoutSink() final { }
+  void clear() {
+    buffer.str("");
+  }
 
-  static std::unique_ptr<CoutSink> createSink() 
-  { return std::unique_ptr<CoutSink>(new CoutSink);  }
+  std::string string() {
+    return buffer.str();
+  }
+
+  void save(g2::internal::LogEntry msg) {
+    std::cout << msg;
+  }
+
+  virtual ~CoutSink() final {
+  }
+
+  static std::unique_ptr<CoutSink> createSink() {
+    return std::unique_ptr<CoutSink>(new CoutSink);
+  }
 };
 
 
@@ -61,11 +74,13 @@ namespace g2 {
     }
 
     ~Worker() {
-      _bg->send([this] { _container.clear(); });
+      _bg->send([this] {
+        _container.clear(); });
     }
 
     void save(LogEntry msg) {
-      _bg->send([this, msg] { bgSave(msg); });
+      _bg->send([this, msg] {
+        bgSave(msg); });
     } // will this be copied?
     //this is guaranteed to work std::bind(&Worker::bgSave, this, msg));   }
 
@@ -73,8 +88,9 @@ namespace g2 {
     std::unique_ptr< SinkHandle<T> > addSink(std::unique_ptr<T> unique, DefaultLogCall call) {
       auto shared = std::shared_ptr<T>(unique.release());
       auto sink = std::make_shared < internal::Sink<T> > (shared, call);
-      auto add_sink_call = [this, sink] { _container.push_back(sink);
-      
+      auto add_sink_call = [this, sink] {
+        _container.push_back(sink);
+
       };
       auto wait_result = g2::spawn_task(add_sink_call, _bg.get());
       wait_result.wait();
@@ -83,55 +99,58 @@ namespace g2 {
       return handle;
     }
   };
-  
+
 } // g2
-  
- 
-    
-  using namespace g2;
-  using namespace g2::internal;
-    
-  TEST(Sink, CreateHandle) {
-    Worker worker;    
-    auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save); 
-    ASSERT_NE(nullptr, handle.get());
+
+
+
+using namespace g2;
+using namespace g2::internal;
+
+TEST(Sink, CreateHandle) {
+  Worker worker;
+  auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save);
+  ASSERT_NE(nullptr, handle.get());
+}
+
+TEST(Sink, OneSink__VerifyMsgIn) {
+  Worker worker;
+  auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save);
+  worker.save("Hello World!");
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  auto output = handle->call(&CoutSink::string);
+  ASSERT_EQ("Hello World!", output.get());
+}
+
+struct StringSink {
+  std::string raw;
+
+  void append(LogEntry entry) {
+    raw.append(entry);
   }
-  
-  TEST(Sink, OneSink__VerifyMsgIn) {
-    Worker worker;
-    auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save);
-    worker.save("Hello World!");
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    auto output = handle->call(&CoutSink::string);
-    ASSERT_EQ("Hello World!", output.get());
+
+  std::string string() {
+    return raw;
   }
-  
-  struct StringSink {
-    std::string raw;
-    void append(LogEntry entry) { raw.append(entry); }
-    std::string string(){return raw; }
-  };
-  
-  
-  TEST(Sink, DualSink__VerifyMsgIn) {
-    Worker worker;
-    auto h1 = worker.addSink(CoutSink::createSink(), &CoutSink::save);
-    auto h2 = worker.addSink(std2::make_unique<StringSink>(), &StringSink::append);
-    worker.save("Hello World!");
-    
-    
-    std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    auto first =  h1->call(&CoutSink::string);
-    auto second = h2->call(&StringSink::string);
-    
-    
-    ASSERT_EQ("Hello World!", first.get());
-    ASSERT_EQ("Hello World!", second.get());
-  }
-  
-  
-  
-  TEST(Sink, DeletedSink__Exptect_badweak_ptr___exception) {
+};
+
+TEST(Sink, DualSink__VerifyMsgIn) {
+  Worker worker;
+  auto h1 = worker.addSink(CoutSink::createSink(), &CoutSink::save);
+  auto h2 = worker.addSink(std2::make_unique<StringSink>(), &StringSink::append);
+  worker.save("Hello World!");
+
+
+  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+  auto first = h1->call(&CoutSink::string);
+  auto second = h2->call(&StringSink::string);
+
+
+  ASSERT_EQ("Hello World!", first.get());
+  ASSERT_EQ("Hello World!", second.get());
+}
+
+TEST(Sink, DeletedSink__Exptect_badweak_ptr___exception) {
   auto worker = std2::make_unique<Worker>();
   auto h1 = worker->addSink(CoutSink::createSink(), &CoutSink::save);
   worker->save("Hello World!");
@@ -140,3 +159,81 @@ namespace g2 {
   auto first = h1->call(&CoutSink::string);
   EXPECT_THROW(first.get(), std::bad_weak_ptr);
 }
+
+
+
+
+
+/*
+TEST(Sink, OneSink) {
+  AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
+  AtomicIntPtr count = make_shared<atomic<int>>(0);
+    {
+    auto worker = std::make_shared<g2LogWorker>();
+    worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+    worker->save("this message should trigger an atomic increment at the sink");
+
+    EXPECT_FALSE(flag->load());
+    EXPECT_TRUE(0 == count->load());
+  }
+  EXPECT_TRUE(flag->load());
+  EXPECT_TRUE(1 == count->load());
+}
+
+TEST(Sink, OneSinkWithHandleOutOfScope) {
+  AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
+  AtomicIntPtr count = make_shared<atomic<int>>(0);
+  {
+    auto worker = std::make_shared<g2LogWorker>();
+    {
+       auto handle =   worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+    }
+    EXPECT_FALSE(flag->load());
+    EXPECT_TRUE(0 == count->load());
+    worker->save("this message should trigger an atomic increment at the sink");
+  }
+  EXPECT_TRUE(flag->load());
+  EXPECT_TRUE(1 == count->load());
+}
+
+//Perfect det här testet triggar felet
+
+typedef vector<AtomicBoolPtr> BoolPtrVector;
+typedef vector<AtomicIntPtr> IntPtrVector;
+TEST(Sink, OneHundredSinks) {
+  BoolPtrVector flags;
+  IntPtrVector counts;
+
+  size_t NumberOfItems = 100;
+  for (size_t index = 0; index < NumberOfItems; ++index) {
+    flags.push_back(make_shared < atomic<bool >> (false));
+    counts.push_back(make_shared < atomic<int >> (0));
+  }
+
+  {
+    auto worker = std::make_shared<g2LogWorker>();
+    size_t index = 0;
+    for (auto& flag : flags) {
+      auto& count = counts[index++];
+      // ignore the handle
+      worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+    }
+    worker->save("Hello to 100 receivers :)");
+  }
+
+  // at the curly brace above the ScopedLogger will go out of scope and all the 
+  // 100 logging receivers will get their message to exit after all messages are
+  // are processed // at the curly brace above the ScopedLogger will go out of scope and all the 
+  // 100 logging receivers will get their message to exit after all messages are
+  // are processed
+  size_t index = 0;
+  for (auto& flag : flags) {
+    auto& count = counts[index++];
+    EXPECT_TRUE(flag->load());
+    EXPECT_EQ(100, count->load());
+    cout << "test one hundred sinks is finished finished\n";
+  }
+}
+
+*/
+    

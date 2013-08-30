@@ -33,7 +33,10 @@ struct g2LogWorkerImpl {
   g2LogWorkerImpl() : _bg(kjellkod::Active::createActive()) {  }
 
   ~g2LogWorkerImpl() {
-    _bg->send([this]{_sinks.clear(); });
+    std::cout << "g2logworkerpimpl in destructor\n"; 
+    if(!_bg) { std::cout << "g2sink: fatal failure, no active object in sink\n"; return;}
+    _bg.reset(); 
+    std::cout << "g2logworker active object destroyed. done sending exit messages to all sinks\n"; 
   }
 
   void bgSave(g2::internal::LogEntry msg) {
@@ -71,7 +74,9 @@ g2LogWorker::g2LogWorker()
 : _pimpl(std2::make_unique<g2LogWorkerImpl>()) {
 }
 
-g2LogWorker::~g2LogWorker() { _pimpl.reset(); }
+g2LogWorker::~g2LogWorker() { 
+  _pimpl->_bg->send([this]{_pimpl->_sinks.clear();}); 
+ }
 
 void g2LogWorker::save(g2::internal::LogEntry msg) {
   _pimpl->_bg->send([this, msg] { _pimpl->bgSave(msg); });
@@ -79,7 +84,6 @@ void g2LogWorker::save(g2::internal::LogEntry msg) {
 
 void g2LogWorker::fatal(g2::internal::FatalMessage fatal_message) {
   _pimpl->_bg->send([this, fatal_message] {_pimpl->bgFatal(fatal_message); });
-  //OR: td::bind(&g2LogWorkerImpl::backgroundExitFatal, _pimpl.get(), fatal_message));
 }
 
 void g2LogWorker::addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> sink) {

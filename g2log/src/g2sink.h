@@ -43,7 +43,12 @@ namespace g2 {
       _default_log_call(std::bind(call, _real_sink.get(), std::placeholders::_1))
       { }
 
-      virtual ~Sink() {   _bg.reset();    }
+      virtual ~Sink() {  
+        std::cout << "Sink<T> in destructor\n";
+        _bg.reset();   
+        std::cout << "Sink<T> Active object was reset. in destructor\n";
+
+      }
 
       void send(LogEntry msg) override {
         _bg->send([this, msg]{_default_log_call(msg);});

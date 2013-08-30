@@ -21,12 +21,13 @@
 
 #include "active.h"
 #include <cassert>
-
+#include <iostream>
 using namespace kjellkod;
 
 Active::Active(): done_(false){}
 
 Active::~Active() {
+  
   Callback quit_token = std::bind(&Active::doDone, this);
   send(quit_token); // tell thread to exit
   thd_.join();

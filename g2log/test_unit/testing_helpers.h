@@ -9,7 +9,9 @@
 
 #include <memory>
 #include <string>
-#include <mutex>
+#include <atomic>
+#include <chrono>
+#include <thread>
 #include <algorithm>
 #include "g2logworker.h"
 
@@ -89,6 +91,28 @@ struct ScopedLogger {
     g2LogWorker* _previousWorker;
     std::unique_ptr<g2LogWorker> _currentWorker;
 };
+
+
+  typedef std::shared_ptr<std::atomic<bool>> AtomicBoolPtr;
+  typedef std::shared_ptr<std::atomic<int>> AtomicIntPtr;
+  struct ScopedSetTrue {
+    AtomicBoolPtr  _flag;
+    AtomicIntPtr _count;
+
+    explicit ScopedSetTrue(AtomicBoolPtr flag, AtomicIntPtr count)
+    : _flag(flag), _count(count) {
+    }
+
+    void ReceiveMsg(std::string message) {
+      std::chrono::milliseconds wait{100};
+      std::this_thread::sleep_for(wait);
+      ++(*_count);
+    }
+
+    ~ScopedSetTrue() {
+      (*_flag) = true;
+    }
+  };
 } // testing_helpers
 
 

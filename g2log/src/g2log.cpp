@@ -82,6 +82,8 @@ g2LogWorker* shutDownLogging() // safe to call multiple times
   return backup;
 }
 
+g2LogWorker* HackToBeRemoved(){return internal::g_logger_instance;}
+
 
 
 namespace internal
