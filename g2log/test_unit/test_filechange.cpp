@@ -128,10 +128,13 @@ int main(int argc, char *argv[]) {
     
     testing_helpers::ScopedOut scopedCerr(std::cerr, &cerrDump);
 
-    auto pair = g2LogWorker::createWithDefaultFileSink("ReplaceLogFile", name_path_1);
-    //g2LogWorker logger("ReplaceLogFile", name_path_2);
-    g_logger_ptr = pair.first.get(); // ugly but fine for this test
-    g_filesink_handler = pair.second.get();
+    auto logger = g2LogWorker::createWithDefaultLogger("ReplaceLogFile", name_path_1);
+    g_logger_ptr = logger.worker.get(); 
+    g_filesink_handler = logger.sink.get();
+    last_log_file = g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+    cleaner.addLogToClean(last_log_file);
+
+
     g2::initializeLogging(g_logger_ptr);
     LOG(INFO) << "test_filechange demo*" << std::endl;
     

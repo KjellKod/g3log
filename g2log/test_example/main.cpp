@@ -48,11 +48,11 @@ int main(int argc, char** argv)
 //  auto sinkptr = std2::make_unique<g2::g2FileSink>(argv[0], path_to_log_file);
 //  auto log_handle = logger->addSink(std::move(singkptr), &g2::g2FileSink::fileWrite);
 //  g2::initializeLogging(logger.get());
-  auto logger_n_handle = g2LogWorker::createWithDefaultFileSink(argv[0], path_to_log_file);
-  g2::initializeLogging(logger_n_handle.first.get());
+  auto logger_n_handle = g2LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
+  g2::initializeLogging(logger_n_handle.worker.get());
   
   
-  std::future<std::string> log_file_name = logger_n_handle.second->call(&g2::g2FileSink::fileName);
+  std::future<std::string> log_file_name = logger_n_handle.sink->call(&g2::g2FileSink::fileName);
   std::cout << "*** This is an example of g2log " << std::endl;
   std::cout << "*** It WILL exit by a FATAL trigger in the end" << std::endl;
   std::cout << "*** Please see the generated log and compare to " << std::endl;

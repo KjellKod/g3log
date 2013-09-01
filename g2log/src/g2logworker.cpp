@@ -93,17 +93,21 @@ void g2LogWorker::addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> sink
 }
 
 
-  
-  g2LogWorker::DefaultWorkerPair g2LogWorker::createWithDefaultFileSink(const std::string& log_prefix, const std::string& log_directory)
+  // Gör en egen super simpel klass/struct med 
+  // DefaultFilLogger den ska INTE vara i g2logworker.cpp
+  g2::DefaultFileLogger g2LogWorker::createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory)
   {
-    auto logger = g2LogWorker::createWithNoSink();
-    auto handle = logger->addSink(std2::make_unique<g2::g2FileSink>(log_prefix, log_directory), &g2FileSink::fileWrite);
-    
-    auto pair = std::pair<std::unique_ptr<g2LogWorker>, std::unique_ptr<g2::SinkHandle<g2FileSink>>  >(std::move(logger), std::move(handle));
-    return pair;
+    return g2::DefaultFileLogger(log_prefix, log_directory);
   }
   
   std::unique_ptr<g2LogWorker> g2LogWorker::createWithNoSink() 
   {
     return std::unique_ptr<g2LogWorker>(new g2LogWorker);
   }
+  
+  
+
+DefaultFileLogger::DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory)
+: worker(g2LogWorker::createWithNoSink())
+, sink(worker->addSink(std2::make_unique<g2::g2FileSink>(log_prefix, log_directory), &g2FileSink::fileWrite)) {
+}

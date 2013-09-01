@@ -107,13 +107,13 @@ namespace g2 {
 using namespace g2;
 using namespace g2::internal;
 
-TEST(Sink, CreateHandle) {
+TEST(ConceptSink, CreateHandle) {
   Worker worker;
   auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save);
   ASSERT_NE(nullptr, handle.get());
 }
 
-TEST(Sink, OneSink__VerifyMsgIn) {
+TEST(ConceptSink, OneSink__VerifyMsgIn) {
   Worker worker;
   auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save);
   worker.save("Hello World!");
@@ -134,7 +134,7 @@ struct StringSink {
   }
 };
 
-TEST(Sink, DualSink__VerifyMsgIn) {
+TEST(ConceptSink, DualSink__VerifyMsgIn) {
   Worker worker;
   auto h1 = worker.addSink(CoutSink::createSink(), &CoutSink::save);
   auto h2 = worker.addSink(std2::make_unique<StringSink>(), &StringSink::append);
@@ -150,7 +150,7 @@ TEST(Sink, DualSink__VerifyMsgIn) {
   ASSERT_EQ("Hello World!", second.get());
 }
 
-TEST(Sink, DeletedSink__Exptect_badweak_ptr___exception) {
+TEST(ConceptSink, DeletedSink__Exptect_badweak_ptr___exception) {
   auto worker = std2::make_unique<Worker>();
   auto h1 = worker->addSink(CoutSink::createSink(), &CoutSink::save);
   worker->save("Hello World!");
@@ -160,9 +160,46 @@ TEST(Sink, DeletedSink__Exptect_badweak_ptr___exception) {
   EXPECT_THROW(first.get(), std::bad_weak_ptr);
 }
 
-
-
-
+namespace {
+    typedef std::shared_ptr<std::atomic<bool>> AtomicBoolPtr;
+    typedef std::shared_ptr<std::atomic<int>> AtomicIntPtr;
+    typedef vector<AtomicBoolPtr> BoolList;
+    typedef vector<AtomicIntPtr> IntVector;
+}
+TEST(ConceptSink, OneHundredSinks) {
+  BoolList flags;
+  IntVector counts;
+  
+  size_t NumberOfItems = 100;
+  for(size_t index = 0; index < NumberOfItems; ++index) {
+    flags.push_back(make_shared<atomic<bool>>(false));
+    counts.push_back(make_shared<atomic<int>>(0));
+  }
+  
+  { 
+    auto worker = std::unique_ptr<Worker>(new Worker);
+    size_t index = 0;
+    for(auto& flag: flags) { 
+      auto& count = counts[index++];
+      // ignore the handle
+      worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+    }
+    worker->save("Hello to 100 receivers :)");
+    worker->save("Hello to 100 receivers :)");
+  }
+  // at the curly brace above the ScopedLogger will go out of scope and all the 
+  // 100 logging receivers will get their message to exit after all messages are
+  // are processed
+   size_t index = 0;
+    for(auto& flag: flags) { 
+      auto& count = counts[index++];
+    ASSERT_TRUE(flag->load()) << ", count : " << (index-1);
+    ASSERT_TRUE(2 == count->load()) << ", count : " << (index-1);
+  }
+  
+  cout << "test one hundred sinks is finished finished\n";
+} 
+  
 
 /*
 TEST(Sink, OneSink) {

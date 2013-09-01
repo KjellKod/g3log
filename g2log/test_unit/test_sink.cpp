@@ -37,40 +37,48 @@ TEST(Sink, OneSink) {
 }
 
 
-//Perfect det här testet triggar felet
-typedef vector<AtomicBoolPtr> BoolPtrVectorX;
-typedef vector<AtomicIntPtr> IntPtrVectorX;
-TEST(Sink, OneHundredSinks) {
-  BoolPtrVectorX flags;
-  IntPtrVectorX counts;
+namespace {
+    typedef std::shared_ptr<std::atomic<bool>> AtomicBoolPtr;
+    typedef std::shared_ptr<std::atomic<int>> AtomicIntPtr;
+    typedef vector<AtomicBoolPtr> BoolList;
+    typedef vector<AtomicIntPtr> IntVector;
+}
+TEST(ConceptSink, OneHundredSinks) {
+  BoolList flags;
+  IntVector counts;
   
-  size_t NumberOfItems = 1;
+  size_t NumberOfItems = 100;
   for(size_t index = 0; index < NumberOfItems; ++index) {
     flags.push_back(make_shared<atomic<bool>>(false));
     counts.push_back(make_shared<atomic<int>>(0));
   }
   
-  
-  {
-    auto worker = g2LogWorker::createWithNoSink();  
-    for(size_t index = 0; index < NumberOfItems; ++index) {
-      AtomicBoolPtr flag = flags[index];
-      AtomicIntPtr count = counts[index];
+  { 
+    ScopedLogger scope;
+    auto worker = scope.get(); //g2LogWorker::createWithNoSink();
+    size_t index = 0;
+    for(auto& flag: flags) { 
+      auto& count = counts[index++];
       // ignore the handle
       worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
     }
-    worker->save("Hello to 100 receivers");
+    LOG(DEBUG) << "start message";
+    worker->save("Hello to 100 receivers :)");
+    worker->save("Hello to 100 receivers :)");
+    LOG(INFO) << "end message";
   }
   // at the curly brace above the ScopedLogger will go out of scope and all the 
   // 100 logging receivers will get their message to exit after all messages are
   // are processed
-  for(size_t index = NumberOfItems-1; index >=0; --index) {
-    AtomicBoolPtr flag = flags[index];
-    AtomicIntPtr count = counts[index];
-    EXPECT_TRUE(flag->load());
-    EXPECT_TRUE(1 == count->load());
+   size_t index = 0;
+    for(auto& flag: flags) { 
+      auto& count = counts[index++];
+    ASSERT_TRUE(flag->load()) << ", count : " << (index-1);
+    ASSERT_TRUE(4 == count->load()) << ", count : " << (index-1);
   }
-}     
+  
+  cout << "test one hundred sinks is finished finished\n";
+} 
 
 //    
 //    for(size_t = 0; )
