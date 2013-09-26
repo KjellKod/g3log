@@ -25,7 +25,7 @@
 
 
 #include <future>
-#include "active.h"
+#include "active.hpp"
 
 namespace g2 {
 

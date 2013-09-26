@@ -16,7 +16,7 @@
 
 
 
-#include "active.h"
+#include "active.hpp"
 #include "g2log.h"
 #include "g2time.hpp"
 #include "g2future.h"

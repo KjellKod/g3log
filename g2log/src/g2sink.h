@@ -12,7 +12,7 @@
 #include <functional>
 
 #include "g2sinkwrapper.h"
-#include "active.h"
+#include "active.hpp"
 #include "g2future.h"
 
 

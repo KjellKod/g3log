@@ -15,38 +15,35 @@
  * e-mail: hedstrom at kjellkod dot cc
  * linkedin: http://linkedin.com/se/kjellkod */
 
+#pragma once
 
-#include "active.hpp"
-using namespace kjellkod;
-Active::Active() : done_(false) {
-}
-Active::~Active() {
-   send( [this]{ done_ = true;} );
-   thd_.join();
-}
+#include <thread>
+#include <functional>
+#include <memory>
 
-/// Add asynchronously a work-message to queue
-void Active::send(Callback msg_) {
-   mq_.push(msg_);
-}
+#include "shared_queue.h"
+
+namespace kjellkod {
+   typedef std::function<void() > Callback;
+
+   class Active {
+   private:
+      Active(); // Construction ONLY through factory createActive();
+      void run();
+
+      shared_queue<Callback> mq_;
+      std::thread thd_;
+      bool done_; // finished flag : set by ~Active
 
 
-/// Will wait for msgs if queue is empty
-/// A great explanation of how this is done (using Qt's library):
-/// http://doc.qt.nokia.com/stable/qwaitcondition.html
-void Active::run() {
-   while (!done_) {
-      // wait till job is available, then retrieve it and
-      // executes the retrieved job in this thread (background)
-      Callback func;
-      mq_.wait_and_pop(func);
-      func();
-   }
-}
+   public:
+      virtual ~Active();
+      void send(Callback msg_);
+      static std::unique_ptr<Active> createActive();
 
-/// Factory: safe construction of object before thread start
-std::unique_ptr<Active> Active::createActive() {
-   std::unique_ptr<Active> aPtr(new Active());
-   aPtr->thd_ = std::thread(&Active::run, aPtr.get());
-   return aPtr;
-}
+      Active(const Active&) = delete;
+      Active& operator=(const Active&) = delete;
+   };
+
+
+} // kjellkod
