@@ -69,7 +69,7 @@ void initializeLogging(g2LogWorker *bgworker)
 
   if(false == once_only_signalhandler)
   {
-    installSignalHandler();
+    internal::installSignalHandler();
     once_only_signalhandler = true;
   }
 }

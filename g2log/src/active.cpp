@@ -21,7 +21,9 @@ using namespace kjellkod;
 Active::Active() : done_(false) {
 }
 Active::~Active() {
-   send( [this]{ done_ = true;} );
+   send([this] {
+      done_ = true;
+   });
    thd_.join();
 }
 

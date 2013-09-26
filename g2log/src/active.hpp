@@ -24,26 +24,25 @@
 #include "shared_queue.h"
 
 namespace kjellkod {
-   typedef std::function<void() > Callback;
+typedef std::function<void() > Callback;
 
-   class Active {
-   private:
-      Active(); // Construction ONLY through factory createActive();
-      void run();
+class Active {
+private:
+   Active(); // Construction ONLY through factory createActive();
+   void run();
 
-      shared_queue<Callback> mq_;
-      std::thread thd_;
-      bool done_; // finished flag : set by ~Active
+   shared_queue<Callback> mq_;
+   std::thread thd_;
+   bool done_; // finished flag : set by ~Active
 
 
-   public:
-      virtual ~Active();
-      void send(Callback msg_);
-      static std::unique_ptr<Active> createActive();
+public:
+   virtual ~Active();
+   void send(Callback msg_);
+   static std::unique_ptr<Active> createActive();
 
-      Active(const Active&) = delete;
-      Active& operator=(const Active&) = delete;
-   };
-
+   Active(const Active&) = delete;
+   Active& operator=(const Active&) = delete;
+};
 
 } // kjellkod
