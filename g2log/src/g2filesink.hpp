@@ -1,6 +1,12 @@
 #ifndef PRIVATE_G2_FILE_SINK_H_
 #define PRIVATE_G2_FILE_SINK_H_
 
+/** ==========================================================================
+ * 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+ * with no warranties. This code is yours to share, use and modify with no
+ * strings attached and no restrictions or obligations.
+ * ============================================================================*/
+
 #include <string>
 #include <memory>
 
@@ -8,31 +14,30 @@
 #include "g2time.hpp"
 
 namespace g2 {
-  struct g2FileSink {
-    g2FileSink(const std::string& log_prefix, const std::string& log_directory);
-    virtual ~g2FileSink();
 
-    void fileWrite(internal::LogEntry message);
-    std::string changeLogFile(const std::string& directory);
-    std::string fileName();
+class FileSink {
+public:
+   FileSink(const std::string& log_prefix, const std::string& log_directory);
+   virtual ~FileSink();
+
+   void fileWrite(internal::LogEntry message);
+   std::string changeLogFile(const std::string& directory);
+   std::string fileName();
 
 
-  private:
-   //void backgroundExitFatal(internal::FatalMessage fatal_message);
-    void addLogFileHeader();
+private:
+   std::string _log_file_with_path;
+   std::string _log_prefix_backup; // needed in case of future log file changes of directory
+   std::unique_ptr<std::ofstream> _outptr;
+   g2::steady_time_point _steady_start_time;
 
-    std::string _log_file_with_path;
-    std::string _log_prefix_backup; // needed in case of future log file changes of directory
-    std::unique_ptr<std::ofstream> _outptr;
-    g2::steady_time_point _steady_start_time;
-    
-    
-    g2FileSink& operator=(const g2FileSink&); // c++11 feature not yet in vs2010 = delete;
-    g2FileSink(const g2FileSink& other); // c++11 feature not yet in vs2010 = delete;
+   void addLogFileHeader();
+   std::ofstream & filestream() {return *(_outptr.get()); }
 
-    std::ofstream & filestream() {
-      return *(_outptr.get());
-    }
-  };
+
+   FileSink& operator=(const FileSink&) = delete;
+   FileSink(const FileSink& other) = delete;
+
+};
 } // g2
 #endif // pimple

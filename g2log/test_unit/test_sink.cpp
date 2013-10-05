@@ -7,7 +7,7 @@
 #include <chrono>
  
 #include "testing_helpers.h"
-#include "g2logworker.h"
+#include "g2logworker.hpp"
 
 namespace {
   g2LogWorker* g_logger_ptr = nullptr;
@@ -18,8 +18,12 @@ using namespace testing_helpers;
 using namespace std;
 
 TEST(Sink, TestSetup) {
-  ScopedLogger scope;
-  ASSERT_EQ(g_logger_ptr, scope._previousWorker);
+   {
+      ScopedLogger scope;
+      ASSERT_EQ(g_logger_ptr, scope._previousWorker);
+   }
+   ScopedLogger scope;
+   ASSERT_EQ(g_logger_ptr, scope._previousWorker);
 }
 
 TEST(Sink, OneSink) {

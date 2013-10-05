@@ -4,8 +4,8 @@
 * strings attached and no restrictions or obligations.
 * ============================================================================*/
 
-#include "g2logworker.h"
-#include "g2log.h"
+#include "g2logworker.hpp"
+#include "g2log.hpp"
 #include <iomanip>
 #include <thread>
 
@@ -52,7 +52,7 @@ int main(int argc, char** argv)
   g2::initializeLogging(logger_n_handle.worker.get());
   
   
-  std::future<std::string> log_file_name = logger_n_handle.sink->call(&g2::g2FileSink::fileName);
+  std::future<std::string> log_file_name = logger_n_handle.sink->call(&g2::FileSink::fileName);
   std::cout << "*** This is an example of g2log " << std::endl;
   std::cout << "*** It WILL exit by a FATAL trigger in the end" << std::endl;
   std::cout << "*** Please see the generated log and compare to " << std::endl;

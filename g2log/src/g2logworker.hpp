@@ -17,7 +17,7 @@
 #include <string>
 #include <utility>
 
-#include "g2log.h"
+#include "g2log.hpp"
 #include "g2sinkwrapper.h"
 #include "g2sinkhandle.h"
 #include "g2filesink.hpp"
@@ -31,7 +31,7 @@ namespace g2 {
 struct DefaultFileLogger {
     DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory);
     std::unique_ptr<g2LogWorker> worker;
-    std::unique_ptr<g2::SinkHandle<g2::g2FileSink>> sink;
+    std::unique_ptr<g2::SinkHandle<g2::FileSink>> sink;
   };
 }
 

@@ -13,7 +13,7 @@
 #include <chrono>
 #include <thread>
 #include <algorithm>
-#include "g2logworker.h"
+#include "g2logworker.hpp"
 
 namespace testing_helpers {
 
@@ -54,32 +54,9 @@ private:
   std::mutex g_mutex;
 public:
   size_t size();
-
-  LogFileCleaner() {
-  }
+  LogFileCleaner() {}
   virtual ~LogFileCleaner();
   void addLogToClean(std::string path_to_log);
-};
-
-
-
-/** RAII temporarily replace of logger
- *  and restoration of original logger at scope end*/
-struct RestoreFileLogger {
-  explicit RestoreFileLogger(std::string directory);
-  ~RestoreFileLogger();
-  void reset();  
-  std::unique_ptr<g2LogWorker> logger_;
-
-  template<typename Call, typename ... Args >
-          typename std::result_of<Call(Args...)>::type callToLogger(Call call, Args&&... args) {
-    auto func = std::bind(call, logger_.get(), std::forward<Args>(args)...);
-    return func();
-  }
-  
-  std::string logFile() { return log_file_;  }
-private:
-  std::string log_file_;
 };
 
 
@@ -91,6 +68,33 @@ struct ScopedLogger {
     g2LogWorker* _previousWorker;
     std::unique_ptr<g2LogWorker> _currentWorker;
 };
+
+
+
+
+/** RAII temporarily replace of logger
+ *  and restoration of original logger at scope end*/
+struct RestoreFileLogger {
+  explicit RestoreFileLogger(std::string directory);
+  ~RestoreFileLogger();
+
+  std::unique_ptr<ScopedLogger> scope_;
+  void reset(){ scope_.reset();}
+  
+
+  template<typename Call, typename ... Args >
+          typename std::result_of<Call(Args...)>::type callToLogger(Call call, Args&&... args) {
+    auto func = std::bind(call, scope_->get(), std::forward<Args>(args)...);
+    return func();
+  }
+  
+  std::string logFile() { return log_file_;  }
+private:
+  std::string log_file_;
+};
+
+
+
 
 
   typedef std::shared_ptr<std::atomic<bool>> AtomicBoolPtr;

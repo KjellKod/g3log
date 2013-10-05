@@ -1,5 +1,10 @@
-#ifndef G2_FILESINK_HELPER_IPP_
-#define G2_FILESINK_HELPER_IPP_
+/** ==========================================================================
+ * 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+ * with no warranties. This code is yours to share, use and modify with no
+ * strings attached and no restrictions or obligations.
+ * ============================================================================*/
+
+#pragma once
 
 
 #include <memory>
@@ -10,21 +15,12 @@
 #include <sstream>
 #include <string>
 
-//#include <fstream>
-//#include <algorithm>
-//#include <future>
-//#include <cassert>
-//#include <chrono>  
-
 
 namespace g2 {
   namespace internal {
-
-
     static const std::string file_name_time_formatted = "%Y%m%d-%H%M%S";
 
     // check for filename validity -  filename should not be part of PATH
-
     bool isValidFilename(const std::string& prefix_filename) {
       std::string illegal_characters("/,|<>:#$%{}()[]\'\"^!?+* ");
       size_t pos = prefix_filename.find_first_of(illegal_characters, 0);
@@ -80,7 +76,7 @@ namespace g2 {
     std::string header() {
       std::ostringstream ss_entry;
       //  Day Month Date Time Year: is written as "%a %b %d %H:%M:%S %Y" and formatted output as : Wed Sep 19 08:28:16 2012
-      ss_entry << "\t\tg2log created log file at: " << g2::localtime_formatted(g2::systemtime_now(), "%a %b %d %H:%M:%S %Y") << "\n";
+      ss_entry << "\t\tg2log created log at: " << g2::localtime_formatted(g2::systemtime_now(), "%a %b %d %H:%M:%S %Y") << "\n";
       ss_entry << "\t\tLOG format: [YYYY/MM/DD hh:mm:ss.uuu* LEVEL FILE:LINE] message\n\n"; // TODO: if(header)
       return ss_entry.str();
     }
@@ -121,4 +117,3 @@ namespace g2 {
 
   }
 }
-#endif // G2_FILESINK_HELPER_IPP_

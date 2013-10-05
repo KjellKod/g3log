@@ -43,7 +43,7 @@ struct PretendToBeCopyable
 
   void operator()() { move_only_(); } // execute
 private:
-  Moveable move_only_;
+  mutable Moveable move_only_;
 };
 
 

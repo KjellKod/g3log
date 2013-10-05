@@ -15,8 +15,8 @@
 
 
 #include <thread>
-#include "g2log.h"
-#include "g2logworker.h"
+#include "g2log.hpp"
+#include "g2logworker.hpp"
 #include "testing_helpers.h"
 
 using namespace testing_helpers;
@@ -24,9 +24,8 @@ using namespace testing_helpers;
 
 namespace { // anonymous
   const char* name_path_1 = "./some_fake_DirectoryOrName_1_";
-  const char* name_path_2 = "./some_fake_DirectoryOrName_3_";
   g2LogWorker* g_logger_ptr = nullptr;
-  g2::SinkHandle<g2::g2FileSink>* g_filesink_handler = nullptr;
+  g2::SinkHandle<g2::FileSink>* g_filesink_handler = nullptr;
   LogFileCleaner* g_cleaner_ptr = nullptr;
 
   bool isTextAvailableInContent(const std::string &total_text, std::string msg_to_find) {
@@ -54,7 +53,7 @@ namespace { // anonymous
     std::lock_guard<std::mutex> lock(m);
     {
       add_count = std::to_string(++count) + "_";
-      auto future_new_log = g_filesink_handler->call(&g2::g2FileSink::changeLogFile, new_file_to_create + add_count);
+      auto future_new_log = g_filesink_handler->call(&g2::FileSink::changeLogFile, new_file_to_create + add_count);
       auto new_log = future_new_log.get();
       if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
       return new_log;
@@ -63,14 +62,14 @@ namespace { // anonymous
   }
 
   std::string setLogName(std::string new_file_to_create) {
-    auto future_new_log = g_filesink_handler->call(&g2::g2FileSink::changeLogFile, new_file_to_create);
+    auto future_new_log = g_filesink_handler->call(&g2::FileSink::changeLogFile, new_file_to_create);
     auto new_log = future_new_log.get();
     if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
     return new_log;
   }
 
   std::string getLogName() {
-    return g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+    return g_filesink_handler->call(&g2::FileSink::fileName).get();
   }
 
 } // anonymous
@@ -90,7 +89,7 @@ TEST(TestOf_ChangingLogFile, Expecting_NewLogFileUsed) {
 }
 
 TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
-  auto old_log = g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+  auto old_log = g_filesink_handler->call(&g2::FileSink::fileName).get();
   if (!old_log.empty()) g_cleaner_ptr->addLogToClean(old_log);
 
   LOG(INFO) << "SoManyThreadsAllDoingChangeFileName";
@@ -131,7 +130,7 @@ int main(int argc, char *argv[]) {
     auto logger = g2LogWorker::createWithDefaultLogger("ReplaceLogFile", name_path_1);
     g_logger_ptr = logger.worker.get(); 
     g_filesink_handler = logger.sink.get();
-    last_log_file = g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+    last_log_file = g_filesink_handler->call(&g2::FileSink::fileName).get();
     cleaner.addLogToClean(last_log_file);
 
 
@@ -141,7 +140,7 @@ int main(int argc, char *argv[]) {
     testing::InitGoogleTest(&argc, argv);
     return_value = RUN_ALL_TESTS();
 
-    last_log_file = g_filesink_handler->call(&g2::g2FileSink::fileName).get();
+    last_log_file = g_filesink_handler->call(&g2::FileSink::fileName).get();
     std::cout << "log file at: " << last_log_file << std::endl;
     //g2::shutDownLogging();
   }

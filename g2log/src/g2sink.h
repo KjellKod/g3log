@@ -44,10 +44,7 @@ namespace g2 {
       { }
 
       virtual ~Sink() {  
-        std::cout << "Sink<T> in destructor\n";
-        _bg.reset();   
-        std::cout << "Sink<T> Active object was reset. in destructor\n";
-
+        _bg.reset();   // TODO: to remove
       }
 
       void send(LogEntry msg) override {

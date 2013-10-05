@@ -9,15 +9,15 @@
  * PUBLIC DOMAIN and Not under copywrite protection. First published at KjellKod.cc
  * ********************************************* */
 
-#include "g2logworker.h"
+#include "g2logworker.hpp"
 
 #include <cassert>
 #include <functional>
-
+#include <iostream>
 
 
 #include "active.hpp"
-#include "g2log.h"
+#include "g2log.hpp"
 #include "g2time.hpp"
 #include "g2future.h"
 #include "crashhandler.hpp"
@@ -109,5 +109,5 @@ void g2LogWorker::addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> sink
 
 DefaultFileLogger::DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory)
 : worker(g2LogWorker::createWithNoSink())
-, sink(worker->addSink(std2::make_unique<g2::g2FileSink>(log_prefix, log_directory), &g2FileSink::fileWrite)) {
+, sink(worker->addSink(std2::make_unique<g2::FileSink>(log_prefix, log_directory), &FileSink::fileWrite)) {
 }
