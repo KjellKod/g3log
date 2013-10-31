@@ -15,10 +15,10 @@ namespace g2 {
     
     struct SinkWrapper {
       virtual ~SinkWrapper() { }
-      virtual void send(LogEntry msg) = 0;
+      virtual void send(LogMessage msg) = 0;
     };
   }
 }
 
-#endif	/* G2SINKWRAPPER_IPP */
+#endif	/* G2SINKWRAPPER_IPP */ 
 

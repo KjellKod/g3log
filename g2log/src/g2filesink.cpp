@@ -42,22 +42,25 @@ FileSink::~FileSink() {
    exit_msg.append({"\nLog file at: ["}).append(_log_file_with_path).append({"]\n\n"});
    std::cerr << exit_msg << std::flush;
 }
-void FileSink::fileWrite(internal::LogEntry message) {
-   std::ofstream & out(filestream());
-   auto system_time = systemtime_now();
-   auto steady_time = std::chrono::steady_clock::now();
-   out << "\n" << localtime_formatted(system_time, date_formatted);
-   out << " " << localtime_formatted(system_time, time_formatted); // TODO: time kommer från LogEntry
-   out << "." << std::chrono::duration_cast<std::chrono::microseconds>(steady_time - _steady_start_time).count();
-   out << "\t" << message << std::flush;
+void FileSink::fileWrite(LogMessage message) {
+   std::ofstream& out(filestream());
+   out << "msg1: \n" << message.toString() << std::flush;
+   
+   out << "msg2:\n" << message.timestamp() << "." << message.microseconds() << message.level();
+//           << " [" << message.file() << "/" << message.function() << " L" << message.line() <<  "] "
+ //          << message.expression() << "\t" << '"' << message.message() << '"' << std::flush;
 }
 
 std::string FileSink::changeLogFile(const std::string& directory) {
+
+   auto now = g2::systemtime_now();
+   auto now_formatted = g2::localtime_formatted(now, {internal::date_formatted + " " + internal::time_formatted});
+   
    std::string file_name = createLogFileName(_log_prefix_backup);
    std::string prospect_log = directory + file_name;
    std::unique_ptr<std::ofstream> log_stream = createLogFile(prospect_log);
    if (nullptr == log_stream) {
-      fileWrite("Unable to change log file. Illegal filename or busy? Unsuccessful log name was:" + prospect_log);
+      filestream() << "\n" << now_formatted << " Unable to change log file. Illegal filename or busy? Unsuccessful log name was: " << prospect_log;
       return {}; // no success
    }
 
@@ -65,7 +68,7 @@ std::string FileSink::changeLogFile(const std::string& directory) {
    std::ostringstream ss_change;
    ss_change << "\n\tChanging log file from : " << _log_file_with_path;
    ss_change << "\n\tto new location: " << prospect_log << "\n";
-   fileWrite(ss_change.str().c_str());
+   filestream() << now_formatted << ss_change.str();
    ss_change.str("");
 
    std::string old_log = _log_file_with_path;
@@ -73,7 +76,7 @@ std::string FileSink::changeLogFile(const std::string& directory) {
    _outptr = std::move(log_stream);
    ss_change << "\n\tNew log file. The previous log file was at: ";
    ss_change << old_log;
-   fileWrite(ss_change.str());
+   filestream() << now_formatted << ss_change.str();
    return _log_file_with_path;
 }
 std::string FileSink::fileName() {

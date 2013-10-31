@@ -39,25 +39,25 @@ struct g2LogWorkerImpl {
     std::cout << "g2logworker active object destroyed. done sending exit messages to all sinks\n"; 
   }
 
-  void bgSave(g2::internal::LogEntry msg) {
+  void bgSave(const g2::LogMessage& msg) {
     for (auto& sink : _sinks) {
       sink->send(msg);
     }
 
     if (_sinks.empty()) {
       std::string err_msg{"g2logworker has no sinks. Message: ["};
-      err_msg.append(msg).append({"]\n"});
+      err_msg.append(msg.toString()).append({"]\n"});
       std::cerr << err_msg;
     }
   }
 
   void bgFatal(g2::internal::FatalMessage fatal_message) {
-    auto entry = fatal_message.message_;
+    auto entry = fatal_message._crash_message;
+    entry.stream() <<  "\nExiting after fatal event. Log flushed sucessfully to disk.\n";
     bgSave(entry);
-    std::string end_message{"Exiting after fatal event. Log flushed sucessfully to disk.\n"};
-    bgSave(end_message);
-    std::cerr << "g2log sinks are flushed. Now exiting after receiving fatal event\n" << std::flush;
 
+    std::cerr << entry.toString() << std::endl;
+    std::cerr << "g2log sinks are flushed. Now exiting after receiving fatal event\n" << std::flush;
     _sinks.clear(); // flush all queues
     exitWithDefaultSignalHandler(fatal_message.signal_id_);
 
@@ -77,9 +77,9 @@ g2LogWorker::g2LogWorker()
 g2LogWorker::~g2LogWorker() { 
   _pimpl->_bg->send([this]{_pimpl->_sinks.clear();}); 
  }
-
-void g2LogWorker::save(g2::internal::LogEntry msg) {
-  _pimpl->_bg->send([this, msg] { _pimpl->bgSave(msg); });
+// todo move operator
+void g2LogWorker::save(g2::LogMessage msg) {
+  _pimpl->_bg->send([this, msg] { _pimpl->bgSave(msg); }); // TODO std::move
 }
 
 void g2LogWorker::fatal(g2::internal::FatalMessage fatal_message) {

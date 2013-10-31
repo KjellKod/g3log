@@ -24,10 +24,9 @@
 #include <cstdarg>
 
 #include "g2loglevels.hpp"
-#include "g2logmessage.hpp"
+#include "g2LogMessageBuilder.hpp"
 
 class g2LogWorker;
-
 #if !(defined(__PRETTY_FUNCTION__))
 #define __PRETTY_FUNCTION__   __FUNCTION__
 #endif
@@ -35,101 +34,80 @@ class g2LogWorker;
 
 
 /** namespace for LOG() and CHECK() frameworks
-  * Histroy lesson:   Why the names 'g2' and 'g2log'?:
-  * The framework was made in my own free time as PUBLIC DOMAIN but the 
-  * first commercial project to use it used 'g2' as an internal denominator for 
-  * the current project. g2 as in 'generation 2'. I decided to keep the g2 and g2log names
-  * to give credit to the people in that project (you know who you are :) and I guess also
-  * for 'sentimental' reasons. That a big influence was google's glog is just a happy 
-  *  concidence or subconscious choice. Either way g2log became the name for this logger.
-  *
-  * --- Thanks for a great 2011 and good luck with 'g2' --- KjellKod 
-  */
-namespace g2
-{
+ * History lesson:   Why the names 'g2' and 'g2log'?:
+ * The framework was made in my own free time as PUBLIC DOMAIN but the 
+ * first commercial project to use it used 'g2' as an internal denominator for 
+ * the current project. g2 as in 'generation 2'. I decided to keep the g2 and g2log names
+ * to give credit to the people in that project (you know who you are :) and I guess also
+ * for 'sentimental' reasons. That a big influence was google's glog is just a happy 
+ *  concidence or subconscious choice. Either way g2log became the name for this logger.
+ *
+ * --- Thanks for a great 2011 and good luck with 'g2' --- KjellKod 
+ */
+namespace g2 {
+struct LogMessage;
 
-  /** Should be called at very first startup of the software with \ref g2LogWorker
-  *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
-  void initializeLogging(g2LogWorker *logger);
+/** Should be called at very first startup of the software with \ref g2LogWorker
+ *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
+void initializeLogging(g2LogWorker *logger);
 
-  /** Shutdown the logging by making the pointer to the background logger to nullptr
+namespace internal {
+// Save the created LogMessage to any existing sinks
+void saveMessage(const g2::LogMessage& log_entry);
+
+/** FOR TESTING PURPOSES
+ * Shutdown the logging by making the pointer to the background logger to nullptr
  * The \ref pointer to the g2LogWorker is owned by the instantniater \ref initializeLogging
  * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. 
+ * 
  * This is kept for test reasons and should normally not be used */
-  g2LogWorker* shutDownLogging();
+g2LogWorker* shutDownLogging();
+
+bool isLoggingInitialized();
 
 
-  // defined here but should't not have to be used outside the g2log
-  namespace internal
-  {
-    typedef const std::string& LogEntry;
-
-    bool isLoggingInitialized();
-    long microsecondsCounter();
-    void saveMessage(const LogEntry& log_entry);
+/** FOR TESTING PURPOSES: @ref g2log.ipp
+ *  By default the g2log will call g2LogWorker::fatal(...) which will
+ * abort() the system after flushing the logs to file. This makes unit
+ * test of FATAL level cumbersome. A work around is to change the
+ *  fatal call'  which can be done here */
+void changeFatalInitHandlerForUnitTesting();
 
 
-    /** By default the g2log will call g2LogWorker::fatal(...) which will
-    * abort() the system after flushing the logs to file. This makes unit
-    * test of FATAL level cumbersome. A work around is to change the
-    * 'fatal call'  which can be done here */
-    void changeFatalInitHandlerForUnitTesting();
-
-
-
-
-    /** Trigger for flushing the message queue and exiting the application
-    A thread that causes a FatalMessage will sleep forever until the
-    application has exited (after message flush) */
-    struct FatalMessage
-    {
-      enum FatalType {kReasonFatal, kReasonOS_FATAL_SIGNAL};
-      FatalMessage(std::string message, FatalType type, int signal_id);
-
-      std::string message_;
-      FatalType type_;
-      int signal_id_;
-    };
-
-
-    // At RAII scope end this struct will trigger a FatalMessage sending
-    struct FatalTrigger
-    {
-      FatalTrigger(const FatalMessage& message);
-      ~FatalTrigger();
-      FatalMessage message_;
-    };
-
-  } // end namespace internal
+} // end namespace internal
 } // end namespace g2
 
 
-#define INTERNAL_LOG_MESSAGE(level) g2::internal::LogMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
 
+
+
+#define INTERNAL_LOG_MESSAGE(level) g2::internal::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
+
+//LogMessageBuilder(const char* file, const int line, const char* function, const LEVELS& level){}
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
-        g2::internal::LogContractMessage(__FILE__, __LINE__, __PRETTY_FUNCTION__, boolean_expression)
-
+        g2::internal::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, ::FATAL) 
+//.setExpression(boolean_expression)
 
 
 // LOG(level) is the API for the stream log
-#define LOG(level) if(g2::logLevel(level)) INTERNAL_LOG_MESSAGE(level).messageStream()
+#define LOG(level) if(g2::logLevel(level)) INTERNAL_LOG_MESSAGE(level).stream()
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
   if(true == boolean_expression)  \
-  if(g2::logLevel(level))  INTERNAL_LOG_MESSAGE(level).messageStream()
+  if(g2::logLevel(level))  INTERNAL_LOG_MESSAGE(level).stream()
 
 // 'Design By Contract' stream API. For Broken Contracts:
 //         unit testing: it will throw std::runtime_error when a contract breaks
 //         I.R.L : it will exit the application by using fatal signal SIGABRT
 #define CHECK(boolean_expression)        \
-  if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).messageStream()
+  if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
 
 
 /** For details please see this
-  * REFERENCE: http://www.cppreference.com/wiki/io/c/printf_format
-  * \verbatim
-  *
+ * REFERENCE: http://www.cppreference.com/wiki/io/c/printf_format
+ * \verbatim
+ *
   There are different %-codes for different variable types, as well as options to
     limit the length of the variables and whatnot.
     Code Format

@@ -19,9 +19,16 @@ struct LEVELS
 {
   const int value;
   const std::string text;
-} const DEBUG = {0, "DEBUG"}, INFO = {1, "INFO"}, WARNING = {2, "WARNING"}, FATAL = {3, "FATAL"};
+};
+const LEVELS DEBUG = {0, "DEBUG"}, INFO = {1, "INFO"}, WARNING = {2, "WARNING"}, FATAL = {3, "FATAL"};
 
 namespace g2 {
+namespace internal {
+  const LEVELS CONTRACT = {4, "CONTRACT"}, FATAL_SIGNAL{5, "FATAL_SIGNAL"}; 
+  
+  bool wasFatal(const LEVELS& level);
+}
+
 #ifdef G2_DYNAMIC_LOGGING
   // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
   // Obviously: 'enabled_status' set to 'false' - means to disable that log level

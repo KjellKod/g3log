@@ -1,16 +1,15 @@
 /** ==========================================================================
-* 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
-* with no warranties. This code is yours to share, use and modify with no
-* strings attached and no restrictions or obligations.
-* ============================================================================
-* Filename:g2logmessage.hpp  Part of Framework for Logging and Design By Contract
-* Created: 2012 by Kjell Hedström
-*
-* PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
-* ********************************************* */
+ * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+ * with no warranties. This code is yours to share, use and modify with no
+ * strings attached and no restrictions or obligations.
+ * ============================================================================
+ * Filename:g2logmessage.hpp  Part of Framework for Logging and Design By Contract
+ * Created: 2012 by Kjell Hedström
+ *
+ * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
+ * ********************************************* */
 
-#ifndef G2_LOG_MESSAGE_HPP
-#define G2_LOG_MESSAGE_HPP
+#pragma once
 
 
 #include <string>
@@ -21,91 +20,53 @@
 
 #include "g2log.hpp"
 #include "g2loglevels.hpp"
+#include "g2time.hpp"
 
-struct LogEntryMessageImpl;
-// Notice: Currently the LogEntryMessage does not use polymorphism to
-// implement the "expression" part even though it is only used for CHECK(...)
-// contracts and not by normal messages
-class LogEntryMessage
-{
-  std::unique_ptr<LogEntryMessageImpl> pimpl_;
-  std::string file();
-  std::string line();
-  std::string function();
-  std::string level();
-  std::string timestamp();
-  std::string microseconds();
-  std::string message();
-  std::string expression();
+namespace g2 {
+struct LogMessageImpl;
 
-  std::ostringstream&  saveMessageByStream();
-#ifndef __GNUC__
-#define  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
-#endif
-  // Coder note: Since it's C++ and not C EVERY CLASS FUNCTION always get a first
-  // compiler given argument 'this'. This must be supplied as well, hence '2,3'
-  // ref: http://www.codemaestro.com/reviews/18 -- ref KjellKod
-  void saveMessage(const char *printf_like_message, ...)
-  __attribute__((format(printf,2,3) ));
 
-public:
-  // replace for factory function instead
-  // createContractMessage
-  // createMessage
-  LogEntryMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level);
-  LogEntryMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level, const std::string boolean_expression);
+struct LogMessage {
+   mutable std::shared_ptr<LogMessageImpl> _pimpl;
+   std::string file() const;
+   std::string line() const;
+   std::string function() const;
+   std::string level() const;
+   
+   std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
+   std::string microseconds() const;
+   std::string message() const;
+   std::string expression() const;
+
+   bool wasFatal() const;
+
+   // convert all content to ONE string
+   std::string toString() const;
+
+
+   std::ostringstream& stream();
+   explicit LogMessage(std::shared_ptr<LogMessageImpl> details);
+   ~LogMessage() = default;
 };
+   
+   
+   namespace internal {
+   /** Trigger for flushing the message queue and exiting the application
+    * A thread that causes a FatalMessage will sleep forever until the
+    * application has exited (after message flush) */
+   struct FatalMessage {
+      FatalMessage(const std::string& message, int signal_id);
+      FatalMessage(const LogMessage& message, int signal_id);
+      ~FatalMessage() = default;
+      mutable LogMessage _crash_message;
+      int signal_id_;
+   };
 
-
-
-
-namespace g2 {  namespace internal {
-
-    // temporary message construct to capture log input and push to g2logworker
-    class LogMessage
-    {
-    public:
-      LogMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level);
-      virtual ~LogMessage(); // flush the message
-      std::ostringstream& messageStream(){return stream_;}
-
-
-      // The __attribute__ generates compiler warnings if illegal "printf" format
-      // IMPORTANT: You muse enable the compiler flag '-Wall' for this to work!
-      // ref: http://www.unixwiz.net/techtips/gnu-c-attributes.html
-#ifndef __GNUC__
-#define  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
-#endif
-      // Coder note: Since it's C++ and not C EVERY CLASS FUNCTION always get a first
-      // compiler given argument 'this'. This must be supplied as well, hence '2,3'
-      // ref: http://www.codemaestro.com/reviews/18 -- ref KjellKod
-      void messageSave(const char *printf_like_message, ...)
-      __attribute__((format(printf,2,3) ));
-
-
-    protected:
-      const std::string file_;
-      const int line_;
-      const std::string function_;
-      const LEVELS& level_;
-      std::ostringstream stream_;
-      std::string log_entry_;
-    };
-
-
-    // 'Design-by-Contract' temporary messsage construction
-    class LogContractMessage : public LogMessage
-    {
-    public:
-      LogContractMessage(const std::string &file, const int line,
-                         const std::string &function, const std::string &boolean_expression);
-      virtual ~LogContractMessage(); // at destruction will flush the message
-
-    protected:
-      const std::string expression_;
-    };
-  } // internal
-             } // g2
-
-
-#endif //G2_LOG_MESSAGE_HPP
+   // At RAII scope end this struct will trigger a FatalMessage sending
+   struct FatalTrigger {
+      explicit FatalTrigger(const FatalMessage& exit_message);
+      ~FatalTrigger();
+      FatalMessage _fatal_message;
+   };
+   } // internal
+} // g2

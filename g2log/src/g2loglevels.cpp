@@ -16,6 +16,10 @@
 namespace g2
 {
   namespace internal {
+     bool wasFatal(const LEVELS& level) { 
+        return level.value > WARNING.value; 
+     }
+
     std::atomic<bool> g_log_level_status[4]; // DEBUG, INFO, WARNING, FATAL
   } // internal
 

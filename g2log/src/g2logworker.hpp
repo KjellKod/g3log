@@ -56,7 +56,7 @@ public:
 
   
   /// pushes in background thread (asynchronously) input messages to log file
-  void save(g2::internal::LogEntry entry);
+  void save(g2::LogMessage entry);
 
   /// Will push a fatal message on the queue, this is the last message to be processed
   /// this way it's ensured that all existing entries were flushed before 'fatal'
