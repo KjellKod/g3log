@@ -61,7 +61,7 @@ public:
   /// Will push a fatal message on the queue, this is the last message to be processed
   /// this way it's ensured that all existing entries were flushed before 'fatal'
   /// Will abort the application!
-  void fatal(g2::internal::FatalMessage fatal_message);
+  void fatal(g2::FatalMessage fatal_message);
 
   template<typename T, typename DefaultLogCall>
   std::unique_ptr<g2::SinkHandle<T >> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {

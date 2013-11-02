@@ -7,6 +7,7 @@
 #include "crashhandler.hpp"
 #include "g2log.hpp"
 #include "g2logmessage.hpp"
+#include "g2LogMessageBuilder.hpp"
 
 #include <csignal>
 #include <cstring>
@@ -41,14 +42,13 @@ namespace {
          fatal_stream << oss.str() << std::endl;
          fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;
 
-         FatalMessage fatal_message(fatal_stream.str(), signal_number);
-         const auto& crashMessage = fatal_message._crash_message;
-         std::cerr << crashMessage.toString() << std::endl << std::flush;
+         //g2::FatalMessage fatal_message{fatal_stream.str(), signal_number};
+         //const auto& crashMessage = fatal_message._crash_message;
+         std::cerr << fatal_stream.str()  << std::flush;
 
-         FatalTrigger trigger(fatal_message);
-         std::ostringstream oss;
-      } // message sent to g2LogWorker by FatalTrigger
-      // wait to die -- will be inside the FatalTrigger
+         g2::FatalMessageBuilder trigger(fatal_stream.str(), signal_number);
+      } // message sent to g2LogWorker by FatalMessageBuilder
+      // wait to die -- will be inside the FatalMessageBuilder
    }
 } // end anonymous namespace
 

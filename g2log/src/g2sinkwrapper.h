@@ -15,7 +15,7 @@ namespace g2 {
     
     struct SinkWrapper {
       virtual ~SinkWrapper() { }
-      virtual void send(LogMessage msg) = 0;
+      virtual void send(const LogMessage& msg) = 0;
     };
   }
 }

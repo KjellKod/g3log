@@ -42,13 +42,13 @@ namespace testing_helpers {
    
    
    ScopedLogger::ScopedLogger()
-  : _previousWorker(g2::shutDownLogging())
+  : _previousWorker(g2::internal::shutDownLogging())
    , _currentWorker(g2LogWorker::createWithNoSink()) {
      g2::initializeLogging(_currentWorker.get());
   }
 
   ScopedLogger::~ScopedLogger() {
-     auto* current = g2::shutDownLogging();  
+     auto* current = g2::internal::shutDownLogging();  
      CHECK(current == _currentWorker.get());
      if (nullptr != _previousWorker) { 
         g2::initializeLogging(_previousWorker); 

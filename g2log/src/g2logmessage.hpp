@@ -21,52 +21,45 @@
 #include "g2log.hpp"
 #include "g2loglevels.hpp"
 #include "g2time.hpp"
+//#include "g2logmessageimpl.hpp"
 
 namespace g2 {
-struct LogMessageImpl;
+   struct LogMessageImpl;
+
+   struct LogMessage {
+      mutable std::shared_ptr<LogMessageImpl> _pimpl;
+      std::string file() const;
+      std::string line() const;
+      std::string function() const;
+      std::string level() const;
+
+      std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
+      std::string microseconds() const;
+      std::string message() const;
+      std::string expression() const;
+
+      bool wasFatal() const;
+
+      // convert all content to ONE string
+      std::string toString() const;
 
 
-struct LogMessage {
-   mutable std::shared_ptr<LogMessageImpl> _pimpl;
-   std::string file() const;
-   std::string line() const;
-   std::string function() const;
-   std::string level() const;
-   
-   std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
-   std::string microseconds() const;
-   std::string message() const;
-   std::string expression() const;
+      std::ostringstream& stream();
+      explicit LogMessage(std::shared_ptr<LogMessageImpl> details);
+      ~LogMessage() = default;
+   };
 
-   bool wasFatal() const;
-
-   // convert all content to ONE string
-   std::string toString() const;
-
-
-   std::ostringstream& stream();
-   explicit LogMessage(std::shared_ptr<LogMessageImpl> details);
-   ~LogMessage() = default;
-};
-   
-   
-   namespace internal {
    /** Trigger for flushing the message queue and exiting the application
     * A thread that causes a FatalMessage will sleep forever until the
     * application has exited (after message flush) */
-   struct FatalMessage {
+   struct FatalMessage : public LogMessage {
       FatalMessage(const std::string& message, int signal_id);
-      FatalMessage(const LogMessage& message, int signal_id);
+      //FatalMessage(const LogMessage& message, int signal_id);
       ~FatalMessage() = default;
-      mutable LogMessage _crash_message;
+      
+      LogMessage copyToLogMessage() const;
+      
+      //mutable LogMessage _crash_message;
       int signal_id_;
    };
-
-   // At RAII scope end this struct will trigger a FatalMessage sending
-   struct FatalTrigger {
-      explicit FatalTrigger(const FatalMessage& exit_message);
-      ~FatalTrigger();
-      FatalMessage _fatal_message;
-   };
-   } // internal
 } // g2

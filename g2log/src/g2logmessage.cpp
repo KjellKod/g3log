@@ -10,11 +10,12 @@
  * ********************************************* */
 
 #include "g2logmessage.hpp"
+#include "g2logmessageimpl.hpp"
 #include "g2time.hpp"
 #include "crashhandler.hpp"
 #include <stdexcept> // exceptions
 #include "g2log.hpp"
-#include "g2log.ipp"
+
 
 namespace g2 {
 
@@ -76,7 +77,7 @@ namespace g2 {
       std::ostringstream oss;
       oss << "\n" << timestamp() << "." << microseconds() << "\t";
 
-      
+
       oss << level() << " [" << file();
       oss << " L: " << line() << "]\t";
 
@@ -116,31 +117,20 @@ namespace g2 {
    }
 
 
-   LogMessage(std::shared_ptr<LogMessageImpl> details)
+   LogMessage::LogMessage(std::shared_ptr<LogMessageImpl> details)
    : _pimpl(details) { }
 
 
-
-   namespace internal {
-
-
-      FatalMessage::FatalMessage(const std::string& crash_message, int signal_id)
-      : FatalMessage({std::make_shared<LogMessageImpl>(crash_message)}, signal_id) { }
+   FatalMessage::FatalMessage(const std::string& crash_message, int signal_id)
+   : LogMessage(std::make_shared<LogMessageImpl>(crash_message)), signal_id_(signal_id) 
+   { }
 
 
-      FatalMessage(const LogMessage& message, int signal_id)
-      : _crash_message(message), signal_id_(signal_id) { }
+   LogMessage  FatalMessage::copyToLogMessage() const {
+      return LogMessage(_pimpl);
+   }
+ 
+   //FatalMessage(const LogMessage& message, int signal_id)
+   //: _crash_message(message), signal_id_(signal_id) { }
 
-
-      FatalTrigger::FatalTrigger(const FatalMessage& exit_message) : _fatal_message(exit_message) { }
-
-
-      FatalTrigger::~FatalTrigger() {
-         // At destruction, flushes fatal message to g2LogWorker
-         // either we will stay here until the background worker has received the fatal
-         // message, flushed the crash message to the sinks and exits with the same fatal signal
-         //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
-         fatalCall(_fatal_message);
-      }
-   } // internal
 } // g2

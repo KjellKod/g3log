@@ -58,7 +58,7 @@ struct Sink : public SinkWrapper {
       _bg.reset(); // TODO: to remove
    }
 
-   void send(LogMessage msg) override {
+   void send(const LogMessage& msg) override {
       _bg->send([this, msg] {
          _default_log_call(msg);
       });

@@ -13,6 +13,7 @@
 #include "g2sinkwrapper.h"
 #include "g2sinkhandle.h"
 #include "g2logmessage.hpp"
+#include "g2logmessageimpl.hpp"
 
 
 using namespace std;
@@ -35,7 +36,7 @@ public:
     return buffer.str();
   }
 
-  void save(g2::internal::LogEntry msg) {
+  void save(std::string msg) {
     std::cout << msg;
   }
 
@@ -50,7 +51,7 @@ public:
 
 namespace {
   typedef std::shared_ptr<g2::internal::SinkWrapper> SinkWrapperPtr;
-  typedef g2::internal::LogEntry LogEntry;
+  typedef std::string LogEntry;
 }
 
 namespace g2 {
@@ -61,7 +62,9 @@ namespace g2 {
 
     void bgSave(LogEntry msg) {
       for (auto& sink : _container) {
-        sink->send(msg);
+        g2::LogMessage message(std::make_shared<g2::LogMessageImpl>("test", 0, "test", DEBUG));
+        message.stream() << msg;
+        sink->send(message);
       }
     }
 

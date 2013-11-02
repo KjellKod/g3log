@@ -17,8 +17,7 @@
  * ********************************************* */
 
 
-#ifndef G2LOG_H
-#define G2LOG_H
+#pragma once
 
 #include <string>
 #include <cstdarg>
@@ -46,14 +45,23 @@ class g2LogWorker;
  */
 namespace g2 {
 struct LogMessage;
+struct FatalMessage;
+
 
 /** Should be called at very first startup of the software with \ref g2LogWorker
  *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
 void initializeLogging(g2LogWorker *logger);
 
 namespace internal {
+   
 // Save the created LogMessage to any existing sinks
-void saveMessage(const g2::LogMessage& log_entry);
+void saveMessage(g2::LogMessage log_entry);
+
+
+// Save the created FatalMessage to any existing sinks and exit with 
+// the originating fatal signal,. or SIGABRT if it originated from a broken contract
+void fatalCall(FatalMessage message);
+
 
 /** FOR TESTING PURPOSES
  * Shutdown the logging by making the pointer to the background logger to nullptr
@@ -72,21 +80,18 @@ bool isLoggingInitialized();
  * test of FATAL level cumbersome. A work around is to change the
  *  fatal call'  which can be done here */
 void changeFatalInitHandlerForUnitTesting();
-
-
-} // end namespace internal
-} // end namespace g2
+} // g2::internal
+} // g2
 
 
 
 
 
-#define INTERNAL_LOG_MESSAGE(level) g2::internal::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
+#define INTERNAL_LOG_MESSAGE(level) g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
 
-//LogMessageBuilder(const char* file, const int line, const char* function, const LEVELS& level){}
+
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
-        g2::internal::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, ::FATAL) 
-//.setExpression(boolean_expression)
+        g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, FATAL).setExpression(boolean_expression)
 
 
 // LOG(level) is the API for the stream log
@@ -165,4 +170,4 @@ And here is possible output
 #define CHECK_F(boolean_expression, printf_like_message, ...)    \
   if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).messageSave(printf_like_message, ##__VA_ARGS__)
 
-#endif // G2LOG_H
+
