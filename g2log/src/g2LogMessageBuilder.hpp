@@ -13,36 +13,36 @@
 #include "g2loglevels.hpp"
 
 
-namespace g2 {struct LogMessageImpl;
+namespace g2 {
 
-// At RAII scope end this struct will trigger a FatalMessage sending
-struct FatalMessageBuilder {
-   //explicit FatalMessageBuilder(const FatalMessage& exit_message);
-   FatalMessageBuilder(const std::string& exit_message, int fatal_signal);
-   ~FatalMessageBuilder();
-  
-   std::string _exit_message;
-   int _fatal_signal;
-};
+   struct LogMessageImpl;
 
+   // At RAII scope end this struct will trigger a FatalMessage sending
+   struct FatalMessageBuilder {
+      //explicit FatalMessageBuilder(const FatalMessage& exit_message);
+      FatalMessageBuilder(const std::string& exit_message, int fatal_signal);
+      virtual ~FatalMessageBuilder();
 
-struct LogMessageBuilder {
-   LogMessageBuilder(const std::string& file, const int line, const std::string& function, const LEVELS& level);
-   virtual ~LogMessageBuilder();
+      std::string _exit_message;
+      int _fatal_signal;
+   };
 
-   LogMessageBuilder& setExpression(const std::string& boolean_expression);
-   std::ostringstream& stream();
+   struct LogMessageBuilder {
+      LogMessageBuilder(const std::string& file, const int line, const std::string& function, const LEVELS& level);
+      virtual ~LogMessageBuilder();
 
-   // Use "-Wall" to generate warnings in case of illegal printf format. 
-   //      Ref:  http://www.unixwiz.net/techtips/gnu-c-attributes.html
+      LogMessageBuilder& setExpression(const std::string& boolean_expression);
+      std::ostringstream& stream();
+
+      // Use "-Wall" to generate warnings in case of illegal printf format. 
+      //      Ref:  http://www.unixwiz.net/techtips/gnu-c-attributes.html
 #ifndef __GNUC__
 #define  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
 #endif
-   void messageSave(const char *printf_like_message, ...)
-   __attribute__((format(printf, 2, 3))); // ref:  http://www.codemaestro.com/reviews/18
+      void messageSave(const char *printf_like_message, ...)
+      __attribute__((format(printf, 2, 3))); // ref:  http://www.codemaestro.com/reviews/18
 
-private:
-   std::shared_ptr<LogMessageImpl> _message;
-};
-
+   private:
+      std::shared_ptr<LogMessageImpl> _message;
+   };
 } // g2

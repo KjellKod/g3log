@@ -5,20 +5,19 @@
  * Created on October 26, 2013, 3:45 PM
  */
 
+//#include "g2log.hpp"
 #include "g2LogMessageBuilder.hpp"
 #include "g2logmessageimpl.hpp"
-#include "g2log.hpp"
 #include "g2logmessage.hpp"
-#include <iostream>
 #include <csignal>
 
-namespace g2 {
 
+namespace g2 {
+   using namespace internal;
    LogMessageBuilder::LogMessageBuilder(const std::string& file, const int line,
            const std::string& function, const LEVELS& level)
-   : _message(std::make_shared<LogMessageImpl>(file, line, function, level)) {}
-    //: _message(new LogMessageImpl(file, line, function, level)) //
-   //{}
+   : _message(std::make_shared<LogMessageImpl>(file, line, function, level)) {
+   }
 
    LogMessageBuilder::~LogMessageBuilder() {
       LogMessage log_entry(_message);
@@ -26,7 +25,7 @@ namespace g2 {
          FatalMessageBuilder trigger({log_entry.toString(), SIGABRT});
          return; // FatalMessageBuilder will send to worker at scope exit 
       }
-      internal::saveMessage(log_entry); // message saved to g2LogWorker
+      saveMessage(log_entry); // message saved to g2LogWorker
    }
 
    LogMessageBuilder& LogMessageBuilder::setExpression(const std::string& boolean_expression) {
@@ -40,17 +39,18 @@ namespace g2 {
 
 
    /// FatalMessageBuilder
-
    FatalMessageBuilder::FatalMessageBuilder(const std::string& exit_message, int fatal_signal)
-   :_exit_message(exit_message), _fatal_signal(fatal_signal) { }
+   : _exit_message(exit_message), _fatal_signal(fatal_signal) {
+   }
 
    FatalMessageBuilder::~FatalMessageBuilder() {
       // At destruction, flushes fatal message to g2LogWorker
       // either we will stay here until the background worker has received the fatal
       // message, flushed the crash message to the sinks and exits with the same fatal signal
       //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
-      internal::fatalCall({_exit_message, _fatal_signal});
+      FatalMessage msg(_exit_message, _fatal_signal);
+      //internal::fatalCall({_exit_message, _fatal_signal});
+      internal::fatalCall(msg);
+
    }
-
-
 } // g2

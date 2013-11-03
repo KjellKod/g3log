@@ -44,43 +44,41 @@ class g2LogWorker;
  * --- Thanks for a great 2011 and good luck with 'g2' --- KjellKod 
  */
 namespace g2 {
-struct LogMessage;
-struct FatalMessage;
+   struct LogMessage;
+   struct FatalMessage;
 
 
-/** Should be called at very first startup of the software with \ref g2LogWorker
- *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
-void initializeLogging(g2LogWorker *logger);
+   /** Should be called at very first startup of the software with \ref g2LogWorker
+    *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
+   void initializeLogging(g2LogWorker *logger);
 
-namespace internal {
-   
-// Save the created LogMessage to any existing sinks
-void saveMessage(g2::LogMessage log_entry);
+   namespace internal {
 
-
-// Save the created FatalMessage to any existing sinks and exit with 
-// the originating fatal signal,. or SIGABRT if it originated from a broken contract
-void fatalCall(FatalMessage message);
+      bool isLoggingInitialized();
 
 
-/** FOR TESTING PURPOSES
- * Shutdown the logging by making the pointer to the background logger to nullptr
- * The \ref pointer to the g2LogWorker is owned by the instantniater \ref initializeLogging
- * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. 
- * 
- * This is kept for test reasons and should normally not be used */
-g2LogWorker* shutDownLogging();
+      // Save the created LogMessage to any existing sinks
+      void saveMessage(LogMessage log_entry);
 
-bool isLoggingInitialized();
+      // Save the created FatalMessage to any existing sinks and exit with 
+      // the originating fatal signal,. or SIGABRT if it originated from a broken contract
+      void fatalCall(FatalMessage message);
 
+      /** FOR TESTING PURPOSES
+       * Shutdown the logging by making the pointer to the background logger to nullptr
+       * The \ref pointer to the g2LogWorker is owned by the instantniater \ref initializeLogging
+       * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. 
+       * 
+       * This is kept for test reasons and should normally not be used */
+      g2LogWorker* shutDownLogging();
 
-/** FOR TESTING PURPOSES: @ref g2log.ipp
- *  By default the g2log will call g2LogWorker::fatal(...) which will
- * abort() the system after flushing the logs to file. This makes unit
- * test of FATAL level cumbersome. A work around is to change the
- *  fatal call'  which can be done here */
-void changeFatalInitHandlerForUnitTesting();
-} // g2::internal
+      /** FOR TESTING PURPOSES: @ref g2log.ipp
+       *  By default the g2log will call g2LogWorker::fatal(...) which will
+       * abort() the system after flushing the logs to file. This makes unit
+       * test of FATAL level cumbersome. A work around is to change the
+       *  fatal call'  which can be done here */
+      void changeFatalInitHandlerForUnitTesting();
+   } // g2::internal
 } // g2
 
 
