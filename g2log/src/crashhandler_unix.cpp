@@ -21,7 +21,6 @@
 #include <cxxabi.h>
 #include <cstdlib>
 #include <sstream>
-#include <iostream>
 
 namespace {
    // Dump of stack,. then exit through g2log background worker
@@ -41,10 +40,6 @@ namespace {
          std::ostringstream fatal_stream;
          fatal_stream << oss.str() << std::endl;
          fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;
-
-         //g2::FatalMessage fatal_message{fatal_stream.str(), signal_number};
-         //const auto& crashMessage = fatal_message._crash_message;
-         std::cerr << fatal_stream.str()  << std::flush;
 
          g2::FatalMessageBuilder trigger(fatal_stream.str(), signal_number);
       } // message sent to g2LogWorker by FatalMessageBuilder

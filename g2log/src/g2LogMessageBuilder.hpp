@@ -33,7 +33,8 @@ namespace g2 {
 
       LogMessageBuilder& setExpression(const std::string& boolean_expression);
       std::ostringstream& stream();
-
+      
+   
       // Use "-Wall" to generate warnings in case of illegal printf format. 
       //      Ref:  http://www.unixwiz.net/techtips/gnu-c-attributes.html
 #ifndef __GNUC__

@@ -88,6 +88,8 @@ namespace g2 {
       }
 
       if (internal::FATAL_SIGNAL.value == _pimpl->_level.value) {
+         oss.str(""); // clear any previous text and formatting
+         oss << "\n" << timestamp() << "." << microseconds();
          oss << "\n\n***** FATAL SIGNAL RECEIVED ******* " << std::endl;
          oss << '"' << message() << '"';
          return oss.str();
@@ -103,7 +105,7 @@ namespace g2 {
       } else if (internal::CONTRACT.value == level_value) {
          oss << "\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(" << _pimpl->_expression << ")\n\t";
          oss << '"' << message() << '"';
-         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump();
+         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump()<< '"';
       } else {
          oss << "\n\t*******\tUNKNOWN Log Message Type\n" << '"' << message() << '"';
       }

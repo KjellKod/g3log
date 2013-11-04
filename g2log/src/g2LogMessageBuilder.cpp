@@ -11,9 +11,12 @@
 #include "g2logmessage.hpp"
 #include <csignal>
 
-
+namespace {
+   const int kMaxMessageSize = 2048;
+   const std::string kTruncatedWarningText = "[...truncated...]";
+}
 namespace g2 {
-   using namespace internal;
+
    LogMessageBuilder::LogMessageBuilder(const std::string& file, const int line,
            const std::string& function, const LEVELS& level)
    : _message(std::make_shared<LogMessageImpl>(file, line, function, level)) {
@@ -25,7 +28,7 @@ namespace g2 {
          FatalMessageBuilder trigger({log_entry.toString(), SIGABRT});
          return; // FatalMessageBuilder will send to worker at scope exit 
       }
-      saveMessage(log_entry); // message saved to g2LogWorker
+      internal::saveMessage(log_entry); // message saved to g2LogWorker
    }
 
    LogMessageBuilder& LogMessageBuilder::setExpression(const std::string& boolean_expression) {
@@ -37,8 +40,28 @@ namespace g2 {
       return _message->_stream;
    }
 
+   void LogMessageBuilder::messageSave(const char *printf_like_message, ...) {
+      char finished_message[kMaxMessageSize];
+      va_list arglist;
+      va_start(arglist, printf_like_message);
+      const int nbrcharacters = vsnprintf(finished_message, sizeof (finished_message), printf_like_message, arglist);
+      va_end(arglist);
+      if (nbrcharacters <= 0) {
+         stream() << "\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully the message";
+         stream() << '"' << printf_like_message << '"' << std::endl;
+      } else if (nbrcharacters > kMaxMessageSize) {
+         stream() << finished_message << kTruncatedWarningText;
+      } else {
+         stream() << finished_message;
+      }
+   }
+
+
+
+
 
    /// FatalMessageBuilder
+
    FatalMessageBuilder::FatalMessageBuilder(const std::string& exit_message, int fatal_signal)
    : _exit_message(exit_message), _fatal_signal(fatal_signal) {
    }

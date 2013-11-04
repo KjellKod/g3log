@@ -5,15 +5,13 @@
 #include <mutex>
 
 namespace {
-   const int kMaxMessageSize = 2048;
-   const std::string kTruncatedWarningText = "[...truncated...]";
    std::once_flag g_start_time_flag;
    g2::steady_time_point g_start_time;
 
    long microsecondsCounter() {
       std::call_once(g_start_time_flag, []() { g_start_time =  std::chrono::steady_clock::now();  });
       g2::steady_time_point  now = std::chrono::steady_clock::now();
-      return std::chrono::duration_cast<std::chrono::microseconds>(g_start_time - now).count();
+      return std::chrono::duration_cast<std::chrono::microseconds>(now - g_start_time).count();
    }
 
    std::string splitFileName(const std::string& str) {

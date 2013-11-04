@@ -44,11 +44,7 @@ FileSink::~FileSink() {
 }
 void FileSink::fileWrite(LogMessage message) {
    std::ofstream& out(filestream());
-   out << "msg1: \n" << message.toString() << std::flush;
-   
-   out << "msg2:\n" << message.timestamp() << "." << message.microseconds() << message.level();
-//           << " [" << message.file() << "/" << message.function() << " L" << message.line() <<  "] "
- //          << message.expression() << "\t" << '"' << message.message() << '"' << std::flush;
+   out << message.toString() << std::flush;
 }
 
 std::string FileSink::changeLogFile(const std::string& directory) {
