@@ -24,24 +24,13 @@ class CoutSink {
   stringstream buffer;
   unique_ptr<ScopedOut> scope_ptr;
 
-  CoutSink() : scope_ptr(std2::make_unique<ScopedOut>(std::cout, &buffer)) {
-  }
+  CoutSink() : scope_ptr(std2::make_unique<ScopedOut>(std::cout, &buffer)) {  }
 public:
 
-  void clear() {
-    buffer.str("");
-  }
-
-  std::string string() {
-    return buffer.str();
-  }
-
-  void save(std::string msg) {
-    std::cout << msg;
-  }
-
-  virtual ~CoutSink() final {
-  }
+  void clear() { buffer.str(""); }
+  std::string string() { return buffer.str();  }
+  void save(g2::LogMessage msg) {std::cout << msg.message();}
+  virtual ~CoutSink() final { }
 
   static std::unique_ptr<CoutSink> createSink() {
     return std::unique_ptr<CoutSink>(new CoutSink);
@@ -70,15 +59,11 @@ namespace g2 {
 
   public:
 
-    Worker() : _bg {
-      kjellkod::Active::createActive()
-    }
-    {
-    }
+    Worker() : _bg { kjellkod::Active::createActive() } 
+    {}
 
     ~Worker() {
-      _bg->send([this] {
-        _container.clear(); });
+      _bg->send([this] {  _container.clear(); });
     }
 
     void save(LogEntry msg) {
@@ -122,14 +107,16 @@ TEST(ConceptSink, OneSink__VerifyMsgIn) {
   worker.save("Hello World!");
   std::this_thread::sleep_for(std::chrono::milliseconds(100));
   auto output = handle->call(&CoutSink::string);
-  ASSERT_EQ("Hello World!", output.get());
+  auto content = output.get();
+  auto pos = content.find("Hello World!");
+  ASSERT_NE(pos, std::string::npos);
 }
 
 struct StringSink {
   std::string raw;
 
-  void append(LogEntry entry) {
-    raw.append(entry);
+  void append(g2::LogMessage entry) {
+    raw.append(entry.message());
   }
 
   std::string string() {
