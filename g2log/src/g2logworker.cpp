@@ -52,8 +52,7 @@ struct g2LogWorkerImpl {
   }
 
   void bgFatal(FatalMessage msg) {
-    //auto entry = fatal_message._crash_message;
-     auto fatal_message = msg;
+    auto fatal_message = msg;
     fatal_message.stream() <<  "\nExiting after fatal event. Log flushed sucessfully to disk.\n";
     bgSave(fatal_message.copyToLogMessage());
 

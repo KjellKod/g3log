@@ -11,7 +11,6 @@
 
 #include <memory>
 #include <string>
-#include <fstream>
 #include <cstdio>
 #include <thread>
 #include <chrono>
@@ -19,26 +18,6 @@
 namespace {
 const int k_wait_time = 5; // 5s wait between LOG/CHECK FATAL till we say it's too long time
 const std::string log_directory = "./";
-
-
-bool verifyContent(const std::string &total_text, std::string msg_to_find) {
-   std::string content(total_text);
-   size_t location = content.find(msg_to_find);
-   return (location != std::string::npos);
-}
-
-
-std::string readFileToText(std::string filename) {
-   std::ifstream in;
-   in.open(filename.c_str(), std::ios_base::in);
-   if (!in.is_open()) {
-      return
-      { }; // error just return empty string - test will 'fault'
-   }
-   std::ostringstream oss;
-   oss << in.rdbuf();
-   return oss.str();
-}
 } // end anonymous namespace
 
 
@@ -58,17 +37,64 @@ TEST(IO_RestoreFileLogger, Expecting_Fine_To_ShutDownMultipleTimes) {
    }
 }
 
+/// THIS MUST BE THE FIRST UNIT TEST TO RUN! If any unit test run before this 
+/// one then it will fail
+TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
+   {
+      // Temporarily enable all levels. then go out of scope again.
+      RestoreFileLogger logger(log_directory);
+      EXPECT_TRUE(g2::internal::isLoggingInitialized());
+      EXPECT_TRUE(g2::logLevel(INFO));
+      EXPECT_TRUE(g2::logLevel(FATAL));
+      EXPECT_TRUE(g2::logLevel(DEBUG));
+      EXPECT_TRUE(g2::logLevel(WARNING));
+   }
+
+   EXPECT_FALSE(g2::internal::isLoggingInitialized());
+   EXPECT_TRUE(g2::logLevel(INFO));
+   EXPECT_TRUE(g2::logLevel(FATAL));
+   EXPECT_TRUE(g2::logLevel(DEBUG));
+   EXPECT_TRUE(g2::logLevel(WARNING));
+   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g2logger)";
+   std::string err_msg2_ignored = "This uninitialized message should be ignored";
+
+   try {
+      LOG(INFO) << err_msg1;
+      LOG(INFO) << err_msg2_ignored;
+
+   } catch (std::exception& e) {
+      ADD_FAILURE() << "Should never have thrown even if it is not instantiated";
+   }
+
+   RestoreFileLogger logger(log_directory); // now instantiate the logger
+   auto content = logger.contentSoFar();
+   ASSERT_FALSE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
+
+   std::string good_msg1 = "This message will pull in also the uninitialized_call message";
+   LOG(INFO) << good_msg1;
+   content = logger.contentSoFar(); // this synchronizes with the LOG(INFO) call.
+   ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
+   ASSERT_FALSE(verifyContent(content, err_msg2_ignored)) << "Content: [" << content << "]";
+   ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";
+
+   // debug this. it SHOULD crash since we havent fixed the code yet
+}
+
 
 TEST(LOGTest, LOG) {
    std::string file_content;
    {
       RestoreFileLogger logger(log_directory);
+      EXPECT_TRUE(g2::logLevel(INFO));
+      EXPECT_TRUE(g2::logLevel(FATAL));
       LOG(INFO) << "test LOG(INFO)";
       logger.reset(); // force flush of logger
       file_content = readFileToText(logger.logFile());
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
    }
-   ASSERT_TRUE(verifyContent(file_content, "test LOG(INFO)"));
+   EXPECT_TRUE(verifyContent(file_content, "test LOG(INFO)"));
+   EXPECT_TRUE(g2::logLevel(INFO));
+   EXPECT_TRUE(g2::logLevel(FATAL));
 }
 
 
@@ -106,8 +132,6 @@ TEST(LogTest, LOG_F) {
 
 
 // stream-type log
-
-
 TEST(LogTest, LOG) {
    std::string file_content;
    {
@@ -150,125 +174,90 @@ TEST(LogTest, LOG_IF) {
       file_content = readFileToText(logger.logFile());
       SCOPED_TRACE("LOG_IF"); // Scope exit be prepared for destructor failure
    }
-   ASSERT_TRUE(verifyContent(file_content, t_info2));
-   ASSERT_FALSE(verifyContent(file_content, t_debug2));
+   EXPECT_TRUE(verifyContent(file_content, t_info2));
+   EXPECT_FALSE(verifyContent(file_content, t_debug2));
 }
-
-
 TEST(LogTest, LOGF__FATAL) {
    RestoreFileLogger logger(log_directory);
-   try {
-      LOGF(FATAL, "This message should throw %d", 0);
-   } catch (std::exception const &e) {
-      logger.reset();
-      std::string file_content = readFileToText(logger.logFile());
-      std::cerr << file_content << std::endl << std::flush;
-      if (verifyContent(e.what(), "EXIT trigger caused by ") &&
-              verifyContent(file_content, "FATAL") &&
-              verifyContent(file_content, "This message should throw")) {
-         SUCCEED();
-         return;
-      } else {
-         ADD_FAILURE() << "Didn't throw exception as expected";
-      }
-   }
-   ADD_FAILURE() << "Didn't throw exception at ALL";
+   ASSERT_FALSE(mockFatalWasCalled());
+   LOGF(FATAL, "This message should throw %d", 0);
+   EXPECT_TRUE(mockFatalWasCalled());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw 0"));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
+
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(file_content, "This message should throw 0"));
+   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
-
-
 TEST(LogTest, LOG_FATAL) {
    RestoreFileLogger logger(log_directory);
-   try {
-      LOG(FATAL) << "This message should throw";
-   } catch (std::exception const &e) {
-      logger.reset();
-      std::string file_content = readFileToText(logger.logFile());
-      if (verifyContent(e.what(), "EXIT trigger caused by ") &&
-              verifyContent(file_content, "FATAL") &&
-              verifyContent(file_content, "This message should throw")) {
-         SUCCEED();
-         return;
-      } else {
-         ADD_FAILURE() << "Didn't throw exception as expected";
-      }
-   }
-   ADD_FAILURE() << "Didn't throw exception at ALL";
+   ASSERT_FALSE(mockFatalWasCalled());
+   LOG(FATAL) << "This message should throw";
+   EXPECT_TRUE(mockFatalWasCalled());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw"))
+           << "\ncontent: [[" << mockFatalMessage() << "]]";
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
+
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(file_content, "This message should throw"));
+   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
+   EXPECT_TRUE(verifyContent(file_content, "EXIT trigger caused by "));
 }
-
-
 TEST(LogTest, LOGF_IF__FATAL) {
    RestoreFileLogger logger(log_directory);
-   try {
-      LOGF_IF(FATAL, (2 < 3), "This message%sshould throw", " ");
-   } catch (std::exception const &e) {
-      logger.reset();
-      std::string file_content = readFileToText(logger.logFile());
-      if (verifyContent(e.what(), "EXIT trigger caused by ") &&
-              verifyContent(file_content, "FATAL") &&
-              verifyContent(file_content, "This message should throw")) {
-         SUCCEED();
-         return;
-      } else {
-         ADD_FAILURE() << "Didn't throw exception as expected";
-      }
-   }
-   ADD_FAILURE() << "Didn't throw exception at ALL";
+   LOGF_IF(FATAL, (2 < 3), "This message%sshould throw", " ");
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw"));
+
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(file_content, "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
+   EXPECT_TRUE(verifyContent(file_content, "This message should throw"));
 }
-
-
 TEST(LogTest, LOG_IF__FATAL) {
    RestoreFileLogger logger(log_directory);
-   try {
-      LOG_IF(WARNING, (0 != t_info.compare(t_info))) << "This message should NOT be written";
-      LOG_IF(FATAL, (0 != t_info.compare(t_info2))) << "This message should throw";
-   } catch (std::exception const &e) {
-      logger.reset();
-      std::string file_content = readFileToText(logger.logFile());
-      if (verifyContent(e.what(), "EXIT trigger caused by ") &&
-              verifyContent(file_content, "FATAL") &&
-              verifyContent(file_content, "This message should throw") &&
-              (false == verifyContent(file_content, "This message should NOT be written"))) {
-         SUCCEED();
-         return;
-      } else {
-         ADD_FAILURE() << "Didn't throw exception as expected";
-      }
-   }
-   ADD_FAILURE() << "Didn't throw exception at ALL";
+   LOG_IF(WARNING, (0 != t_info.compare(t_info))) << "This message should NOT be written";
+   EXPECT_FALSE(mockFatalWasCalled());
+   LOG_IF(FATAL, (0 != t_info.compare(t_info2))) << "This message should throw. xyz ";
+   EXPECT_TRUE(mockFatalWasCalled());
+
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw. xyz "));
+
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(file_content, "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
+   EXPECT_TRUE(verifyContent(file_content, "This message should throw. xyz "));
 }
-
-
 TEST(LogTest, LOG_IF__FATAL__NO_THROW) {
    RestoreFileLogger logger(log_directory);
-   try {
-      LOG_IF(FATAL, (2 > 3)) << "This message%sshould NOT throw";
-   } catch (std::exception const &e) {
-      std::cerr << e.what() << std::endl;
-      logger.reset();
-      ADD_FAILURE() << "Didn't throw exception as expected";
-   }
-   logger.reset();
-   SUCCEED();
+   LOG_IF(FATAL, (2 > 3)) << "This message%sshould NOT throw";
+   ASSERT_FALSE(mockFatalWasCalled());
 }
 
 
 // CHECK_F
-
-
 TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg) {
    RestoreFileLogger logger(log_directory);
-   try {
-      CHECK(1 == 2);
-   } catch (std::exception const &e) {
-      logger.reset();
-      std::string file_content = readFileToText(logger.logFile());
-      if (verifyContent(e.what(), "EXIT trigger caused by ") &&
-              verifyContent(file_content, "FATAL")) {
-         SUCCEED();
-         return;
-      }
-   }
-   ADD_FAILURE() << "Didn't throw exception as expected";
+   EXPECT_TRUE(mockFatalMessage().empty());
+   EXPECT_FALSE(mockFatalWasCalled());
+
+   CHECK(1 == 2);
+   EXPECT_FALSE(mockFatalMessage().empty());
+   EXPECT_TRUE(mockFatalWasCalled());
+
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
 
 
@@ -278,19 +267,12 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
    std::string msg2 = "This message is added to throw message and log";
    std::string arg1 = "message";
    std::string arg2 = "log";
-   try {
-      //CHECK_F(1 >= 2, msg.c_str(), arg1.c_str(), arg2.c_str());
-   } catch (std::exception const &e) {
-      logger.reset();
-      std::string file_content = readFileToText(logger.logFile());
-      if (verifyContent(e.what(), "EXIT trigger caused by ") &&
-              verifyContent(file_content, "FATAL") &&
-              verifyContent(file_content, msg2)) {
-         SUCCEED();
-         return;
-      }
-   }
-   ADD_FAILURE() << "Didn't throw exception as expected";
+
+   CHECK_F(1 >= 2, msg.c_str(), arg1.c_str(), arg2.c_str());
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
 
 
@@ -300,37 +282,159 @@ TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg) {
    std::string msg2 = "This message is added to throw message and log";
    std::string arg1 = "message";
    std::string arg2 = "log";
-   try {
-      CHECK(1 >= 2) << msg2;
-   } catch (std::exception const &e) {
-      logger.reset();
-      std::string file_content = readFileToText(logger.logFile());
-      if (verifyContent(e.what(), "EXIT trigger caused by ") &&
-              verifyContent(file_content, "FATAL") &&
-              verifyContent(file_content, msg2)) {
-         SUCCEED();
-         return;
-      }
-   }
-   ADD_FAILURE() << "Didn't throw exception as expected";
+   CHECK(1 >= 2) << msg2;
+
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
+   EXPECT_TRUE(verifyContent(file_content, msg2));
 }
-
-
 TEST(CHECK, CHECK_ThatWontThrow) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This %s should never appear in the %s";
    std::string msg2 = "This message should never appear in the log";
    std::string arg1 = "message";
    std::string arg2 = "log";
+
+   CHECK(1 == 1);
+   CHECK_F(1 == 1, msg.c_str(), "message", "log");
+   EXPECT_FALSE(mockFatalWasCalled());
+
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_FALSE(verifyContent(file_content, msg2));
+   EXPECT_FALSE(verifyContent(mockFatalMessage(), msg2));
+}
+
+
+#ifdef G2_DYNAMIC_LOGGING 
+namespace {
+   // Restore dynamic levels if turned off
+
+   struct RestoreDynamicLoggingLevels {
+      RestoreDynamicLoggingLevels() {
+      };
+      ~RestoreDynamicLoggingLevels() {
+         g2::setLogLevel(DEBUG, false);
+         g2::setLogLevel(INFO, false);
+         g2::setLogLevel(WARNING, false);
+         g2::setLogLevel(FATAL, false);
+      }
+   };
+} // anonymous
+TEST(DynamicLogging, DynamicLogging_IS_ENABLED) {
+   RestoreDynamicLoggingLevels raiiLevelRestore;
+
+   ASSERT_TRUE(g2::logLevel(DEBUG));
+   ASSERT_TRUE(g2::logLevel(INFO));
+   ASSERT_TRUE(g2::logLevel(WARNING));
+   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+   g2::setLogLevel(DEBUG, false);
+   ASSERT_FALSE(g2::logLevel(DEBUG));
+   ASSERT_TRUE(g2::logLevel(INFO));
+   ASSERT_TRUE(g2::logLevel(WARNING));
+   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+
+   g2::setLogLevel(INFO, false);
+   ASSERT_FALSE(g2::logLevel(DEBUG));
+   ASSERT_FALSE(g2::logLevel(INFO));
+   ASSERT_TRUE(g2::logLevel(WARNING));
+   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+
+   g2::setLogLevel(WARNING, false);
+   ASSERT_FALSE(g2::logLevel(DEBUG));
+   ASSERT_FALSE(g2::logLevel(INFO));
+   ASSERT_FALSE(g2::logLevel(WARNING));
+   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+
+   g2::setLogLevel(FATAL, false);
+   ASSERT_FALSE(g2::logLevel(DEBUG));
+   ASSERT_FALSE(g2::logLevel(INFO));
+   ASSERT_FALSE(g2::logLevel(WARNING));
+   ASSERT_FALSE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+}
+TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
+   RestoreFileLogger logger(log_directory);
+   ASSERT_TRUE(g2::logLevel(DEBUG));
+   ASSERT_TRUE(g2::logLevel(INFO));
+   ASSERT_TRUE(g2::logLevel(WARNING));
+   ASSERT_TRUE(g2::logLevel(FATAL));
+
+   RestoreDynamicLoggingLevels raiiLevelRestore;
+
+   std::string msg_debugOn = "This %s SHOULD  appear in the %s";
+   std::string msg_debugOff = "This message should never appear in the log";
+   std::string msg_info1 = "This info msg log";
    try {
-      CHECK(1 == 1);
-      CHECK_F(1 == 1, msg.c_str(), "message", "log");
+      LOGF(DEBUG, msg_debugOn.c_str(), "msg", "log");
+      auto content = logger.contentSoFar();
+      ASSERT_TRUE(verifyContent(content, "This msg SHOULD  appear in the log")) << "Content: [" << content << "]";
+
+      g2::setLogLevel(DEBUG, false);
+      EXPECT_FALSE(g2::logLevel(DEBUG));
+      LOG(DEBUG) << msg_debugOff;
+      content = logger.contentSoFar();
+      ASSERT_FALSE(verifyContent(content, "This message should never appear in the log")) << "Content: [" << content << "]";
+
    } catch (std::exception const &e) {
       std::cerr << e.what() << std::endl;
       ADD_FAILURE() << "Should never have thrown";
    }
+}
+TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {
+   RestoreFileLogger logger(log_directory);
+   RestoreDynamicLoggingLevels raiiLevelRestore;
+   ASSERT_TRUE(g2::logLevel(DEBUG));
+   ASSERT_TRUE(g2::logLevel(INFO));
+   ASSERT_TRUE(g2::logLevel(WARNING));
+   ASSERT_TRUE(g2::logLevel(FATAL));
 
-   std::string file_content = readFileToText(logger.logFile());
-   ASSERT_FALSE(verifyContent(file_content, msg2));
+   std::string msg1 = "This IS fatal (not crash, since it is unit test";
+
+   LOG(FATAL) << msg1;
+   EXPECT_TRUE(mockFatalWasCalled());
+   EXPECT_FALSE(mockFatalMessage().empty());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), msg1));
+   
+   clearMockFatal();
+   EXPECT_FALSE(mockFatalWasCalled());
+   
+   
+   g2::setLogLevel(FATAL, false);
+   std::string msg2 = "This is NOT fatal (not crash, since it is unit test. FATAL is disabled";
+   LOG(FATAL) << msg2;
+   EXPECT_FALSE(mockFatalWasCalled());
+   EXPECT_TRUE(mockFatalMessage().empty());
 }
 
+
+TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disabled) {
+   RestoreFileLogger logger(log_directory);
+   RestoreDynamicLoggingLevels raiiLevelRestore;
+   ASSERT_TRUE(g2::logLevel(FATAL));
+
+   std::string msg1 = "dummy message to check if CHECK worked when fatal is enabled";
+   std::string msg2 = "dummy message to check if CHECK worked when fatal is disabled";
+   LOG(FATAL) << msg1;
+   EXPECT_TRUE(mockFatalWasCalled());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), msg1));
+   
+   clearMockFatal();
+   EXPECT_FALSE(mockFatalWasCalled());
+ 
+   // Disable also CHECK calls
+   g2::setLogLevel(FATAL, false);
+   ASSERT_FALSE(g2::logLevel(FATAL));
+   LOG(FATAL) << msg2;
+   EXPECT_FALSE(mockFatalWasCalled());
+}
+
+
+
+#else 
+TEST(DynamicLogging, DynamicLogging_IS_NOT_ENABLED) {
+   ASSERT_TRUE(g2::logLevel(DEBUG));
+   //g2::setLogLevel(DEBUG, false);  this line will not compile since G2_DYNAMIC_LOGGING is not enabled. Kept for show.
+   //ASSERT_FALSE(g2::logLevel(DEBUG));
+}
+#endif // Dynamic logging

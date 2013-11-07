@@ -66,13 +66,6 @@ namespace g2 {
       return internal::wasFatal(_pimpl->_level);
    }
 
-   // YYYY/MM/DD HH:MM:SS -- ref g2time.hpp/cpp
-   //out << "\n" << localtime_formatted(system_time, date_formatted);
-   //out << " " << localtime_formatted(system_time, time_formatted); // TODO: time kommer från LogEntry
-   //out << "." << std::chrono::duration_cast<std::chrono::microseconds>(steady_time - _steady_start_time).count();
-   //out << "\t" << message << std::flush;
-
-
    std::string LogMessage::toString() const {
       std::ostringstream oss;
       oss << "\n" << timestamp() << "." << microseconds() << "\t";
@@ -123,16 +116,12 @@ namespace g2 {
    : _pimpl(details) { }
 
 
-   FatalMessage::FatalMessage(const std::string& crash_message, int signal_id)
-   : LogMessage(std::make_shared<LogMessageImpl>(crash_message)), signal_id_(signal_id) 
-   { }
-
+   FatalMessage::FatalMessage(std::shared_ptr<LogMessageImpl> details, int signal_id) 
+   : LogMessage(details), signal_id_(signal_id) { }
 
    LogMessage  FatalMessage::copyToLogMessage() const {
       return LogMessage(_pimpl);
    }
- 
-   //FatalMessage(const LogMessage& message, int signal_id)
-   //: _crash_message(message), signal_id_(signal_id) { }
+
 
 } // g2

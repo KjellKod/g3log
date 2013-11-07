@@ -23,11 +23,12 @@ namespace g2 {
    }
 
    LogMessageBuilder::~LogMessageBuilder() {
-      LogMessage log_entry(_message);
-      if (log_entry.wasFatal()) {
-         FatalMessageBuilder trigger({log_entry.toString(), SIGABRT});
+      if (internal::wasFatal(_message->_level)) {
+         FatalMessageBuilder trigger({_message, SIGABRT});
          return; // FatalMessageBuilder will send to worker at scope exit 
       }
+
+      LogMessage log_entry(_message);
       internal::saveMessage(log_entry); // message saved to g2LogWorker
    }
 
@@ -62,16 +63,22 @@ namespace g2 {
 
    /// FatalMessageBuilder
 
-   FatalMessageBuilder::FatalMessageBuilder(const std::string& exit_message, int fatal_signal)
-   : _exit_message(exit_message), _fatal_signal(fatal_signal) {
-   }
+   FatalMessageBuilder::FatalMessageBuilder(const std::string& exit_message, int signal_id)
+   : _fatal_message(std::make_shared<LogMessageImpl>(exit_message)), _fatal_signal(signal_id) 
+   { }
+
+   
+  FatalMessageBuilder:: FatalMessageBuilder(std::shared_ptr<LogMessageImpl> details, int signal_id)
+  : _fatal_message(details), _fatal_signal(signal_id) 
+  {}
+     
 
    FatalMessageBuilder::~FatalMessageBuilder() {
       // At destruction, flushes fatal message to g2LogWorker
       // either we will stay here until the background worker has received the fatal
       // message, flushed the crash message to the sinks and exits with the same fatal signal
       //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
-      FatalMessage msg(_exit_message, _fatal_signal);
+      FatalMessage msg(_fatal_message, _fatal_signal);
       //internal::fatalCall({_exit_message, _fatal_signal});
       internal::fatalCall(msg);
 

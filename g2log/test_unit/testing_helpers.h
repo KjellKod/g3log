@@ -15,10 +15,21 @@
 #include <algorithm>
 #include "g2logworker.hpp"
 #include "g2logmessage.hpp"
+#include "g2filesink.hpp"
 
 namespace testing_helpers {
 
+   std::string mockFatalMessage();
+   int mockFatalSignal();
+   bool mockFatalWasCalled();
+   void mockFatalCall(g2::FatalMessage fatal_message);
+   void clearMockFatal();
+
    bool removeFile(std::string path_to_file);
+   bool verifyContent(const std::string &total_text, std::string msg_to_find);
+   std::string readFileToText(std::string filename);
+   
+   
    
 /** After initializing ScopedCout all std::couts is redirected to the buffer
  @verbatim
@@ -79,19 +90,23 @@ struct RestoreFileLogger {
   explicit RestoreFileLogger(std::string directory);
   ~RestoreFileLogger();
 
-  std::unique_ptr<ScopedLogger> scope_;
-  void reset(){ scope_.reset();}
+  std::unique_ptr<ScopedLogger> _scope;
+  void reset(){ _scope.reset();}
   
 
   template<typename Call, typename ... Args >
           typename std::result_of<Call(Args...)>::type callToLogger(Call call, Args&&... args) {
-    auto func = std::bind(call, scope_->get(), std::forward<Args>(args)...);
+    auto func = std::bind(call, _scope->get(), std::forward<Args>(args)...);
     return func();
   }
   
-  std::string logFile() { return log_file_;  }
+  std::string logFile() { return _log_file;  }
+  std::string contentSoFar();
+  
+
 private:
-  std::string log_file_;
+  std::unique_ptr<g2::SinkHandle<g2::FileSink>> _handle;
+  std::string _log_file;
 };
 
 

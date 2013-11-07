@@ -4,17 +4,56 @@
 #include "testing_helpers.h"
 #include "g2log.hpp"
 #include "g2logworker.hpp"
-#include "g2filesink.hpp"
 #include "std2_make_unique.hpp"
+#include <fstream>
 
 using namespace std;
 namespace testing_helpers {
+
+   std::string g_mockFatal_message = {};
+   int g_mockFatal_signal = -1;
+   bool g_mockFatalWasCalled = false;
+
+
+   std::string mockFatalMessage() { return g_mockFatal_message; }
+   int mockFatalSignal() { return g_mockFatal_signal; }
+   bool mockFatalWasCalled() { return g_mockFatalWasCalled; }
+
+
+   void mockFatalCall(g2::FatalMessage fatal_message) {
+      g_mockFatal_message = fatal_message.toString();
+      g_mockFatal_signal = fatal_message.signal_id_;
+      g_mockFatalWasCalled = true;
+   }
+   void clearMockFatal() {
+      g_mockFatal_message = {};
+      g_mockFatal_signal = -1;
+      g_mockFatalWasCalled = false;
+   }
+
 
    bool removeFile(std::string path_to_file) {
       return (0 == std::remove(path_to_file.c_str()));
    }
 
-   
+   bool verifyContent(const std::string &total_text, std::string msg_to_find) {
+      std::string content(total_text);
+      size_t location = content.find(msg_to_find);
+      return (location != std::string::npos);
+   }
+
+   std::string readFileToText(std::string filename) {
+      std::ifstream in;
+      in.open(filename.c_str(), std::ios_base::in);
+      if (!in.is_open()) {
+         return
+         {
+         }; // error just return empty string - test will 'fault'
+      }
+      std::ostringstream oss;
+      oss << in.rdbuf();
+      return oss.str();
+   }
       size_t LogFileCleaner::size() {
       return logs_to_clean_.size();
    }
@@ -61,23 +100,30 @@ namespace testing_helpers {
    
    
    RestoreFileLogger::RestoreFileLogger(std::string directory)
-   : scope_(new ScopedLogger)
+   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std2::make_unique<g2::FileSink>("UNIT_TEST_LOGGER", directory), &g2::FileSink::fileWrite))
    {
       using namespace g2;
-      auto filehandler = scope_->get()->addSink(std2::make_unique<FileSink>("UNIT_TEST_LOGGER", directory), &FileSink::fileWrite);
+      internal::changeFatalInitHandlerForUnitTesting(&mockFatalCall);
 
-      internal::changeFatalInitHandlerForUnitTesting();
       LOG(INFO) << "Restore logger test ";
-      auto filename = filehandler->call(&FileSink::fileName);
+      auto filename = _handle->call(&FileSink::fileName);
       if (!filename.valid()) ADD_FAILURE();
-      log_file_ = filename.get();
+      _log_file = filename.get();
    }
 
    RestoreFileLogger::~RestoreFileLogger() {
-      scope_.reset();
-      if (!removeFile(log_file_))
+      _scope.reset();
+      if (!removeFile(_log_file))
          ADD_FAILURE();
    }
+
+   std::string RestoreFileLogger::contentSoFar() {
+      std::future<std::string> filename = _handle->call(&g2::FileSink::fileName);
+      EXPECT_TRUE(filename.valid());
+      auto file = filename.get();
+      return readFileToText(file);
+   }
+
 
 
 

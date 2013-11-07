@@ -134,8 +134,6 @@ namespace g2 {
       // Triggered by g2log->g2LogWorker after receiving a FATAL trigger
       // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
       // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-
-
       void exitWithDefaultSignalHandler(int signal_number) {
          std::cerr << "Exiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
          struct sigaction action;

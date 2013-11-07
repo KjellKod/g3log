@@ -12,6 +12,7 @@
 #include "g2logworker.hpp"
 #include "g2logmessageimpl.hpp"
 #include "g2loglevels.hpp"
+#include "crashhandler.hpp"
 
 #include <cassert>
 #include <memory>
@@ -57,37 +58,48 @@ namespace g2 {
          g_logger_instance->save(log_entry);
       }
 
+      /** Fatal call saved to logger. This will trigger SIGABRT or other fatal signal 
+       * to exit the program. After saving the fatal message the calling thread
+       * will sleep forever (i.e. until the background thread catches up, saves the fatal
+       * message and kills the software with the fatal signal.
+       */
       void fatalCallToLogger(FatalMessage message) {
-         // real fatal call to loggr
-         internal::g_logger_instance->fatal(message);
-      }
+         if (!internal::isLoggingInitialized()) {
+            std::ostringstream error;
+            error << "FATAL CALL but logger is NOT initialized\n"
+                    << "SIGNAL: " << g2::internal::signalName(message.signal_id_)
+                    << "\nMessage: \n" << message.toString() << std::flush;
+            std::cerr << error;
+            internal::exitWithDefaultSignalHandler(message.signal_id_);
+         }
 
-      // By default this function pointer goes to \ref fatalCall;
-      void (*g_fatal_to_g2logworker_function_ptr)(FatalMessage) = fatalCallToLogger;
+         g_logger_instance->fatal(message);
 
-      void fatalCallForUnitTest(FatalMessage fatal_message) {
-         // mock fatal call, not to logger: used by unit test
-         assert(internal::g_logger_instance != nullptr);
-         internal::g_logger_instance->save(fatal_message.copyToLogMessage()); // calling 'save' instead of 'fatal'
-         throw std::runtime_error(fatal_message.toString());
-      }
-
-      /** The default, initial, handling to send a 'fatal' event to g2logworker 
-       * he caller will stay here, eternally, until the software is aborted
-       *  During unit testing the sleep-loop will be interrupted by exception from 
-       * @ref fatalCallForUnitTest */
-      void fatalCall(FatalMessage message) {
-         g_fatal_to_g2logworker_function_ptr(message);
          while (true) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
          }
       }
 
-      /** Used to  REPLACE fatalCallToLogger for fatalCallForUnitTest
-       * This function switches the function pointer so that only
-       *  'unitTest' mock-fatal calls are made. */
-      void changeFatalInitHandlerForUnitTesting() {
-         g_fatal_to_g2logworker_function_ptr = fatalCallForUnitTest;
+
+      // By default this function pointer goes to \ref fatalCallToLogger;
+     std::function<void(FatalMessage) > g_fatal_to_g2logworker_function_ptr = fatalCallToLogger; 
+     
+
+     /** The default, initial, handling to send a 'fatal' event to g2logworker
+       *  the caller will stay here, eternally, until the software is aborted
+       * ... in the case of unit testing it is the given "Mock" fatalCall that will
+       * define the behaviour.
+       */
+      void fatalCall(FatalMessage message) {
+         g_fatal_to_g2logworker_function_ptr(message);
+
+      }
+
+      // REPLACE fatalCallToLogger for fatalCallForUnitTest
+      // This function switches the function pointer so that only
+      //      'unitTest' mock-fatal calls are made.
+      void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessage) > fatal_call) {
+         g_fatal_to_g2logworker_function_ptr = fatal_call;
       }
    } // internal
 } // g2

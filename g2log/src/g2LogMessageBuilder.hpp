@@ -21,9 +21,10 @@ namespace g2 {
    struct FatalMessageBuilder {
       //explicit FatalMessageBuilder(const FatalMessage& exit_message);
       FatalMessageBuilder(const std::string& exit_message, int fatal_signal);
+      FatalMessageBuilder(std::shared_ptr<LogMessageImpl> details, int signal_id);
       virtual ~FatalMessageBuilder();
 
-      std::string _exit_message;
+      std::shared_ptr<LogMessageImpl> _fatal_message;
       int _fatal_signal;
    };
 

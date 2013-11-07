@@ -72,12 +72,15 @@ namespace g2 {
        * This is kept for test reasons and should normally not be used */
       g2LogWorker* shutDownLogging();
 
-      /** FOR TESTING PURPOSES: @ref g2log.ipp
-       *  By default the g2log will call g2LogWorker::fatal(...) which will
+ /** By default the g2log will call g2LogWorker::fatal(...) which will
        * abort() the system after flushing the logs to file. This makes unit
        * test of FATAL level cumbersome. A work around is to change the
-       *  fatal call'  which can be done here */
-      void changeFatalInitHandlerForUnitTesting();
+       * 'fatal call'  which can be done here 
+       * 
+       *  The bool return values in the fatal_call is whether or not the fatal_call should
+       *  
+       */
+      void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessage) > fatal_call);
    } // g2::internal
 } // g2
 
@@ -89,7 +92,7 @@ namespace g2 {
 
 
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
-        g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, FATAL).setExpression(boolean_expression)
+        g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, g2::internal::CONTRACT).setExpression(boolean_expression)
 
 
 // LOG(level) is the API for the stream log
