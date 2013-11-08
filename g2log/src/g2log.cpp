@@ -92,7 +92,7 @@ namespace g2 {
        * The first initialized log entry will also save the first uninitialized log message, if any
        * @param log_entry to save to logger
        */
-      void saveMessage(g2::LogMessage log_entry) {
+      void saveMessage(const g2::LogMessage& log_entry) {
          // Uninitialized messages are ignored but does not CHECK/crash the logger  
          if (!internal::isLoggingInitialized()) {
             
@@ -128,7 +128,7 @@ namespace g2 {
        * will sleep forever (i.e. until the background thread catches up, saves the fatal
        * message and kills the software with the fatal signal.
        */
-      void fatalCallToLogger(FatalMessage message) {
+      void fatalCallToLogger(const FatalMessage& message) {
          if (!isLoggingInitialized()) {
             std::ostringstream error;
             error << "FATAL CALL but logger is NOT initialized\n"
@@ -147,7 +147,7 @@ namespace g2 {
 
 
       // By default this function pointer goes to \ref fatalCallToLogger;
-      std::function<void(FatalMessage) > g_fatal_to_g2logworker_function_ptr = fatalCallToLogger;
+      std::function<void(const FatalMessage&) > g_fatal_to_g2logworker_function_ptr = fatalCallToLogger;
 
 
       /** The default, initial, handling to send a 'fatal' event to g2logworker
@@ -155,7 +155,7 @@ namespace g2 {
        * ... in the case of unit testing it is the given "Mock" fatalCall that will
        * define the behaviour.
        */
-      void fatalCall(FatalMessage message) {
+      void fatalCall(const FatalMessage& message) {
          g_fatal_to_g2logworker_function_ptr(message);
       }
 
@@ -164,7 +164,7 @@ namespace g2 {
        * This function switches the function pointer so that only
        * 'unitTest' mock-fatal calls are made.
        * */
-      void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessage) > fatal_call) {
+      void changeFatalInitHandlerForUnitTesting(std::function<void(const FatalMessage&) > fatal_call) {
          g_fatal_to_g2logworker_function_ptr = fatal_call;
       }
    } // internal

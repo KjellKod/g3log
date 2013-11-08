@@ -61,11 +61,11 @@ namespace internal {
 bool isLoggingInitialized();
 
 // Save the created LogMessage to any existing sinks
-void saveMessage(LogMessage log_entry);
+void saveMessage(const LogMessage& log_entry);
 
 // Save the created FatalMessage to any existing sinks and exit with 
 // the originating fatal signal,. or SIGABRT if it originated from a broken contract
-void fatalCall(FatalMessage message);
+void fatalCall(const FatalMessage& message);
 
 /** FOR TESTING PURPOSES
  * Shutdown the logging by making the pointer to the background logger to nullptr
@@ -83,7 +83,7 @@ g2LogWorker* shutDownLogging();
  *  The bool return values in the fatal_call is whether or not the fatal_call should
  *  
  */
-void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessage) > fatal_call);
+void changeFatalInitHandlerForUnitTesting(std::function<void(const FatalMessage&) > fatal_call);
 } // internal
 } // g2
 

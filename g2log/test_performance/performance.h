@@ -19,8 +19,8 @@
 #include <cassert>
 
 #if defined(G2LOG_PERFORMANCE)
-#include "g2log.h"
-#include "g2logworker.h"
+#include "g2log.hpp"
+#include "g2logworker.hpp"
 using namespace g2::internal;
 
 #elif defined(GOOGLE_GLOG_PERFORMANCE)

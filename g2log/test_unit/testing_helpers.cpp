@@ -32,7 +32,7 @@ namespace testing_helpers {
    }
 
 
-   void mockFatalCall(g2::FatalMessage fatal_message) {
+   void mockFatalCall(const g2::FatalMessage& fatal_message) {
       g_mockFatal_message = fatal_message.toString();
       g_mockFatal_signal = fatal_message.signal_id_;
       g_mockFatalWasCalled = true;
@@ -121,8 +121,8 @@ namespace testing_helpers {
    RestoreFileLogger::~RestoreFileLogger() {
       g2::internal::shutDownLogging();
 
-      //if (!removeFile(_log_file))
-      //   ADD_FAILURE();
+      if (!removeFile(_log_file))
+         ADD_FAILURE();
    }
 
 

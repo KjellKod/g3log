@@ -22,7 +22,7 @@ namespace testing_helpers {
    std::string mockFatalMessage();
    int mockFatalSignal();
    bool mockFatalWasCalled();
-   void mockFatalCall(g2::FatalMessage fatal_message);
+   void mockFatalCall(const g2::FatalMessage& fatal_message);
    void clearMockFatal();
 
    bool removeFile(std::string path_to_file);

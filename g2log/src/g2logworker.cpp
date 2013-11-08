@@ -34,7 +34,7 @@ struct g2LogWorkerImpl {
     _bg.reset(); 
   }
 
-  void bgSave(g2::LogMessage msg) {
+  void bgSave(const g2::LogMessage& msg) {
     for (auto& sink : _sinks) {
       sink->send(msg);
     }
@@ -46,7 +46,7 @@ struct g2LogWorkerImpl {
     }
   }
 
-  void bgFatal(FatalMessage msg) {
+  void bgFatal(const FatalMessage& msg) {
     auto fatal_message = msg;
     fatal_message.stream() <<  "\nExiting after fatal event. Log flushed sucessfully to disk.\n";
     bgSave(fatal_message.copyToLogMessage());
@@ -70,11 +70,11 @@ g2LogWorker::~g2LogWorker() {
   _pimpl->_bg->send([this]{_pimpl->_sinks.clear();}); 
  }
 // todo move operator
-void g2LogWorker::save(LogMessage msg) {
+void g2LogWorker::save(const LogMessage& msg) {
   _pimpl->_bg->send([this, msg] { _pimpl->bgSave(msg); }); // TODO std::move
 }
 
-void g2LogWorker::fatal(FatalMessage fatal_message) {
+void g2LogWorker::fatal(const FatalMessage& fatal_message) {
   _pimpl->_bg->send([this, fatal_message] {_pimpl->bgFatal(fatal_message); });
 }
 

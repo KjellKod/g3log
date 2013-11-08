@@ -44,8 +44,8 @@ namespace g2 {
       std::string toString() const;
 
 
-      std::ostringstream& stream();
-      explicit LogMessage(std::shared_ptr<LogMessageImpl> details);
+      std::ostringstream& stream() const;
+      explicit LogMessage(const std::shared_ptr<LogMessageImpl>& details);
       ~LogMessage() = default;
    };
 
@@ -53,7 +53,7 @@ namespace g2 {
     * A thread that causes a FatalMessage will sleep forever until the
     * application has exited (after message flush) */
    struct FatalMessage : public LogMessage {
-      FatalMessage(std::shared_ptr<LogMessageImpl> details, int signal_id);
+      FatalMessage(const std::shared_ptr<LogMessageImpl>& details, int signal_id);
       
       ~FatalMessage() = default;
       LogMessage copyToLogMessage() const;

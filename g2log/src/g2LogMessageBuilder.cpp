@@ -69,7 +69,7 @@ namespace g2 {
    { }
 
    
-  FatalMessageBuilder:: FatalMessageBuilder(std::shared_ptr<LogMessageImpl> details, int signal_id)
+  FatalMessageBuilder:: FatalMessageBuilder(const std::shared_ptr<LogMessageImpl>& details, int signal_id)
   : _fatal_message(details), _fatal_signal(signal_id) 
   {}
      

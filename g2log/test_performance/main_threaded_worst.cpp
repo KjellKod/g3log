@@ -68,8 +68,9 @@ int main(int argc, char** argv)
   oss.str(""); // clear the stream
 
 #if defined(G2LOG_PERFORMANCE)
-  g2LogWorker* logger = new g2LogWorker(g_prefix_log_name, g_path);
-  g2::initializeLogging(logger);
+  auto logger_n_handle = g2LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
+  g2::initializeLogging(logger_n_handle.worker.get());
+
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
   google::InitGoogleLogging(argv[0]);
 #endif
@@ -103,7 +104,7 @@ int main(int argc, char** argv)
 
 
 #if defined(G2LOG_PERFORMANCE)
-  delete logger; // will flush anything in the queue to file
+  logger_n_handle.worker.reset(); // will flush anything in the queue to file
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
   google::ShutdownGoogleLogging();
 #endif

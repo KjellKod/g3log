@@ -107,16 +107,17 @@ namespace g2 {
    }
 
 
-   std::ostringstream& LogMessage::stream() {
+   // is strictly not speaking const
+   std::ostringstream& LogMessage::stream() const{
       return _pimpl->_stream;
    }
 
 
-   LogMessage::LogMessage(std::shared_ptr<LogMessageImpl> details)
+   LogMessage::LogMessage(const std::shared_ptr<LogMessageImpl>& details)
    : _pimpl(details) { }
 
 
-   FatalMessage::FatalMessage(std::shared_ptr<LogMessageImpl> details, int signal_id) 
+   FatalMessage::FatalMessage(const std::shared_ptr<LogMessageImpl>& details, int signal_id) 
    : LogMessage(details), signal_id_(signal_id) { }
 
    LogMessage  FatalMessage::copyToLogMessage() const {

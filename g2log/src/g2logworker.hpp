@@ -55,12 +55,12 @@ public:
 
   
   /// pushes in background thread (asynchronously) input messages to log file
-  void save(g2::LogMessage entry);
+  void save(const g2::LogMessage& entry);
 
   /// Will push a fatal message on the queue, this is the last message to be processed
   /// this way it's ensured that all existing entries were flushed before 'fatal'
   /// Will abort the application!
-  void fatal(g2::FatalMessage fatal_message);
+  void fatal(const g2::FatalMessage& fatal_message);
 
   template<typename T, typename DefaultLogCall>
   std::unique_ptr<g2::SinkHandle<T >> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {
