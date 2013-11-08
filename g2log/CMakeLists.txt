@@ -1,4 +1,4 @@
-# CMakeLists.txt cmake configuration for g2log test
+#  CMakeLists.txt cmake configuration for g2log test
 # g2log is a KjellKod Logger
 # 2011 @author Kjell Hedström, hedstrom@kjellkod.cc
 # ==================================================================
