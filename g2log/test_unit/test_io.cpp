@@ -21,21 +21,8 @@ const std::string log_directory = "./";
 } // end anonymous namespace
 
 
-
 using namespace testing_helpers;
-// LOG
 
-
-TEST(IO_RestoreFileLogger, Expecting_Fine_To_ShutDownMultipleTimes) {
-   {
-      //RestoreFileLogger logger1("");
-      ScopedLogger scope;
-   }
-   {
-      ScopedLogger scope;
-      //RestoreFileLogger logger2("./");
-   }
-}
 
 /// THIS MUST BE THE FIRST UNIT TEST TO RUN! If any unit test run before this 
 /// one then it will fail
@@ -43,7 +30,8 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    {
       // Temporarily enable all levels. then go out of scope again.
       RestoreFileLogger logger(log_directory);
-      EXPECT_TRUE(g2::internal::isLoggingInitialized());
+      using namespace g2::internal;
+      EXPECT_TRUE(isLoggingInitialized());
       EXPECT_TRUE(g2::logLevel(INFO));
       EXPECT_TRUE(g2::logLevel(FATAL));
       EXPECT_TRUE(g2::logLevel(DEBUG));
@@ -67,12 +55,10 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    }
 
    RestoreFileLogger logger(log_directory); // now instantiate the logger
-   auto content = logger.contentSoFar();
-   ASSERT_FALSE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
 
    std::string good_msg1 = "This message will pull in also the uninitialized_call message";
    LOG(INFO) << good_msg1;
-   content = logger.contentSoFar(); // this synchronizes with the LOG(INFO) call.
+   auto content = logger.resetAndRetrieveContent(); // this synchronizes with the LOG(INFO) call.
    ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
    ASSERT_FALSE(verifyContent(content, err_msg2_ignored)) << "Content: [" << content << "]";
    ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";
@@ -183,42 +169,43 @@ TEST(LogTest, LOGF__FATAL) {
    LOGF(FATAL, "This message should throw %d", 0);
    EXPECT_TRUE(mockFatalWasCalled());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
-   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw 0"));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw 0")) << "\n****" << mockFatalMessage();
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
 
-   logger.reset();
-   std::string file_content = readFileToText(logger.logFile());
-   EXPECT_TRUE(verifyContent(file_content, "This message should throw 0"));
+   auto file_content = logger.resetAndRetrieveContent();
+   EXPECT_TRUE(verifyContent(file_content, "This message should throw 0")) << "\n****" << file_content;
    EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
 TEST(LogTest, LOG_FATAL) {
    RestoreFileLogger logger(log_directory);
    ASSERT_FALSE(mockFatalWasCalled());
-   LOG(FATAL) << "This message should throw";
+   LOG(FATAL) << "This message is fatal";
    EXPECT_TRUE(mockFatalWasCalled());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
-   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw"))
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message is fatal"))
            << "\ncontent: [[" << mockFatalMessage() << "]]";
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
 
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
-   EXPECT_TRUE(verifyContent(file_content, "This message should throw"));
+   EXPECT_TRUE(verifyContent(file_content, "This message is fatal"));
    EXPECT_TRUE(verifyContent(file_content, "FATAL"));
    EXPECT_TRUE(verifyContent(file_content, "EXIT trigger caused by "));
 }
 TEST(LogTest, LOGF_IF__FATAL) {
    RestoreFileLogger logger(log_directory);
-   LOGF_IF(FATAL, (2 < 3), "This message%sshould throw", " ");
-   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
+   EXPECT_FALSE(mockFatalWasCalled());
+   LOGF_IF(FATAL, (2 < 3), "This message %s be worse", "could");
+   EXPECT_TRUE(mockFatalWasCalled());
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by ")) << "\n" << mockFatalMessage();
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
-   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message should throw"));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message could be worse"));
 
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(file_content, "EXIT trigger caused by "));
    EXPECT_TRUE(verifyContent(file_content, "FATAL"));
-   EXPECT_TRUE(verifyContent(file_content, "This message should throw"));
+   EXPECT_TRUE(verifyContent(file_content, "This message could be worse"));
 }
 TEST(LogTest, LOG_IF__FATAL) {
    RestoreFileLogger logger(log_directory);
@@ -257,7 +244,7 @@ TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg) {
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
-   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
+   EXPECT_TRUE(verifyContent(file_content, "CONTRACT"))  << "**** " << mockFatalMessage();
 }
 
 
@@ -272,7 +259,7 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
-   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
+   EXPECT_TRUE(verifyContent(file_content, "CONTRACT"));
 }
 
 
@@ -287,7 +274,7 @@ TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg) {
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
-   EXPECT_TRUE(verifyContent(file_content, "FATAL"));
+   EXPECT_TRUE(verifyContent(file_content, "CONTRACT"));
    EXPECT_TRUE(verifyContent(file_content, msg2));
 }
 TEST(CHECK, CHECK_ThatWontThrow) {

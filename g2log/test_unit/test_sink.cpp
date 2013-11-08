@@ -11,22 +11,8 @@
 #include "g2logmessage.hpp"
 #include "g2logworker.hpp"
 
-namespace {
-   g2LogWorker* g_logger_ptr = nullptr;
-}
-
-
 using namespace testing_helpers;
 using namespace std;
-
-TEST(Sink, TestSetup) {
-   {
-      ScopedLogger scope;
-      ASSERT_EQ(g_logger_ptr, scope._previousWorker);
-   }
-   ScopedLogger scope;
-   ASSERT_EQ(g_logger_ptr, scope._previousWorker);
-}
 
 TEST(Sink, OneSink) {
    AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
@@ -64,8 +50,8 @@ TEST(ConceptSink, OneHundredSinks) {
    }
 
    {
-      ScopedLogger scope;
-      auto worker = scope.get(); //g2LogWorker::createWithNoSink();
+      RestoreFileLogger logger{"/tmp"};
+      auto worker = logger._scope->get(); //g2LogWorker::createWithNoSink();
       size_t index = 0;
       for (auto& flag : flags) {
          auto& count = counts[index++];
@@ -94,24 +80,4 @@ TEST(ConceptSink, OneHundredSinks) {
    }
 
    cout << "test one hundred sinks is finished finished\n";
-}
-
-//    
-//    for(size_t = 0; )
-//    auto handle = scope.get()->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
-//    EXPECT_FALSE(flag);
-//    EXPECT_TRUE(0 == count);
-//    LOG(INFO) << "this message should trigger an atomic increment at the sink";
-
-//EXPECT_TRUE(flag);
-//EXPECT_TRUE(1 == count);
-
-int main(int argc, char *argv[]) {
-   testing::InitGoogleTest(&argc, argv);
-   auto logger = g2LogWorker::createWithNoSink();
-   g_logger_ptr = logger.get();
-   g2::initializeLogging(logger.get());
-   int return_value = RUN_ALL_TESTS();
-   std::cout << "FINISHED WITH THE TESTING" << std::endl;
-   return return_value;
 }

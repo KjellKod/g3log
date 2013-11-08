@@ -8,6 +8,8 @@
 #include <fstream>
 
 using namespace std;
+using namespace g2;
+
 namespace testing_helpers {
 
    std::string g_mockFatal_message = {};
@@ -15,16 +17,29 @@ namespace testing_helpers {
    bool g_mockFatalWasCalled = false;
 
 
-   std::string mockFatalMessage() { return g_mockFatal_message; }
-   int mockFatalSignal() { return g_mockFatal_signal; }
-   bool mockFatalWasCalled() { return g_mockFatalWasCalled; }
+   std::string mockFatalMessage() {
+      return g_mockFatal_message;
+   }
+
+
+   int mockFatalSignal() {
+      return g_mockFatal_signal;
+   }
+
+
+   bool mockFatalWasCalled() {
+      return g_mockFatalWasCalled;
+   }
 
 
    void mockFatalCall(g2::FatalMessage fatal_message) {
       g_mockFatal_message = fatal_message.toString();
       g_mockFatal_signal = fatal_message.signal_id_;
       g_mockFatalWasCalled = true;
+      g2::internal::saveMessage(fatal_message.copyToLogMessage());
    }
+
+
    void clearMockFatal() {
       g_mockFatal_message = {};
       g_mockFatal_signal = -1;
@@ -36,11 +51,13 @@ namespace testing_helpers {
       return (0 == std::remove(path_to_file.c_str()));
    }
 
+
    bool verifyContent(const std::string &total_text, std::string msg_to_find) {
       std::string content(total_text);
       size_t location = content.find(msg_to_find);
       return (location != std::string::npos);
    }
+
 
    std::string readFileToText(std::string filename) {
       std::ifstream in;
@@ -54,9 +71,12 @@ namespace testing_helpers {
       oss << in.rdbuf();
       return oss.str();
    }
-      size_t LogFileCleaner::size() {
+
+
+   size_t LogFileCleaner::size() {
       return logs_to_clean_.size();
    }
+
 
    LogFileCleaner::~LogFileCleaner() {
       std::lock_guard<std::mutex> lock(g_mutex);
@@ -70,6 +90,7 @@ namespace testing_helpers {
       } // mutex
    }
 
+
    void LogFileCleaner::addLogToClean(std::string path_to_log) {
       std::lock_guard<std::mutex> lock(g_mutex);
       {
@@ -78,47 +99,39 @@ namespace testing_helpers {
       }
    }
 
-   
-   
-   ScopedLogger::ScopedLogger()
-  : _previousWorker(g2::internal::shutDownLogging())
-   , _currentWorker(g2LogWorker::createWithNoSink()) {
-     g2::initializeLogging(_currentWorker.get());
-  }
 
-  ScopedLogger::~ScopedLogger() {
-     auto* current = g2::internal::shutDownLogging();  
-     CHECK(current == _currentWorker.get());
-     if (nullptr != _previousWorker) { 
-        g2::initializeLogging(_previousWorker); 
-     }
-  }
-  
-   g2LogWorker*  ScopedLogger::get() {
-      return _currentWorker.get(); 
-   }
-   
-   
+   ScopedLogger::ScopedLogger() : _currentWorker(g2LogWorker::createWithNoSink()) { }
+   ScopedLogger::~ScopedLogger() { }
+   g2LogWorker* ScopedLogger::get() { return _currentWorker.get();  }
+
+
    RestoreFileLogger::RestoreFileLogger(std::string directory)
-   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std2::make_unique<g2::FileSink>("UNIT_TEST_LOGGER", directory), &g2::FileSink::fileWrite))
-   {
+   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std2::make_unique<g2::FileSink>("UNIT_TEST_LOGGER", directory), &g2::FileSink::fileWrite)) {
       using namespace g2;
+      g2::initializeLogging(_scope->_currentWorker.get());
+      clearMockFatal();
       internal::changeFatalInitHandlerForUnitTesting(&mockFatalCall);
 
-      LOG(INFO) << "Restore logger test ";
       auto filename = _handle->call(&FileSink::fileName);
       if (!filename.valid()) ADD_FAILURE();
       _log_file = filename.get();
    }
 
+
    RestoreFileLogger::~RestoreFileLogger() {
-      _scope.reset();
-      if (!removeFile(_log_file))
-         ADD_FAILURE();
+      g2::internal::shutDownLogging();
+
+      //if (!removeFile(_log_file))
+      //   ADD_FAILURE();
    }
 
-   std::string RestoreFileLogger::contentSoFar() {
+
+   // Beware of race between LOG(...) and this function. 
+   // since LOG(...) passes two queues but the handle::call only passes one queue 
+   // the handle::call can happen faster
+   std::string RestoreFileLogger::resetAndRetrieveContent() {
       std::future<std::string> filename = _handle->call(&g2::FileSink::fileName);
+      reset(); // flush all queues to sinks
       EXPECT_TRUE(filename.valid());
       auto file = filename.get();
       return readFileToText(file);

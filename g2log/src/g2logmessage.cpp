@@ -92,7 +92,7 @@ namespace g2 {
       // Not crash scenario but LOG or CONTRACT
       auto level_value = _pimpl->_level.value;
       if (FATAL.value == level_value) {
-         oss << "\n\t*******\tEXIT trigger caused LOG(FATAL) entry: \n\t";
+         oss << "\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t";
          oss << '"' << message() << '"';
          oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump();
       } else if (internal::CONTRACT.value == level_value) {

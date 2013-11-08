@@ -35,3 +35,5 @@ namespace g2 {
       _stream << fatalOsSignalCrashMessage;
    }
 } // g2
+
+

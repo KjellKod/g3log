@@ -50,7 +50,6 @@ public:
   virtual ~g2LogWorker();
   
     
-  //typedef std::pair<std::unique_ptr<g2LogWorker>, std::unique_ptr<g2::SinkHandle<g2::g2FileSink>> >  DefaultWorkerPair;
   static g2::DefaultFileLogger  createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory); 
   static std::unique_ptr<g2LogWorker> createWithNoSink();
 

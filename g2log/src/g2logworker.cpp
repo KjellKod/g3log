@@ -13,15 +13,13 @@
 
 #include <cassert>
 #include <functional>
-#include <iostream>
-
-
 #include "active.hpp"
 #include "g2log.hpp"
 #include "g2time.hpp"
 #include "g2future.h"
 #include "crashhandler.hpp"
 
+#include <iostream> // remove
 using namespace g2;
 using namespace g2::internal;
 
@@ -33,10 +31,7 @@ struct g2LogWorkerImpl {
   g2LogWorkerImpl() : _bg(kjellkod::Active::createActive()) {  }
 
   ~g2LogWorkerImpl() {
-    std::cout << "g2logworkerpimpl in destructor\n"; 
-    if(!_bg) { std::cout << "g2sink: fatal failure, no active object in sink\n"; return;}
     _bg.reset(); 
-    std::cout << "g2logworker active object destroyed. done sending exit messages to all sinks\n"; 
   }
 
   void bgSave(g2::LogMessage msg) {
@@ -56,11 +51,8 @@ struct g2LogWorkerImpl {
     fatal_message.stream() <<  "\nExiting after fatal event. Log flushed sucessfully to disk.\n";
     bgSave(fatal_message.copyToLogMessage());
 
-    std::cerr << fatal_message.toString() << std::endl;
-    std::cerr << "g2log sinks are flushed. Now exiting after receiving fatal event\n" << std::flush;
     _sinks.clear(); // flush all queues
     exitWithDefaultSignalHandler(fatal_message.signal_id_);
-
     // should never reach this point
     perror("g2log exited after receiving FATAL trigger. Flush message status: ");
   }

@@ -77,8 +77,7 @@ struct ScopedLogger {
     virtual ~ScopedLogger();
     
     g2LogWorker* get();
-    g2LogWorker* _previousWorker;
-    std::unique_ptr<g2LogWorker> _currentWorker;
+     std::unique_ptr<g2LogWorker> _currentWorker;
 };
 
 
@@ -101,7 +100,7 @@ struct RestoreFileLogger {
   }
   
   std::string logFile() { return _log_file;  }
-  std::string contentSoFar();
+  std::string resetAndRetrieveContent();
   
 
 private:

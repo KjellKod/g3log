@@ -16,7 +16,8 @@ namespace {
    const std::string kTruncatedWarningText = "[...truncated...]";
 }
 namespace g2 {
-
+   using namespace internal;
+   
    LogMessageBuilder::LogMessageBuilder(const std::string& file, const int line,
            const std::string& function, const LEVELS& level)
    : _message(std::make_shared<LogMessageImpl>(file, line, function, level)) {
@@ -29,7 +30,7 @@ namespace g2 {
       }
 
       LogMessage log_entry(_message);
-      internal::saveMessage(log_entry); // message saved to g2LogWorker
+      saveMessage(log_entry); // message saved to g2LogWorker
    }
 
    LogMessageBuilder& LogMessageBuilder::setExpression(const std::string& boolean_expression) {
@@ -79,8 +80,7 @@ namespace g2 {
       // message, flushed the crash message to the sinks and exits with the same fatal signal
       //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
       FatalMessage msg(_fatal_message, _fatal_signal);
-      //internal::fatalCall({_exit_message, _fatal_signal});
-      internal::fatalCall(msg);
+      fatalCall(msg);
 
    }
 } // g2

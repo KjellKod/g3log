@@ -23,7 +23,8 @@ struct LogMessageImpl {
 
    // Fatal OS-Signal constructor 
    explicit LogMessageImpl(const std::string& fatalOsSignalCrashMessage);
-   
+
+   LogMessageImpl(const LogMessageImpl& copy) = default;
    ~LogMessageImpl() = default;
 
    const std::time_t _timestamp;
