@@ -43,7 +43,7 @@ TEST(ConceptSink, OneHundredSinks) {
    BoolList flags;
    IntVector counts;
 
-   size_t NumberOfItems = 2;
+   size_t NumberOfItems = 100;
    for (size_t index = 0; index < NumberOfItems; ++index) {
       flags.push_back(make_shared < atomic<bool >> (false));
       counts.push_back(make_shared < atomic<int >> (0));
@@ -65,7 +65,7 @@ TEST(ConceptSink, OneHundredSinks) {
       stream1 << "Hello to 100 receivers :)";
       worker->save(message1);
       
-      auto& stream2 = message1.get()->stream();
+      auto& stream2 = message2.get()->stream();
       stream2 << "Hello to 100 receivers :)";
       worker->save(message2);
       //worker->save("Hello to 100 receivers :)");
