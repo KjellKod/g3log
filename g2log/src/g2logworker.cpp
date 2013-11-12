@@ -20,91 +20,98 @@
 #include "crashhandler.hpp"
 
 #include <iostream> // remove
-using namespace g2;
-using namespace g2::internal;
 
-struct g2LogWorkerImpl {
-  typedef std::shared_ptr<g2::internal::SinkWrapper> SinkWrapperPtr;
-  std::unique_ptr<kjellkod::Active> _bg;
-  std::vector<SinkWrapperPtr> _sinks;
+namespace g2 {
+   
+struct LogWorkerImpl {
+   typedef std::shared_ptr<g2::internal::SinkWrapper> SinkWrapperPtr;
+   std::unique_ptr<kjellkod::Active> _bg;
+   std::vector<SinkWrapperPtr> _sinks;
 
-  g2LogWorkerImpl() : _bg(kjellkod::Active::createActive()) {  }
+   LogWorkerImpl() : _bg(kjellkod::Active::createActive()) {}
 
-  ~g2LogWorkerImpl() {
-    _bg.reset(); 
-  }
+   ~LogWorkerImpl() {
+      _bg.reset();
+   }
 
-  void bgSave(const g2::LogMessage& msg) {
-    for (auto& sink : _sinks) {
-      sink->send(msg);
-    }
+   void bgSave(g2::LogMessagePtr msgPtr) {
+      LogMessage* msg = msgPtr.get().get();
+      if (msg == nullptr) {
+         std::cerr << "ERROR NULLPTR" << std::endl;
+         return;
+         
+      }
+      for (auto& sink : _sinks) {
+         sink->send(*msg);
+      }
 
-    if (_sinks.empty()) {
-      std::string err_msg{"g2logworker has no sinks. Message: ["};
-      err_msg.append(msg.toString()).append({"]\n"});
-      std::cerr << err_msg;
-    }
-  }
+      if (_sinks.empty()) {
+         std::string err_msg{"g2logworker has no sinks. Message: ["};
+         err_msg.append(msg->toString()).append({"]\n"});
+         std::cerr << err_msg;
+      }
+   }
 
-  void bgFatal(const FatalMessage& msg) {
-    FatalMessage fatal_message{msg};
-    fatal_message.stream() <<  "\nExiting after fatal event  (" << fatal_message.level() 
-            <<"). Exiting with signal: " << fatal_message.signal() 
-            << "\nLog flushed sucessfully to disk\n\n";
-    
-    
-    
-    std::cerr << fatal_message.message() << std::flush;
-    _sinks.clear(); // flush all queues
+   void bgFatal(FatalMessagePtr msgPtr) {
+      LogMessage message = msgPtr.get()->copyToLogMessage();
+      message.stream() << "\nExiting after fatal event  (" << message.level()
+              << "). Exiting with signal: " << msgPtr.get()->signal()
+              << "\nLog content flushed flushed sucessfully to sink\n\n";
+      
+      std::cerr << message.message() << std::flush;
+      for (auto& sink : _sinks) {
+         sink->send(message);
+      }
+      _sinks.clear(); // flush all queues
 
-    exitWithDefaultSignalHandler(fatal_message._signal_id);
-    // should never reach this point
-    perror("g2log exited after receiving FATAL trigger. Flush message status: ");
-  }
+      internal::exitWithDefaultSignalHandler(msgPtr.get()->_signal_id);
+      // should never reach this point
+      perror("g2log exited after receiving FATAL trigger. Flush message status: ");
+   }
 };
 
 
 
+
 // Default constructor will have one sink: g2filesink.
-
-g2LogWorker::g2LogWorker()
-: _pimpl(std2::make_unique<g2LogWorkerImpl>()) {
+LogWorker::LogWorker()
+: _pimpl(std2::make_unique<LogWorkerImpl>()) {
 }
 
-g2LogWorker::~g2LogWorker() { 
-  _pimpl->_bg->send([this]{_pimpl->_sinks.clear();}); 
- }
+LogWorker::~LogWorker() {
+   _pimpl->_bg->send([this] {_pimpl->_sinks.clear();});
+}
 // todo move operator
-void g2LogWorker::save(const LogMessage& msg) {
-  _pimpl->_bg->send([this, msg] { _pimpl->bgSave(msg); }); // TODO std::move
+
+void LogWorker::save(LogMessagePtr msg) {
+   _pimpl->_bg->send([this, msg] {_pimpl->bgSave(msg); }); 
 }
 
-void g2LogWorker::fatal(const FatalMessage& fatal_message) {
-  _pimpl->_bg->send([this, fatal_message] {_pimpl->bgFatal(fatal_message); });
+void LogWorker::fatal(FatalMessagePtr fatal_message) {
+   _pimpl->_bg->send([this, fatal_message] { _pimpl->bgFatal(fatal_message); });
 }
 
-void g2LogWorker::addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> sink) {
-  auto bg_addsink_call = [this, sink] { _pimpl->_sinks.push_back(sink); };
-  auto token_done = g2::spawn_task(bg_addsink_call, _pimpl->_bg.get());
-  token_done.wait();
+void LogWorker::addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> sink) {
+   auto bg_addsink_call = [this, sink] { _pimpl->_sinks.push_back(sink); };
+   auto token_done = g2::spawn_task(bg_addsink_call, _pimpl->_bg.get());
+   token_done.wait();
 }
 
 
-  // Gör en egen super simpel klass/struct med 
-  // DefaultFilLogger den ska INTE vara i g2logworker.cpp
-  g2::DefaultFileLogger g2LogWorker::createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory)
-  {
-    return g2::DefaultFileLogger(log_prefix, log_directory);
-  }
-  
-  std::unique_ptr<g2LogWorker> g2LogWorker::createWithNoSink() 
-  {
-    return std::unique_ptr<g2LogWorker>(new g2LogWorker);
-  }
-  
-  
+// Gör en egen super simpel klass/struct med 
+// DefaultFilLogger den ska INTE vara i g2logworker.cpp
+
+g2::DefaultFileLogger LogWorker::createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory) {
+   return g2::DefaultFileLogger(log_prefix, log_directory);
+}
+
+std::unique_ptr<LogWorker> LogWorker::createWithNoSink() {
+   return std::unique_ptr<LogWorker>(new LogWorker);
+}
 
 DefaultFileLogger::DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory)
-: worker(g2LogWorker::createWithNoSink())
+: worker(LogWorker::createWithNoSink())
 , sink(worker->addSink(std2::make_unique<g2::FileSink>(log_prefix, log_directory), &FileSink::fileWrite)) {
 }
+
+} // g2

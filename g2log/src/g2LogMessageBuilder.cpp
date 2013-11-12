@@ -9,7 +9,10 @@
 #include "g2LogMessageBuilder.hpp"
 #include "g2logmessage.hpp"
 #include "g2log.hpp"
+#include "std2_make_unique.hpp"
 #include <csignal>
+
+#include <iostream>
 namespace {
    const int kMaxMessageSize = 2048;
    const std::string kTruncatedWarningText = "[...truncated...]";
@@ -19,11 +22,12 @@ namespace g2 {
    
    LogMessageBuilder::LogMessageBuilder(const std::string& file, const int line,
            const std::string& function, const LEVELS& level)
-   : _message(file, line, function, level) {
+   : _message(std2::make_unique<LogMessage>(file, line, function, level)) {
+      
    }
 
    LogMessageBuilder::~LogMessageBuilder() {
-      if (_message.wasFatal()) {
+      if (_message.get()->wasFatal()) {
          FatalMessageBuilder trigger(_message, SIGABRT);
          return; // FatalMessageBuilder will send to worker at scope exit 
       }
@@ -32,12 +36,12 @@ namespace g2 {
    }
 
    LogMessageBuilder& LogMessageBuilder::setExpression(const std::string& boolean_expression) {
-      _message.setExpression(boolean_expression);
+      _message.get()->setExpression(boolean_expression);
       return *this;
    }
 
    std::ostringstream& LogMessageBuilder::stream() {
-      return _message.stream();
+      return _message.get()->stream();
    }
 
    void LogMessageBuilder::messageSave(const char *printf_like_message, ...) {
@@ -63,12 +67,13 @@ namespace g2 {
    /// FatalMessageBuilder
 
    FatalMessageBuilder::FatalMessageBuilder(const std::string& exit_message, int signal_id)
-   : _fatal_message{exit_message}, _fatal_signal{signal_id} 
+   : _fatal_message(std2::make_unique<FatalMessage>(LogMessage{exit_message}, signal_id)) 
    { }
 
    
-  FatalMessageBuilder:: FatalMessageBuilder(const LogMessage& details, int signal_id)
-  : _fatal_message(details), _fatal_signal(signal_id) 
+  FatalMessageBuilder:: FatalMessageBuilder(LogMessagePtr details, int signal_id)
+  //: _fatal_message(details), _fatal_signal(signal_id) 
+     : _fatal_message(std2::make_unique<FatalMessage>(*(details._move_only.get()), signal_id)) 
   {}
      
 
@@ -78,8 +83,7 @@ namespace g2 {
       // message, flushed the crash message to the sinks and exits with the same fatal signal
       //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
       
-      FatalMessage msg(_fatal_message, _fatal_signal);
-      fatalCall(msg);
+      fatalCall(_fatal_message);
 
    }
 } // g2

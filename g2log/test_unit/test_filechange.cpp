@@ -24,7 +24,7 @@ using namespace testing_helpers;
 
 namespace { // anonymous
   const char* name_path_1 = "./some_fake_DirectoryOrName_1_";
-  g2LogWorker* g_logger_ptr = nullptr;
+  g2::LogWorker* g_logger_ptr = nullptr;
   g2::SinkHandle<g2::FileSink>* g_filesink_handler = nullptr;
   LogFileCleaner* g_cleaner_ptr = nullptr;
 
@@ -127,7 +127,7 @@ int main(int argc, char *argv[]) {
     
     testing_helpers::ScopedOut scopedCerr(std::cerr, &cerrDump);
 
-    auto logger = g2LogWorker::createWithDefaultLogger("ReplaceLogFile", name_path_1);
+    auto logger = g2::LogWorker::createWithDefaultLogger("ReplaceLogFile", name_path_1);
     g_logger_ptr = logger.worker.get(); 
     g_filesink_handler = logger.sink.get();
     last_log_file = g_filesink_handler->call(&g2::FileSink::fileName).get();

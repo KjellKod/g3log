@@ -19,10 +19,10 @@ namespace g2 {
    struct FatalMessageBuilder {
       //explicit FatalMessageBuilder(const FatalMessage& exit_message);
       FatalMessageBuilder(const std::string& exit_message, int fatal_signal);
-      FatalMessageBuilder(const LogMessage& details, int signal_id);
+      FatalMessageBuilder(LogMessagePtr details, int signal_id);
       virtual ~FatalMessageBuilder();
 
-      LogMessage _fatal_message;
+      FatalMessagePtr _fatal_message;
       int _fatal_signal;
    };
 
@@ -43,6 +43,6 @@ namespace g2 {
       __attribute__((format(printf, 2, 3))); // ref:  http://www.codemaestro.com/reviews/18
 
    private:
-      LogMessage _message;
+      LogMessagePtr _message;
    };
 } // g2

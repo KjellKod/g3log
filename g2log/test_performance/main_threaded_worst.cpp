@@ -68,7 +68,7 @@ int main(int argc, char** argv)
   oss.str(""); // clear the stream
 
 #if defined(G2LOG_PERFORMANCE)
-  auto logger_n_handle = g2LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
+  auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
   g2::initializeLogging(logger_n_handle.worker.get());
 
 #elif defined(GOOGLE_GLOG_PERFORMANCE)

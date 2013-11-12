@@ -31,7 +31,7 @@
 
 namespace {
    std::once_flag g_initialize_flag;
-   g2LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
+   g2::LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
    std::mutex g_logging_init_mutex;
 
    std::unique_ptr<g2::LogMessage> g_first_unintialized_msg = {nullptr};
@@ -50,7 +50,7 @@ namespace g2 {
    // several times... for all other practical use, it shouldn't!
 
 
-   void initializeLogging(g2LogWorker *bgworker) {
+   void initializeLogging(LogWorker *bgworker) {
       std::call_once(g_initialize_flag, []() {
          installSignalHandler(); });
       std::lock_guard<std::mutex> lock(g_logging_init_mutex);
@@ -76,10 +76,10 @@ namespace g2 {
       }
 
       /** Should be used for unit testing. Used in production code is likely wrong.*/
-      g2LogWorker* shutDownLogging() {
+      LogWorker* shutDownLogging() {
          std::lock_guard<std::mutex> lock(g_logging_init_mutex);
          CHECK(isLoggingInitialized()) << "NO Logger is instantiated ... exiting";
-         g2LogWorker *backup = g_logger_instance;
+         LogWorker *backup = g_logger_instance;
          g_logger_instance = nullptr;
          return backup;
       }
@@ -93,19 +93,16 @@ namespace g2 {
        * The first initialized log entry will also save the first uninitialized log message, if any
        * @param log_entry to save to logger
        */
-      void saveMessage(const g2::LogMessage& incoming) {
+      void saveMessage(LogMessagePtr incoming) {
          // Uninitialized messages are ignored but does not CHECK/crash the logger  
          if (!internal::isLoggingInitialized()) {
-            LogMessage log_entry{incoming};
             std::call_once(g_set_first_uninitialized_flag, [&] {
-               g_first_unintialized_msg = std2::make_unique<LogMessage>(log_entry);
-               //g_uninitialized_call = true;
+               g_first_unintialized_msg = incoming.release();
                std::string err = {"LOGGER NOT INITIALIZED:\n\t\t"};
-               err.append(log_entry.message());
-               auto& stream = log_entry.stream();
-               stream.str("");
-               stream << err;
-               std::cerr << err << std::endl;
+               err.append(g_first_unintialized_msg->message());
+               auto& stream = g_first_unintialized_msg->stream();
+               stream.str(err);
+               std::cerr << stream.str() << std::endl;
             });
             return;
          }
@@ -114,9 +111,7 @@ namespace g2 {
          // Save the first uninitialized message, if any     
          std::call_once(g_save_first_unintialized_flag, [] {
             if (g_first_unintialized_msg) {
-               LogMessage error_msg{*(g_first_unintialized_msg.get())};
-               g_logger_instance->save(error_msg);
-               g_first_unintialized_msg.reset();
+               g_logger_instance->save(LogMessagePtr{std::move(g_first_unintialized_msg)});
             }
          });
 
@@ -129,14 +124,14 @@ namespace g2 {
        * will sleep forever (i.e. until the background thread catches up, saves the fatal
        * message and kills the software with the fatal signal.
        */
-      void fatalCallToLogger(const FatalMessage& message) {               
+      void fatalCallToLogger(FatalMessagePtr message) {               
          if (!isLoggingInitialized()) {
             std::ostringstream error;
             error << "FATAL CALL but logger is NOT initialized\n"
-                    << "SIGNAL: " << g2::internal::signalName(message._signal_id)
-                    << "\nMessage: \n" << message.toString() << std::flush;
+                    << "SIGNAL: " << message.get()->signal()
+                    << "\nMessage: \n" << message.get()->toString() << std::flush;
             std::cerr << error << std::flush;
-            internal::exitWithDefaultSignalHandler(message._signal_id);
+            internal::exitWithDefaultSignalHandler(message.get()->_signal_id);
          }
 
          g_logger_instance->fatal(message);
@@ -148,7 +143,7 @@ namespace g2 {
 
 
       // By default this function pointer goes to \ref fatalCallToLogger;
-      std::function<void(const FatalMessage&) > g_fatal_to_g2logworker_function_ptr = fatalCallToLogger;
+      std::function<void(FatalMessagePtr) > g_fatal_to_g2logworker_function_ptr = fatalCallToLogger;
 
 
       /** The default, initial, handling to send a 'fatal' event to g2logworker
@@ -156,8 +151,8 @@ namespace g2 {
        * ... in the case of unit testing it is the given "Mock" fatalCall that will
        * define the behaviour.
        */
-      void fatalCall(const FatalMessage& message) {
-         g_fatal_to_g2logworker_function_ptr(message);
+      void fatalCall(FatalMessagePtr message) {
+         g_fatal_to_g2logworker_function_ptr(FatalMessagePtr{std::move(message)});
       }
 
 
@@ -165,7 +160,7 @@ namespace g2 {
        * This function switches the function pointer so that only
        * 'unitTest' mock-fatal calls are made.
        * */
-      void changeFatalInitHandlerForUnitTesting(std::function<void(const FatalMessage&) > fatal_call) {
+      void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessagePtr) > fatal_call) {
          g_fatal_to_g2logworker_function_ptr = fatal_call;
       }
    } // internal

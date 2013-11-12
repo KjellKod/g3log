@@ -5,6 +5,7 @@
 #include "g2log.hpp"
 #include "g2logworker.hpp"
 #include "std2_make_unique.hpp"
+#include "g2logmessage.hpp"
 #include <fstream>
 
 using namespace std;
@@ -32,11 +33,12 @@ namespace testing_helpers {
    }
 
 
-   void mockFatalCall(const g2::FatalMessage& fatal_message) {
-      g_mockFatal_message = fatal_message.toString();
-      g_mockFatal_signal = fatal_message._signal_id;
+   void mockFatalCall(FatalMessagePtr fatal_message) {
+      g_mockFatal_message = fatal_message.get()->toString();
+      g_mockFatal_signal = fatal_message.get()->_signal_id;
       g_mockFatalWasCalled = true;
-      g2::internal::saveMessage(fatal_message.copyToLogMessage());
+      LogMessagePtr message{fatal_message.release()};
+      g2::internal::saveMessage(message); //fatal_message.copyToLogMessage());
    }
 
 
@@ -100,9 +102,9 @@ namespace testing_helpers {
    }
 
 
-   ScopedLogger::ScopedLogger() : _currentWorker(g2LogWorker::createWithNoSink()) { }
+   ScopedLogger::ScopedLogger() : _currentWorker(g2::LogWorker::createWithNoSink()) { }
    ScopedLogger::~ScopedLogger() { }
-   g2LogWorker* ScopedLogger::get() { return _currentWorker.get();  }
+   g2::LogWorker* ScopedLogger::get() { return _currentWorker.get();  }
 
 
    RestoreFileLogger::RestoreFileLogger(std::string directory)

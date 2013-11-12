@@ -22,7 +22,7 @@ namespace testing_helpers {
    std::string mockFatalMessage();
    int mockFatalSignal();
    bool mockFatalWasCalled();
-   void mockFatalCall(const g2::FatalMessage& fatal_message);
+   void mockFatalCall(g2::FatalMessagePtr fatal_message);
    void clearMockFatal();
 
    bool removeFile(std::string path_to_file);
@@ -76,8 +76,8 @@ struct ScopedLogger {
     ScopedLogger();
     virtual ~ScopedLogger();
     
-    g2LogWorker* get();
-     std::unique_ptr<g2LogWorker> _currentWorker;
+    g2::LogWorker* get();
+    std::unique_ptr<g2::LogWorker> _currentWorker;
 };
 
 

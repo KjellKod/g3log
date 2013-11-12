@@ -25,9 +25,8 @@
 
 #include "g2loglevels.hpp"
 #include "g2LogMessageBuilder.hpp"
+#include "g2logmessage.hpp"
 
-
-class g2LogWorker;
 #if !(defined(__PRETTY_FUNCTION__))
 #define __PRETTY_FUNCTION__   __FUNCTION__
 #endif
@@ -46,12 +45,13 @@ class g2LogWorker;
  * --- Thanks for a great 2011 and good luck with 'g2' --- KjellKod 
  */
 namespace g2 {
+class LogWorker;
 struct LogMessage;
 struct FatalMessage;
 
 /** Should be called at very first startup of the software with \ref g2LogWorker
  *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
-void initializeLogging(g2LogWorker *logger);
+void initializeLogging(LogWorker *logger);
 
 
 
@@ -63,11 +63,11 @@ namespace internal {
 bool isLoggingInitialized();
 
 // Save the created LogMessage to any existing sinks
-void saveMessage(const LogMessage& log_entry);
+void saveMessage(LogMessagePtr log_entry);
 
 // Save the created FatalMessage to any existing sinks and exit with 
 // the originating fatal signal,. or SIGABRT if it originated from a broken contract
-void fatalCall(const FatalMessage& message);
+void fatalCall(FatalMessagePtr message);
 
 /** FOR TESTING PURPOSES
  * Shutdown the logging by making the pointer to the background logger to nullptr
@@ -75,7 +75,7 @@ void fatalCall(const FatalMessage& message);
  * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. 
  * 
  * This is kept for test reasons and should normally not be used */
-g2LogWorker* shutDownLogging();
+LogWorker* shutDownLogging();
 
 /** By default the g2log will call g2LogWorker::fatal(...) which will
  * abort() the system after flushing the logs to file. This makes unit
@@ -85,7 +85,7 @@ g2LogWorker* shutDownLogging();
  *  The bool return values in the fatal_call is whether or not the fatal_call should
  *  
  */
-void changeFatalInitHandlerForUnitTesting(std::function<void(const FatalMessage&) > fatal_call);
+void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessagePtr) > fatal_call);
 } // internal
 } // g2
 

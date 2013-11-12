@@ -18,9 +18,10 @@
 
 #include "g2loglevels.hpp"
 #include "g2time.hpp"
+#include "g2pretendtobecopyable.hpp"
+#include <memory>
 
 namespace g2 {
-
    struct LogMessage {
       std::string file() const;
       std::string line() const;
@@ -77,4 +78,8 @@ namespace g2 {
       
       const int _signal_id;
    };
+   
+   
+   typedef PretendToBeCopyable<std::unique_ptr<FatalMessage>> FatalMessagePtr;
+   typedef PretendToBeCopyable<std::unique_ptr<LogMessage>> LogMessagePtr;
 } // g2

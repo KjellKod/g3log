@@ -12,18 +12,18 @@
 
 using namespace testing_helpers;
 using namespace std;
-
 TEST(Sink, OneSink) {
+using namespace g2;
    AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
    AtomicIntPtr count = make_shared < atomic<int >> (0);
    {
-      auto worker = g2LogWorker::createWithNoSink();
+      auto worker = g2::LogWorker::createWithNoSink();
       auto handle = worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
       //worker->save("this message should trigger an atomic increment at the sink");
-      g2::LogMessage message("test", 0, "test", DEBUG);
-      message.stream() << "this message should trigger an atomic increment at the sink";
+      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      message.get()->stream() << "this message should trigger an atomic increment at the sink";
       worker->save(message);
    }
    EXPECT_TRUE(flag->load());
@@ -39,10 +39,11 @@ namespace {
 }
 
 TEST(ConceptSink, OneHundredSinks) {
+   using namespace g2;
    BoolList flags;
    IntVector counts;
 
-   size_t NumberOfItems = 100;
+   size_t NumberOfItems = 2;
    for (size_t index = 0; index < NumberOfItems; ++index) {
       flags.push_back(make_shared < atomic<bool >> (false));
       counts.push_back(make_shared < atomic<int >> (0));
@@ -50,7 +51,7 @@ TEST(ConceptSink, OneHundredSinks) {
 
    {
       RestoreFileLogger logger{"/tmp"};
-      auto worker = logger._scope->get(); //g2LogWorker::createWithNoSink();
+      g2::LogWorker* worker = logger._scope->get(); //g2LogWorker::createWithNoSink();
       size_t index = 0;
       for (auto& flag : flags) {
          auto& count = counts[index++];
@@ -58,12 +59,15 @@ TEST(ConceptSink, OneHundredSinks) {
          worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
       LOG(DEBUG) << "start message";
-      g2::LogMessage message("test", 0, "test", DEBUG);
-      auto& stream = message.stream();
-      stream << "Hello to 100 receivers :)";
-      worker->save(message);
-      stream << "Hello to 100 receivers :)";
-      worker->save(message);
+      LogMessagePtr message1{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      LogMessagePtr message2{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      auto& stream1 = message1.get()->stream();
+      stream1 << "Hello to 100 receivers :)";
+      worker->save(message1);
+      
+      auto& stream2 = message1.get()->stream();
+      stream2 << "Hello to 100 receivers :)";
+      worker->save(message2);
       //worker->save("Hello to 100 receivers :)");
       //worker->save("Hello to 100 receivers :)");
       LOG(INFO) << "end message";

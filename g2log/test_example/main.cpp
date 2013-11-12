@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 //  auto sinkptr = std2::make_unique<g2::g2FileSink>(argv[0], path_to_log_file);
 //  auto log_handle = logger->addSink(std::move(singkptr), &g2::g2FileSink::fileWrite);
 //  g2::initializeLogging(logger.get());
-  auto logger_n_handle = g2LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
+  auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
   g2::initializeLogging(logger_n_handle.worker.get());
   
   

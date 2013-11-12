@@ -21,46 +21,45 @@
 #include "g2sinkwrapper.h"
 #include "g2sinkhandle.h"
 #include "g2filesink.hpp"
+#include "g2logmessage.hpp"
 #include "std2_make_unique.hpp"
 
-struct g2LogWorkerImpl;
 
-
-class g2LogWorker;
+class LogWorker;
 namespace g2 {
-struct DefaultFileLogger {
+struct LogWorkerImpl;
+
+   struct DefaultFileLogger {
     DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory);
-    std::unique_ptr<g2LogWorker> worker;
+    std::unique_ptr<LogWorker> worker;
     std::unique_ptr<g2::SinkHandle<g2::FileSink>> sink;
   };
-}
 
-
-class g2LogWorker {
-  g2LogWorker();    // Create only through factory  
+class LogWorker {
+  LogWorker();    // Create only through factory  
   void addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> wrapper);
 
-  std::unique_ptr<g2LogWorkerImpl> _pimpl;
-  g2LogWorker(const g2LogWorker&); // c++11 feature not yet in vs2010 = delete;
-  g2LogWorker& operator=(const g2LogWorker&); // c++11 feature not yet in vs2010 = delete;
+  std::unique_ptr<LogWorkerImpl> _pimpl;
+  LogWorker(const LogWorker&); // c++11 feature not yet in vs2010 = delete;
+  LogWorker& operator=(const LogWorker&); // c++11 feature not yet in vs2010 = delete;
 
 
 
 public:
-  virtual ~g2LogWorker();
+  virtual ~LogWorker();
   
     
   static g2::DefaultFileLogger  createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory); 
-  static std::unique_ptr<g2LogWorker> createWithNoSink();
+  static std::unique_ptr<LogWorker> createWithNoSink();
 
   
   /// pushes in background thread (asynchronously) input messages to log file
-  void save(const g2::LogMessage& entry);
+  void save(LogMessagePtr entry);
 
   /// Will push a fatal message on the queue, this is the last message to be processed
   /// this way it's ensured that all existing entries were flushed before 'fatal'
   /// Will abort the application!
-  void fatal(const g2::FatalMessage& fatal_message);
+  void fatal(FatalMessagePtr fatal_message);
 
   template<typename T, typename DefaultLogCall>
   std::unique_ptr<g2::SinkHandle<T >> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {
@@ -73,6 +72,6 @@ public:
   }
 };
 
-
+} // g2
 
 #endif // LOG_WORKER_H_
