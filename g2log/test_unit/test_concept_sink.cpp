@@ -13,7 +13,6 @@
 #include "g2sinkwrapper.h"
 #include "g2sinkhandle.h"
 #include "g2logmessage.hpp"
-#include "g2logmessageimpl.hpp"
 
 
 using namespace std;
@@ -51,7 +50,7 @@ namespace g2 {
 
     void bgSave(LogEntry msg) {
       for (auto& sink : _container) {
-        g2::LogMessage message(std::make_shared<g2::LogMessageImpl>("test", 0, "test", DEBUG));
+        g2::LogMessage message("test", 0, "test", DEBUG);
         message.stream() << msg;
         sink->send(message);
       }

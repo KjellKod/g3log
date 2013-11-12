@@ -34,7 +34,7 @@ namespace testing_helpers {
 
    void mockFatalCall(const g2::FatalMessage& fatal_message) {
       g_mockFatal_message = fatal_message.toString();
-      g_mockFatal_signal = fatal_message.signal_id_;
+      g_mockFatal_signal = fatal_message._signal_id;
       g_mockFatalWasCalled = true;
       g2::internal::saveMessage(fatal_message.copyToLogMessage());
    }

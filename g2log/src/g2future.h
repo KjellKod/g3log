@@ -36,14 +36,25 @@ namespace g2 {
 template<typename Moveable>
 struct PretendToBeCopyable
 {
-  explicit PretendToBeCopyable(Moveable&& m)  : move_only_(std::move(m)) {}
+  explicit PretendToBeCopyable(Moveable&& m)  : _move_only(std::move(m)) {}
   
-  template<typename T> // universal copy constructor
-  PretendToBeCopyable(T&& t): move_only_(std::move(t.move_only_)){}
+  PretendToBeCopyable(PretendToBeCopyable const& t): _move_only(std::move(t._move_only)){}
+  PretendToBeCopyable(PretendToBeCopyable&& t): _move_only(std::move(t._move_only)){}
 
-  void operator()() { move_only_(); } // execute
+  PretendToBeCopyable& operator=(PretendToBeCopyable const& other) {
+     _move_only=std::move(other._move_only);
+     return *this;
+  }
+      
+  PretendToBeCopyable& operator=(PretendToBeCopyable&& other) {
+     _move_only=std::move(other._move_only);
+     return *this;
+  }
+  
+  
+  void operator()() { _move_only(); } // execute
 private:
-  mutable Moveable move_only_;
+  mutable Moveable _move_only;
 };
 
 

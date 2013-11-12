@@ -35,7 +35,7 @@ FileSink::FileSink(const std::string& log_prefix, const std::string& log_directo
    addLogFileHeader();
 }
 FileSink::~FileSink() {
-   std::string exit_msg{"\n\t\tg2log g2FileSink shutdown at: "};
+   std::string exit_msg{"\ng2log g2FileSink shutdown at: "};
    exit_msg.append(localtime_formatted(systemtime_now(), internal::time_formatted));
    filestream() << exit_msg << std::flush;
 

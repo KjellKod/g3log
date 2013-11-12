@@ -8,23 +8,21 @@
 #pragma once
 #include <string>
 #include <sstream>
-#include <memory>
 #include <cstdarg>
-#include "g2loglevels.hpp"
 
+#include "g2loglevels.hpp"
+#include "g2logmessage.hpp"
 
 namespace g2 {
-
-   struct LogMessageImpl;
 
    // At RAII scope end this struct will trigger a FatalMessage sending
    struct FatalMessageBuilder {
       //explicit FatalMessageBuilder(const FatalMessage& exit_message);
       FatalMessageBuilder(const std::string& exit_message, int fatal_signal);
-      FatalMessageBuilder(const std::shared_ptr<LogMessageImpl>& details, int signal_id);
+      FatalMessageBuilder(const LogMessage& details, int signal_id);
       virtual ~FatalMessageBuilder();
 
-      std::shared_ptr<LogMessageImpl> _fatal_message;
+      LogMessage _fatal_message;
       int _fatal_signal;
    };
 
@@ -45,6 +43,6 @@ namespace g2 {
       __attribute__((format(printf, 2, 3))); // ref:  http://www.codemaestro.com/reviews/18
 
    private:
-      std::shared_ptr<LogMessageImpl> _message;
+      LogMessage _message;
    };
 } // g2

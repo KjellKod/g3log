@@ -5,7 +5,6 @@
  * ============================================================================*/
 
 #include "crashhandler.hpp"
-#include "g2log.hpp"
 #include "g2logmessage.hpp"
 #include "g2LogMessageBuilder.hpp"
 
@@ -21,6 +20,7 @@
 #include <cxxabi.h>
 #include <cstdlib>
 #include <sstream>
+#include <iostream>
 
 namespace {
    // Dump of stack,. then exit through g2log background worker
@@ -32,15 +32,13 @@ namespace {
 
       std::ostringstream oss;
       oss << "Received fatal signal: " << g2::internal::signalName(signal_number);
-      oss << "(" << signal_number << ")" << std::endl;
-      oss << "\tPID: " << getpid() << std::endl;
+      oss << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
       oss << stackdump();
 
       { // Local scope, trigger send
          std::ostringstream fatal_stream;
          fatal_stream << oss.str() << std::endl;
-         fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;
-
+         fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;        
          g2::FatalMessageBuilder trigger(fatal_stream.str(), signal_number);
       } // message sent to g2LogWorker by FatalMessageBuilder
       // wait to die -- will be inside the FatalMessageBuilder
@@ -68,12 +66,13 @@ namespace g2 {
    //          http://stackoverflow.com/questions/6878546/why-doesnt-parent-process-return-to-the-exact-location-after-handling-signal_number
    namespace internal {
       std::string stackdump() {
-         std::ostringstream oss;
          const size_t max_dump_size = 50;
          void* dump[max_dump_size];
          size_t size = backtrace(dump, max_dump_size);
          char** messages = backtrace_symbols(dump, size); // overwrite sigaction with caller's address
+
          // dump stack: skip first frame, since that is here
+         std::ostringstream oss;
          for (size_t idx = 1; idx < size && messages != nullptr; ++idx) {
             char *mangled_name = 0, *offset_begin = 0, *offset_end = 0;
             // find parantheses and +address offset surrounding mangled name
@@ -99,7 +98,7 @@ namespace g2 {
                char * real_name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
                // if demangling is successful, output the demangled function name
                if (status == 0) {
-                  oss << "\tstack dump [" << idx << "]  " << messages[idx] << " : " << real_name << "+";
+                  oss << "\n\tstack dump [" << idx << "]  " << messages[idx] << " : " << real_name << "+";
                   oss << offset_begin << offset_end << std::endl;
                }// otherwise, output the mangled function name
                else {

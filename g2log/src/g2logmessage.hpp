@@ -14,20 +14,14 @@
 
 #include <string>
 #include <sstream>
-#include <iostream>
-#include <cstdarg>
-#include <memory>
+#include <chrono>
 
-#include "g2log.hpp"
 #include "g2loglevels.hpp"
 #include "g2time.hpp"
-//#include "g2logmessageimpl.hpp"
 
 namespace g2 {
-   struct LogMessageImpl;
 
    struct LogMessage {
-      mutable std::shared_ptr<LogMessageImpl> _pimpl;
       std::string file() const;
       std::string line() const;
       std::string function() const;
@@ -44,20 +38,43 @@ namespace g2 {
       std::string toString() const;
 
 
-      std::ostringstream& stream() const;
-      explicit LogMessage(const std::shared_ptr<LogMessageImpl>& details);
+      std::ostringstream& stream();
+      void setExpression(const std::string expression);
+      
+      LogMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level);
+      explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
+      
+      LogMessage(const LogMessage&);
+      //LogMessage(LogMessage&&);
+      
       ~LogMessage() = default;
+      
+   protected:
+      const std::time_t _timestamp;
+      const long _microseconds;
+      const std::string _file;
+      const int _line;
+      const std::string _function;
+      const LEVELS _level;
+
+      std::string _expression; // only with content for CHECK(...) calls
+      mutable std::ostringstream _stream;
    };
+   
+   
+   
 
    /** Trigger for flushing the message queue and exiting the application
     * A thread that causes a FatalMessage will sleep forever until the
     * application has exited (after message flush) */
    struct FatalMessage : public LogMessage {
-      FatalMessage(const std::shared_ptr<LogMessageImpl>& details, int signal_id);
-      
+      FatalMessage(const LogMessage& details, int signal_id);
+      FatalMessage(const FatalMessage&);
       ~FatalMessage() = default;
-      LogMessage copyToLogMessage() const;
       
-      int signal_id_;
+      LogMessage copyToLogMessage() const;
+      std::string signal() const;
+      
+      const int _signal_id;
    };
 } // g2

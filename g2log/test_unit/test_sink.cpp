@@ -7,7 +7,6 @@
 #include <chrono>
 
 #include "testing_helpers.h"
-#include "g2logmessageimpl.hpp"
 #include "g2logmessage.hpp"
 #include "g2logworker.hpp"
 
@@ -23,7 +22,7 @@ TEST(Sink, OneSink) {
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
       //worker->save("this message should trigger an atomic increment at the sink");
-      g2::LogMessage message(std::make_shared<g2::LogMessageImpl>("test", 0, "test", DEBUG));
+      g2::LogMessage message("test", 0, "test", DEBUG);
       message.stream() << "this message should trigger an atomic increment at the sink";
       worker->save(message);
    }
@@ -59,7 +58,7 @@ TEST(ConceptSink, OneHundredSinks) {
          worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
       LOG(DEBUG) << "start message";
-      g2::LogMessage message(std::make_shared<g2::LogMessageImpl>("test", 0, "test", DEBUG));
+      g2::LogMessage message("test", 0, "test", DEBUG);
       auto& stream = message.stream();
       stream << "Hello to 100 receivers :)";
       worker->save(message);

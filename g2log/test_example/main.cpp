@@ -8,7 +8,7 @@
 #include "g2log.hpp"
 #include <iomanip>
 #include <thread>
-
+#include <iostream>
 namespace
 {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))

@@ -21,9 +21,11 @@
 
 #include <string>
 #include <cstdarg>
+#include <functional>
 
 #include "g2loglevels.hpp"
 #include "g2LogMessageBuilder.hpp"
+
 
 class g2LogWorker;
 #if !(defined(__PRETTY_FUNCTION__))

@@ -7,10 +7,9 @@
 
 //#include "g2log.hpp"
 #include "g2LogMessageBuilder.hpp"
-#include "g2logmessageimpl.hpp"
 #include "g2logmessage.hpp"
+#include "g2log.hpp"
 #include <csignal>
-
 namespace {
    const int kMaxMessageSize = 2048;
    const std::string kTruncatedWarningText = "[...truncated...]";
@@ -20,26 +19,25 @@ namespace g2 {
    
    LogMessageBuilder::LogMessageBuilder(const std::string& file, const int line,
            const std::string& function, const LEVELS& level)
-   : _message(std::make_shared<LogMessageImpl>(file, line, function, level)) {
+   : _message(file, line, function, level) {
    }
 
    LogMessageBuilder::~LogMessageBuilder() {
-      if (internal::wasFatal(_message->_level)) {
-         FatalMessageBuilder trigger({_message, SIGABRT});
+      if (_message.wasFatal()) {
+         FatalMessageBuilder trigger(_message, SIGABRT);
          return; // FatalMessageBuilder will send to worker at scope exit 
       }
 
-      LogMessage log_entry(_message);
-      saveMessage(log_entry); // message saved to g2LogWorker
+      saveMessage(_message); // message saved to g2LogWorker
    }
 
    LogMessageBuilder& LogMessageBuilder::setExpression(const std::string& boolean_expression) {
-      _message->_expression = boolean_expression;
+      _message.setExpression(boolean_expression);
       return *this;
    }
 
    std::ostringstream& LogMessageBuilder::stream() {
-      return _message->_stream;
+      return _message.stream();
    }
 
    void LogMessageBuilder::messageSave(const char *printf_like_message, ...) {
@@ -65,11 +63,11 @@ namespace g2 {
    /// FatalMessageBuilder
 
    FatalMessageBuilder::FatalMessageBuilder(const std::string& exit_message, int signal_id)
-   : _fatal_message(std::make_shared<LogMessageImpl>(exit_message)), _fatal_signal(signal_id) 
+   : _fatal_message{exit_message}, _fatal_signal{signal_id} 
    { }
 
    
-  FatalMessageBuilder:: FatalMessageBuilder(const std::shared_ptr<LogMessageImpl>& details, int signal_id)
+  FatalMessageBuilder:: FatalMessageBuilder(const LogMessage& details, int signal_id)
   : _fatal_message(details), _fatal_signal(signal_id) 
   {}
      
@@ -79,6 +77,7 @@ namespace g2 {
       // either we will stay here until the background worker has received the fatal
       // message, flushed the crash message to the sinks and exits with the same fatal signal
       //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
+      
       FatalMessage msg(_fatal_message, _fatal_signal);
       fatalCall(msg);
 

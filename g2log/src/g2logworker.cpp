@@ -47,12 +47,17 @@ struct g2LogWorkerImpl {
   }
 
   void bgFatal(const FatalMessage& msg) {
-    auto fatal_message = msg;
-    fatal_message.stream() <<  "\nExiting after fatal event. Log flushed sucessfully to disk.\n";
-    bgSave(fatal_message.copyToLogMessage());
-
+    FatalMessage fatal_message{msg};
+    fatal_message.stream() <<  "\nExiting after fatal event  (" << fatal_message.level() 
+            <<"). Exiting with signal: " << fatal_message.signal() 
+            << "\nLog flushed sucessfully to disk\n\n";
+    
+    
+    
+    std::cerr << fatal_message.message() << std::flush;
     _sinks.clear(); // flush all queues
-    exitWithDefaultSignalHandler(fatal_message.signal_id_);
+
+    exitWithDefaultSignalHandler(fatal_message._signal_id);
     // should never reach this point
     perror("g2log exited after receiving FATAL trigger. Flush message status: ");
   }
