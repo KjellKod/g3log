@@ -23,31 +23,27 @@
 
 namespace g2 {
    struct LogMessage {
-      std::string file() const;
-      std::string line() const;
-      std::string function() const;
-      std::string level() const;
+      std::string file() const { return _file; }
+      std::string line() const { return std::to_string(_line); }
+      std::string function() const { return _function; }
+      std::string level() const { return _level.text; }
 
       std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
-      std::string microseconds() const;
-      std::string message() const;
-      std::string expression() const;
+      std::string microseconds() const { return std::to_string(_microseconds); }
+      std::string message() const {  return _stream.str(); }
+      std::string expression() const { return _expression; }
+      bool wasFatal() const { return internal::wasFatal(_level); }
 
-      bool wasFatal() const;
-
-      // convert all content to ONE string
       std::string toString() const;
 
 
-      std::ostringstream& stream();
-      void setExpression(const std::string expression);
+      std::ostringstream& stream() { return _stream; }
+      void setExpression(const std::string expression) { _expression = expression; } 
       
       LogMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level);
       explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
-      
-      LogMessage(const LogMessage&);
-      //LogMessage(LogMessage&&);
-      
+     
+      LogMessage(const LogMessage&);      
       ~LogMessage() = default;
       
    protected:

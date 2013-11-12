@@ -35,95 +35,91 @@ namespace {
 
 namespace g2 {
 
-   std::string LogMessage::line() const {
-      return std::to_string(_line);
-   }
+//   std::string LogMessage::toString() const {
+//      std::ostringstream oss;
+//      oss << "\n" << timestamp() << "." << microseconds() << "\t";
+//      oss << level() << " [" << file();
+//      oss << " L: " << line() << "]\t";
+//
+//      // Non-fatal Log Message
+//      if (false == wasFatal()) {
+//         oss << '"' << message() << '"';
+//         return oss.str();
+//      }
+//
+//      if (internal::FATAL_SIGNAL.value == _level.value) {
+//         oss.str(""); // clear any previous text and formatting
+//         oss << "\n" << timestamp() << "." << microseconds();
+//         oss << "\n\n***** FATAL SIGNAL RECEIVED ******* " << std::endl;
+//         oss << '"' << message() << '"';
+//         return oss.str();
+//      }
+//
+//      // Not crash scenario but LOG or CONTRACT
+//      auto level_value = _level.value;
+//      if (FATAL.value == level_value) {
+//         oss << "\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t";
+//         oss << '"' << message() << '"';
+//         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump();
+//      } else if (internal::CONTRACT.value == level_value) {
+//         oss << "\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(" << _expression << ")\n\t";
+//         oss << '"' << message() << '"';
+//         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump() << '"';
+//      } else {
+//         oss << "\n\t*******\tUNKNOWN Log Message Type\n" << '"' << message() << '"';
+//      }
+//
+//      return oss.str();
+//   }
 
-   std::string LogMessage::file() const {
-      return _file;
-   }
-
-   std::string LogMessage::function() const {
-      return _function;
-   }
-
-   std::string LogMessage::level() const {
-      return _level.text;
-   }
-
-   std::string LogMessage::timestamp(const std::string & time_look) const {
+     std::string LogMessage::timestamp(const std::string & time_look) const {
       std::ostringstream oss;
       oss << localtime_formatted(_timestamp, time_look);
       return oss.str();
    }
 
-   std::string LogMessage::microseconds() const {
-      return std::to_string(_microseconds);
-   }
 
-   std::string LogMessage::message() const {
-      return _stream.str();
-   }
-
-   std::string LogMessage::expression() const {
-      return _expression;
-   }
-
-   bool LogMessage::wasFatal() const {
-      return internal::wasFatal(_level);
-   }
 
    std::string LogMessage::toString() const {
-      std::ostringstream oss;
-      oss << "\n" << timestamp() << "." << microseconds() << "\t";
-
-
-      oss << level() << " [" << file();
-      oss << " L: " << line() << "]\t";
-
+      std::string out;
+      out.append("\n").append(timestamp()).append(".")
+      .append(microseconds()).append("\t")
+      .append(level()).append(" [").append(file())
+      .append(" L: ").append(line()).append("]\t");
+      
       // Non-fatal Log Message
       if (false == wasFatal()) {
-         oss << '"' << message() << '"';
-         return oss.str();
+         out.append("\"").append(message()).append("\"");
+         return out;
       }
 
       if (internal::FATAL_SIGNAL.value == _level.value) {
-         oss.str(""); // clear any previous text and formatting
-         oss << "\n" << timestamp() << "." << microseconds();
-         oss << "\n\n***** FATAL SIGNAL RECEIVED ******* " << std::endl;
-         oss << '"' << message() << '"';
-         return oss.str();
+         out = {"\n"};
+         out.append(timestamp()).append(".").append(microseconds())
+         .append("\n\n***** FATAL SIGNAL RECEIVED ******* \n""\"").append(message()).append("\"");
+         return out;
       }
-
 
       // Not crash scenario but LOG or CONTRACT
       auto level_value = _level.value;
       if (FATAL.value == level_value) {
-         oss << "\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t";
-         oss << '"' << message() << '"';
-         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump();
+         out.append("\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t")
+         .append("\"").append(message()).append("\"")
+         .append("\n*******\tSTACKDUMP *******\n")
+         .append(internal::stackdump());
       } else if (internal::CONTRACT.value == level_value) {
-         oss << "\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(" << _expression << ")\n\t";
-         oss << '"' << message() << '"';
-         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump() << '"';
+         out.append("\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(").append(_expression)
+         .append(")\n\t").append("\"").append(message()).append("\"")
+         .append("\n*******\tSTACKDUMP *******\n").append(internal::stackdump()).append("\"");
       } else {
-         oss << "\n\t*******\tUNKNOWN Log Message Type\n" << '"' << message() << '"';
+         out.append("\n\t*******\tUNKNOWN Log Message Type\n").append("\"").append(message()).append("\"");
       }
 
-      return oss.str();
-   }
-
-
-   // is strictly not speaking const
- void LogMessage::setExpression(const std::string expression) {
-    _expression = expression;
- }
+      return out;
+   } 
+   
  
-   std::ostringstream& LogMessage::stream(){
-      return _stream;
-   }
-
-    LogMessage::LogMessage(const std::string &file, const int line,
+     LogMessage::LogMessage(const std::string &file, const int line,
            const std::string& function, const LEVELS& level)
    : _timestamp(g2::systemtime_now())
    , _microseconds(microsecondsCounter())
