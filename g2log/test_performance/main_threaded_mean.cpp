@@ -7,6 +7,7 @@
 // through CMakeLists.txt   #define of GOOGLE_GLOG_PERFORMANCE and G2LOG_PERFORMANCE
 #include "performance.h"
 #include <thread>
+#include <iostream>
 
 #if defined(G2LOG_PERFORMANCE)
 const std::string title = "G2LOG";
@@ -25,6 +26,12 @@ using namespace g2_test;
 
 int main(int argc, char** argv)
 {
+#ifdef G2_DYNAMIC_LOGGING
+   std::cerr << "G2_DYNAMIC_LOGGING is enabled" << std::endl;
+#else 
+   std::cerr << "G2_DYNAMIC_LOGGING is DISABLED" << std::endl;
+#endif
+   
   size_t number_of_threads =0;
   if(argc == 2)
   {
