@@ -26,7 +26,7 @@
 
 #include <future>
 #include "active.hpp"
-#include "g2pretendtobecopyable.hpp"
+#include "g2moveoncopy.hpp"
 
 namespace g2 {
 // Generic helper function to avoid repeating the steps for managing
@@ -47,7 +47,7 @@ std::future<typename std::result_of<Func()>::type> spawn_task(Func func, BgWorke
   task_type task(std::move(func));
 
   std::future<result_type> result = task.get_future();
-  worker->send(PretendToBeCopyable<task_type>(std::move(task))); 
+  worker->send(MoveOnCopy<task_type>(std::move(task))); 
   return std::move(result);
 }
 } // end namespace g2

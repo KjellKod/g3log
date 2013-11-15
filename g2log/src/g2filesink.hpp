@@ -20,7 +20,7 @@ public:
    FileSink(const std::string& log_prefix, const std::string& log_directory);
    virtual ~FileSink();
 
-   void fileWrite(LogMessage message);
+   void fileWrite(std::shared_ptr<LogMessage> message);
    std::string changeLogFile(const std::string& directory);
    std::string fileName();
 

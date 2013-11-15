@@ -95,7 +95,7 @@ int main(int argc, char** argv)
   auto application_time_us = std::chrono::duration_cast<microsecond>(application_end_time - start_time).count();
   auto total_time_us = std::chrono::duration_cast<microsecond>(worker_end_time - start_time).count();
 
-  oss << "\n" << g_iterations << " log entries took: [" << total_time_us / 1000000 << " s] to write to disk"<< std::endl;
+  oss << "\n" << number_of_threads << "*" << g_iterations << " log entries took: [" << total_time_us / 1000000 << " s] to write to disk"<< std::endl;
   oss << "[Application(" << number_of_threads << "):\t\t:" << application_time_us/1000 << " ms]" << std::endl;
   oss << "[Background thread to finish\t:" << total_time_us/1000 << " ms]" << std::endl;
   oss << "\nAverage time per log entry:" << std::endl;

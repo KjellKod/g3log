@@ -35,14 +35,14 @@ struct LogWorkerImpl {
    }
 
    void bgSave(g2::LogMessagePtr msgPtr) {
-      LogMessage* msg = msgPtr.get().get();
+      std::shared_ptr<LogMessage> msg(msgPtr.get().release());
       if (msg == nullptr) {
          std::cerr << "ERROR NULLPTR" << std::endl;
          return;
          
       }
-      for (auto& sink : _sinks) {
-         sink->send(*msg);
+      for (auto& sink : _sinks) { 
+         sink->send(msg);
       }
 
       if (_sinks.empty()) {
@@ -53,12 +53,13 @@ struct LogWorkerImpl {
    }
 
    void bgFatal(FatalMessagePtr msgPtr) {
-      LogMessage message = msgPtr.get()->copyToLogMessage();
-      message.stream() << "\nExiting after fatal event  (" << message.level()
-              << "). Exiting with signal: " << msgPtr.get()->signal()
+      std::string signal = msgPtr.get()->signal();
+      std::shared_ptr<LogMessage> message(msgPtr.release()); // = msgPtr.get()->copyToLogMessage();
+      message->stream() << "\nExiting after fatal event  (" << message->level()
+              << "). Exiting with signal: " << signal
               << "\nLog content flushed flushed sucessfully to sink\n\n";
       
-      std::cerr << message.message() << std::flush;
+      std::cerr << message->message() << std::flush;
       for (auto& sink : _sinks) {
          sink->send(message);
       }

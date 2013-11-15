@@ -18,7 +18,7 @@
 
 #include "g2loglevels.hpp"
 #include "g2time.hpp"
-#include "g2pretendtobecopyable.hpp"
+#include "g2moveoncopy.hpp"
 #include <memory>
 
 namespace g2 {
@@ -30,32 +30,37 @@ namespace g2 {
 
       std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
       std::string microseconds() const { return std::to_string(_microseconds); }
-      std::string message() const {  return _stream.str(); }
+      std::string message() const {  return stream().str(); }
       std::string expression() const { return _expression; }
       bool wasFatal() const { return internal::wasFatal(_level); }
 
       std::string toString() const;
 
-
-      std::ostringstream& stream() { return _stream; }
+      
+      std::ostringstream& stream() const { return *(_stream.get()); }
       void setExpression(const std::string expression) { _expression = expression; } 
       
       LogMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level);
       explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
-     
+ 
       LogMessage(const LogMessage&);      
-      ~LogMessage() = default;
+      LogMessage(LogMessage&& other);
+      //LogMessage& operator=(const LogMessage& other);
+      //LogMessage& operator=(LogMessage&& other);
+      virtual ~LogMessage() = default;
       
+      
+   
+  
    protected:
-      const std::time_t _timestamp;
-      const long _microseconds;
-      const std::string _file;
-      const int _line;
-      const std::string _function;
-      const LEVELS _level;
-
+      std::time_t _timestamp;
+      long _microseconds;
+      std::string _file;
+      int _line;
+      std::string _function;
+      LEVELS _level;
       std::string _expression; // only with content for CHECK(...) calls
-      mutable std::ostringstream _stream;
+      std::unique_ptr<std::ostringstream> _stream;
    };
    
    
@@ -76,6 +81,6 @@ namespace g2 {
    };
    
    
-   typedef PretendToBeCopyable<std::unique_ptr<FatalMessage>> FatalMessagePtr;
-   typedef PretendToBeCopyable<std::unique_ptr<LogMessage>> LogMessagePtr;
+   typedef MoveOnCopy<std::unique_ptr<FatalMessage>> FatalMessagePtr;
+   typedef MoveOnCopy<std::unique_ptr<LogMessage>> LogMessagePtr;
 } // g2

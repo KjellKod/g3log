@@ -1,5 +1,5 @@
 /* 
- * File:   pretendtobecopyable.hpp
+ * File:   g2moveoncopy.hpp
  * Author: kjell
  *
  * Created on November 11, 2013, 11:33 PM
@@ -14,19 +14,19 @@ namespace g2 {
    //  to be wrapped and their internals "moved" when tried to be copied.
 
    template<typename Moveable>
-   struct PretendToBeCopyable {
+   struct MoveOnCopy {
       mutable Moveable _move_only;
 
-      explicit PretendToBeCopyable(Moveable&& m) : _move_only(std::move(m)) {}
-      PretendToBeCopyable(PretendToBeCopyable const& t) : _move_only(std::move(t._move_only)) {}
-      PretendToBeCopyable(PretendToBeCopyable&& t) : _move_only(std::move(t._move_only)) {}
+      explicit MoveOnCopy(Moveable&& m) : _move_only(std::move(m)) {}
+      MoveOnCopy(MoveOnCopy const& t) : _move_only(std::move(t._move_only)) {}
+      MoveOnCopy(MoveOnCopy&& t) : _move_only(std::move(t._move_only)) {}
 
-      PretendToBeCopyable& operator=(PretendToBeCopyable const& other) {
+      MoveOnCopy& operator=(MoveOnCopy const& other) {
          _move_only = std::move(other._move_only);
          return *this;
       }
 
-      PretendToBeCopyable& operator=(PretendToBeCopyable&& other) {
+      MoveOnCopy& operator=(MoveOnCopy&& other) {
          _move_only = std::move(other._move_only);
          return *this;
       }

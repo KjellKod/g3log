@@ -12,6 +12,7 @@
 #include "g2logmessage.hpp"
 #include "crashhandler.hpp"
 #include "g2time.hpp"
+#include "std2_make_unique.hpp"
 #include <mutex>
 
 namespace {
@@ -73,9 +74,7 @@ namespace g2 {
 //   }
 
      std::string LogMessage::timestamp(const std::string & time_look) const {
-      std::ostringstream oss;
-      oss << localtime_formatted(_timestamp, time_look);
-      return oss.str();
+        return  localtime_formatted(_timestamp, time_look);
    }
 
 
@@ -117,18 +116,17 @@ namespace g2 {
 
       return out;
    } 
-   
- 
-     LogMessage::LogMessage(const std::string &file, const int line,
+   LogMessage::LogMessage(const std::string &file, const int line,
            const std::string& function, const LEVELS& level)
    : _timestamp(g2::systemtime_now())
    , _microseconds(microsecondsCounter())
-   , _file(splitFileName(file)), _line(line), _function(function), _level(level) { }
+   , _file(splitFileName(file)), _line(line), _function(function), _level(level)
+   , _stream(std2::make_unique<std::ostringstream>()){}
 
 
-    LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
+   LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
    : LogMessage({""}, 0, {""}, internal::FATAL_SIGNAL) {
-      _stream << fatalOsSignalCrashMessage;
+     stream() << fatalOsSignalCrashMessage;
    }
    
    LogMessage::LogMessage(const LogMessage& other) 
@@ -140,21 +138,47 @@ namespace g2 {
    , _level(other._level)
    , _expression(other._expression)
    {
-    _stream << other._stream.str();
+    stream().str(other.stream().str());
    }
+
+  
+   LogMessage::LogMessage(LogMessage&& other)
+   : _timestamp(other._timestamp)
+   , _microseconds(other._microseconds)
+   , _file(std::move(other._file))
+   , _line(other._line)
+   , _function(std::move(other._function))
+   , _level(other._level)
+   , _expression(std::move(other._expression))
+   , _stream(std::move(other._stream)) {
+   }
+
+
+//   LogMessage& LogMessage::operator=(const LogMessage& other) {
+//      _timestamp = other._timestamp;
+//      _microseconds = other._microseconds;
+//      _file = other._file;
+//      _line=other._line;
+//      _function=other._function;
+//      _level.value = other._level.value;
+//      _level.text = other._level.text;
+//      _expression= other._expression;
+//      stream().str(other.stream().str());
+//   }
+  
    
-//   LogMessage::LogMessage(LogMessage&& msg) 
-//   : _timestamp(other._timestamp)
-//   , _microseconds(other._microseconds)
-//   , _file(std::move(other._file))
-//   , _line(other._line)
-//   , _function(std::move(other._function))
-//   , _level(other._level)
-//   , _expression(other._expression)
-//   , _stream(std::move(other._stream))
-//   {
+//   LogMessage& LogMessage::operator=(LogMessage&& other) {
+//      _timestamp = other._timestamp;
+//      _microseconds = other._microseconds;
+//      _file = std::move(other._file);
+//      _line = other._line;
+//      _function = std::move(other._function);
+//      _level = other._level;
+//      _expression = std::move(other._expression);
+//      std::move(_stream, other._stream);
 //   }
 
+      
      
       
 
