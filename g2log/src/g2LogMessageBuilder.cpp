@@ -27,6 +27,7 @@ namespace g2 {
    }
 
    LogMessageBuilder::~LogMessageBuilder() {
+      _message.get()->write().append(stream().str());
       if (_message.get()->wasFatal()) {
          FatalMessageBuilder trigger(_message, SIGABRT);
          return; // FatalMessageBuilder will send to worker at scope exit 
@@ -41,7 +42,7 @@ namespace g2 {
    }
 
    std::ostringstream& LogMessageBuilder::stream() {
-      return _message.get()->stream();
+      return _stream;
    }
 
    void LogMessageBuilder::messageSave(const char *printf_like_message, ...) {
@@ -72,7 +73,6 @@ namespace g2 {
 
    
   FatalMessageBuilder:: FatalMessageBuilder(LogMessagePtr details, int signal_id)
-  //: _fatal_message(details), _fatal_signal(signal_id) 
      : _fatal_message(std2::make_unique<FatalMessage>(*(details._move_only.get()), signal_id)) 
   {}
      

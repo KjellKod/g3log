@@ -42,9 +42,9 @@ FileSink::~FileSink() {
    exit_msg.append({"\nLog file at: ["}).append(_log_file_with_path).append({"]\n\n"});
    std::cerr << exit_msg << std::flush;
 }
-void FileSink::fileWrite(std::shared_ptr<LogMessage> message) {
+void FileSink::fileWrite(LogMessageMover message) {
    std::ofstream& out(filestream());
-   out << message->toString() << std::flush;
+   out << message.get().toString() << std::flush;
 }
 
 std::string FileSink::changeLogFile(const std::string& directory) {

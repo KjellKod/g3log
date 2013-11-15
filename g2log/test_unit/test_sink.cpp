@@ -23,7 +23,7 @@ using namespace g2;
       EXPECT_TRUE(0 == count->load());
       //worker->save("this message should trigger an atomic increment at the sink");
       LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
-      message.get()->stream() << "this message should trigger an atomic increment at the sink";
+      message.get()->write().append("this message should trigger an atomic increment at the sink");
       worker->save(message);
    }
    EXPECT_TRUE(flag->load());
@@ -61,15 +61,13 @@ TEST(ConceptSink, OneHundredSinks) {
       LOG(DEBUG) << "start message";
       LogMessagePtr message1{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       LogMessagePtr message2{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
-      auto& stream1 = message1.get()->stream();
-      stream1 << "Hello to 100 receivers :)";
+      auto& write1 = message1.get()->write();
+      write1.append("Hello to 100 receivers :)");
       worker->save(message1);
       
-      auto& stream2 = message2.get()->stream();
-      stream2 << "Hello to 100 receivers :)";
+      auto& write2 = message2.get()->write();
+      write2.append("Hello to 100 receivers :)");
       worker->save(message2);
-      //worker->save("Hello to 100 receivers :)");
-      //worker->save("Hello to 100 receivers :)");
       LOG(INFO) << "end message";
    }
    // at the curly brace above the ScopedLogger will go out of scope and all the 

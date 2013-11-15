@@ -18,7 +18,7 @@
 
 namespace g2 {
 namespace internal {
-typedef std::function<void(std::shared_ptr<LogMessage>) > AsyncMessageCall;
+typedef std::function<void(LogMessageMover) > AsyncMessageCall;
 
 /// The asynchronous Sink has an active object, incoming requests for actions
 //  will be processed in the background by the specific object the Sink represents. 
@@ -51,14 +51,14 @@ struct Sink : public SinkWrapper {
    _real_sink {sink},
    _bg(kjellkod::Active::createActive()) {
       auto adapter = std::bind(Call, _real_sink.get(), std::placeholders::_1);
-      _default_log_call = [ = ](std::shared_ptr<LogMessage> m){adapter(m->toString());};
+      _default_log_call = [ = ](LogMessageMover m){adapter(m.get().toString());};
    }
 
    virtual ~Sink() {
       _bg.reset(); // TODO: to remove
    }
 
-   void send(std::shared_ptr<LogMessage> msg) override {
+   void send(LogMessageMover msg) override {
       _bg->send([this, msg] {
          _default_log_call(msg);
       });

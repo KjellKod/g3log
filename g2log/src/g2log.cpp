@@ -100,9 +100,10 @@ namespace g2 {
                g_first_unintialized_msg = incoming.release();
                std::string err = {"LOGGER NOT INITIALIZED:\n\t\t"};
                err.append(g_first_unintialized_msg->message());
-               auto& stream = g_first_unintialized_msg->stream();
-               stream.str(err);
-               std::cerr << stream.str() << std::endl;
+               std::string& str = g_first_unintialized_msg->write();
+               str.clear();
+               str.append(err);
+               std::cerr << str << std::endl;
             });
             return;
          }

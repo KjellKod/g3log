@@ -79,7 +79,7 @@ namespace g2 {
 
 
 
-   std::string LogMessage::toString() const {
+   std::string LogMessage::toString()  {
       std::string out;
       out.append("\n").append(timestamp()).append(".")
       .append(microseconds()).append("\t")
@@ -121,12 +121,12 @@ namespace g2 {
    : _timestamp(g2::systemtime_now())
    , _microseconds(microsecondsCounter())
    , _file(splitFileName(file)), _line(line), _function(function), _level(level)
-   , _stream(std2::make_unique<std::ostringstream>()){}
+{}
 
 
    LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
    : LogMessage({""}, 0, {""}, internal::FATAL_SIGNAL) {
-     stream() << fatalOsSignalCrashMessage;
+      _message.append(fatalOsSignalCrashMessage);
    }
    
    LogMessage::LogMessage(const LogMessage& other) 
@@ -137,8 +137,8 @@ namespace g2 {
    , _function(other._function)
    , _level(other._level)
    , _expression(other._expression)
+   , _message(other._message)
    {
-    stream().str(other.stream().str());
    }
 
   
@@ -150,7 +150,7 @@ namespace g2 {
    , _function(std::move(other._function))
    , _level(other._level)
    , _expression(std::move(other._expression))
-   , _stream(std::move(other._stream)) {
+   , _message(std::move(other._message)) {
    }
 
 
@@ -176,10 +176,11 @@ namespace g2 {
 //      _level = other._level;
 //      _expression = std::move(other._expression);
 //      std::move(_stream, other._stream);
+//      return *this;
 //   }
-
-      
-     
+//
+//      
+//     
       
 
    FatalMessage::FatalMessage(const LogMessage& details, int signal_id) 

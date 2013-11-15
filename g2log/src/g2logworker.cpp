@@ -34,38 +34,38 @@ struct LogWorkerImpl {
       _bg.reset();
    }
 
-   void bgSave(g2::LogMessagePtr msgPtr) {
-      std::shared_ptr<LogMessage> msg(msgPtr.get().release());
-      if (msg == nullptr) {
-         std::cerr << "ERROR NULLPTR" << std::endl;
-         return;
-         
-      }
+   void bgSave(g2::LogMessagePtr msgPtr) {     
+      std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
+      
       for (auto& sink : _sinks) { 
-         sink->send(msg);
+         LogMessage msg(*(uniqueMsg));
+         sink->send(LogMessageMover(std::move(msg)));
       }
 
       if (_sinks.empty()) {
          std::string err_msg{"g2logworker has no sinks. Message: ["};
-         err_msg.append(msg->toString()).append({"]\n"});
+         err_msg.append(uniqueMsg.get()->toString()).append({"]\n"});
          std::cerr << err_msg;
       }
    }
 
    void bgFatal(FatalMessagePtr msgPtr) {
       std::string signal = msgPtr.get()->signal();
-      std::shared_ptr<LogMessage> message(msgPtr.release()); // = msgPtr.get()->copyToLogMessage();
-      message->stream() << "\nExiting after fatal event  (" << message->level()
-              << "). Exiting with signal: " << signal
-              << "\nLog content flushed flushed sucessfully to sink\n\n";
+      auto fatal_signal_id = msgPtr.get()->_signal_id;
+
+      std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
+      uniqueMsg->write().append("\nExiting after fatal event  (").append(uniqueMsg->level());
+      uniqueMsg->write().append("). Exiting with signal: ").append(signal)
+              .append("\nLog content flushed flushed sucessfully to sink\n\n");
       
-      std::cerr << message->message() << std::flush;
+      std::cerr << uniqueMsg->message() << std::flush;
       for (auto& sink : _sinks) {
-         sink->send(message);
+         LogMessage msg(*(uniqueMsg));
+         sink->send(LogMessageMover(std::move(msg)));
       }
       _sinks.clear(); // flush all queues
 
-      internal::exitWithDefaultSignalHandler(msgPtr.get()->_signal_id);
+      internal::exitWithDefaultSignalHandler(fatal_signal_id);
       // should never reach this point
       perror("g2log exited after receiving FATAL trigger. Flush message status: ");
    }

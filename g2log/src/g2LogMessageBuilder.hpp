@@ -44,5 +44,6 @@ namespace g2 {
 
    private:
       LogMessagePtr _message;
+      std::ostringstream _stream;
    };
 } // g2

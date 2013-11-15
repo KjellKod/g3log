@@ -30,15 +30,16 @@ namespace g2 {
 
       std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
       std::string microseconds() const { return std::to_string(_microseconds); }
-      std::string message() const {  return stream().str(); }
-      std::string expression() const { return _expression; }
-      bool wasFatal() const { return internal::wasFatal(_level); }
-
-      std::string toString() const;
-
       
-      std::ostringstream& stream() const { return *(_stream.get()); }
+      std::string message() const  {  return _message; }
+      std::string& write() const {  return _message; }
+      
+      std::string expression()  { return _expression; }
+      bool wasFatal()  { return internal::wasFatal(_level); }
+
+      std::string toString();
       void setExpression(const std::string expression) { _expression = expression; } 
+      
       
       LogMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level);
       explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
@@ -60,7 +61,8 @@ namespace g2 {
       std::string _function;
       LEVELS _level;
       std::string _expression; // only with content for CHECK(...) calls
-      std::unique_ptr<std::ostringstream> _stream;
+      //std::unique_ptr<std::ostringstream> _stream;
+      mutable std::string _message;
    };
    
    
@@ -83,4 +85,5 @@ namespace g2 {
    
    typedef MoveOnCopy<std::unique_ptr<FatalMessage>> FatalMessagePtr;
    typedef MoveOnCopy<std::unique_ptr<LogMessage>> LogMessagePtr;
+   typedef MoveOnCopy<LogMessage> LogMessageMover;
 } // g2
