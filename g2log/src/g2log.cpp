@@ -62,6 +62,14 @@ namespace g2 {
 #endif
       CHECK(!internal::isLoggingInitialized());
       CHECK(bgworker != nullptr);
+      
+       // Save the first uninitialized message, if any     
+      std::call_once(g_save_first_unintialized_flag, [&bgworker] {
+         if (g_first_unintialized_msg) {
+            bgworker->save(LogMessagePtr{std::move(g_first_unintialized_msg)});
+         }   
+      });
+         
       g_logger_instance = bgworker;
    }
 
@@ -102,20 +110,13 @@ namespace g2 {
                err.append(g_first_unintialized_msg->message());
                std::string& str = g_first_unintialized_msg->write();
                str.clear();
-               str.append(err);
+               str.append(err); // replace content
                std::cerr << str << std::endl;
             });
             return;
          }
 
          // logger is initialized
-         // Save the first uninitialized message, if any     
-         std::call_once(g_save_first_unintialized_flag, [] {
-            if (g_first_unintialized_msg) {
-               g_logger_instance->save(LogMessagePtr{std::move(g_first_unintialized_msg)});
-            }
-         });
-
          g_logger_instance->save(incoming);
       }
 

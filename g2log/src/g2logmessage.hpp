@@ -34,10 +34,10 @@ namespace g2 {
       std::string message() const  {  return _message; }
       std::string& write() const {  return _message; }
       
-      std::string expression()  { return _expression; }
-      bool wasFatal()  { return internal::wasFatal(_level); }
+      std::string expression() const  { return _expression; }
+      bool wasFatal() const { return internal::wasFatal(_level); }
 
-      std::string toString();
+      std::string toString() const;
       void setExpression(const std::string expression) { _expression = expression; } 
       
       
@@ -46,8 +46,6 @@ namespace g2 {
  
       LogMessage(const LogMessage&);      
       LogMessage(LogMessage&& other);
-      //LogMessage& operator=(const LogMessage& other);
-      //LogMessage& operator=(LogMessage&& other);
       virtual ~LogMessage() = default;
       
       
