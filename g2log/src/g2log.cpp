@@ -131,7 +131,7 @@ namespace g2 {
             error << "FATAL CALL but logger is NOT initialized\n"
                     << "SIGNAL: " << message.get()->signal()
                     << "\nMessage: \n" << message.get()->toString() << std::flush;
-            std::cerr << error << std::flush;
+            std::cerr << error.str() << std::flush;
             internal::exitWithDefaultSignalHandler(message.get()->_signal_id);
          }
 

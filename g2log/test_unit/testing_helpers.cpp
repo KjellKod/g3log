@@ -13,7 +13,7 @@ using namespace g2;
 
 namespace testing_helpers {
 
-   std::string g_mockFatal_message = {};
+   std::string g_mockFatal_message{};
    int g_mockFatal_signal = -1;
    bool g_mockFatalWasCalled = false;
 
@@ -43,7 +43,7 @@ namespace testing_helpers {
 
 
    void clearMockFatal() {
-      g_mockFatal_message = {};
+      g_mockFatal_message.clear();
       g_mockFatal_signal = -1;
       g_mockFatalWasCalled = false;
    }
