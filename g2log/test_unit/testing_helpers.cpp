@@ -128,6 +128,20 @@ namespace testing_helpers {
    }
 
 
+   std::string RestoreFileLogger::logFile() {
+     if (_scope) {
+       // beware for race condition
+       // example: 
+       //         LOG(INFO) << ... 
+       //     auto file =    logger.logFile()
+       //     auto content = ReadContentFromFile(file)
+       // ... it is not guaranteed that the content will contain (yet) the LOG(INFO)
+       std::future<std::string> filename = _handle->call(&g2::FileSink::fileName);
+       _log_file = filename.get();
+     }
+     return _log_file;  
+  }
+  
    // Beware of race between LOG(...) and this function. 
    // since LOG(...) passes two queues but the handle::call only passes one queue 
    // the handle::call can happen faster

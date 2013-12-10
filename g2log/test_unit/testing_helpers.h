@@ -99,7 +99,7 @@ struct RestoreFileLogger {
     return func();
   }
   
-  std::string logFile() { return _log_file;  }
+  std::string logFile();
   std::string resetAndRetrieveContent();
   
 

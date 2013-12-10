@@ -10,8 +10,8 @@
 * ********************************************* */
 
 #include "g2loglevels.hpp"
+#include "g2log.hpp"
 #include <atomic>
-
 
 namespace g2
 {
@@ -20,7 +20,8 @@ namespace g2
         return level.value > WARNING.value; 
      }
 
-    std::atomic<bool> g_log_level_status[4]; // DEBUG, INFO, WARNING, FATAL
+    // By default all are OFF. At instantiation they are turned on. DEBUG, INFO, WARNING, FATAL
+    std::atomic<bool> g_log_level_status[4];    
   } // internal
 
 
@@ -33,7 +34,7 @@ namespace g2
   }
 #endif
 
-
+  
   bool logLevel(LEVELS log_level)
   {
 #ifdef G2_DYNAMIC_LOGGING

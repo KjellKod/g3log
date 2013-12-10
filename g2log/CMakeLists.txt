@@ -107,17 +107,31 @@ ENDIF(MSVC)
    endif(MSVC)
 
    set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
-
+ 
    # Create the g2log library
    include_directories(${LOG_SRC})
-   MESSAGE("  g2logger files: [${SRC_FILES}]")
-   add_library(lib_g2logger  ${SRC_FILES})
-   set_target_properties(lib_g2logger PROPERTIES LINKER_LANGUAGE CXX)
+   MESSAGE("  g3logger files: [${SRC_FILES}]")
+   add_library(lib_g3logger  ${SRC_FILES})
+   set_target_properties(lib_g3logger PROPERTIES LINKER_LANGUAGE CXX)
 
 
 
    # ============================================================================
-   # OPTIONS: Turn OFF the ones that is of no interest to you
+   # G2LOG OPTIONS: Turn OFF the ones that is of no interest to you
+   # ============================================================================
+   option (USE_DYNAMIC_LOGGING_LEVELS
+          "Turn ON/OFF log levels. An disabled level will not push logs of that level to the sink. By default dynamic logging is disabled" OFF)
+
+   # Do 'cmake -DUSE_DYNAMIC_LOGGING_LEVELS=ON' to enable this 
+   #            (or change the default option above)
+   if(USE_DYNAMIC_LOGGING_LEVELS)
+     add_definitions(-DG2_DYNAMIC_LOGGING)
+     MESSAGE ("\nUSE_DYNAMIC_LOGGING_LEVELS is turned on"\n\t"Use g2::setLogLevel(LEVEL boolean) to enable/disable logging on specified levels.\n\tAll levels are by default turn ON\n\n")
+   endif(USE_DYNAMIC_LOGGING_LEVELS)
+
+
+   # ============================================================================
+   # TEST OPTIONS: Turn OFF the ones that is of no interest to you
    # ---- by default all is OFF: except 'g2log-FATAL-example -----
    # ---- the reason for this is that
    # ----- 1) the performance tests were only thoroughly tested on Ubuntu, not windows-
@@ -126,6 +140,7 @@ ENDIF(MSVC)
    #       2) The unit test were tested windows/linux,. but must be unzipped
    #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
    # ============================================================================
+
    # 1. a simple test example 'g2log-FATAL-example'
    option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash) example " ON)
 
@@ -155,7 +170,7 @@ ENDIF(MSVC)
       MESSAGE(" g2log-FATAL-example option ON")
       include_directories (${DIR_EXAMPLE})
       add_executable(g2log-FATAL-example ${DIR_EXAMPLE}/main.cpp)
-      target_link_libraries(g2log-FATAL-example lib_g2logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-FATAL-example lib_g3logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_SIMPLE_EXAMPLE)
 
 
@@ -170,13 +185,13 @@ ENDIF(MSVC)
                     ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
       # Turn on G2LOG performance flag
       set_target_properties(g2log-performance-threaded_mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-      target_link_libraries(g2log-performance-threaded_mean lib_g2logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-performance-threaded_mean lib_g3logger ${PLATFORM_LINK_LIBRIES})
 
      # WORST CASE PERFORMANCE TEST
      add_executable(g2log-performance-threaded_worst ${DIR_PERFORMANCE}/main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
      # Turn on G2LOG performance flag
      set_target_properties(g2log-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-     target_link_libraries(g2log-performance-threaded_worst  lib_g2logger ${PLATFORM_LINK_LIBRIES})
+     target_link_libraries(g2log-performance-threaded_worst  lib_g3logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_G2LOG_PERFORMANCE)
 
 
@@ -244,13 +259,13 @@ ENDIF(MSVC)
 
          set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
          set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-         target_link_libraries(${test} lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+         target_link_libraries(${test} lib_g3logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
       ENDFOREACH(test)
 
       #add_executable(test_ALL  ${all_tests} ${DIR_UNIT_TEST}/test_filechange.cpp ${helper})  
       #set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
       #set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-      #target_link_libraries(test_ALL   lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+      #target_link_libraries(test_ALL   lib_g3logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
 
 
 
@@ -262,7 +277,7 @@ ENDIF(MSVC)
 #
 #      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
 #      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-#     target_link_libraries(${test_ALL}   lib_g2logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+#     target_link_libraries(${test_ALL}   lib_g3logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
 
 endif (USE_G2LOG_UNIT_TEST)
 

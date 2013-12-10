@@ -8,6 +8,7 @@
 #include "g2log.hpp"
 #include "g2logworker.hpp"
 #include "testing_helpers.h"
+#include "g2loglevels.hpp"
 
 #include <memory>
 #include <string>
@@ -25,19 +26,37 @@ using namespace testing_helpers;
 
 
 /// THIS MUST BE THE FIRST UNIT TEST TO RUN! If any unit test run before this 
-/// one then it will fail
+/// one then it will fail. For dynamic levels all levels are turned on only AT
+/// instantiation so we do different test for dynamic logging levels
+
+#ifdef G2_DYNAMIC_LOGGING
 TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
-   {
-      // Temporarily enable all levels. then go out of scope again.
-      RestoreFileLogger logger(log_directory);
-      using namespace g2::internal;
-      EXPECT_TRUE(isLoggingInitialized());
-      EXPECT_TRUE(g2::logLevel(INFO));
-      EXPECT_TRUE(g2::logLevel(FATAL));
-      EXPECT_TRUE(g2::logLevel(DEBUG));
-      EXPECT_TRUE(g2::logLevel(WARNING));
+   EXPECT_FALSE(g2::internal::isLoggingInitialized());
+   EXPECT_FALSE(g2::logLevel(INFO));
+   EXPECT_FALSE(g2::logLevel(FATAL));
+   EXPECT_FALSE(g2::logLevel(DEBUG));
+   EXPECT_FALSE(g2::logLevel(WARNING));
+   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g2logger)";
+   std::string err_msg2_ignored = "This uninitialized message should be ignored";
+   try {
+      LOG(INFO) << err_msg1; // nothing happened. level not ON
+      LOG(INFO) << err_msg2_ignored; // nothing happened. level not ON
+
+   } catch (std::exception& e) {
+      ADD_FAILURE() << "Should never have thrown even if it is not instantiated";
    }
 
+   RestoreFileLogger logger(log_directory); // now instantiate the logger
+
+   std::string good_msg1 = "This message could have pulled in the uninitialized_call message";
+   LOG(INFO) << good_msg1;
+   auto content = logger.resetAndRetrieveContent(); // this synchronizes with the LOG(INFO) call if debug level would be ON.
+   ASSERT_FALSE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
+   ASSERT_FALSE(verifyContent(content, err_msg2_ignored)) << "Content: [" << content << "]";
+   ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";       
+}
+#else
+TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
    EXPECT_FALSE(g2::internal::isLoggingInitialized());
    EXPECT_TRUE(g2::logLevel(INFO));
    EXPECT_TRUE(g2::logLevel(FATAL));
@@ -62,9 +81,8 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
    ASSERT_FALSE(verifyContent(content, err_msg2_ignored)) << "Content: [" << content << "]";
    ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";
-
-   // debug this. it SHOULD crash since we havent fixed the code yet
-}
+ }
+#endif // #ifdef G2_DYNAMIC_LOGGING
 
 
 TEST(LOGTest, LOG) {
@@ -341,28 +359,36 @@ TEST(DynamicLogging, DynamicLogging_IS_ENABLED) {
    ASSERT_FALSE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 }
 TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
-   RestoreFileLogger logger(log_directory);
-   ASSERT_TRUE(g2::logLevel(DEBUG));
-   ASSERT_TRUE(g2::logLevel(INFO));
-   ASSERT_TRUE(g2::logLevel(WARNING));
-   ASSERT_TRUE(g2::logLevel(FATAL));
+   {
+      RestoreFileLogger logger(log_directory);   
+      ASSERT_TRUE(g2::logLevel(DEBUG));
+      ASSERT_TRUE(g2::logLevel(INFO));
+      ASSERT_TRUE(g2::logLevel(WARNING));
+      ASSERT_TRUE(g2::logLevel(FATAL));
+   }
 
    RestoreDynamicLoggingLevels raiiLevelRestore;
-
+   
    std::string msg_debugOn = "This %s SHOULD  appear in the %s";
    std::string msg_debugOff = "This message should never appear in the log";
    std::string msg_info1 = "This info msg log";
    try {
-      LOGF(DEBUG, msg_debugOn.c_str(), "msg", "log");
-      auto content = logger.contentSoFar();
-      ASSERT_TRUE(verifyContent(content, "This msg SHOULD  appear in the log")) << "Content: [" << content << "]";
+      {
+              RestoreFileLogger logger(log_directory);   
+              LOGF(DEBUG, msg_debugOn.c_str(), "msg", "log");
+              auto content = logger.resetAndRetrieveContent();
+              ASSERT_TRUE(verifyContent(content, "This msg SHOULD  appear in the log")) << "Content: [" << content << "]";
+      }
 
-      g2::setLogLevel(DEBUG, false);
-      EXPECT_FALSE(g2::logLevel(DEBUG));
-      LOG(DEBUG) << msg_debugOff;
-      content = logger.contentSoFar();
-      ASSERT_FALSE(verifyContent(content, "This message should never appear in the log")) << "Content: [" << content << "]";
-
+      {
+         RestoreFileLogger logger(log_directory);
+         g2::setLogLevel(DEBUG, false);
+         EXPECT_FALSE(g2::logLevel(DEBUG));
+         LOG(DEBUG) << msg_debugOff;
+         auto content = logger.resetAndRetrieveContent();
+         ASSERT_FALSE(verifyContent(content, "This message should never appear in the log")) << "Content: [" << content << "]";
+      }
+      
    } catch (std::exception const &e) {
       std::cerr << e.what() << std::endl;
       ADD_FAILURE() << "Should never have thrown";
