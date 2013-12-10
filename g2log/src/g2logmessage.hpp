@@ -46,7 +46,7 @@ namespace g2 {
  
       LogMessage(const LogMessage&);      
       LogMessage(LogMessage&& other);
-      virtual ~LogMessage() = default;
+      virtual ~LogMessage(){};
       
       
    
@@ -72,7 +72,7 @@ namespace g2 {
    struct FatalMessage : public LogMessage {
       FatalMessage(const LogMessage& details, int signal_id);
       FatalMessage(const FatalMessage&);
-      ~FatalMessage() = default;
+      virtual ~FatalMessage(){};
       
       LogMessage copyToLogMessage() const;
       std::string signal() const;
