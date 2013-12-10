@@ -122,7 +122,8 @@ int main(int argc, char** argv)
   for(size_t idx = 0; idx < number_of_threads; ++idx)
   {
     std::vector<long long>& t_result = threads_result[idx];
-    oss << "[Application t" << idx+1 << " worst took: " <<  (*std::max_element(t_result.begin(), t_result.end())) / 1000 << " ms]" << std::endl;
+    auto worstUs = (*std::max_element(t_result.begin(), t_result.end()));
+    oss << "[Application t" << idx+1 << " worst took: " <<  worstUs / 1000 << " ms  (" << worstUs << " us)] " << std::endl;
   }
   writeTextToFile(g_measurement_dump,oss.str(), kAppend);
   std::cout << "Result can be found at:" << g_measurement_dump << std::endl;
