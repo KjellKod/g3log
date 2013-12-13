@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <functional>
-#include <g2sink.h>
+#include "g2sink.h"
 
 namespace g2 {
    
