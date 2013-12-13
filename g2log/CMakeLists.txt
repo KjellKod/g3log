@@ -126,7 +126,7 @@ ENDIF(MSVC)
    #            (or change the default option above)
    if(USE_DYNAMIC_LOGGING_LEVELS)
      add_definitions(-DG2_DYNAMIC_LOGGING)
-     MESSAGE ("\nUSE_DYNAMIC_LOGGING_LEVELS is turned on"\n\t"Use g2::setLogLevel(LEVEL boolean) to enable/disable logging on specified levels.\n\tAll levels are by default turn ON\n\n")
+     MESSAGE ("\nUSE_DYNAMIC_LOGGING_LEVELS is turned on\n\tUse g2::setLogLevel(LEVEL boolean) to enable/disable logging on specified levels.\n\tAll levels are by default turn ON\n\n")
    endif(USE_DYNAMIC_LOGGING_LEVELS)
 
 
