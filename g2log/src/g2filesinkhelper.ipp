@@ -40,6 +40,7 @@ namespace g2 {
       prefix.erase(std::remove(prefix.begin(), prefix.end(), '/'), prefix.end());
       prefix.erase(std::remove(prefix.begin(), prefix.end(), '\\'), prefix.end());
       prefix.erase(std::remove(prefix.begin(), prefix.end(), '.'), prefix.end());
+      prefix.erase(std::remove(prefix.begin(), prefix.end(), ':'), prefix.end());
       if (!isValidFilename(prefix)) {
         return
         {
