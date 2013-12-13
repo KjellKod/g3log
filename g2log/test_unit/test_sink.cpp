@@ -50,7 +50,7 @@ TEST(ConceptSink, OneHundredSinks) {
    }
 
    {
-      RestoreFileLogger logger{"/tmp"};
+      RestoreFileLogger logger{"./"};
       g2::LogWorker* worker = logger._scope->get(); //g2LogWorker::createWithNoSink();
       size_t index = 0;
       for (auto& flag : flags) {
@@ -69,6 +69,8 @@ TEST(ConceptSink, OneHundredSinks) {
       write2.append("Hello to 100 receivers :)");
       worker->save(message2);
       LOG(INFO) << "end message";
+
+      logger.reset();
    }
    // at the curly brace above the ScopedLogger will go out of scope and all the 
    // 100 logging receivers will get their message to exit after all messages are

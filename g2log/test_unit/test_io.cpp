@@ -245,6 +245,7 @@ TEST(LogTest, LOG_IF__FATAL) {
 TEST(LogTest, LOG_IF__FATAL__NO_THROW) {
    RestoreFileLogger logger(log_directory);
    LOG_IF(FATAL, (2 > 3)) << "This message%sshould NOT throw";
+   logger.reset();
    ASSERT_FALSE(mockFatalWasCalled());
 }
 
@@ -304,6 +305,7 @@ TEST(CHECK, CHECK_ThatWontThrow) {
 
    CHECK(1 == 1);
    CHECK_F(1 == 1, msg.c_str(), "message", "log");
+   logger.reset();
    EXPECT_FALSE(mockFatalWasCalled());
 
    std::string file_content = readFileToText(logger.logFile());
