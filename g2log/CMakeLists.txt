@@ -75,8 +75,18 @@ IF(UNIX)
    # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
    set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
-   ENDIF(UNIX)
+ENDIF(UNIX)
 
+IF(MINGW)
+   MESSAGE("")
+   MESSAGE("cmake for MinGW ")
+   MESSAGE("if cmake finishes OK, do make")
+   MESSAGE("then run './g2log-FATAL-example' or whatever performance test you feel like trying")
+   MESSAGE("")
+   # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
+   set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
+   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
+ENDIF(MINGW)
  
 # Visual Studio 2011 -- std::thread etc are included with the Visual Studio package, so justthread dependencies are removed
 IF(MSVC)
@@ -100,11 +110,11 @@ ENDIF(MSVC)
 
    # GENERIC STEPS
    file(GLOB SRC_FILES ${LOG_SRC}/*.h ${LOG_SRC}/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
-   if(MSVC) 
+   if(MSVC OR MINGW) 
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
    else()     
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_win.cpp)
-   endif(MSVC)
+   endif(MSVC OR MINGW)
 
    set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
  
@@ -126,7 +136,7 @@ ENDIF(MSVC)
    #            (or change the default option above)
    if(USE_DYNAMIC_LOGGING_LEVELS)
      add_definitions(-DG2_DYNAMIC_LOGGING)
-     MESSAGE ("\nUSE_DYNAMIC_LOGGING_LEVELS is turned on"\n\t"Use g2::setLogLevel(LEVEL boolean) to enable/disable logging on specified levels.\n\tAll levels are by default turn ON\n\n")
+     MESSAGE ("\nUSE_DYNAMIC_LOGGING_LEVELS is turned on\n\tUse g2::setLogLevel(LEVEL boolean) to enable/disable logging on specified levels.\n\tAll levels are by default turn ON\n\n")
    endif(USE_DYNAMIC_LOGGING_LEVELS)
 
 

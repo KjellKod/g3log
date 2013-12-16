@@ -27,7 +27,7 @@ namespace g2 {
     // return value is SIMPLIFIED to only return a std::string
 
     std::string put_time(const struct tm* tmb, const char* c_time_format) {
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
       std::ostringstream oss;
       oss.fill('0');
       // BOGUS hack done for VS2012: C++11 non-conformant since it SHOULD take a "const struct tm*  "

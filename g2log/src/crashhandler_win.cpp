@@ -5,11 +5,13 @@
 * ============================================================================*/
 
 #include "crashhandler.hpp"
-#include "g2log.hpp"
+#include "g2logmessage.hpp"
+#include "g2LogMessageBuilder.hpp"
 
 #include <csignal>
 #include <cstring>
 #include <cstdlib>
+#include <sstream>
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "crashhandler_win.cpp used but not on a windows system"
 #endif
@@ -26,9 +28,10 @@ void crashHandler(int signal_number)
     fatal_stream << "\n\n***** FATAL TRIGGER RECEIVED ******* " << std::endl;
     fatal_stream << "\n***** RETHROWING SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;
 
-    FatalMessage fatal_message(fatal_stream.str(),FatalMessage::kReasonOS_FATAL_SIGNAL, signal_number);
-    FatalMessageBuilder trigger(fatal_message);  std::ostringstream oss;
-    std::cerr << fatal_message.message_ << std::endl << std::flush;
+    //FatalMessage fatal_message(fatal_stream.str(),FatalMessage::kReasonOS_FATAL_SIGNAL, signal_number);
+    g2::FatalMessageBuilder trigger(fatal_stream.str(), signal_number);
+    //std::ostringstream oss;
+    //std::cerr << fatal_message.message_ << std::endl << std::flush;
 } // scope exit - message sent to LogWorker, wait to die...
 } // end anonymous namespace
 
@@ -37,6 +40,12 @@ namespace g2
 {
 namespace internal
 {
+std::string stackdump()
+{
+  std::string temp;
+  return temp;
+}
+
 std::string signalName(int signal_number)
 {
   switch(signal_number)
