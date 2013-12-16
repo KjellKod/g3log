@@ -43,7 +43,7 @@ namespace testing_helpers {
 
 
    void clearMockFatal() {
-      g_mockFatal_message = {};
+      g_mockFatal_message.clear();
       g_mockFatal_signal = -1;
       g_mockFatalWasCalled = false;
    }
@@ -122,6 +122,7 @@ namespace testing_helpers {
 
    RestoreFileLogger::~RestoreFileLogger() {
       g2::internal::shutDownLogging();
+      reset();
 
       if (!removeFile(_log_file))
          ADD_FAILURE();
