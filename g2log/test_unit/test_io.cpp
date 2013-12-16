@@ -245,7 +245,6 @@ TEST(LogTest, LOG_IF__FATAL) {
 TEST(LogTest, LOG_IF__FATAL__NO_THROW) {
    RestoreFileLogger logger(log_directory);
    LOG_IF(FATAL, (2 > 3)) << "This message%sshould NOT throw";
-   logger.reset();
    ASSERT_FALSE(mockFatalWasCalled());
 }
 

@@ -1,9 +1,8 @@
-/* 
- * File:   g2moveoncopy.hpp
- * Author: kjell
- *
- * Created on November 11, 2013, 11:33 PM
- */
+/** ==========================================================================
+* 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
 
 #pragma once
 namespace g2 {

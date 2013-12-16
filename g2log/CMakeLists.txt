@@ -164,7 +164,7 @@ ENDIF(MSVC)
 
    # 4. unit test for g2log
    #    remember to unzip gtest at g2log/3rdParty/gtest
-   option (USE_G2LOG_UNIT_TEST "g2log unit tests" ON)
+   option (USE_G2LOG_UNIT_TEST "g2log unit tests" OFF)
 
 
 

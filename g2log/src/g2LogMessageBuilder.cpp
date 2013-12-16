@@ -1,11 +1,9 @@
-/* 
- * File:   MessageBuilder.cpp
- * Author: kjell
- * 
- * Created on October 26, 2013, 3:45 PM
- */
+/** ==========================================================================
+* 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
 
-//#include "g2log.hpp"
 #include "g2LogMessageBuilder.hpp"
 #include "g2logmessage.hpp"
 #include "g2log.hpp"

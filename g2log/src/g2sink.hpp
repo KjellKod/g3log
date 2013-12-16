@@ -1,9 +1,8 @@
-/* 
- * File:   g2sink.ipp
- * Author: kjell
- *
- * Created on July 21, 2013, 11:27 AM
- */
+/** ==========================================================================
+* 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
 
 #ifndef G2SINK_IPP
 #define	G2SINK_IPP

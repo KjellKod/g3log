@@ -1,9 +1,8 @@
-/* 
- * File:   g2sinkwrapper.hpp
- * Author: kjell
- *
- * Created on July 21, 2013, 11:21 AM
- */
+/** ==========================================================================
+* 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
 
 #ifndef G2SINKWRAPPER_HPP
 #define	G2SINKWRAPPER_HPP

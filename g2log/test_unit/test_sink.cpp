@@ -1,3 +1,9 @@
+/** ==========================================================================
+* 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
+
 #include <gtest/gtest.h>
 #include <iostream>
 #include <atomic>
@@ -69,7 +75,6 @@ TEST(ConceptSink, OneHundredSinks) {
       write2.append("Hello to 100 receivers :)");
       worker->save(message2);
       LOG(INFO) << "end message";
-
       logger.reset();
    }
    // at the curly brace above the ScopedLogger will go out of scope and all the 

@@ -1,9 +1,8 @@
-/* 
- * File:   test_helper__restore_logger.h
- * Author: kjell
- *
- * Created on July 13, 2013, 4:46 PM
- */
+/** ==========================================================================
+* 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* ============================================================================*/
 
 #pragma once
 
