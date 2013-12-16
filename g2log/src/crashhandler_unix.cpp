@@ -14,13 +14,20 @@
 #error "crashhandler_unix.cpp used but it's a windows system"
 #endif
 
-#include <unistd.h>  // getpid,
+#include <unistd.h> 
 #include <execinfo.h>
-#include <ucontext.h>
 #include <cxxabi.h>
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
+
+
+#ifdef __clang__
+#include <sys/ucontext.h>
+#else
+#include <ucontext.h>
+#endif
+
 
 namespace {
    // Dump of stack,. then exit through g2log background worker
