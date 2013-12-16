@@ -5,7 +5,7 @@
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
 * ============================================================================
-* Filename:g2future.h
+* Filename:g2future.hpp
 *          Helper functionality to put packaged_tasks in standard container. This
 *          is especially helpful for background thread processing a la async but through
 *          an actor pattern (active object), thread pool or similar.

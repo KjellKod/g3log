@@ -21,7 +21,7 @@
 #include <functional>
 #include <memory>
 
-#include "shared_queue.h"
+#include "shared_queue.hpp"
 
 namespace kjellkod {
 typedef std::function<void() > Callback;

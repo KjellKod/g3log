@@ -11,9 +11,9 @@
 #include <memory>
 #include <functional>
 
-#include "g2sinkwrapper.h"
+#include "g2sinkwrapper.hpp"
 #include "active.hpp"
-#include "g2future.h"
+#include "g2future.hpp"
 #include "g2logmessage.hpp"
 
 namespace g2 {

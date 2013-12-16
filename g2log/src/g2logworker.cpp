@@ -16,7 +16,7 @@
 #include "active.hpp"
 #include "g2log.hpp"
 #include "g2time.hpp"
-#include "g2future.h"
+#include "g2future.hpp"
 #include "crashhandler.hpp"
 
 #include <iostream> // remove

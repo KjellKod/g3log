@@ -14,7 +14,7 @@
 #include <functional>
 #include <memory>
 #include "g2time.hpp"
-#include "g2future.h"
+#include "g2future.hpp"
 
 TEST(Configuration, LOG)
 { // ref: http://www.cplusplus.com/reference/clibrary/ctime/strftime/

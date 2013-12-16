@@ -9,9 +9,9 @@
 
 #include "testing_helpers.h"
 #include "std2_make_unique.hpp"
-#include "g2sink.h"
-#include "g2sinkwrapper.h"
-#include "g2sinkhandle.h"
+#include "g2sink.hpp"
+#include "g2sinkwrapper.hpp"
+#include "g2sinkhandle.hpp"
 #include "g2logmessage.hpp"
 
 

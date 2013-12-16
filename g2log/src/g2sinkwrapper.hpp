@@ -1,12 +1,12 @@
 /* 
- * File:   g2sinkwrapper.ipp
+ * File:   g2sinkwrapper.hpp
  * Author: kjell
  *
  * Created on July 21, 2013, 11:21 AM
  */
 
-#ifndef G2SINKWRAPPER_IPP
-#define	G2SINKWRAPPER_IPP
+#ifndef G2SINKWRAPPER_HPP
+#define	G2SINKWRAPPER_HPP
 
 #include "g2logmessage.hpp"
 

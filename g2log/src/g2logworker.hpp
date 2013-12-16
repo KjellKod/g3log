@@ -18,8 +18,8 @@
 #include <utility>
 
 #include "g2log.hpp"
-#include "g2sinkwrapper.h"
-#include "g2sinkhandle.h"
+#include "g2sinkwrapper.hpp"
+#include "g2sinkhandle.hpp"
 #include "g2filesink.hpp"
 #include "g2logmessage.hpp"
 #include "std2_make_unique.hpp"

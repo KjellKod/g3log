@@ -1,5 +1,5 @@
 /* 
- * File:   g2sinkhandle.h
+ * File:   g2sinkhandle.hpp
  * Author: kjell
  *
  * Created on July 21, 2013, 11:42 AM
@@ -10,7 +10,7 @@
 
 #include <memory>
 #include <functional>
-#include <g2sink.h>
+#include "g2sink.hpp"
 
 namespace g2 {
    
