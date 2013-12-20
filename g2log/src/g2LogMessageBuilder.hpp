@@ -30,6 +30,8 @@ namespace g2 {
       virtual ~LogMessageBuilder();
 
       LogMessageBuilder& setExpression(const std::string& boolean_expression);
+      LogMessageBuilder& addStackTrace();
+
       std::ostringstream& stream();
       
    
@@ -44,5 +46,6 @@ namespace g2 {
    private:
       LogMessagePtr _message;
       std::ostringstream _stream;
+      std::string _stackTrace;
    };
 } // g2

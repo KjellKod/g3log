@@ -97,7 +97,7 @@ void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessagePtr) > 
 
 
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
-        g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, g2::internal::CONTRACT).setExpression(boolean_expression)
+        g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, g2::internal::CONTRACT).setExpression(boolean_expression).addStackTrace()
 
 
 // LOG(level) is the API for the stream log

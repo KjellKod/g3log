@@ -61,11 +61,9 @@ namespace g2 {
       if (FATAL.value == level_value) {
          oss << "\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t";
          oss << '"' << message() << '"';
-         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump();
       } else if (internal::CONTRACT.value == level_value) {
          oss << "\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(" << _expression << ")\n\t";
          oss << '"' << message() << '"';
-         oss << "\n*******\tSTACKDUMP *******\n" << internal::stackdump() << '"';
       } else {
          oss << "\n\t*******\tUNKNOWN Log Message Type\n" << '"' << message() << '"';
       }

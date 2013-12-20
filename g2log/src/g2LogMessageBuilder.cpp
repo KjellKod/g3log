@@ -8,6 +8,7 @@
 #include "g2logmessage.hpp"
 #include "g2log.hpp"
 #include "std2_make_unique.hpp"
+#include "crashhandler.hpp"
 #include <csignal>
 
 #include <iostream>
@@ -22,11 +23,15 @@ namespace g2 {
            const std::string& function, const LEVELS& level)
    : _message(std2::make_unique<LogMessage>(file, line, function, level)) {
       
+      if (_message.get()->wasFatal()) {
+         addStackTrace();
+      }
    }
 
    LogMessageBuilder::~LogMessageBuilder() {
       _message.get()->write().append(stream().str());
       if (_message.get()->wasFatal()) {
+         _message.get()->write().append(_stackTrace); // empty or not
          FatalMessageBuilder trigger(_message, SIGABRT);
          return; // FatalMessageBuilder will send to worker at scope exit 
       }
@@ -35,9 +40,16 @@ namespace g2 {
    }
 
    LogMessageBuilder& LogMessageBuilder::setExpression(const std::string& boolean_expression) {
-      _message.get()->setExpression(boolean_expression);
+     _message.get()->setExpression(boolean_expression);
       return *this;
    }
+
+   LogMessageBuilder& LogMessageBuilder::addStackTrace() {
+      _stackTrace = {"\n*******\tSTACKDUMP *******\n"};
+      _stackTrace.append(internal::stackdump()); 
+      return *this;
+   }
+
 
    std::ostringstream& LogMessageBuilder::stream() {
       return _stream;

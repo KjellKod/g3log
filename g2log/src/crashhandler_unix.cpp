@@ -36,7 +36,6 @@ namespace {
    void crashHandler(int signal_number, siginfo_t *info, void *unused_context) {
       using namespace g2::internal;
 
-
       std::ostringstream oss;
       oss << "Received fatal signal: " << g2::internal::signalName(signal_number);
       oss << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
