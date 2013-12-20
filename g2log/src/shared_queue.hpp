@@ -12,8 +12,7 @@
 * This exampel  was totally inspired by Anthony Williams lock-based data structures in
 * Ref: "C++ Concurrency In Action" http://www.manning.com/williams */
 
-#ifndef SHARED_QUEUE
-#define SHARED_QUEUE
+#pragma once
 
 #include <queue>
 #include <mutex>
@@ -29,15 +28,15 @@ class shared_queue
   mutable std::mutex m_;
   std::condition_variable data_cond_;
 
-  shared_queue& operator=(const shared_queue&); // c++11 feature not yet in vs2010 = delete;
-  shared_queue(const shared_queue& other); // c++11 feature not yet in vs2010 = delete;
+  shared_queue& operator=(const shared_queue&) = delete;
+  shared_queue(const shared_queue& other) = delete;
 
 public:
   shared_queue(){}
 
   void push(T item){
     std::lock_guard<std::mutex> lock(m_);
-    queue_.push(item);
+    queue_.push(std::move(item));
     data_cond_.notify_one();
   }
 
@@ -54,10 +53,12 @@ public:
 
   /// Try to retrieve, if no items, wait till an item is available and try again
   void wait_and_pop(T& popped_item){
-    std::unique_lock<std::mutex> lock(m_); // note: unique_lock is needed for std::condition_variable::wait
+    std::unique_lock<std::mutex> lock(m_); 
     while(queue_.empty())
-    { //                       The 'while' loop below is equal to
-      data_cond_.wait(lock);  //data_cond_.wait(lock, [](bool result){return !queue_.empty();});
+    { 
+       data_cond_.wait(lock);
+       //  This 'while' loop is equal to
+       //  data_cond_.wait(lock, [](bool result){return !queue_.empty();});
     }
     popped_item=std::move(queue_.front());
     queue_.pop();
@@ -73,5 +74,3 @@ public:
     return queue_.size();
   }
 };
-
-#endif
