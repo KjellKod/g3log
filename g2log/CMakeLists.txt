@@ -27,7 +27,7 @@
 # 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 11" ..
 #              the "Visual Studio 11" .. does not require just::thread!
 # 4. msbuild g2log_by_kjellkod.sln /p:Configuration=Release
-# 5. Release\g2log-FATAL-example.exe
+# 5. Release\g2log-FATAL-contract.exe
 #
 #
 # >>. LINUX:To try this out from folder g2log:
@@ -132,7 +132,7 @@ ENDIF(MSVC)
    option (USE_DYNAMIC_LOGGING_LEVELS
           "Turn ON/OFF log levels. An disabled level will not push logs of that level to the sink. By default dynamic logging is disabled" OFF)
 
-   # Do 'cmake -DUSE_DYNAMIC_LOGGING_LEVELS=ON' to enable this 
+   # Do 'cmake -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DCMAKE_BUILD_TYPE=Release .. ' to enable this 
    #            (or change the default option above)
    if(USE_DYNAMIC_LOGGING_LEVELS)
      add_definitions(-DG2_DYNAMIC_LOGGING)
@@ -151,10 +151,12 @@ ENDIF(MSVC)
    #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
    # ============================================================================
 
-   # 1. a simple test example 'g2log-FATAL-example'
-   option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash) example " ON)
+   # 1. a simple test example 'g2log-FATAL-*'
+   #    Do 'cmake -DUSE_SIMPLE_EXAMPLE=ON' to enable this 
+   option (USE_SIMPLE_EXAMPLE  "Simple (fatal-crash/contract) examples " ON)
 
    # 2. performance test (average + worst case) for KjellKod's g2log
+   #    Do 'cmake -DUSE_G2LOG_PERFORMANCE=ON' to enable this 
    option (USE_G2LOG_PERFORMANCE "g2log performance test" OFF)
 
    # 3. performance test for Google's glog
@@ -177,10 +179,12 @@ ENDIF(MSVC)
    # 1. create the the example EXECUTABLE - hook in the test_example's CMakeLists.txt file
    # =========================
    if (USE_SIMPLE_EXAMPLE)
-      MESSAGE(" g2log-FATAL-example option ON")
+      MESSAGE(" g2log-FATAL-* examples option ON")
       include_directories (${DIR_EXAMPLE})
-      add_executable(g2log-FATAL-example ${DIR_EXAMPLE}/main.cpp)
-      target_link_libraries(g2log-FATAL-example lib_g3logger ${PLATFORM_LINK_LIBRIES})
+      add_executable(g2log-FATAL-contract ${DIR_EXAMPLE}/main_contract.cpp)
+      add_executable(g2log-FATAL-sigsegv ${DIR_EXAMPLE}/main_sigsegv.cpp)
+      target_link_libraries(g2log-FATAL-contract lib_g3logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-FATAL-sigsegv lib_g3logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_SIMPLE_EXAMPLE)
 
 
