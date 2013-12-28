@@ -1,17 +1,14 @@
-#ifndef PRIVATE_G2_FILE_SINK_H_
-#define PRIVATE_G2_FILE_SINK_H_
-
 /** ==========================================================================
  * 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
  * ============================================================================*/
+#pragma once
 
 #include <string>
 #include <memory>
 
-#include "g2logmessage.hpp" // TODO refactoring, should include message instead
-
+#include "g2logmessage.hpp" 
 namespace g2 {
 
 class FileSink {
@@ -38,4 +35,4 @@ private:
 
 };
 } // g2
-#endif // pimple
+
