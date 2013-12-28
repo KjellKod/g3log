@@ -40,7 +40,7 @@ namespace g2 {
         std::shared_ptr<internal::Sink<T>> sink(_sink); 
         return sink->send(call, args...);
       } catch (const std::bad_weak_ptr& e) {
-        T* t;
+        T* t = nullptr;
         typedef decltype(std::bind(call, t, args...)()) PromiseType;
         std::promise<PromiseType> promise;
         promise.set_exception(std::make_exception_ptr(e));

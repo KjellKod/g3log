@@ -30,7 +30,7 @@ namespace g2 {
          return *this;
       }
 
-      void operator()() { _move_only(); } 
+      void operator()() { _move_only(); }
       Moveable& get() { return _move_only; }
       Moveable release() { return std::move(_move_only); }
    };

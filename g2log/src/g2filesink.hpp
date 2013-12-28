@@ -11,7 +11,6 @@
 #include <memory>
 
 #include "g2logmessage.hpp" // TODO refactoring, should include message instead
-#include "g2time.hpp"
 
 namespace g2 {
 
@@ -29,7 +28,6 @@ private:
    std::string _log_file_with_path;
    std::string _log_prefix_backup; // needed in case of future log file changes of directory
    std::unique_ptr<std::ofstream> _outptr;
-   g2::steady_time_point _steady_start_time;
 
    void addLogFileHeader();
    std::ofstream & filestream() {return *(_outptr.get()); }

@@ -53,7 +53,7 @@ namespace g2 {
   
    protected:
       std::time_t _timestamp;
-      long _microseconds;
+      int64_t _microseconds;
       std::string _file;
       int _line;
       std::string _function;

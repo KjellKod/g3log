@@ -55,15 +55,15 @@ int main(int argc, char** argv)
   const std::string  g_prefix_log_name = title + "-performance-" + thread_count_oss.str() + "threads-WORST_LOG";
   const std::string  g_measurement_dump= g_path + g_prefix_log_name + "_RESULT.txt";
   const std::string  g_measurement_bucket_dump= g_path + g_prefix_log_name + "_RESULT_buckets.txt";
-
-
+  const int64_t us_to_ms = 1000;
+  const int64_t us_to_s = 1000000;
 
 
   std::ostringstream oss;
   oss << "\n\n" << title << " performance " << number_of_threads << " threads WORST (PEAK) times\n";
   oss << "Each thread running #: " << g_loop << " * " << g_iterations << " iterations of log entries" << std::endl;  // worst mean case is about 10us per log entry
   const size_t xtra_margin = 2;
-  oss << "*** It can take som time. Please wait: Approximate wait time on MY PC was:  " << number_of_threads * (long long) (g_iterations * 10 * xtra_margin / 1000000 ) << " seconds" << std::endl;
+  oss << "*** It can take som time. Please wait: Approximate wait time on MY PC was:  " << number_of_threads * (int64_t)(g_iterations * 10 * xtra_margin / us_to_s) << " seconds" << std::endl;
   writeTextToFile(g_measurement_dump, oss.str(), kAppend);
   oss.str(""); // clear the stream
 
@@ -85,7 +85,7 @@ int main(int argc, char** argv)
     threads_result[idx].reserve(g_iterations);
   }
 
-  auto start_time = std::chrono::steady_clock::now();
+  auto start_time = std::chrono::high_resolution_clock::now();
   for(size_t idx = 0; idx < number_of_threads; ++idx)
   {
     std::ostringstream count;
@@ -99,7 +99,7 @@ int main(int argc, char** argv)
   {
     threads[idx].join();
   }
-  auto application_end_time = std::chrono::steady_clock::now();
+  auto application_end_time = std::chrono::high_resolution_clock::now();
   delete [] threads;
 
 
@@ -109,13 +109,13 @@ int main(int argc, char** argv)
   google::ShutdownGoogleLogging();
 #endif
 
-  auto worker_end_time = std::chrono::steady_clock::now();
+  auto worker_end_time = std::chrono::high_resolution_clock::now();
   auto application_time_us = std::chrono::duration_cast<microsecond>(application_end_time - start_time).count();
   auto total_time_us = std::chrono::duration_cast<microsecond>(worker_end_time - start_time).count();
 
-  oss << "\n" << number_of_threads << "*" << g_iterations << " log entries took: [" << total_time_us / 1000000 << " s] to write to disk"<< std::endl;
-  oss << "[Application(" << number_of_threads << "_threads+overhead time for measurement):\t" << application_time_us/1000 << " ms]" << std::endl;
-  oss << "[Background thread to finish:\t\t\t\t" << total_time_us/1000 << " ms]" << std::endl;
+  oss << "\n" << number_of_threads << "*" << g_iterations << " log entries took: [" << total_time_us / us_to_s << " s] to write to disk" << std::endl;
+  oss << "[Application(" << number_of_threads << "_threads+overhead time for measurement):\t" << application_time_us/us_to_ms << " ms]" << std::endl;
+  oss << "[Background thread to finish:\t\t\t\t" << total_time_us/us_to_ms << " ms]" << std::endl;
   oss << "\nAverage time per log entry:" << std::endl;
   oss << "[Application: " << application_time_us/(number_of_threads*g_iterations) << " us]" << std::endl;
 
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
   {
     std::vector<long long>& t_result = threads_result[idx];
     auto worstUs = (*std::max_element(t_result.begin(), t_result.end()));
-    oss << "[Application t" << idx+1 << " worst took: " <<  worstUs / 1000 << " ms  (" << worstUs << " us)] " << std::endl;
+    oss << "[Application t" << idx+1 << " worst took: " <<  worstUs / int64_t(1000) << " ms  (" << worstUs << " us)] " << std::endl;
   }
   writeTextToFile(g_measurement_dump,oss.str(), kAppend);
   std::cout << "Result can be found at:" << g_measurement_dump << std::endl;
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
   // for(long long& idx : all_measurements) --- didn't work?!
   for(auto iter = all_measurements.begin(); iter != all_measurements.end(); ++iter)
   {
-    auto value = (*iter)/1000; // convert to ms
+    auto value = (*iter)/us_to_ms; // convert to ms
     //auto bucket=floor(value*10+0.5)/10;
     ++value_amounts[value]; // asuming size_t is default 0 when initialized
   }

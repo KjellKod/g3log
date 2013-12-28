@@ -28,7 +28,6 @@ namespace g2
     static const std::string time_formatted = "%H:%M:%S";
   }
     
-  typedef std::chrono::steady_clock::time_point steady_time_point;
   typedef std::chrono::time_point<std::chrono::system_clock>  system_time_point;
   typedef std::chrono::milliseconds milliseconds;
   typedef std::chrono::microseconds microseconds;

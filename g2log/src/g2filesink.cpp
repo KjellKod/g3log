@@ -14,7 +14,6 @@ FileSink::FileSink(const std::string& log_prefix, const std::string& log_directo
 : _log_file_with_path(log_directory)
 , _log_prefix_backup(log_prefix)
 , _outptr(new std::ofstream)
-, _steady_start_time(std::chrono::steady_clock::now()) 
 {
    _log_prefix_backup = prefixSanityFix(log_prefix);
    if (!isValidFilename(_log_prefix_backup)) {
