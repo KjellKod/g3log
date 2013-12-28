@@ -59,7 +59,6 @@ namespace g2 {
       std::string _function;
       LEVELS _level;
       std::string _expression; // only with content for CHECK(...) calls
-      //std::unique_ptr<std::ostringstream> _stream;
       mutable std::string _message;
    };
    
