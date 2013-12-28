@@ -29,9 +29,9 @@ using namespace g2::internal;
 #error G2LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
 #endif
 
-typedef std::chrono::steady_clock::time_point time_point;
-typedef std::chrono::duration<long,std::ratio<1, 1000> > millisecond;
-typedef std::chrono::duration<long long,std::ratio<1, 1000000> > microsecond;
+typedef std::chrono::high_resolution_clock::time_point time_point;
+typedef std::chrono::duration<int64_t,std::ratio<1, 1000> > millisecond;
+typedef std::chrono::duration<int64_t,std::ratio<1, 1000000> > microsecond;
 
 namespace g2_test
 {
@@ -72,17 +72,17 @@ bool writeTextToFile(const std::string& filename, const std::string& msg, const 
   return true;
 }
 
-long long mean(const std::vector<long long> &v)
+int64_t mean(const std::vector<int64_t> &v)
 {
-  long long total =  std::accumulate(v.begin(), v.end(), 0 ); // '0' is the initial value
+  int64_t total =  std::accumulate(v.begin(), v.end(), 0 ); // '0' is the initial value
   return total/v.size();
 }
 
 
 
 
-void measurePeakDuringLogWrites(const std::string& title, std::vector<long long>& result);
-inline void measurePeakDuringLogWrites(const std::string& title, std::vector<long long>& result)
+void measurePeakDuringLogWrites(const std::string& title, std::vector<int64_t>& result);
+inline void measurePeakDuringLogWrites(const std::string& title, std::vector<int64_t>& result)
 {
 
 
@@ -96,9 +96,9 @@ inline void measurePeakDuringLogWrites(const std::string& title, std::vector<lon
 #endif
   for(size_t count = 0; count < g_iterations; ++count)
   {
-    auto start_time = std::chrono::steady_clock::now();
+    auto start_time = std::chrono::high_resolution_clock::now();
     LOG(INFO) << title << " iteration #" << count << " " << charptrmsg << strmsg << " and a float: " << std::setprecision(6) << pi_f;
-    auto stop_time = std::chrono::steady_clock::now();
+    auto stop_time = std::chrono::high_resolution_clock::now();
     auto time_us = std::chrono::duration_cast<microsecond>(stop_time - start_time).count();
     result.push_back(time_us);
   }

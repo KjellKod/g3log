@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 #endif
 
   std::thread* threads = new std::thread[number_of_threads];
-  std::vector<long long>* threads_result = new std::vector<long long>[number_of_threads];
+  std::vector<int64_t>* threads_result = new std::vector<int64_t>[number_of_threads];
 
   // kiss: just loop, create threads, store them then join
   // could probably do this more elegant with lambdas
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 
   for(size_t idx = 0; idx < number_of_threads; ++idx)
   {
-    std::vector<long long>& t_result = threads_result[idx];
+    std::vector<int64_t>& t_result = threads_result[idx];
     auto worstUs = (*std::max_element(t_result.begin(), t_result.end()));
     oss << "[Application t" << idx+1 << " worst took: " <<  worstUs / int64_t(1000) << " ms  (" << worstUs << " us)] " << std::endl;
   }
@@ -129,33 +129,54 @@ int main(int argc, char** argv)
   std::cout << "Result can be found at:" << g_measurement_dump << std::endl;
 
   // now split the result in buckets of 10ms each so that it's obvious how the peaks go
-  std::vector<long long> all_measurements;
+  std::vector<int64_t> all_measurements;
   all_measurements.reserve(g_iterations * number_of_threads);
   for(size_t idx = 0; idx < number_of_threads; ++idx)
   {
-    std::vector<long long>& t_result = threads_result[idx];
+    std::vector<int64_t>& t_result = threads_result[idx];
     all_measurements.insert(all_measurements.end(), t_result.begin(), t_result.end());
   }
   delete [] threads_result; // finally get rid of them
 
   std::sort (all_measurements.begin(), all_measurements.end());
-  std::map<long long, long long> value_amounts;
-  // for(long long& idx : all_measurements) --- didn't work?!
+  std::map<int64_t, int64_t> value_amounts;
+  std::map<int64_t, int64_t> value_amounts_for_0ms_bucket;
+  
   for(auto iter = all_measurements.begin(); iter != all_measurements.end(); ++iter)
   {
     auto value = (*iter)/us_to_ms; // convert to ms
-    //auto bucket=floor(value*10+0.5)/10;
-    ++value_amounts[value]; // asuming size_t is default 0 when initialized
+    ++value_amounts[value]; // asuming int64_t is default 0 when initialized
+    
+    if(0 == value) {
+       ++value_amounts_for_0ms_bucket[*iter];
+    }
   }
 
   oss.str("");
-  oss << "Number of values rounted to milliseconds and put to [millisecond bucket] were dumped to file: " << g_measurement_bucket_dump << std::endl;
-  oss << "Format:  bucket_of_ms, number_of_values_in_bucket\n\n" << std::endl;
+  oss << "Number of values rounded to milliseconds and put to [millisecond bucket] were dumped to file: " << g_measurement_bucket_dump << std::endl;
+  if(1 == value_amounts.size()) {
+     oss << "Format:  bucket of us inside bucket0 for ms\nFormat:bucket_of_ms, number_of_values_in_bucket\n\n" << std::endl;
+     oss << "\n";
+  }
+  else {
+     oss << "Format:bucket_of_ms, number_of_values_in_bucket\n\n" << std::endl;
+  }
   std::cout << oss.str() << std::endl;
 
-  for(auto iter = value_amounts.begin(); iter != value_amounts.end(); ++iter)
+  //
+  // If all values are for the 0ms bucket then instead show us buckets
+  //
+  if(1 == value_amounts.size()) {
+     oss << "\n\n***** Microsecond bucket measurement for all measurements that went inside the '0 millisecond bucket' ****\n";  
+     for(auto us_bucket: value_amounts_for_0ms_bucket) {
+        oss << us_bucket.first << "\t" << us_bucket.second << std::endl;
+     }
+     oss << "\n\n***** Millisecond bucket measurement ****\n";
+  }
+   
+  for(auto ms_bucket: value_amounts)
   {
-    oss << iter->first << "\t, " << iter->second << std::endl;
+    oss << ms_bucket.first << "\t, " << ms_bucket.second << std::endl;
   }
   writeTextToFile(g_measurement_bucket_dump,oss.str(), kAppend,  false);
 

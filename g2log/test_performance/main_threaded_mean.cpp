@@ -49,10 +49,11 @@ int main(int argc, char** argv)
   const std::string  g_measurement_dump= g_path + g_prefix_log_name + "_RESULT.txt";
 
   std::ostringstream oss;
+  const int64_t us_to_s = 1000000;
   oss << "\n\n" << title << " performance " << number_of_threads << " threads MEAN times\n";
   oss << "Each thread running #: " << g_loop << " * " << g_iterations << " iterations of log entries" << std::endl;  // worst mean case is about 10us per log entry
   const size_t xtra_margin = 2;
-  oss << "*** It can take som time. Please wait: Approximate wait time on MY PC was:  " <<number_of_threads*  (long long) (g_iterations * 10 * xtra_margin / 1000000 ) << " seconds" << std::endl;
+  oss << "*** It can take som time. Please wait: Approximate wait time on MY PC was:  " <<number_of_threads*  (int64_t) (g_iterations * 10 * xtra_margin / us_to_s ) << " seconds" << std::endl;
   writeTextToFile(g_measurement_dump, oss.str(), kAppend);
   oss.str(""); // clear the stream
 
@@ -60,12 +61,10 @@ int main(int argc, char** argv)
   auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
   g2::initializeLogging(logger_n_handle.worker.get());
 
-  //g2LogWorker* logger = new g2LogWorker(g_prefix_log_name, g_path);
-  //g2::initializeLogging(logger);
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
   google::InitGoogleLogging(argv[0]);
 #endif
-  auto start_time = std::chrono::steady_clock::now();
+  auto start_time = std::chrono::high_resolution_clock::now();
 
   std::thread* threads = new std::thread[number_of_threads];
   // kiss: just loop, create threads, store them then join
@@ -82,7 +81,7 @@ int main(int argc, char** argv)
   {
     threads[idx].join();
   }
-  auto application_end_time = std::chrono::steady_clock::now();
+  auto application_end_time = std::chrono::high_resolution_clock::now();
   delete [] threads;
 
 #if defined(G2LOG_PERFORMANCE)
@@ -91,7 +90,7 @@ int main(int argc, char** argv)
   google::ShutdownGoogleLogging();
 #endif
 
-  auto worker_end_time = std::chrono::steady_clock::now();
+  auto worker_end_time = std::chrono::high_resolution_clock::now();
   auto application_time_us = std::chrono::duration_cast<microsecond>(application_end_time - start_time).count();
   auto total_time_us = std::chrono::duration_cast<microsecond>(worker_end_time - start_time).count();
 
