@@ -1,5 +1,5 @@
 syntax: glob
 g2log-sinks/*
 3rdParty/*
-g2log/build/*
+g2log/*uild/*
 *~
