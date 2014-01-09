@@ -18,21 +18,28 @@
 struct LEVELS
 {
   const int value;
-  const std::string text;
+  const char* text;
 };
-const LEVELS DEBUG = {0, "DEBUG"}, INFO = {1, "INFO"}, WARNING = {2, "WARNING"}, FATAL = {3, "FATAL"};
+
+constexpr const LEVELS hej{0, "1"};
+
+constexpr const LEVELS DEBUG{0, "DEBUG"}, 
+             INFO{DEBUG.value+1, "INFO"}, 
+             WARNING{INFO.value+1, "WARNING"}, 
+             // Insert here *any* extra logging levels that is needed
+             // 1) Remember to update the FATAL initialization below
+             // 2) Remember to update the initialization of "g2loglevels.cpp/g_log_level_status"
+             FATAL{WARNING.value+1, "FATAL"};
 
 namespace g2 {
 namespace internal {
-  const LEVELS CONTRACT = {4, "CONTRACT"}, FATAL_SIGNAL{5, "FATAL_SIGNAL"}; 
+  const LEVELS CONTRACT = {100, "CONTRACT"}, FATAL_SIGNAL{101, "FATAL_SIGNAL"}; 
   
   bool wasFatal(const LEVELS& level);
 }
 
 #ifdef G2_DYNAMIC_LOGGING
   // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
-  // Obviously: 'enabled_status' set to 'false' - means to disable that log level
-  // WARNING: This should be used AFTER \ref g2::initializeLogging
   void setLogLevel(LEVELS level, bool enabled_status);
 #endif
   bool logLevel(LEVELS level);

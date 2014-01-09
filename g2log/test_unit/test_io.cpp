@@ -26,16 +26,30 @@ using namespace testing_helpers;
 
 
 /// THIS MUST BE THE FIRST UNIT TEST TO RUN! If any unit test run before this 
-/// one then it will fail. For dynamic levels all levels are turned on only AT
+/// one then it could fail. For dynamic levels all levels are turned on only AT
 /// instantiation so we do different test for dynamic logging levels
-
+///
+/// TODO : (gtest issue)
+///Move out to separate unit test binary to ensure reordering of tests does not happen 
 #ifdef G2_DYNAMIC_LOGGING
+TEST(Initialization, No_Logger_Initialized___LevelsAreONByDefault) {
+   EXPECT_FALSE(g2::internal::isLoggingInitialized());
+   EXPECT_TRUE(g2::logLevel(DEBUG));
+   EXPECT_TRUE(g2::logLevel(INFO));
+   EXPECT_TRUE(g2::logLevel(WARNING));
+   EXPECT_TRUE(g2::logLevel(FATAL));
+   EXPECT_EQ(DEBUG.value, 0);
+   EXPECT_EQ(INFO.value, 1);
+   EXPECT_EQ(WARNING.value, 2);
+   EXPECT_EQ(FATAL.value, 3);
+}
+
 TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
    EXPECT_FALSE(g2::internal::isLoggingInitialized());
-   EXPECT_FALSE(g2::logLevel(INFO));
-   EXPECT_FALSE(g2::logLevel(FATAL));
-   EXPECT_FALSE(g2::logLevel(DEBUG));
-   EXPECT_FALSE(g2::logLevel(WARNING));
+   EXPECT_TRUE(g2::logLevel(INFO));
+   EXPECT_TRUE(g2::logLevel(FATAL));
+   EXPECT_TRUE(g2::logLevel(DEBUG));
+   EXPECT_TRUE(g2::logLevel(WARNING));
    std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g2logger)";
    std::string err_msg2_ignored = "This uninitialized message should be ignored";
    try {
@@ -51,7 +65,7 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    std::string good_msg1 = "This message could have pulled in the uninitialized_call message";
    LOG(INFO) << good_msg1;
    auto content = logger.resetAndRetrieveContent(); // this synchronizes with the LOG(INFO) call if debug level would be ON.
-   ASSERT_FALSE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
+   ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
    ASSERT_FALSE(verifyContent(content, err_msg2_ignored)) << "Content: [" << content << "]";
    ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";       
 }

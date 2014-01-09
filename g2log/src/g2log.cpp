@@ -26,7 +26,6 @@
 #include "std2_make_unique.hpp"
 #include "g2logworker.hpp"
 #include "crashhandler.hpp"
-#include "g2loglevels.hpp"
 #include "g2logmessage.hpp"
 
 namespace {
@@ -47,19 +46,12 @@ namespace {
 namespace g2 {
    // signalhandler and internal clock is only needed to install once
    // for unit testing purposes the initializeLogging might be called
-   // several times... for all other practical use, it shouldn't!
-
-
+   // several times... 
+   //                    for all other practical use, it shouldn't!
    void initializeLogging(LogWorker *bgworker) {
       std::call_once(g_initialize_flag, []() {
          installSignalHandler(); });
       std::lock_guard<std::mutex> lock(g_logging_init_mutex);
-#ifdef G2_DYNAMIC_LOGGING
-      setLogLevel(DEBUG, true);
-      setLogLevel(INFO, true);
-      setLogLevel(WARNING, true);
-      setLogLevel(FATAL, true);
-#endif
       CHECK(!internal::isLoggingInitialized());
       CHECK(bgworker != nullptr);
       
@@ -83,7 +75,7 @@ namespace g2 {
          return g_logger_instance != nullptr;
       }
 
-      /** Should be used for unit testing. Used in production code is likely wrong.*/
+      /** Should be used for unit testing. Used in production code is likely, but not always, wrong.*/
       LogWorker* shutDownLogging() {
          std::lock_guard<std::mutex> lock(g_logging_init_mutex);
          CHECK(isLoggingInitialized()) << "NO Logger is instantiated ... exiting";

@@ -164,7 +164,7 @@ ENDIF(MSVC)
    option (USE_GOOGLE_GLOG_PERFORMANCE  "Google's glog performance test" OFF) 
    
 
-   # 4. unit test for g2log
+   # 4. unit test for g2log  (cmake -DUSE_G2LOG_UNIT_TEST=ON ..)
    #    remember to unzip gtest at g2log/3rdParty/gtest
    option (USE_G2LOG_UNIT_TEST "g2log unit tests" OFF)
 

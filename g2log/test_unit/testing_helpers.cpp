@@ -123,6 +123,13 @@ namespace testing_helpers {
       auto filename = _handle->call(&FileSink::fileName);
       if (!filename.valid()) ADD_FAILURE();
       _log_file = filename.get();
+    
+#ifdef G2_DYNAMIC_LOGGING
+    g2::setLogLevel(INFO, true);
+    g2::setLogLevel(DEBUG, true);
+    g2::setLogLevel(WARNING, true);
+    g2::setLogLevel(FATAL, true);
+#endif
    }
 
 
