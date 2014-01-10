@@ -22,12 +22,23 @@
 #include <memory>
 
 namespace g2 {
+
+   /** LogMessage contains all the data collected from the LOG(...) call.
+   * If the sink receives a std::string it will be the std::string toString()... function
+   * that will format the data into a string
+   *
+   * For sinks that receive a LogMessage they can either use the toString() function, or use
+   * the helper functions or even the public raw data to format the saved log message any
+   * desired way.
+   */
    struct LogMessage {
       std::string file() const { return _file; }
       std::string line() const { return std::to_string(_line); }
       std::string function() const { return _function; }
       std::string level() const { return _level.text; }
 
+      /// use a different format string to get a different look on the time.
+      //  default look is Y/M/D H:M:S
       std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
       std::string microseconds() const { return std::to_string(_microseconds); }
       
@@ -48,10 +59,10 @@ namespace g2 {
       LogMessage(LogMessage&& other);
       virtual ~LogMessage(){};
       
-      
-   
-  
-   protected:
+      //
+      // Complete access to the raw data in case the helper functions above 
+      // are not enough.
+      //
       std::time_t _timestamp;
       int64_t _microseconds;
       std::string _file;
