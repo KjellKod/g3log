@@ -24,8 +24,7 @@
 # 2. from the g2log folder
 #    mkdir build
 #    cd build;
-# 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 11" ..
-#              the "Visual Studio 11" .. does not require just::thread!
+# 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
 # 4. msbuild g2log_by_kjellkod.sln /p:Configuration=Release
 # 5. Release\g2log-FATAL-contract.exe
 #
