@@ -76,8 +76,6 @@ namespace g2 {
 
   std::string localtime_formatted(const std::time_t& time_snapshot, const std::string& time_format) {
     std::tm t = localtime(time_snapshot); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)
-    std::stringstream buffer;
-    buffer << g2::internal::put_time(&t, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
-    return buffer.str();
+    return g2::internal::put_time(&t, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
   }
 } // g2
