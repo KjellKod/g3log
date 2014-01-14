@@ -21,8 +21,14 @@ struct LEVELS
   const char* text;
 };
 
-constexpr const LEVELS hej{0, "1"};
-
+#if _MSC_VER
+// Visual Studio does not support constexpr
+// what is below is ugly and not right but it works in this purpose.
+// if there are any issues with it then just please remove all instances of constexpr
+  #ifndef constexpr
+     #define constexpr 
+  #endif
+#endif
 constexpr const LEVELS DEBUG{0, "DEBUG"}, 
              INFO{DEBUG.value+1, "INFO"}, 
              WARNING{INFO.value+1, "WARNING"}, 
@@ -33,7 +39,7 @@ constexpr const LEVELS DEBUG{0, "DEBUG"},
 
 namespace g2 {
 namespace internal {
-  const LEVELS CONTRACT = {100, "CONTRACT"}, FATAL_SIGNAL{101, "FATAL_SIGNAL"}; 
+  constexpr const LEVELS CONTRACT{100, "CONTRACT"}, FATAL_SIGNAL{101, "FATAL_SIGNAL"}; 
   
   bool wasFatal(const LEVELS& level);
 }
