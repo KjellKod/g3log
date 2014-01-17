@@ -31,7 +31,7 @@ CHECK(less > more) << "CHECK(false) triggers a FATAL message");
 
 ## What G3Log is: 
 * ***G3log*** is the acting name for the third version of g2log and it stands for **g2log with dynamic sinks**
-* You can choose to use the default log receiver which saves all LOG calls to file, *or*, you can choose to use your own custom made log receivers, *or* you can use both, *or* as many sinks as you need.
+* You can choose to use the default log receiver which saves all LOG calls to file, **or** you can choose to use your own custom made log receivers, **or** you can use both, **or** as many sinks as you need.
 * G3log is an asynchronous, "crash-safe" logger. You can read more about it here [[g2log version]](
 http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logger-using-Cplus)
 
