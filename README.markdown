@@ -81,6 +81,7 @@ auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
                                      &CustomSink::ReceiveLogMessage);
 ```
 
+#Code Examples
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
 ```
 // main.cpp
