@@ -25,7 +25,7 @@ application will exit.
 
 ```
 CHECK(less != more); // not FATAL
-CHECK(less > more) << "CHECK(false) triggers a FATAL message");
+CHECK(less > more) << "CHECK(false) triggers a FATAL message";
 ```
 
 
@@ -33,7 +33,7 @@ CHECK(less > more) << "CHECK(false) triggers a FATAL message");
 * ***G3log*** is the acting name for the third version of g2log and it stands for **g2log with dynamic sinks**
 * G3log is an asynchronous, "crash-safe" logger. You can read more about it here [[g2log version]](
 http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logger-using-Cplus)
-* You can choose to use the default log receiver which saves all LOG calls to file, **or** you can choose to use your own custom made log receivers, **or** you can use both, **or** as many sinks as you need.
+* You can choose to use the default log receiver which saves all LOG calls to file, **or** you can choose to use your own custom made log receiver(s), **or** both, **or** as many sinks as you need.
 
 
 
@@ -71,10 +71,12 @@ The code is given for free as public domain. This gives the option to change, us
 
 
 # G3log with sinks
-[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G2log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either recive a LOG message as a  *std::string* **or** as a *g2::LogMessageMover*. 
+[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G2log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either receive a LOG message as a  *std::string* **or** as a *g2::LogMessageMover*. 
 
+The *std::string* comes pre-formatted. The *g2::LogMessageMover* is a wrapped struct that contains the raw data for custom handling in your own sink.
 
-The *std::string* comes pre-formatted while the *g2::LogMessageMover* contains the raw data for custom handling in your own sink.
+A sink is *owned* by the G3log and is added to the logger inside a ```std::unique_ptr```.  The sink can be called though its public API through a *handler* which will asynchronously forward the call to the receiving sink. 
+
 
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
 ```
