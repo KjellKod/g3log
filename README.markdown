@@ -38,7 +38,7 @@ http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logge
 ## Benefits you get when using G3log ##
 1. Easy to use, clean syntax and blazingly fast logger. 
 
-2. All the slow log I/O disk access is done in a background thread. This ensures that the LOG caller can immediately continue with other tasks and do not have to wait for the LOG call to fínish.
+2. All the slow log I/O disk access is done in a background thread. This ensures that the LOG caller can immediately continue with other tasks and do not have to wait for the LOG call to finish.
 
 3. G3log provides logging, Design-by-Contract [#CHECK], and flush of log to file at
  shutdown. Buffered logs will be written to the sink before the application shuts down.
@@ -69,8 +69,72 @@ The code is given for free as public domain. This gives the option to change, us
 
 
 # G3log with sinks
-[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (the same as G2log uses) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either recive a LOG message as a  **std::string** *or* a **g2::LogMessageMover**. The **std::string** comes pre-formatted while the **g2::LogMessageMover** contains the raw data for custom handling in your own sink.
+[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G2log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either recive a LOG message as a  *std::string* **or** a *g2::LogMessageMover*. The *std::string* comes pre-formatted while the *g2::LogMessageMover* contains the raw data for custom handling in your own sink.
 
+Example usage where a custom sink is added. And a function is called though the sink handler to the actual sink object.
+```
+// main.cpp
+#include<g2log.hpp>
+#include<g2logworker.hpp>
+#include <std2_make_unique.hpp>
+
+#include "CustomSink.h"
+
+int main(int argc, char**argv) {
+   using namespace g2;
+   std::unique_ptr<LogWorker> logworker{ LogWorker::createWithNoSink() };
+   auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(), &CustomSink::ReceiveLogMessage);
+   
+   // initialize the logger before it can receive and LOG calls
+   initializeLogging(logworker.get());
+   LOG(WARNING) << "This log call, may or may not happend before"
+                << the sinkHandle->call";
+				
+				
+   // You can call in a thread safe manner public functions on your sink
+   // The call is asynchronously executed on your custom sink.
+   std::future<void> received = sinkHandle->call(&CustomSink::Foo, param1, param2);
+   
+   // before exiting you can always call g2::ShutdownLogging to avoid
+   // LOG calls from static entities
+   g2::shutDownLogging();
+}
+
+
+// some_file.cpp : To show how easy it is to get the logger to work
+// in other parts of your software
+
+#include <g2log.hpp>
+
+void SomeFunction() {
+   ...
+   LOG(INFO) << "Hello World";
+}
+```
+
+Example usage where a the default file logger is used **and** a custom sink is added
+```
+// main.cpp
+#include<g2log.hpp>
+#include<g2logworker.hpp>
+#include <std2_make_unique.hpp>
+
+#include "CustomSink.h"
+
+int main(int argc, char**argv) {
+   using namespace g2;
+   auto defaultHandler = LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
+   
+   // logger is initialized
+   g2::initializeLogging(defaultHandler.worker.get());
+   
+   LOG(DEBUG) << "Make log call, then add another sink";
+   
+   defaultHandler.worker->addSink(std2::make_unique<CustomSink>(), &CustomSink::ReceiveLogMessage);
+   
+   ...
+}
+```
 
 
 
