@@ -97,7 +97,8 @@ int main(int argc, char**argv) {
 				
    // You can call in a thread safe manner public functions on your sink
    // The call is asynchronously executed on your custom sink.
-   std::future<void> received = sinkHandle->call(&CustomSink::Foo, param1, param2);
+   std::future<void> received = sinkHandle->call(&CustomSink::Foo, 
+                                                 param1, param2);
    
    // before exiting you can always call g2::ShutdownLogging to avoid
    // LOG calls from static entities that goes out of scope later.
@@ -127,14 +128,16 @@ Example usage where a the default file logger is used **and** a custom sink is a
 
 int main(int argc, char**argv) {
    using namespace g2;
-   auto defaultHandler = LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
+   auto defaultHandler = LogWorker::createWithDefaultLogger(argv[0], 
+                                                 path_to_log_file);
    
    // logger is initialized
    g2::initializeLogging(defaultHandler.worker.get());
    
    LOG(DEBUG) << "Make log call, then add another sink";
    
-   defaultHandler.worker->addSink(std2::make_unique<CustomSink>(), &CustomSink::ReceiveLogMessage);
+   defaultHandler.worker->addSink(std2::make_unique<CustomSink>(),
+                                  &CustomSink::ReceiveLogMessage);
    
    ...
 }
@@ -152,9 +155,11 @@ enable the creation of them in the g2log/CMakeLists.txt file. See that file for
 more details
 
 
-```cd g2log
+```
+cd g2log
 mkdir build
-cd build```
+cd build
+```
 
 
 *** Building on Linux ***
@@ -171,7 +176,8 @@ msbuild g2log_by_kjellkod.sln /p:Configuration=Release
 Release\g2log-SIGSEGV.exe
 ```
 
-*** Building on *nix with Clang: Clang usage for g3log is experimental ***
+*** Building on *nix with Clang: 
+Warning: Clang usage for g3log is experimental ***
 ```
 cmake -DCMAKE_CXX_COMPILER=clang++ .. -DCMAKE_BUILD_TYPE=Release ..
 make 
