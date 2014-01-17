@@ -160,7 +160,8 @@ cd build```
 *** Building on Linux ***
 ```
 cmake -DCMAKE_BUILD_TYPE=Release ..
-make ```
+make 
+```
 
 *** Building on Windows ***
 Please use the Visual Studio 11 (2012) command prompt "Developer command prompt"
