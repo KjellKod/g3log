@@ -191,9 +191,7 @@ make
 ```
 
 
-
-
-      
+     
 #Enjoy
 If you like this logger (or not) it would be nice with some feedback. That way I can improve g3log and g2log and it is also nice to see if someone is using it.
 
