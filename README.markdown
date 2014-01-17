@@ -38,7 +38,7 @@ http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logge
 
 
 ## Benefits you get when using G3log ##
-1. Easy to use, clean syntax and blazingly fast logger. 
+1. Easy to use, clean syntax and a blazing fast logger. 
 
 2. All the slow log I/O disk access is done in a background thread. This ensures that the LOG caller can immediately continue with other tasks and do not have to wait for the LOG call to finish.
 
@@ -62,7 +62,7 @@ The code is given for free as public domain. This gives the option to change, us
  and do whatever with it, no strings attached.
 
 9. Three versions of g2log exist. 
-    * This version: *g3log* : which is made to faciliate easy adding of custom log receivers. 
+    * This version: *g3log* : which is made to facilitate  easy adding of custom log receivers. 
     * [g2log-dev](https://bitbucket.org/KjellKod/g2log-dev): Acting as feature try-out and playground. 
     * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio. 
 
