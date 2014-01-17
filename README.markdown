@@ -31,6 +31,7 @@ CHECK(less > more) << "CHECK(false) triggers a FATAL message");
 
 ## What G3Log is: 
 * ***G3log*** is the acting name for the third version of g2log and it stands for **g2log with dynamic sinks**
+* You can choose to use the default log receiver which saves all LOG calls to file, *or*, you can choose to use your own custom made log receivers, *or* you can use both, *or* as many sinks as you need.
 * G3log is an asynchronous, "crash-safe" logger. You can read more about it here [[g2log version]](
 http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logger-using-Cplus)
 
@@ -173,7 +174,6 @@ Please use the Visual Studio 11 (2012) command prompt "Developer command prompt"
 ```
 cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 11" ..
 msbuild g2log_by_kjellkod.sln /p:Configuration=Release
-Release\g2log-SIGSEGV.exe
 ```
 
 *** Building on *nix with Clang: 
@@ -182,6 +182,7 @@ Warning: Clang usage for g3log is experimental ***
 cmake -DCMAKE_CXX_COMPILER=clang++ .. -DCMAKE_BUILD_TYPE=Release ..
 make 
 ```
+
 
 
 
