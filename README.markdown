@@ -1,4 +1,4 @@
-# G3Log (text below is in progress)
+# G3log : Asynchronous logger with Dynamic Sinks
 
 ## EXAMPLE USAGE
 #### Optional to use either streaming or printf-like syntax
@@ -10,14 +10,12 @@ LOGF(WARNING, "Printf-style syntax is also %s", "available");
 
 
 
-
 #### Conditional logging
     int less = 1; int more = 2
     LOG_IF(INFO, (less<more)) <<"If [true], then this text will be logged";
     
     // or with printf-like syntax
     LOGF_IF(INFO, (less<more), "if %d<%d then this text will be logged", less,more);
-
 
 
 
@@ -32,17 +30,15 @@ CHECK(less > more) << "CHECK(false) triggers a FATAL message");
 
 
 ## What G3Log is: 
-* ***G3log*** is the acting name for the third version of g2log and it stands for ***g2log with dynamic sinks***
-* G3log is an asynchronous, "crash-safe" logger. You can read more about it's use here [[g2log version]](
+* ***G3log*** is the acting name for the third version of g2log and it stands for **g2log with dynamic sinks**
+* G3log is an asynchronous, "crash-safe" logger. You can read more about it here [[g2log version]](
 http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logger-using-Cplus)
 
 
 ## Benefits you get when using G3log ##
 1. Easy to use, clean syntax and blazingly fast logger. 
 
-2. All the slow log I/O disk access is done in a background thread. This ensures that the
- other parts of the software can immediately continue with their work after making a
- log entry. 
+2. All the slow log I/O disk access is done in a background thread. This ensures that the LOG caller can immediately continue with other tasks and do not have to wait for the LOG call to fínish.
 
 3. G3log provides logging, Design-by-Contract [#CHECK], and flush of log to file at
  shutdown. Buffered logs will be written to the sink before the application shuts down.
@@ -64,17 +60,18 @@ The code is given for free as public domain. This gives the option to change, us
  and do whatever with it, no strings attached.
 
 9. Three versions of g2log exist. 
-    * This version: g3log : which is made to faciliate easy adding of custom log receivers. 
+    * This version: *g3log* : which is made to faciliate easy adding of custom log receivers. 
     * [g2log-dev](https://bitbucket.org/KjellKod/g2log-dev): Acting as feature try-out and playground. 
-    * [g2log](https://bitbucket.org/KjellKod/g2log): The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio. 
+    * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio. 
 
 
 
 
 
-# TO WRITE 
-* Example of how to use G2log
-* Sinks easy to follow examples
+# G3log with sinks
+[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (the same as G2log uses) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either recive a LOG message as a  **std::string** *or* a **g2::LogMessageMover**. The **std::string** comes pre-formatted while the **g2::LogMessageMover** contains the raw data for custom handling in your own sink.
+
+
 
 
 # BUILDING g2log: 
