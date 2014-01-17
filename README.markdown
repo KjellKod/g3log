@@ -69,9 +69,12 @@ The code is given for free as public domain. This gives the option to change, us
 
 
 # G3log with sinks
-[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G2log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either recive a LOG message as a  *std::string* **or** a *g2::LogMessageMover*. The *std::string* comes pre-formatted while the *g2::LogMessageMover* contains the raw data for custom handling in your own sink.
+[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G2log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either recive a LOG message as a  *std::string* **or** as a *g2::LogMessageMover*. 
 
-Example usage where a custom sink is added. And a function is called though the sink handler to the actual sink object.
+
+The *std::string* comes pre-formatted while the *g2::LogMessageMover* contains the raw data for custom handling in your own sink.
+
+Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
 ```
 // main.cpp
 #include<g2log.hpp>
@@ -83,12 +86,13 @@ Example usage where a custom sink is added. And a function is called though the 
 int main(int argc, char**argv) {
    using namespace g2;
    std::unique_ptr<LogWorker> logworker{ LogWorker::createWithNoSink() };
-   auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(), &CustomSink::ReceiveLogMessage);
+   auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
+                                          &CustomSink::ReceiveLogMessage);
    
-   // initialize the logger before it can receive and LOG calls
+   // initialize the logger before it can receive LOG calls
    initializeLogging(logworker.get());
    LOG(WARNING) << "This log call, may or may not happend before"
-                << the sinkHandle->call";
+                << "the sinkHandle->call below";
 				
 				
    // You can call in a thread safe manner public functions on your sink
@@ -96,7 +100,7 @@ int main(int argc, char**argv) {
    std::future<void> received = sinkHandle->call(&CustomSink::Foo, param1, param2);
    
    // before exiting you can always call g2::ShutdownLogging to avoid
-   // LOG calls from static entities
+   // LOG calls from static entities that goes out of scope later.
    g2::shutDownLogging();
 }
 
@@ -147,39 +151,40 @@ If you are interested in the performance or unit tests then you can
 enable the creation of them in the g2log/CMakeLists.txt file. See that file for 
 more details
 
-*** Building on Linux ***
-cd g2log
+
+```cd g2log
 mkdir build
-cd build 
-cmake ..
-make
+cd build```
+
+
+*** Building on Linux ***
+```
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make ```
 
 *** Building on Windows ***
 Please use the Visual Studio 11 (2012) command prompt "Developer command prompt"
-cd g2log
-mkdir build
-cd build
+```
 cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 11" ..
 msbuild g2log_by_kjellkod.sln /p:Configuration=Release
-Release\g2log-FATAL.exe
+Release\g2log-SIGSEGV.exe
+```
+
+*** Building on *nix with Clang: Clang usage for g3log is experimental ***
+```
+cmake -DCMAKE_CXX_COMPILER=clang++ .. -DCMAKE_BUILD_TYPE=Release ..
+make 
+```
+
 
 
       
-#SOURCE CONTENTS
-3rdParty -- gtest, glog. 
------------------------
-*gtest is needed for the unit tests. 
-*glog is only needed if you want to run the glog vs g2log comparison tests
+#Enjoy
+If you like this logger (or not) it would be nice with some feedback. That way I can improve g3log and g2log and it is also nice to see if someone is using it.
 
-
-
-If you like this logger (or not) it would be nice with some feedback. That way I can 
-improve g2log and it is also nice to see if someone is using it. If you have 
-ANY questions or problems please do not hesitate in contacting me on my blog 
-http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asynchronous-loggers-taking-over/
-or at <Hedstrom at KjellKod dot cc>
+ If you have ANY questions or problems please do not hesitate in contacting me on my blog 
+http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asynchronous-loggers-taking-over/  or at <Hedstrom at KjellKod dot cc>
 
 Good luck :)
-
 Cheers
 Kjell (a.k.a. KjellKod)
