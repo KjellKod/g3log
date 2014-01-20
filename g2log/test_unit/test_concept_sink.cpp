@@ -85,10 +85,8 @@ namespace g2 {
       
       template<typename T, typename DefaultLogCall>
       std::unique_ptr< SinkHandle<T> > addSink(std::unique_ptr<T> unique, DefaultLogCall call) {
-         auto shared = std::shared_ptr<T>(unique.release());
-         auto sink = std::make_shared < internal::Sink<T> > (shared, call);
+         auto sink = std::make_shared < internal::Sink<T> > (std::move(unique), call);
          auto add_sink_call = [this, sink] { _container.push_back(sink); };
-         
          auto wait_result = g2::spawn_task(add_sink_call, _bg.get());
          wait_result.wait();
 
@@ -98,6 +96,7 @@ namespace g2 {
    };
 
 } // g2
+
 
 
 

@@ -65,8 +65,7 @@ public:
   std::unique_ptr<g2::SinkHandle<T >> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {
     using namespace g2;
     using namespace g2::internal;
-    auto shared_sink = std::shared_ptr<T>(real_sink.release());
-    auto sink = std::make_shared < Sink < T >> (shared_sink, call);
+    auto sink = std::make_shared < Sink < T >> (std::move(real_sink), call);
     addWrappedSink(sink);
     return std2::make_unique < SinkHandle < T >> (sink);
   }

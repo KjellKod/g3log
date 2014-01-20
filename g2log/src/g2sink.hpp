@@ -33,21 +33,21 @@ typedef std::function<void(LogMessageMover) > AsyncMessageCall;
 
 template<class T>
 struct Sink : public SinkWrapper {
-   std::shared_ptr<T> _real_sink;
+   std::unique_ptr<T> _real_sink;
    std::unique_ptr<kjellkod::Active> _bg;
    AsyncMessageCall _default_log_call;
 
    template<typename DefaultLogCall >
-   Sink(std::shared_ptr<T> sink, DefaultLogCall call)
+   Sink(std::unique_ptr<T> sink, DefaultLogCall call)
    : SinkWrapper (),
-   _real_sink{sink},
+   _real_sink{std::move(sink)},
    _bg(kjellkod::Active::createActive()),
    _default_log_call(std::bind(call, _real_sink.get(), std::placeholders::_1)) {
    }
 
-   Sink(std::shared_ptr<T> sink, void(T::*Call)(std::string) )
+   Sink(std::unique_ptr<T> sink, void(T::*Call)(std::string) )
    : SinkWrapper(),
-   _real_sink {sink},
+   _real_sink {std::move(sink)},
    _bg(kjellkod::Active::createActive()) {
       auto adapter = std::bind(Call, _real_sink.get(), std::placeholders::_1);
       _default_log_call = [ = ](LogMessageMover m){adapter(m.get().toString());};
