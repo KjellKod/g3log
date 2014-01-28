@@ -177,9 +177,9 @@ make
 ```
 
 *** Building on Windows ***
-Please use the Visual Studio 11 (2012) command prompt "Developer command prompt"
+Please use the Visual Studio 12 (2013) command prompt "Developer command prompt"
 ```
-cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 11" ..
+cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
 msbuild g2log_by_kjellkod.sln /p:Configuration=Release
 ```
 
