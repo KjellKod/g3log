@@ -75,13 +75,32 @@ namespace g2 {
          return g_logger_instance != nullptr;
       }
 
-      /** Should be used for unit testing. Used in production code is likely, but not always, wrong.*/
-      LogWorker* shutDownLogging() {
+
+    /** 
+     * Shutdown the logging by making the pointer to the background logger to nullptr. The object is not deleted
+     * that is the responsibility of its owner. * 
+     */
+      void shutDownLogging() {
          std::lock_guard<std::mutex> lock(g_logging_init_mutex);
-         CHECK(isLoggingInitialized()) << "NO Logger is instantiated ... exiting";
-         LogWorker *backup = g_logger_instance;
          g_logger_instance = nullptr;
-         return backup;
+      }
+
+     /** Same as the Shutdown above but called by the destructor of the LogWorker, thus ensuring that no further
+      *  LOG(...) calls can happen to  a non-existing LogWorker. 
+      *  @param active MUST BE the LogWorker initialized for logging. If it is not then this call is just ignored
+      *         and the logging continues to be active.
+      * @return true if the correct worker was given,. and shutDownLogging was called 
+      */
+      bool shutDownLoggingForActiveOnly(LogWorker* active) {
+         if(isLoggingInitialized() && nullptr != active  && 
+            (dynamic_cast<void*>(active) != dynamic_cast<void*>(g_logger_instance))) {
+           LOG(WARNING) << "\n\t\tShutting down logging, but the ID of the Logger is not the one that is active."
+                        << "\n\t\tHaving multiple instances of the g2::LogWorker is likely a BUG"
+                        << "\n\t\tEither way, this call to shutDownLogging was ignored";
+           return false;
+         }
+         shutDownLogging();
+         return true;
       }
 
 

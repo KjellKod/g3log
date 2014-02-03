@@ -9,6 +9,7 @@
 #include <iomanip>
 #include <thread>
 #include <iostream>
+#include <memory>
 namespace
 {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -49,10 +50,14 @@ int main(int argc, char** argv)
   double pi_d = 3.1415926535897932384626433832795;
   float pi_f = 3.1415926535897932384626433832795f;
 
+  using namespace g2;
 
-  auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
-  g2::initializeLogging(logger_n_handle.worker.get());
-  std::future<std::string> log_file_name = logger_n_handle.sink->call(&g2::FileSink::fileName);
+  std::unique_ptr<LogWorker> logworker{LogWorker::createWithNoSink()};
+  auto sinkHandle = logworker->addSink(std2::make_unique<FileSink>(argv[0], path_to_log_file),
+                                          &FileSink::fileWrite);
+
+  initializeLogging(logworker.get());
+  std::future<std::string> log_file_name = sinkHandle->call(&FileSink::fileName);
   std::cout << "*   This is an example of g2log. It WILL exit by a FATAL trigger" << std::endl;
   std::cout << "*   Please see the generated log and compare to the code at" << std::endl;
   std::cout << "*   g2log/test_example/main.cpp" << std::endl;

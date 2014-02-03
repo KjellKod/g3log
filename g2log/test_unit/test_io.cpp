@@ -19,6 +19,12 @@
 namespace {
 const int k_wait_time = 5; // 5s wait between LOG/CHECK FATAL till we say it's too long time
 const std::string log_directory = "./";
+const std::string t_info = "test INFO ";
+const std::string t_info2 = "test INFO 123";
+const std::string t_debug = "test DEBUG ";
+const std::string t_debug2 = "test DEBUG 1.123456";
+const std::string t_warning = "test WARNING ";
+const std::string t_warning2 = "test WARNING yello";
 } // end anonymous namespace
 
 
@@ -99,6 +105,65 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
 #endif // #ifdef G2_DYNAMIC_LOGGING
 
 
+TEST(Basics, Shutdown) {
+   std::string file_content;
+   {
+      RestoreFileLogger logger(log_directory);
+      LOG(INFO) << "Not yet shutdown. This message should make it";
+      logger.reset(); // force flush of logger (which will trigger a shutdown)
+      LOG(INFO) << "Logger is shutdown,. this message will not make it (but it's safe to try)";
+      file_content = readFileToText(logger.logFile()); // logger is already reset
+      SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
+   }
+   EXPECT_TRUE(verifyContent(file_content, "Not yet shutdown. This message should make it"));
+   EXPECT_FALSE(verifyContent(file_content, "Logger is shutdown,. this message will not make it (but it's safe to try)"));
+}
+
+TEST(Basics, Shutdownx2) {
+   std::string file_content;
+   {
+      RestoreFileLogger logger(log_directory);
+      LOG(INFO) << "Not yet shutdown. This message should make it";
+      logger.reset(); // force flush of logger (which will trigger a shutdown)
+      g2::internal::shutDownLogging(); // already called in reset, but safe to call again
+      LOG(INFO) << "Logger is shutdown,. this message will not make it (but it's safe to try)";
+      file_content = readFileToText(logger.logFile()); // already reset
+      SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
+   }
+   EXPECT_TRUE(verifyContent(file_content, "Not yet shutdown. This message should make it"));
+   EXPECT_FALSE(verifyContent(file_content, "Logger is shutdown,. this message will not make it (but it's safe to try)"));
+}
+
+TEST(Basics, ShutdownActiveLogger) {
+   std::string file_content;
+   {
+      RestoreFileLogger logger(log_directory);
+      LOG(INFO) << "Not yet shutdown. This message should make it";
+      EXPECT_TRUE(g2::internal::shutDownLoggingForActiveOnly(logger._scope->get()));
+      LOG(INFO) << "Logger is shutdown,. this message will not make it (but it's safe to try)";
+      file_content = logger.resetAndRetrieveContent();
+      SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
+   }
+   EXPECT_TRUE(verifyContent(file_content, "Not yet shutdown. This message should make it")) << "\n\n\n***************************\n" << file_content;
+   EXPECT_FALSE(verifyContent(file_content, "Logger is shutdown,. this message will not make it (but it's safe to try)"));
+}
+
+TEST(Basics, DoNotShutdownActiveLogger) {
+   std::string file_content;
+   {
+      RestoreFileLogger logger(log_directory);
+      LOG(INFO) << "Not yet shutdown. This message should make it";
+      std::unique_ptr<g2::LogWorker> duplicateLogWorker{g2::LogWorker::createWithNoSink()};
+      EXPECT_FALSE(g2::internal::shutDownLoggingForActiveOnly(duplicateLogWorker.get()));
+      LOG(INFO) << "Logger is (NOT) shutdown,. this message WILL make it";
+      file_content = logger.resetAndRetrieveContent();
+      SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
+   }
+   EXPECT_TRUE(verifyContent(file_content, "Not yet shutdown. This message should make it"));
+   EXPECT_TRUE(verifyContent(file_content, "Logger is (NOT) shutdown,. this message WILL make it")) << file_content;
+}
+
+
 TEST(LOGTest, LOG) {
    std::string file_content;
    {
@@ -116,14 +181,6 @@ TEST(LOGTest, LOG) {
 }
 
 
-namespace {
-const std::string t_info = "test INFO ";
-const std::string t_info2 = "test INFO 123";
-const std::string t_debug = "test DEBUG ";
-const std::string t_debug2 = "test DEBUG 1.123456";
-const std::string t_warning = "test WARNING ";
-const std::string t_warning2 = "test WARNING yello";
-}
 
 // printf-type log
 
@@ -327,6 +384,9 @@ TEST(CHECK, CHECK_ThatWontThrow) {
 }
 
 
+
+
+
 #ifdef G2_DYNAMIC_LOGGING 
 namespace {
    // Restore dynamic levels if turned off
@@ -466,3 +526,6 @@ TEST(DynamicLogging, DynamicLogging_IS_NOT_ENABLED) {
    //ASSERT_FALSE(g2::logLevel(DEBUG));
 }
 #endif // Dynamic logging
+
+
+

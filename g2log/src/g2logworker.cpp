@@ -63,7 +63,10 @@ struct LogWorkerImpl {
          LogMessage msg(*(uniqueMsg));
          sink->send(LogMessageMover(std::move(msg)));
       }
-      _sinks.clear(); // flush all queues
+      // only the active logger can receive a FATAL call, so it's safe to shut down logging now
+       g2::internal::shutDownLogging(); 
+       _sinks.clear(); // flush all queues
+
 
       internal::exitWithDefaultSignalHandler(fatal_signal_id);
       // should never reach this point
@@ -80,7 +83,10 @@ LogWorker::LogWorker()
 }
 
 LogWorker::~LogWorker() {
+   g2::internal::shutDownLoggingForActiveOnly(this);
    _pimpl->_bg->send([this] {_pimpl->_sinks.clear();});
+       
+
 }
 // todo move operator
 

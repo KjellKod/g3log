@@ -25,8 +25,9 @@
 #include "std2_make_unique.hpp"
 
 
-class LogWorker;
+
 namespace g2 {
+class LogWorker;
 struct LogWorkerImpl;
 
    struct DefaultFileLogger {

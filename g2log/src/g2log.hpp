@@ -69,13 +69,14 @@ void saveMessage(LogMessagePtr log_entry);
 // the originating fatal signal,. or SIGABRT if it originated from a broken contract
 void fatalCall(FatalMessagePtr message);
 
-/** FOR TESTING PURPOSES
- * Shutdown the logging by making the pointer to the background logger to nullptr
- * The \ref pointer to the g2LogWorker is owned by the instantniater \ref initializeLogging
- * and is not deleted. By restoring the ptr to nullptr we can re-initialize it later again. 
- * 
- * This is kept for test reasons and should normally not be used */
-LogWorker* shutDownLogging();
+
+// Shuts down logging. No object cleanup but further LOG(...) calls will be ignored.
+void shutDownLogging();
+
+// Shutdown logging, but ONLY if the active logger corresponds to the one currently initialized
+bool shutDownLoggingForActiveOnly(LogWorker* active);
+
+
 
 /** By default the g2log will call g2LogWorker::fatal(...) which will
  * abort() the system after flushing the logs to file. This makes unit

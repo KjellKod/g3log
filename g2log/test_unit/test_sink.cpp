@@ -27,7 +27,6 @@ using namespace g2;
       auto handle = worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
-      //worker->save("this message should trigger an atomic increment at the sink");
       LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       message.get()->write().append("this message should trigger an atomic increment at the sink");
       worker->save(message);
