@@ -11,10 +11,12 @@
 #include <memory>
 #include <thread>
 #include <chrono>
+#include <string>
 
 #include "testing_helpers.h"
 #include "g2logmessage.hpp"
 #include "g2logworker.hpp"
+#include "std2_make_unique.hpp"
 
 using namespace testing_helpers;
 using namespace std;
@@ -88,3 +90,75 @@ TEST(ConceptSink, OneHundredSinks) {
 
    cout << "test one hundred sinks is finished finished\n";
 }
+
+struct VoidReceiver {
+   std::atomic<int>* _atomicCounter;
+   explicit VoidReceiver(std::atomic<int>* counter) : _atomicCounter(counter){}
+   
+   void receiveMsg(std::string msg){ /*ignored*/}
+   void incrementAtomic(){
+     (*_atomicCounter)++;
+   }
+};
+
+TEST(ConceptSink, VoidCall__NoCall_ExpectingNoAdd) {
+   std::atomic<int> counter{0};
+   {
+      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      auto handle = worker->addSink(std2::make_unique<VoidReceiver>(&counter), &VoidReceiver::receiveMsg);
+   }  
+   EXPECT_EQ(counter, 0);
+}
+
+TEST(ConceptSink, VoidCall__OneCall_ExpectingOneAdd) {
+   std::atomic<int> counter{0};
+   {
+      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      auto handle = worker->addSink(std2::make_unique<VoidReceiver>(&counter), &VoidReceiver::receiveMsg);
+      std::future<void> ignored = handle->call(&VoidReceiver::incrementAtomic);
+   }  
+   EXPECT_EQ(counter, 1);
+}
+
+TEST(ConceptSink, VoidCall__TwoCalls_ExpectingTwoAdd) {
+   std::atomic<int> counter{0};
+   {
+      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      auto handle = worker->addSink(std2::make_unique<VoidReceiver>(&counter), &VoidReceiver::receiveMsg);
+      auto  voidFuture1 = handle->call(&VoidReceiver::incrementAtomic);
+      auto  voidFuture2 = handle->call(&VoidReceiver::incrementAtomic);
+      voidFuture1.wait();
+      EXPECT_TRUE(counter >= 1);
+   }  
+   EXPECT_EQ(counter, 2);
+}
+
+
+struct IntReceiver {
+   std::atomic<int>* _atomicCounter;
+   explicit IntReceiver(std::atomic<int>* counter) : _atomicCounter(counter){}
+   
+   void receiveMsg(std::string msg){ /*ignored*/}
+   int incrementAtomic(){
+     (*_atomicCounter)++;
+     int value = *_atomicCounter;
+     return value;
+   }
+};
+
+TEST(ConceptSink, IntCall__TwoCalls_ExpectingTwoAdd) {
+   std::atomic<int> counter{0};
+   {
+      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      auto handle = worker->addSink(std2::make_unique<IntReceiver>(&counter), &IntReceiver::receiveMsg);
+      std::future<int> intFuture1 = handle->call(&IntReceiver::incrementAtomic);
+      EXPECT_EQ(intFuture1.get(), 1);
+      EXPECT_EQ(counter, 1);
+
+     auto intFuture2 = handle->call(&IntReceiver::incrementAtomic);
+     EXPECT_EQ(intFuture2.get(), 2);
+
+   }  
+   EXPECT_EQ(counter, 2);
+}
+

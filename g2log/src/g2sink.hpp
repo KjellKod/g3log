@@ -9,6 +9,7 @@
 
 #include <memory>
 #include <functional>
+#include <type_traits>
 
 #include "g2sinkwrapper.hpp"
 #include "active.hpp"
@@ -64,7 +65,7 @@ struct Sink : public SinkWrapper {
    }
 
    template<typename Call, typename... Args>
-   auto send(Call call, Args... args)-> std::future < decltype(bind(call, _real_sink.get(), args...)()) > {
+   auto async(Call call, Args... args)-> std::future< typename std::result_of<decltype(call)(T, Args...)>::type> {
       return g2::spawn_task(std::bind(call, _real_sink.get(), args...), _bg.get());
    }
 };
