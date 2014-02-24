@@ -21,11 +21,11 @@ namespace g2
      }
 
      // All levels are by default ON: i.e. for DEBUG, INFO, WARNING, FATAL
-    constexpr const int size{ FATAL.value + 1 };
+    constexpr const int g_level_size{ FATAL.value + 1 };
     std::atomic<bool> g_log_level_status[4]{{true}, {true}, {true},{true}};   
 	
 	#ifndef _MSC_VER
-	static_assert(4 == size, "Mismatch between number of logging levels and their use");
+	static_assert(4 == g_level_size, "Mismatch between number of logging levels and their use");
 	#endif
   } // internal
 
@@ -34,7 +34,7 @@ namespace g2
   void setLogLevel(LEVELS log_level, bool enabled)
   {
     // MSC: remove when constexpr available. see static_assert above
-    assert(size == 4 && "Mismatch between number of logging levels and their use"); 
+    assert(internal::g_level_size == 4 && "Mismatch between number of logging levels and their use"); 
     int level = log_level.value;
     CHECK((level >= DEBUG.value) && (level <= FATAL.value));
     internal::g_log_level_status[level].store(enabled, std::memory_order_release);
