@@ -15,7 +15,7 @@
 #include <cstdio>
 #include <thread>
 #include <chrono>
-
+#include <exception>
 namespace {
 const int k_wait_time = 5; // 5s wait between LOG/CHECK FATAL till we say it's too long time
 const std::string log_directory = "./";
@@ -63,7 +63,7 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
       LOG(INFO) << err_msg2_ignored; // nothing happened. level not ON
 
    } catch (std::exception& e) {
-      ADD_FAILURE() << "Should never have thrown even if it is not instantiated";
+      ADD_FAILURE() << "Should never have thrown even if it is not instantiated. Ignored exception:  " << e.what();
    }
 
    RestoreFileLogger logger(log_directory); // now instantiate the logger
