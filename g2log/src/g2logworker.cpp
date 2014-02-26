@@ -84,11 +84,10 @@ LogWorker::LogWorker()
 
 LogWorker::~LogWorker() {
    g2::internal::shutDownLoggingForActiveOnly(this);
-   _pimpl->_bg->send([this] {_pimpl->_sinks.clear();});
-       
-
+   auto bg_clear_sink_call = [this] { _pimpl->_sinks.clear(); };
+   auto token_cleared = g2::spawn_task(bg_clear_sink_call, _pimpl->_bg.get());
+   token_cleared.wait();
 }
-// todo move operator
 
 void LogWorker::save(LogMessagePtr msg) {
    _pimpl->_bg->send([this, msg] {_pimpl->bgSave(msg); }); 

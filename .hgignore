@@ -1,5 +1,8 @@
 syntax: glob
 g2log-sinks/*
 3rdParty/*
-g2log/*uild/*
+g2log/build/*
+nbproject/*
+build_clang
+gtest-1.7.0
 *~

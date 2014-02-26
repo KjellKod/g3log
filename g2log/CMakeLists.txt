@@ -14,28 +14,36 @@
 # the performance and unit tests creation can be enabled by switching their
 # OPTIONs from OFF to ON --- See below at around line 110
 
-# 2012-05-29: justthread is no longer necessary on Windows (vs2011) and
-#             linux (gcc4.7.1)
-
-
-# WINDOWS == README: Example how to setup environment + running an example
-# Below written for VS11 (2012)
-# 1. please use the "Visual Studio Command Prompt 11 (2012)"
+# === WINDOWS === 
+# Example for: Visual Studio 2013 (earlier should work too)
+# 1. please use the "Visual Studio Command Prompt 12 (2013)"
 # 2. from the g2log folder
 #    mkdir build
 #    cd build;
 # 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
 # 4. msbuild g2log_by_kjellkod.sln /p:Configuration=Release
+#
+# Try to run an example, such as:
 # 5. Release\g2log-FATAL-contract.exe
 #
 #
-# >>. LINUX:To try this out from folder g2log:
+
+# ===   LINUX: === To try this out from folder g2log:
 #    mkdir build
 #    cd build
 # >> create makefiles in g2log/build directory
-#    cmake ..                              // for debug builds OR    
-# >> Alternatively: for release    cmake -DCMAKE_BUILD_TYPE=Release ..   
-#    make                      # links active, g2log and example code:  g2log-FATAL-example
+#   cmake -DCMAKE_BUILD_TYPE=Release .. 
+#    make -jN   (where N stands for number of cores you want to utilize)     
+#
+#
+#
+# ===  Clang on Linux ===
+#   From g2log/g2log
+#   mkdir build && cd build
+#   cmake -DCMAKE_CXX_COMPILER=clang++ ..
+#   if you want to double-check settings:   "VERBOSE=1 make" 
+#   otherwise just run:   "make -j"                        
+#                
 # ============================================================================
 
 cmake_minimum_required (VERSION 2.8)
@@ -63,7 +71,19 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 
-IF(UNIX)
+#cmake -DCMAKE_CXX_COMPILER=clang++ ..
+IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+    MESSAGE("")
+   MESSAGE("cmake for Clang ")
+  # WARNING: If Clang for Linux does not work with full C++11 support it might be your
+  # installation that is faulty. When I tested Clang on Ubuntu I followed the following
+  # description 
+  #  1) http://kjellkod.wordpress.com/2013/09/23/experimental-g2log-with-clang/
+  #  2) https://github.com/maidsafe/MaidSafe/wiki/Hacking-with-Clang-llvm-abi-and-llvm-libc
+  set(PLATFORM_LINK_LIBRIES rt  c++abi) 
+  set(CMAKE_CXX_FLAGS  "-std=c++11 -pthread -stdlib=libc++ -D_GLIBCXX_USE_NANOSLEEP")
+  set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
+ELSEIF(UNIX)
    MESSAGE("")
    MESSAGE("cmake for *NIX ")
    MESSAGE("if cmake finishes OK, do make")
@@ -74,9 +94,7 @@ IF(UNIX)
    # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
    set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
-ENDIF(UNIX)
-
-IF(MINGW)
+ELSEIF(MINGW)
    MESSAGE("")
    MESSAGE("cmake for MinGW ")
    MESSAGE("if cmake finishes OK, do make")
@@ -85,10 +103,7 @@ IF(MINGW)
    # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
    set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
-ENDIF(MINGW)
- 
-# Visual Studio 2011 -- std::thread etc are included with the Visual Studio package, so justthread dependencies are removed
-IF(MSVC)
+ELSEIF(MSVC)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
       # https://github.com/anhstudios/swganh/pull/186/files
@@ -102,7 +117,7 @@ IF(MSVC)
    MESSAGE("then run 'Release\\g2log-FATAL-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
    set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
-ENDIF(MSVC)
+ENDIF()
 
 
 
@@ -243,10 +258,11 @@ ENDIF(MSVC)
    # =========================
    if (USE_G2LOG_UNIT_TEST)
      MESSAGE(" g2log unit testing option ON")
-      set(GTEST_DIR ../3rdParty/gtest/gtest-1.6.0__stripped)
+      set(GTEST_DIR ../3rdParty/gtest/gtest-1.7.0)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
       include_directories(${GTEST_INCLUDE_DIRECTORIES})
-      add_library(gtest_160_lib ${GTEST_DIR}/src/gtest-all.cc ${GTEST_DIR}/src/gtest_main.cc)
+      add_library(gtest_170_lib ${GTEST_DIR}/src/gtest-all.cc)
+      set_target_properties(gtest_170_lib  PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
       enable_testing(true)
 
      # obs see this: http://stackoverflow.com/questions/9589192/how-do-i-change-the-number-of-template-arguments-supported-by-msvcs-stdtupl
@@ -262,35 +278,31 @@ ENDIF(MSVC)
          IF(${test} STREQUAL "test_filechange")
            add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
 
-         ELSEIF(${test} STREQUAL "test_sink")
-           add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
-           MESSAGE("*****************************************************")
+         #ELSEIF(${test} STREQUAL "test_sink")
+         #  add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
+         #  MESSAGE("*****************************************************")
 
          ELSE()
            add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
          ENDIF(${test} STREQUAL "test_filechange")
 
-         set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
-         set_target_properties(${test}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-         target_link_libraries(${test} lib_g3logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+        set_target_properties(${test} PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
+        set_target_properties(${test} PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
+        set_target_properties(${test} PROPERTIES COMPILE_FLAGS "-isystem -pthread ")
+        target_link_libraries(${test} lib_g3logger gtest_170_lib ${PLATFORM_LINK_LIBRIES})
       ENDFOREACH(test)
 
-      #add_executable(test_ALL  ${all_tests} ${DIR_UNIT_TEST}/test_filechange.cpp ${helper})  
-      #set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
-      #set_target_properties(test_ALL   PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-      #target_link_libraries(test_ALL   lib_g3logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
-
+ 
 
 
 
     
 
-
+# ... in progress
 #      add_executable(test_ALL  ${all_tests})
-#
-#      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "_VARIADIC_MAX=10")      
-#      set_target_properties(${test_ALL}  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-#     target_link_libraries(${test_ALL}   lib_g3logger gtest_160_lib ${PLATFORM_LINK_LIBRIES})
+#      set_target_properties(g2log-unit_test_all PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
+#      set_target_properties(g2log-unit_test_all PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
+#     target_link_libraries(${test_ALL}   lib_g3logger gtest_170_lib ${PLATFORM_LINK_LIBRIES})
 
 endif (USE_G2LOG_UNIT_TEST)
 
