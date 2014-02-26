@@ -62,10 +62,9 @@ The code is given for free as public domain. This gives the option to change, us
  and do whatever with it, no strings attached.
 
 9. Three versions of g2log exist. 
-    * This version: *g3log* : which is made to facilitate  easy adding of custom log receivers. 
-    * [g2log-dev](https://bitbucket.org/KjellKod/g2log-dev): Acting as feature try-out and playground. 
+    * This version: *[g3log](https://bitbucket.org/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013)
     * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio. 
-
+    * [g2log-dev](https://bitbucket.org/KjellKod/g2log-dev)*: Acting as feature try-out and playground. 
 
 
 
@@ -184,7 +183,6 @@ msbuild g2log_by_kjellkod.sln /p:Configuration=Release
 ```
 
 *** Building on *nix with Clang: 
-Warning: Clang usage for g3log is experimental ***
 ```
 cmake -DCMAKE_CXX_COMPILER=clang++ .. -DCMAKE_BUILD_TYPE=Release ..
 make 
