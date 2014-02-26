@@ -49,11 +49,11 @@ int main(int argc, char** argv)
   const std::string  g_measurement_dump= g_path + g_prefix_log_name + "_RESULT.txt";
 
   std::ostringstream oss;
-  const int64_t us_to_s = 1000000;
+  const uint64_t us_to_s = 1000000;
   oss << "\n\n" << title << " performance " << number_of_threads << " threads MEAN times\n";
   oss << "Each thread running #: " << g_loop << " * " << g_iterations << " iterations of log entries" << std::endl;  // worst mean case is about 10us per log entry
-  const size_t xtra_margin = 2;
-  oss << "*** It can take som time. Please wait: Approximate wait time on MY PC was:  " <<number_of_threads*  (int64_t) (g_iterations * 10 * xtra_margin / us_to_s ) << " seconds" << std::endl;
+  const uint64_t xtra_margin = 2;
+  oss << "*** It can take som time. Please wait: Approximate wait time on MY PC was:  " <<number_of_threads*  (uint64_t) (g_iterations * 10 * xtra_margin / us_to_s ) << " seconds" << std::endl;
   writeTextToFile(g_measurement_dump, oss.str(), kAppend);
   oss.str(""); // clear the stream
 
@@ -91,12 +91,12 @@ int main(int argc, char** argv)
 #endif
 
   auto worker_end_time = std::chrono::high_resolution_clock::now();
-  auto application_time_us = std::chrono::duration_cast<microsecond>(application_end_time - start_time).count();
-  auto total_time_us = std::chrono::duration_cast<microsecond>(worker_end_time - start_time).count();
+  uint64_t application_time_us = std::chrono::duration_cast<microsecond>(application_end_time - start_time).count();
+  uint64_t total_time_us = std::chrono::duration_cast<microsecond>(worker_end_time - start_time).count();
 
   oss << "\n" << number_of_threads << "*" << g_iterations << " log entries took: [" << total_time_us / 1000000 << " s] to write to disk"<< std::endl;
   oss << "[Application(" << number_of_threads << "):\t\t:" << application_time_us/1000 << " ms]" << std::endl;
-  oss << "[Background thread to finish\t:" << total_time_us/1000 << " ms]" << std::endl;
+  oss << "[Background thread to finish\t:" << total_time_us/uint64_t(1000 )<< " ms]" << std::endl;
   oss << "\nAverage time per log entry:" << std::endl;
   oss << "[Application: " << application_time_us/(number_of_threads*g_iterations) << " us]" << std::endl;
   oss << "[Background+Application: " << total_time_us/(number_of_threads*g_iterations) << " us]" << std::endl;

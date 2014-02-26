@@ -90,7 +90,7 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
       LOG(INFO) << err_msg2_ignored;
 
    } catch (std::exception& e) {
-      ADD_FAILURE() << "Should never have thrown even if it is not instantiated";
+      ADD_FAILURE() << "Should never have thrown even if it is not instantiated: " << e.what();
    }
 
    RestoreFileLogger logger(log_directory); // now instantiate the logger

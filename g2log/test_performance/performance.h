@@ -30,8 +30,8 @@ using namespace g2::internal;
 #endif
 
 typedef std::chrono::high_resolution_clock::time_point time_point;
-typedef std::chrono::duration<int64_t,std::ratio<1, 1000> > millisecond;
-typedef std::chrono::duration<int64_t,std::ratio<1, 1000000> > microsecond;
+typedef std::chrono::duration<uint64_t,std::ratio<1, 1000> > millisecond;
+typedef std::chrono::duration<uint64_t,std::ratio<1, 1000000> > microsecond;
 
 namespace g2_test
 {
@@ -41,11 +41,11 @@ enum WriteMode
   kTruncate = 1
 };
 
-const size_t g_loop = 1;
-const size_t g_iterations = 1000000;
+const uint64_t g_loop{1};
+const uint64_t g_iterations{1000000};
 const char* charptrmsg = "\tmessage by char*";
-const std::string strmsg = "\tmessage by string";
-float pi_f = 3.1415926535897932384626433832795f;
+const std::string strmsg{"\tmessage by string"};
+float pi_f{3.1415926535897932384626433832795f};
 
 
 bool writeTextToFile(const std::string& filename, const std::string& msg, const WriteMode write_mode, bool push_out = true)
@@ -72,17 +72,17 @@ bool writeTextToFile(const std::string& filename, const std::string& msg, const 
   return true;
 }
 
-int64_t mean(const std::vector<int64_t> &v)
+uint64_t mean(const std::vector<uint64_t> &v)
 {
-  int64_t total =  std::accumulate(v.begin(), v.end(), 0 ); // '0' is the initial value
+  uint64_t total =  std::accumulate(v.begin(), v.end(), uint64_t(0) ); // '0' is the initial value
   return total/v.size();
 }
 
 
 
 
-void measurePeakDuringLogWrites(const std::string& title, std::vector<int64_t>& result);
-inline void measurePeakDuringLogWrites(const std::string& title, std::vector<int64_t>& result)
+void measurePeakDuringLogWrites(const std::string& title, std::vector<uint64_t>& result);
+inline void measurePeakDuringLogWrites(const std::string& title, std::vector<uint64_t>& result)
 {
 
 
@@ -94,12 +94,12 @@ inline void measurePeakDuringLogWrites(const std::string& title, std::vector<int
   std::cout << "ERROR no performance type chosen" << std::endl;
   assert(false);
 #endif
-  for(size_t count = 0; count < g_iterations; ++count)
+  for(uint64_t count = 0; count < g_iterations; ++count)
   {
     auto start_time = std::chrono::high_resolution_clock::now();
     LOG(INFO) << title << " iteration #" << count << " " << charptrmsg << strmsg << " and a float: " << std::setprecision(6) << pi_f;
     auto stop_time = std::chrono::high_resolution_clock::now();
-    auto time_us = std::chrono::duration_cast<microsecond>(stop_time - start_time).count();
+    uint64_t time_us = std::chrono::duration_cast<microsecond>(stop_time - start_time).count();
     result.push_back(time_us);
   }
 }
@@ -116,7 +116,7 @@ inline void doLogWrites(const std::string& title)
   std::cout << "ERROR no performance type chosen" << std::endl;
   assert(false);
 #endif
-  for(size_t count = 0; count < g_iterations; ++count)
+  for(uint64_t count = 0; count < g_iterations; ++count)
   {
     LOG(INFO) << title << " iteration #" << count << " " << charptrmsg << strmsg << " and a float: " << std::setprecision(6) << pi_f;
   }
