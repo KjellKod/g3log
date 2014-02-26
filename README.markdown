@@ -152,7 +152,7 @@ int main(int argc, char**argv) {
 
 
 
-# BUILDING g2log: 
+# BUILDING g3log: 
 -----------
 The default is to build an example binary 'g2log-FATAL'
 I suggest you start with that, run it and view the created log also.
@@ -182,7 +182,7 @@ cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
 msbuild g2log_by_kjellkod.sln /p:Configuration=Release
 ```
 
-*** Building on *nix with Clang: 
+** Building on *nix with Clang:  **
 ```
 cmake -DCMAKE_CXX_COMPILER=clang++ .. -DCMAKE_BUILD_TYPE=Release ..
 make 
