@@ -5,7 +5,6 @@
  * ============================================================================*/
 
 #include "g2logmessagecapture.hpp"
-#include "g2log.hpp"
 
 LogCapture::~LogCapture() {
    using namespace g2::internal;

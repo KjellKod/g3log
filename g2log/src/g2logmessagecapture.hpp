@@ -6,11 +6,10 @@
 
 #pragma once
 #include <string>
-#include <iostream>
+#include <sstream>
 #include <cstdarg>
 
 #include "g2loglevels.hpp"
-#include "g2logmessage.hpp"
 #include "crashhandler.hpp"
 #include "g2log.hpp"
 

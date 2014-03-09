@@ -293,14 +293,14 @@ ENDIF()
     #
     # Test for Linux, runtime loading of dynamic libraries
     #     
-    if(NOT WIN32)
+    if(NOT WIN32 AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
        add_library(tester_sharedlib SHARED ${DIR_UNIT_TEST}/tester_sharedlib.h ${DIR_UNIT_TEST}/tester_sharedlib.cpp)
        target_link_libraries(tester_sharedlib g3logger_shared)
 
        add_executable(test_dynamic_loaded_shared_lib ../test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
-       target_link_libraries(test_dynamic_loaded_shared_lib  -ldl g3logger_shared gtest_170_lib )
+       target_link_libraries(test_dynamic_loaded_shared_lib  g3logger_shared -ldl  gtest_170_lib )
     endif (NOT WIN32)
  
 
