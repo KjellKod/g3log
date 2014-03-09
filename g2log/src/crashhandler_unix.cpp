@@ -6,7 +6,7 @@
 
 #include "crashhandler.hpp"
 #include "g2logmessage.hpp"
-#include "g2LogMessageBuilder.hpp"
+#include "g2logmessagecapture.hpp"
 
 #include <csignal>
 #include <cstring>
@@ -20,7 +20,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
-
+#include "g2loglevels.hpp"
 
 #ifdef __clang__
 #include <sys/ucontext.h>
@@ -33,21 +33,23 @@ namespace {
    // Dump of stack,. then exit through g2log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
    // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
+
    void crashHandler(int signal_number, siginfo_t *info, void *unused_context) {
       using namespace g2::internal;
 
       std::ostringstream oss;
       oss << "Received fatal signal: " << g2::internal::signalName(signal_number);
       oss << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
-      oss << stackdump();
+      //oss << stackdump();
 
       { // Local scope, trigger send
          std::ostringstream fatal_stream;
          fatal_stream << oss.str() << std::endl;
-         fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;        
-         g2::FatalMessageBuilder trigger(fatal_stream.str(), signal_number);
-      } // message sent to g2LogWorker by FatalMessageBuilder
-      // wait to die -- will be inside the FatalMessageBuilder
+         fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;
+         LogCapture trigger(FATAL_SIGNAL, signal_number);
+         trigger.stream() << fatal_stream.str();
+      } // message sent to g2LogWorker
+      // wait to die
    }
 } // end anonymous namespace
 
@@ -71,6 +73,7 @@ namespace g2 {
    //          ,plenty of examples when both or either are used
    //          http://stackoverflow.com/questions/6878546/why-doesnt-parent-process-return-to-the-exact-location-after-handling-signal_number
    namespace internal {
+
       std::string stackdump() {
          const size_t max_dump_size = 50;
          void* dump[max_dump_size];
@@ -121,14 +124,18 @@ namespace g2 {
          return oss.str();
       }
 
-
       std::string signalName(int signal_number) {
          switch (signal_number) {
-            case SIGABRT: return "SIGABRT"; break;
-            case SIGFPE:  return "SIGFPE";  break;
-            case SIGSEGV: return "SIGSEGV"; break;
-            case SIGILL:  return "SIGILL";  break;
-            case SIGTERM: return "SIGTERM"; break;
+            case SIGABRT: return "SIGABRT";
+               break;
+            case SIGFPE: return "SIGFPE";
+               break;
+            case SIGSEGV: return "SIGSEGV";
+               break;
+            case SIGILL: return "SIGILL";
+               break;
+            case SIGTERM: return "SIGTERM";
+               break;
             default:
                std::ostringstream oss;
                oss << "UNKNOWN SIGNAL(" << signal_number << ")";
@@ -139,10 +146,11 @@ namespace g2 {
       // Triggered by g2log->g2LogWorker after receiving a FATAL trigger
       // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
       // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
+
       void exitWithDefaultSignalHandler(int signal_number) {
          std::cerr << "Exiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
          struct sigaction action;
-         memset(&action, 0, sizeof (action));  //
+         memset(&action, 0, sizeof (action)); //
          sigemptyset(&action.sa_mask);
          action.sa_handler = SIG_DFL; // take default action for the signal
          sigaction(signal_number, &action, NULL);
@@ -151,12 +159,11 @@ namespace g2 {
       }
    } // end g2::internal
 
-
    void installSignalHandler() {
       struct sigaction action;
       memset(&action, 0, sizeof (action));
       sigemptyset(&action.sa_mask);
-      action.sa_sigaction = &crashHandler;  // callback to crashHandler for fatal signals
+      action.sa_sigaction = &crashHandler; // callback to crashHandler for fatal signals
       // sigaction to use sa_sigaction file. ref: http://www.linuxprogrammingblog.com/code-examples/sigaction
       action.sa_flags = SA_SIGINFO;
 

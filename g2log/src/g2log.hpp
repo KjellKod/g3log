@@ -24,7 +24,7 @@
 #include <functional>
 
 #include "g2loglevels.hpp"
-#include "g2LogMessageBuilder.hpp"
+#include "g2logmessagecapture.hpp"
 #include "g2logmessage.hpp"
 
 #if !(defined(__PRETTY_FUNCTION__))
@@ -45,64 +45,59 @@
  * --- Thanks for a great 2011 and good luck with 'g2' --- KjellKod 
  */
 namespace g2 {
-class LogWorker;
-struct LogMessage;
-struct FatalMessage;
+   class LogWorker;
+   struct LogMessage;
+   struct FatalMessage;
 
-/** Should be called at very first startup of the software with \ref g2LogWorker
- *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
-void initializeLogging(LogWorker *logger);
+   /** Should be called at very first startup of the software with \ref g2LogWorker
+    *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
+   void initializeLogging(LogWorker *logger);
 
+   
+   namespace internal {
+      /// @returns true if logger is initialized
+      bool isLoggingInitialized();
 
+      // Save the created LogMessage to any existing sinks
+      void saveMessage(const char* message, const char* file, int line, const char* function, const LEVELS& level,
+              const char* boolean_expression, int fatal_signal, const char* stack_trace);
 
+      void pushMessageToLogger(LogMessagePtr log_entry);
 
-
-
-namespace internal {
-/// @returns true if logger is initialized
-bool isLoggingInitialized();
-
-// Save the created LogMessage to any existing sinks
-void saveMessage(LogMessagePtr log_entry);
-
-// Save the created FatalMessage to any existing sinks and exit with 
-// the originating fatal signal,. or SIGABRT if it originated from a broken contract
-void fatalCall(FatalMessagePtr message);
-
-
-// Shuts down logging. No object cleanup but further LOG(...) calls will be ignored.
-void shutDownLogging();
-
-// Shutdown logging, but ONLY if the active logger corresponds to the one currently initialized
-bool shutDownLoggingForActiveOnly(LogWorker* active);
+      // Save the created FatalMessage to any existing sinks and exit with 
+      // the originating fatal signal,. or SIGABRT if it originated from a broken contract
+      void fatalCall(FatalMessagePtr message);
 
 
+      // Shuts down logging. No object cleanup but further LOG(...) calls will be ignored.
+      void shutDownLogging();
 
-/** By default the g2log will call g2LogWorker::fatal(...) which will
- * abort() the system after flushing the logs to file. This makes unit
- * test of FATAL level cumbersome. A work around is to change the
- * 'fatal call'  which can be done here 
- * 
- *  The bool return values in the fatal_call is whether or not the fatal_call should
- *  
- */
-void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessagePtr) > fatal_call);
-} // internal
+      // Shutdown logging, but ONLY if the active logger corresponds to the one currently initialized
+      bool shutDownLoggingForActiveOnly(LogWorker* active);
+
+
+
+      /** By default the g2log will call g2LogWorker::fatal(...) which will
+       * abort() the system after flushing the logs to file. This makes unit
+       * test of FATAL level cumbersome. A work around is to change the
+       * 'fatal call'  which can be done here 
+       * 
+       *  The bool return values in the fatal_call is whether or not the fatal_call should
+       *  
+       */
+      void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessagePtr) > fatal_call);
+   } // internal
 } // g2
 
-
-
-
-
-#define INTERNAL_LOG_MESSAGE(level) g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
-
+#define INTERNAL_LOG_MESSAGE(level) LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
 
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
-        g2::LogMessageBuilder(__FILE__, __LINE__, __PRETTY_FUNCTION__, g2::internal::CONTRACT).setExpression(boolean_expression).addStackTrace()
+        LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, g2::internal::CONTRACT, boolean_expression)
 
 
 // LOG(level) is the API for the stream log
 #define LOG(level) if(g2::logLevel(level)) INTERNAL_LOG_MESSAGE(level).stream()
+
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
@@ -165,16 +160,16 @@ And here is possible output
 :      Width trick:    10
 :      A string  \endverbatim */
 #define LOGF(level, printf_like_message, ...)                 \
-    if(g2::logLevel(level)) INTERNAL_LOG_MESSAGE(level).messageSave(printf_like_message, ##__VA_ARGS__)
+    if(g2::logLevel(level)) INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Conditional log printf syntax
 #define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
   if(true == boolean_expression)                                     \
-  if(g2::logLevel(level))  INTERNAL_LOG_MESSAGE(level).messageSave(printf_like_message, ##__VA_ARGS__)
+  if(g2::logLevel(level))  INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Throws std::runtime_eror if contract breaks
 #define CHECK_F(boolean_expression, printf_like_message, ...)    \
-  if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).messageSave(printf_like_message, ##__VA_ARGS__)
+  if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
 
 

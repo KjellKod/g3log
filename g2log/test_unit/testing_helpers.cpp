@@ -1,8 +1,8 @@
 /** ==========================================================================
-* 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
-* with no warranties. This code is yours to share, use and modify with no
-* strings attached and no restrictions or obligations.
-* ============================================================================*/
+ * 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+ * with no warranties. This code is yours to share, use and modify with no
+ * strings attached and no restrictions or obligations.
+ * ============================================================================*/
 
 
 #include <gtest/gtest.h>
@@ -23,30 +23,25 @@ namespace testing_helpers {
    int g_mockFatal_signal = -1;
    bool g_mockFatalWasCalled = false;
 
-
    std::string mockFatalMessage() {
       return g_mockFatal_message;
    }
-
 
    int mockFatalSignal() {
       return g_mockFatal_signal;
    }
 
-
    bool mockFatalWasCalled() {
       return g_mockFatalWasCalled;
    }
-
 
    void mockFatalCall(FatalMessagePtr fatal_message) {
       g_mockFatal_message = fatal_message.get()->toString();
       g_mockFatal_signal = fatal_message.get()->_signal_id;
       g_mockFatalWasCalled = true;
       LogMessagePtr message{fatal_message.release()};
-      g2::internal::saveMessage(message); //fatal_message.copyToLogMessage());
+      g2::internal::pushMessageToLogger(message); //fatal_message.copyToLogMessage());
    }
-
 
    void clearMockFatal() {
       g_mockFatal_message.clear();
@@ -54,18 +49,15 @@ namespace testing_helpers {
       g_mockFatalWasCalled = false;
    }
 
-
    bool removeFile(std::string path_to_file) {
       return (0 == std::remove(path_to_file.c_str()));
    }
-
 
    bool verifyContent(const std::string &total_text, std::string msg_to_find) {
       std::string content(total_text);
       size_t location = content.find(msg_to_find);
       return (location != std::string::npos);
    }
-
 
    std::string readFileToText(std::string filename) {
       std::ifstream in;
@@ -80,12 +72,11 @@ namespace testing_helpers {
       return oss.str();
    }
 
-
    size_t LogFileCleaner::size() {
       return logs_to_clean_.size();
    }
 
-
+   
    LogFileCleaner::~LogFileCleaner() {
       std::lock_guard<std::mutex> lock(g_mutex);
       {
@@ -98,7 +89,6 @@ namespace testing_helpers {
       } // mutex
    }
 
-
    void LogFileCleaner::addLogToClean(std::string path_to_log) {
       std::lock_guard<std::mutex> lock(g_mutex);
       {
@@ -107,11 +97,12 @@ namespace testing_helpers {
       }
    }
 
+   ScopedLogger::ScopedLogger() : _currentWorker(g2::LogWorker::createWithNoSink()) {}
+   ScopedLogger::~ScopedLogger() {}
 
-   ScopedLogger::ScopedLogger() : _currentWorker(g2::LogWorker::createWithNoSink()) { }
-   ScopedLogger::~ScopedLogger() { }
-   g2::LogWorker* ScopedLogger::get() { return _currentWorker.get();  }
-
+   g2::LogWorker* ScopedLogger::get() {
+      return _currentWorker.get();
+   }
 
    RestoreFileLogger::RestoreFileLogger(std::string directory)
    : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std2::make_unique<g2::FileSink>("UNIT_TEST_LOGGER", directory), &g2::FileSink::fileWrite)) {
@@ -123,15 +114,14 @@ namespace testing_helpers {
       auto filename = _handle->call(&FileSink::fileName);
       if (!filename.valid()) ADD_FAILURE();
       _log_file = filename.get();
-    
+
 #ifdef G2_DYNAMIC_LOGGING
-    g2::setLogLevel(INFO, true);
-    g2::setLogLevel(DEBUG, true);
-    g2::setLogLevel(WARNING, true);
-    g2::setLogLevel(FATAL, true);
+      g2::setLogLevel(INFO, true);
+      g2::setLogLevel(DEBUG, true);
+      g2::setLogLevel(WARNING, true);
+      g2::setLogLevel(FATAL, true);
 #endif
    }
-
 
    RestoreFileLogger::~RestoreFileLogger() {
       g2::internal::shutDownLogging();
@@ -141,21 +131,20 @@ namespace testing_helpers {
          ADD_FAILURE();
    }
 
-
    std::string RestoreFileLogger::logFile() {
-     if (_scope) {
-       // beware for race condition
-       // example: 
-       //         LOG(INFO) << ... 
-       //     auto file =    logger.logFile()
-       //     auto content = ReadContentFromFile(file)
-       // ... it is not guaranteed that the content will contain (yet) the LOG(INFO)
-       std::future<std::string> filename = _handle->call(&g2::FileSink::fileName);
-       _log_file = filename.get();
-     }
-     return _log_file;  
-  }
-  
+      if (_scope) {
+         // beware for race condition
+         // example: 
+         //         LOG(INFO) << ... 
+         //     auto file =    logger.logFile()
+         //     auto content = ReadContentFromFile(file)
+         // ... it is not guaranteed that the content will contain (yet) the LOG(INFO)
+         std::future<std::string> filename = _handle->call(&g2::FileSink::fileName);
+         _log_file = filename.get();
+      }
+      return _log_file;
+   }
+
    // Beware of race between LOG(...) and this function. 
    // since LOG(...) passes two queues but the handle::call only passes one queue 
    // the handle::call can happen faster
@@ -166,12 +155,4 @@ namespace testing_helpers {
       auto file = filename.get();
       return readFileToText(file);
    }
-
-
-
-
-
-
-
-
 } // testing_helpers

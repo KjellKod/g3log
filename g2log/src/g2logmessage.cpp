@@ -110,37 +110,7 @@ namespace g2 {
    , _level(other._level)
    , _expression(std::move(other._expression))
    , _message(std::move(other._message)) {
-   }
-
-
-//   LogMessage& LogMessage::operator=(const LogMessage& other) {
-//      _timestamp = other._timestamp;
-//      _microseconds = other._microseconds;
-//      _file = other._file;
-//      _line=other._line;
-//      _function=other._function;
-//      _level.value = other._level.value;
-//      _level.text = other._level.text;
-//      _expression= other._expression;
-//      stream().str(other.stream().str());
-//   }
-  
-   
-//   LogMessage& LogMessage::operator=(LogMessage&& other) {
-//      _timestamp = other._timestamp;
-//      _microseconds = other._microseconds;
-//      _file = std::move(other._file);
-//      _line = other._line;
-//      _function = std::move(other._function);
-//      _level = other._level;
-//      _expression = std::move(other._expression);
-//      std::move(_stream, other._stream);
-//      return *this;
-//   }
-//
-//      
-//     
-      
+   }    
 
    FatalMessage::FatalMessage(const LogMessage& details, int signal_id) 
    : LogMessage(details), _signal_id(signal_id) { }

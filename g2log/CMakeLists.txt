@@ -135,9 +135,10 @@ ENDIF()
    # Create the g2log library
    include_directories(${LOG_SRC})
    MESSAGE("  g3logger files: [${SRC_FILES}]")
-   add_library(lib_g3logger  ${SRC_FILES})
-   set_target_properties(lib_g3logger PROPERTIES LINKER_LANGUAGE CXX)
-
+   add_library(g3logger ${SRC_FILES})
+   set_target_properties(g3logger PROPERTIES LINKER_LANGUAGE CXX)
+   add_library(g3logger_shared SHARED ${SRC_FILES})
+   set_target_properties(g3logger_shared PROPERTIES LINKER_LANGUAGE CXX)
 
 
    # ============================================================================
@@ -197,8 +198,8 @@ ENDIF()
       include_directories (${DIR_EXAMPLE})
       add_executable(g2log-FATAL-contract ${DIR_EXAMPLE}/main_contract.cpp)
       add_executable(g2log-FATAL-sigsegv ${DIR_EXAMPLE}/main_sigsegv.cpp)
-      target_link_libraries(g2log-FATAL-contract lib_g3logger ${PLATFORM_LINK_LIBRIES})
-      target_link_libraries(g2log-FATAL-sigsegv lib_g3logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-FATAL-contract g3logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-FATAL-sigsegv g3logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_SIMPLE_EXAMPLE)
 
 
@@ -213,13 +214,13 @@ ENDIF()
                     ${DIR_PERFORMANCE}/main_threaded_mean.cpp ${DIR_PERFORMANCE}/performance.h)
       # Turn on G2LOG performance flag
       set_target_properties(g2log-performance-threaded_mean PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-      target_link_libraries(g2log-performance-threaded_mean lib_g3logger ${PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g2log-performance-threaded_mean g3logger ${PLATFORM_LINK_LIBRIES})
 
      # WORST CASE PERFORMANCE TEST
      add_executable(g2log-performance-threaded_worst ${DIR_PERFORMANCE}/main_threaded_worst.cpp ${DIR_PERFORMANCE}/performance.h)
      # Turn on G2LOG performance flag
      set_target_properties(g2log-performance-threaded_worst  PROPERTIES COMPILE_DEFINITIONS "G2LOG_PERFORMANCE=1")
-     target_link_libraries(g2log-performance-threaded_worst  lib_g3logger ${PLATFORM_LINK_LIBRIES})
+     target_link_libraries(g2log-performance-threaded_worst  g3logger ${PLATFORM_LINK_LIBRIES})
    endif (USE_G2LOG_PERFORMANCE)
 
 
@@ -277,11 +278,6 @@ ENDIF()
         SET(all_tests  ${all_tests} ${DIR_UNIT_TEST}/${test}.cpp )
          IF(${test} STREQUAL "test_filechange")
            add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
-
-         #ELSEIF(${test} STREQUAL "test_sink")
-         #  add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
-         #  MESSAGE("*****************************************************")
-
          ELSE()
            add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
          ENDIF(${test} STREQUAL "test_filechange")
@@ -291,20 +287,23 @@ ENDIF()
         IF( NOT(MSVC))
            set_target_properties(${test} PROPERTIES COMPILE_FLAGS "-isystem -pthread ")
         ENDIF( NOT(MSVC)) 
-        target_link_libraries(${test} lib_g3logger gtest_170_lib ${PLATFORM_LINK_LIBRIES})
+        target_link_libraries(${test} g3logger gtest_170_lib ${PLATFORM_LINK_LIBRIES})
       ENDFOREACH(test)
+   
+    #
+    # Test for Linux, runtime loading of dynamic libraries
+    #     
+    if(NOT WIN32)
+       add_library(tester_sharedlib SHARED ${DIR_UNIT_TEST}/tester_sharedlib.h ${DIR_UNIT_TEST}/tester_sharedlib.cpp)
+       target_link_libraries(tester_sharedlib g3logger_shared)
 
+       add_executable(test_dynamic_loaded_shared_lib ../test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
+       set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
+       set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
+       target_link_libraries(test_dynamic_loaded_shared_lib  -ldl g3logger_shared gtest_170_lib )
+    endif (NOT WIN32)
  
 
-
-
-    
-
-# ... in progress
-#      add_executable(test_ALL  ${all_tests})
-#      set_target_properties(g2log-unit_test_all PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
-#      set_target_properties(g2log-unit_test_all PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
-#     target_link_libraries(${test_ALL}   lib_g3logger gtest_170_lib ${PLATFORM_LINK_LIBRIES})
 
 endif (USE_G2LOG_UNIT_TEST)
 
