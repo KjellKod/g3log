@@ -1,6 +1,6 @@
 #  CMakeLists.txt cmake configuration for g2log test
 # g2log is a KjellKod Logger
-# 2011 @author Kjell Hedström, hedstrom@kjellkod.cc
+# 2011 @author Kjell Hedström, hedstrom@kjellkod.cc 
 # ==================================================================
 # 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
 #    risk and comes  with no warranties.
@@ -72,37 +72,35 @@ endif()
 
 
 #cmake -DCMAKE_CXX_COMPILER=clang++ ..
-IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    MESSAGE("")
-   MESSAGE("cmake for Clang ")
   # WARNING: If Clang for Linux does not work with full C++11 support it might be your
   # installation that is faulty. When I tested Clang on Ubuntu I followed the following
   # description 
   #  1) http://kjellkod.wordpress.com/2013/09/23/experimental-g2log-with-clang/
   #  2) https://github.com/maidsafe/MaidSafe/wiki/Hacking-with-Clang-llvm-abi-and-llvm-libc
-  set(PLATFORM_LINK_LIBRIES rt  c++abi) 
-  set(CMAKE_CXX_FLAGS  "-std=c++11 -pthread -stdlib=libc++ -D_GLIBCXX_USE_NANOSLEEP")
-  set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
-ELSEIF(UNIX)
+IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
    MESSAGE("")
-   MESSAGE("cmake for *NIX ")
+   MESSAGE("cmake for Clang ")
+   if (APPLE)
+       set(PLATFORM_LINK_LIBRIES c++abi)
+   else()
+       set(PLATFORM_LINK_LIBRIES rt  c++abi)
+   endif()
+  set(CMAKE_CXX_FLAGS  "-Wall -std=c++11  -pthread -stdlib=libc++ -Wunused -D_GLIBCXX_USE_NANOSLEEP")
+
+
+ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+   MESSAGE("")
+   MESSAGE("cmake for GCC ")
    MESSAGE("if cmake finishes OK, do make")
    MESSAGE("then run './g2log-FATAL-example' or whatever performance test you feel like trying")
    MESSAGE("")
-   set(PLATFORM_LINK_LIBRIES rt)
-   # -rdynamic is needed for correct stack dumps with demangling
-   # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
-   set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
-   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_unix.cpp)
-ELSEIF(MINGW)
-   MESSAGE("")
-   MESSAGE("cmake for MinGW ")
-   MESSAGE("if cmake finishes OK, do make")
-   MESSAGE("then run './g2log-FATAL-example' or whatever performance test you feel like trying")
-   MESSAGE("")
-   # -D_GLIBCXX_USE_NANOSLEEP is needed for this_thread sleep (unit testing)
-   set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11 ${CMAKE_CXX_FLAGS_DEBUG} -pthread -D_GLIBCXX_USE_NANOSLEEP")
-   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
+   if (APPLE)
+       set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP")
+   else()
+       set(PLATFORM_LINK_LIBRIES rt)
+       set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 -pthread -D_GLIBCXX_USE_NANOSLEEP")
+   endif()
+
 ELSEIF(MSVC)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
@@ -116,7 +114,6 @@ ELSEIF(MSVC)
    MESSAGE("if cmake finishes OK, do 'msbuild g2log_by_kjellkod.sln /p:Configuration=Release'")
    MESSAGE("then run 'Release\\g2log-FATAL-example.exe'  or whatever performance test you feel like trying")
    MESSAGE("")
-   set(SRC_PLATFORM_SPECIFIC ${LOG_SRC}/crashhandler_win.cpp)
 ENDIF()
 
 
@@ -301,7 +298,7 @@ ENDIF()
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
        target_link_libraries(test_dynamic_loaded_shared_lib  g3logger_shared -ldl  gtest_170_lib )
-    endif (NOT WIN32)
+    endif()
  
 
 

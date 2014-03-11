@@ -22,7 +22,9 @@
 #include <iostream>
 #include "g2loglevels.hpp"
 
-#ifdef __clang__
+
+// Linux/Clang, OSX/Clang, OSX/gcc
+#if (defined(__clang__) || defined(__APPLE__)) 
 #include <sys/ucontext.h>
 #else
 #include <ucontext.h>
