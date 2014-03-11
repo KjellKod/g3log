@@ -1,9 +1,12 @@
 #include <g2log.hpp>
 #include <g2logworker.hpp>
+#include <g2filesink.hpp>
+#include <std2_make_unique.hpp>
+
 #include <gtest/gtest.h>
 #include <string>
 #include <vector>
-#include "std2_make_unique.hpp"
+
 #include "tester_sharedlib.h"
 #include <dlfcn.h>
 
@@ -23,6 +26,9 @@ TEST(DynamicLoadOfLibrary, JustLoadAndExit) {
    { // scope to flush logs at logworker exit
       auto worker = g2::LogWorker::createWithNoSink();
       auto handle = worker->addSink(std2::make_unique<LogMessageCounter>(std::ref(receiver)), &LogMessageCounter::countMessages);
+      
+      // add another sink just for more throughput of data
+      auto fileHandle = worker->addSink(std2::make_unique<g2::FileSink>("runtimeLoadOfDynamiclibs", "/tmp"), &g2::FileSink::fileWrite);
       g2::initializeLogging(worker.get());
 
       void* libHandle = dlopen("libtester_sharedlib.so", RTLD_LAZY | RTLD_GLOBAL);
