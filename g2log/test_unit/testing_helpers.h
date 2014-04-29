@@ -34,7 +34,7 @@ namespace testing_helpers {
  @verbatim
  Example: 
   stringstream buffer;   
-  ScopedCout guard(&buffer);
+  ScopedCout guard(std::cout, &buffer); // std::cerr is also fine 
   cout << "Hello World";
   ASSERT_STREQ(buffer.str().c_str(), "Hello World"); */
 class ScopedOut {

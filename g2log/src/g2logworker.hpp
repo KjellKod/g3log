@@ -13,9 +13,9 @@
 
 
 #include <memory>
-#include <future>
 #include <string>
 #include <utility>
+#include <vector>
 
 #include "g2log.hpp"
 #include "g2sinkwrapper.hpp"
@@ -25,53 +25,64 @@
 #include "std2_make_unique.hpp"
 
 
-
 namespace g2 {
-class LogWorker;
-struct LogWorkerImpl;
+   class LogWorker;
+   struct LogWorkerImpl;
 
    struct DefaultFileLogger {
-    DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory);
-    std::unique_ptr<LogWorker> worker;
-    std::unique_ptr<g2::SinkHandle<g2::FileSink>> sink;
-  };
+      DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory);
+      std::unique_ptr<LogWorker> worker;
+      std::unique_ptr<g2::SinkHandle<g2::FileSink>> sink;
 
-class LogWorker {
-  LogWorker();    // Create only through factory  
-  void addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> wrapper);
+   };
 
-  std::unique_ptr<LogWorkerImpl> _pimpl;
-  LogWorker(const LogWorker&); // c++11 feature not yet in vs2010 = delete;
-  LogWorker& operator=(const LogWorker&); // c++11 feature not yet in vs2010 = delete;
+   struct LogWorkerImpl final {
+      typedef std::shared_ptr<g2::internal::SinkWrapper> SinkWrapperPtr;
+      std::vector<SinkWrapperPtr> _sinks;
+      std::unique_ptr<kjellkod::Active> _bg; // do not change declaration order. _bg must be destroyed before sinks
+
+      LogWorkerImpl();
+      ~LogWorkerImpl() = default;
+
+      void bgSave(g2::LogMessagePtr msgPtr);
+      void bgFatal(FatalMessagePtr msgPtr);
+
+      LogWorkerImpl(const LogWorkerImpl&) = delete;
+      LogWorkerImpl& operator=(const LogWorkerImpl&) = delete;
+   };
+
+   class LogWorker final {
+      LogWorker() = default;
+      void addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> wrapper);
+
+      LogWorkerImpl _impl;
+      LogWorker(const LogWorker&) = delete;
+      LogWorker& operator=(const LogWorker&) = delete;
 
 
+   public:
+      ~LogWorker();
+      static g2::DefaultFileLogger createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory);
+      static std::unique_ptr<LogWorker> createWithNoSink();
 
-public:
-  virtual ~LogWorker();
-  
-    
-  static g2::DefaultFileLogger  createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory); 
-  static std::unique_ptr<LogWorker> createWithNoSink();
 
-  
-  /// pushes in background thread (asynchronously) input messages to log file
-  void save(LogMessagePtr entry);
+      /// pushes in background thread (asynchronously) input messages to log file
+      void save(LogMessagePtr entry);
 
-  /// Will push a fatal message on the queue, this is the last message to be processed
-  /// this way it's ensured that all existing entries were flushed before 'fatal'
-  /// Will abort the application!
-  void fatal(FatalMessagePtr fatal_message);
+      /// Will push a fatal message on the queue, this is the last message to be processed
+      /// this way it's ensured that all existing entries were flushed before 'fatal'
+      /// Will abort the application!
+      void fatal(FatalMessagePtr fatal_message);
 
-  template<typename T, typename DefaultLogCall>
-  std::unique_ptr<g2::SinkHandle<T >> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {
-    using namespace g2;
-    using namespace g2::internal;
-    auto sink = std::make_shared < Sink < T >> (std::move(real_sink), call);
-    addWrappedSink(sink);
-    return std2::make_unique < SinkHandle < T >> (sink);
-  }
-};
-
+      template<typename T, typename DefaultLogCall>
+      std::unique_ptr<g2::SinkHandle<T>> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {
+         using namespace g2;
+         using namespace g2::internal;
+         auto sink = std::make_shared<Sink<T>> (std::move(real_sink), call);
+         addWrappedSink(sink);
+         return std2::make_unique<SinkHandle<T>> (sink);
+      }
+   };
 } // g2
 
 #endif // LOG_WORKER_H_

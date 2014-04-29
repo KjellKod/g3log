@@ -12,6 +12,7 @@
 #include <thread>
 #include <chrono>
 #include <string>
+#include <future>
 
 #include "testing_helpers.h"
 #include "g2logmessage.hpp"
@@ -138,7 +139,8 @@ struct IntReceiver {
    std::atomic<int>* _atomicCounter;
    explicit IntReceiver(std::atomic<int>* counter) : _atomicCounter(counter){}
    
-   void receiveMsg(std::string msg){ /*ignored*/}
+   void receiveMsgDoNothing(std::string msg){ /*ignored*/}
+   void receiveMsgIncrementAtomic(std::string msg){ incrementAtomic(); }
    int incrementAtomic(){
      (*_atomicCounter)++;
      int value = *_atomicCounter;
@@ -150,7 +152,7 @@ TEST(ConceptSink, IntCall__TwoCalls_ExpectingTwoAdd) {
    std::atomic<int> counter{0};
    {
       std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
-      auto handle = worker->addSink(std2::make_unique<IntReceiver>(&counter), &IntReceiver::receiveMsg);
+      auto handle = worker->addSink(std2::make_unique<IntReceiver>(&counter), &IntReceiver::receiveMsgDoNothing);
       std::future<int> intFuture1 = handle->call(&IntReceiver::incrementAtomic);
       EXPECT_EQ(intFuture1.get(), 1);
       EXPECT_EQ(counter, 1);
@@ -161,4 +163,62 @@ TEST(ConceptSink, IntCall__TwoCalls_ExpectingTwoAdd) {
    }  
    EXPECT_EQ(counter, 2);
 }
+
+
+ 
+void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
+   while(doWhileTrue->load()) {
+      LOG(INFO) << "Calling from #" << counter;
+      std::this_thread::yield();
+   }
+} 
+
+TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
+   std::atomic<bool> keepRunning{true};
+
+   std::vector<std::thread> threads;
+   const size_t numberOfThreads = 100;
+   threads.reserve(numberOfThreads);
+
+   g2::internal::shutDownLogging();
+    
+   // Avoid annoying printouts at log shutdown
+   stringstream cerr_buffer; 
+   testing_helpers::ScopedOut guard1(std::cerr, &cerr_buffer);
+
+   // these threads will continue to write to a logger
+   // while the receiving logger is instantiated, and destroyed repeatedly
+   for (size_t caller = 0; caller < numberOfThreads; ++ caller) {
+      threads.push_back(std::thread(DoLogCalls, &keepRunning, caller));
+   }
+
+
+   std::atomic<int> atomicCounter{0};
+   size_t numberOfCycles = 25;
+   std::cout << "Create logger, delete active logger, " << numberOfCycles << " times\n\tWhile " << numberOfThreads << " threads are continously doing LOG calls" << std::endl;
+   std::cout << "Create/Destroy Times #";
+   for (size_t create = 0; create < numberOfCycles; ++create) {
+      std::cout << create << " ";
+
+      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      auto handle = worker->addSink(std2::make_unique<IntReceiver>(&atomicCounter), &IntReceiver::receiveMsgIncrementAtomic);
+      g2::initializeLogging(worker.get());
+  
+     // wait till some LOGS streaming in
+      atomicCounter = 0;
+      while(atomicCounter.load() < 10) {
+         std::this_thread::sleep_for(std::chrono::milliseconds(5));
+      }
+   } // g2log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
+
+
+  // exit the threads
+  keepRunning = false;
+  for (auto& t : threads) {
+    t.join();
+  }
+  std::cout << "\nAll threads are joined " << std::endl;
+}
+
+
 

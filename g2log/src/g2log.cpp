@@ -92,11 +92,11 @@ namespace g2 {
        * @return true if the correct worker was given,. and shutDownLogging was called 
        */
       bool shutDownLoggingForActiveOnly(LogWorker* active) {
-         if (isLoggingInitialized() && nullptr != active &&
-                 (dynamic_cast<void*> (active) != dynamic_cast<void*> (g_logger_instance))) {
-            LOG(WARNING) << "\n\t\tShutting down logging, but the ID of the Logger is not the one that is active."
+         if (isLoggingInitialized() && nullptr != active && (active != g_logger_instance)) {
+            LOG(WARNING) << "\n\t\tAttempted to shut down logging, but the ID of the Logger is not the one that is active."
                     << "\n\t\tHaving multiple instances of the g2::LogWorker is likely a BUG"
-                    << "\n\t\tEither way, this call to shutDownLogging was ignored";
+                    << "\n\t\tEither way, this call to shutDownLogging was ignored"
+                    << "\n\t\tTry g2::internal::shutDownLogging() instead";
             return false;
          }
          shutDownLogging();
