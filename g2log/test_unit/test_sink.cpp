@@ -173,6 +173,14 @@ void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
    }
 } 
 
+
+TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
+  auto FailedHelloWorld = []{ std::cout << "Hello World" << std::endl; };
+  kjellkod::Active* active = nullptr;
+  auto failed = g2::spawn_task(FailedHelloWorld, active);
+  EXPECT_ANY_THROW(failed.get());
+}
+
 TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    std::atomic<bool> keepRunning{true};
 

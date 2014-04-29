@@ -83,6 +83,21 @@ namespace g2 {
      auto bg_clear_sink_call = [this] { _impl._sinks.clear(); };
      auto token_cleared = g2::spawn_task(bg_clear_sink_call, _impl._bg.get());
      token_cleared.wait();
+
+     // The background worker WILL be automatically cleared at the exit of the destructor
+     // However, the explicitly clearing of the background worker (below) makes sure that there can
+     // be no thread that manages to add another sink after the call to clear the sinks above. 
+     //   i.e. this manages the extremely unlikely case of another thread calling
+     // addWrappedSink after the sink clear above. Normally adding of sinks should be done in main.cpp
+     // and be closely coupled with the existance of the LogWorker. Sharing this adding of sinks to 
+     // other threads that do not know the state of LogWorker is considered a bug but it is dealt with 
+     // nonetheless below.
+     //
+     // If sinks would already have been added after the sink clear above then this reset will deal with it 
+     // without risking lambda execution with a partially deconstructed LogWorkerImpl
+     // Calling g2::spawn_task on a nullptr Active object will not crash but return 
+     // a future containing an appropriate exception. 
+     _impl._bg.reset(nullptr);
    }
  
    void LogWorker::save(LogMessagePtr msg) {
