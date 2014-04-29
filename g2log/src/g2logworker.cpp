@@ -60,7 +60,7 @@ namespace g2 {
 
 
       // This clear is absolutely necessary
-      // All sinks is forced to receive the fatal message above before we continue
+      // All sinks are forced to receive the fatal message above before we continue
       _sinks.clear(); // flush all queues
       internal::exitWithDefaultSignalHandler(fatal_signal_id);
       
