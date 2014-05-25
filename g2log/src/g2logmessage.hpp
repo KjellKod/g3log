@@ -15,6 +15,7 @@
 #include <string>
 #include <sstream>
 #include <chrono>
+#include <thread>
 
 #include "g2loglevels.hpp"
 #include "g2time.hpp"
@@ -47,6 +48,8 @@ namespace g2 {
       
       std::string expression() const  { return _expression; }
       bool wasFatal() const { return internal::wasFatal(_level); }
+      
+      std::string threadID() const;
 
       std::string toString() const;
       void setExpression(const std::string expression) { _expression = expression; } 
@@ -64,6 +67,7 @@ namespace g2 {
       // are not enough.
       //
       std::time_t _timestamp;
+      std::thread::id _call_thread_id;
       int64_t _microseconds;
       std::string _file;
       int _line;

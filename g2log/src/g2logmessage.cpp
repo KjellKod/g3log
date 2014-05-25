@@ -77,8 +77,12 @@ namespace g2 {
    LogMessage::LogMessage(const std::string &file, const int line,
            const std::string& function, const LEVELS& level)
    : _timestamp(g2::systemtime_now())
+   , _call_thread_id(std::this_thread::get_id())
    , _microseconds(microsecondsCounter())
-   , _file(splitFileName(file)), _line(line), _function(function), _level(level)
+   , _file(splitFileName(file))
+   , _line(line)
+   , _function(function)
+   , _level(level)
 {}
 
 
@@ -89,6 +93,7 @@ namespace g2 {
    
    LogMessage::LogMessage(const LogMessage& other) 
    : _timestamp(other._timestamp)
+   , _call_thread_id(other._call_thread_id)
    , _microseconds(other._microseconds)
    , _file(other._file)
    , _line(other._line)
@@ -102,6 +107,7 @@ namespace g2 {
   
    LogMessage::LogMessage(LogMessage&& other)
    : _timestamp(other._timestamp)
+   , _call_thread_id(other._call_thread_id)
    , _microseconds(other._microseconds)
    , _file(std::move(other._file))
    , _line(other._line)
@@ -110,6 +116,13 @@ namespace g2 {
    , _expression(std::move(other._expression))
    , _message(std::move(other._message)) {
    }    
+   
+   
+   std::string LogMessage::threadID() const {
+      std::ostringstream oss;
+      oss << _call_thread_id;
+      return oss.str();
+   }
 
    FatalMessage::FatalMessage(const LogMessage& details, int signal_id) 
    : LogMessage(details), _signal_id(signal_id) { }
