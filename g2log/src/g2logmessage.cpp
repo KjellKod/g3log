@@ -37,38 +37,37 @@ namespace {
 namespace g2 {
 
    std::string LogMessage::toString() const {
-      std::ostringstream oss;
-      oss << "\n" << timestamp() << "." << microseconds() << "\t";
-      oss << level() << " [" << file();
-      oss << " L: " << line() << "]\t";
+      std::string out;
+      out.append("\n" + timestamp() + "." + microseconds() +  "\t"
+              + level() + " [" + file() + " L: " + line() + "]\t");
 
       // Non-fatal Log Message
       if (false == wasFatal()) {
-         oss << '"' << message() << '"';
-         return oss.str();
+         out.append('"' + message() + '"');
+         return out;
       }
 
       if (internal::FATAL_SIGNAL.value == _level.value) {
-         oss.str(""); // clear any previous text and formatting
-         oss << "\n" << timestamp() << "." << microseconds();
-         oss << "\n\n***** FATAL SIGNAL RECEIVED ******* " << std::endl;
-         oss << '"' << message() << '"';
-         return oss.str();
+         out.clear(); // clear any previous text and formatting
+         out.append("\n" + timestamp() + "." + microseconds() 
+                 + "\n\n***** FATAL SIGNAL RECEIVED ******* \n"
+                 + '"' + message() + '"');
+         return out;
       }
 
       // Not crash scenario but LOG or CONTRACT
       auto level_value = _level.value;
       if (FATAL.value == level_value) {
-         oss << "\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t";
-         oss << '"' << message() << '"';
+         out.append("\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t"
+                 + '"' + message() + '"');
       } else if (internal::CONTRACT.value == level_value) {
-         oss << "\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(" << _expression << ")\n\t";
-         oss << '"' << message() << '"';
+         out.append("\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(" + _expression + ")\n\t" 
+                 + '"' + message() + '"');
       } else {
-         oss << "\n\t*******\tUNKNOWN Log Message Type\n" << '"' << message() << '"';
+         out.append("\n\t*******\tUNKNOWN Log Message Type\n" + '"' + message() + '"');
       }
 
-      return oss.str();
+      return out;
    }
 
      std::string LogMessage::timestamp(const std::string & time_look) const {

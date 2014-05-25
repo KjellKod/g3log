@@ -43,7 +43,7 @@ FileSink::~FileSink() {
 }
 void FileSink::fileWrite(LogMessageMover message) {
    std::ofstream& out(filestream());
-   out << message.get().toString() << std::flush;
+   out << message.get().toString();
 }
 
 std::string FileSink::changeLogFile(const std::string& directory) {
