@@ -3,6 +3,8 @@
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
  * 
+ * For more information see g3log/LICENSE or refer refer to http://unlicense.org
+ * 
  * make_unique will be in C++14, this implementation is copied as I understood 
  * Stephan T. Lavavej's description of it. 
  * 

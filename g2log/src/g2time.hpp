@@ -4,6 +4,8 @@
 * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
+ * 
+ * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================
 * Filename:g2time.h cross-platform, thread-safe replacement for C++11 non-thread-safe
 *                   localtime (and similar)
