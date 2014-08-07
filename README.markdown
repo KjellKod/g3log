@@ -197,8 +197,9 @@ make
 If you like this logger (or not) it would be nice with some feedback. That way I can improve g3log and g2log and it is also nice to see if someone is using it.
 
  If you have ANY questions or problems please do not hesitate in contacting me on my blog 
-http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asynchronous-loggers-taking-over/  or at <Hedstrom at KjellKod dot cc>
+http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asynchronous-loggers-taking-over  
+or at <Hedstrom at KjellKod dot cc>
 
-Good luck :)
+
 Cheers
 Kjell (a.k.a. KjellKod)
