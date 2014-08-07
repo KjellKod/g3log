@@ -201,5 +201,5 @@ http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asy
 or at <Hedstrom at KjellKod dot cc>
 
 
-Cheers
+Cheers</br>
 Kjell (a.k.a. KjellKod)
