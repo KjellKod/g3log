@@ -107,8 +107,11 @@ int main(int argc, char**argv) {
    std::future<void> received = sinkHandle->call(&CustomSink::Foo, 
                                                  param1, param2);
    
-   // before exiting you can always call g2::ShutdownLogging to avoid
-   // LOG calls from static entities that goes out of scope later.
+   // If the LogWorker is initialized then at scope exit the g2::shutDownLogging() will be called. 
+   // This is important since it protects from LOG calls from static or other entities that will go out of
+   // scope at a later time. 
+   //
+   // It can also be called manually:
    g2::shutDownLogging();
 }
 
