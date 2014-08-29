@@ -77,7 +77,7 @@ endif()
   # description 
   #  1) http://kjellkod.wordpress.com/2013/09/23/experimental-g2log-with-clang/
   #  2) https://github.com/maidsafe/MaidSafe/wiki/Hacking-with-Clang-llvm-abi-and-llvm-libc
-IF ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang")
    MESSAGE("")
    MESSAGE("cmake for Clang ")
    if (APPLE)
