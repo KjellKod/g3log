@@ -60,15 +60,17 @@ namespace g2 {
       // Not crash scenario but LOG or CONTRACT
       auto level_value = _level.value;
       if (FATAL.value == level_value) {
-         out.append("\n\t*******\tEXIT trigger caused by LOG(FATAL) entry: \n\t"
-                 + '"' + message() + '"');
+         static const std::string fatalExitReason = {"EXIT trigger caused by LOG(FATAL) entry: "};
+         out.append("\n\t*******\t " + fatalExitReason + "\n\t" + '"' + message() + '"');
       } else if (internal::CONTRACT.value == level_value) {
-         out.append("\n\t  *******\tEXIT trigger caused by broken Contract: CHECK(" + _expression + ")\n\t" 
+         static const std::string contractExitReason = {"EXIT trigger caused by broken Contract:"};
+         out.append("\n\t*******\t " + contractExitReason + " CHECK(" + _expression + ")\n\t" 
                  + '"' + message() + '"');
       } else {
-         out.append("\n\t*******\tUNKNOWN Log Message Type\n" + '"' + message() + '"');
+         static const std::string errorUnknown = {"UNKNOWN Log Message Type"};
+         out.append("\n\t*******" + errorUnknown + "\t\n" + '"' + message() + '"');
       }
-
+ 
       return out;
    }
 

@@ -126,7 +126,7 @@ namespace testing_helpers {
    }
 
    RestoreFileLogger::~RestoreFileLogger() {
-      g2::internal::shutDownLogging();
+      g2::internal::shutDownLogging(); // is done at reset. Added for test clarity
       reset();
 
       if (!removeFile(_log_file))

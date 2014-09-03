@@ -12,6 +12,8 @@
 
 namespace g2 {
 using namespace internal;
+
+
 FileSink::FileSink(const std::string& log_prefix, const std::string& log_directory)
 : _log_file_with_path(log_directory)
 , _log_prefix_backup(log_prefix)
@@ -35,6 +37,8 @@ FileSink::FileSink(const std::string& log_prefix, const std::string& log_directo
    assert(_outptr && "cannot open log file at startup");
    addLogFileHeader();
 }
+
+
 FileSink::~FileSink() {
    std::string exit_msg{"\ng2log g2FileSink shutdown at: "};
    exit_msg.append(localtime_formatted(systemtime_now(), internal::time_formatted));
@@ -43,6 +47,8 @@ FileSink::~FileSink() {
    exit_msg.append({"\nLog file at: ["}).append(_log_file_with_path).append({"]\n\n"});
    std::cerr << exit_msg << std::flush;
 }
+
+// The actual log receiving function
 void FileSink::fileWrite(LogMessageMover message) {
    std::ofstream& out(filestream());
    out << message.get().toString();
