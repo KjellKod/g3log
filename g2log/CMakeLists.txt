@@ -290,7 +290,7 @@ ENDIF()
     #
     # Test for Linux, runtime loading of dynamic libraries
     #     
-    if(NOT WIN32 AND NOT ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang"))
+    if(NOT WIN32 AND NOT ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang"))
        add_library(tester_sharedlib SHARED ${DIR_UNIT_TEST}/tester_sharedlib.h ${DIR_UNIT_TEST}/tester_sharedlib.cpp)
        target_link_libraries(tester_sharedlib g3logger_shared)
 
