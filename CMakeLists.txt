@@ -1,5 +1,4 @@
-#  CMakeLists.txt cmake configuration for g2log test
-# g2log is a KjellKod Logger
+# g3log is a KjellKod Logger
 # 2011 @author Kjell Hedström, hedstrom@kjellkod.cc 
 # ==================================================================
 # 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
@@ -20,25 +19,26 @@
 # 2. from the g3log folder
 #    mkdir build
 #    cd build;
-# 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
+# 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio XXX" ..
+#    (XXX is the Visual Studio version you are running)
 # 4. msbuild g3log.sln /p:Configuration=Release
 #
 # Try to run an example, such as:
-# 5. Release\g2log-FATAL-contract.exe
+# 5. Release\g3log-FATAL-contract.exe
 #
 #
 
-# ===   LINUX: === To try this out from folder g2log:
+# ===   LINUX: === To try this out from folder g3log:
 #    mkdir build
 #    cd build
-# >> create makefiles in g2log/build directory
+# >> create makefiles in g3log/build directory
 #   cmake -DCMAKE_BUILD_TYPE=Release .. 
 #    make -jN   (where N stands for number of cores you want to utilize)     
 #
 #
 #
 # ===  Clang on Linux ===
-#   From g2log/g2log
+#   From g3log
 #   mkdir build && cd build
 #   cmake -DCMAKE_CXX_COMPILER=clang++ ..
 #   if you want to double-check settings:   "VERBOSE=1 make" 
@@ -94,7 +94,7 @@ endif()
    # ============================================================================
    # PERFORMANCE TEST OPTIONS: Performance operations for g3log
    # ============================================================================
-   # ENABLE WITH:  -USE_G2LOG_PERFORMANCE=ON  
+   # ENABLE WITH:  -USE_G3LOG_PERFORMANCE=ON  
    INCLUDE (${g3log_SOURCE_DIR}/test_performance/Performance.cmake)
 
       
@@ -119,7 +119,7 @@ endif()
 #         
 #   Check the output result and install accordingly.
 # ==========================================================================
-INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+# INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 
 
 

@@ -1,33 +1,33 @@
-# -DUSE_G2LOG_UNIT_TEST=ON   : unit tests 
+# -DUSE_G3LOG_UNIT_TEST=ON   : unit tests 
 #
 #
-option (USE_G2LOG_UNIT_TEST
+option (USE_G3LOG_UNIT_TEST
        "Turn ON/OFF unit tests for G3Log" OFF)
 
 
 
    # ============================================================================
    # TEST OPTIONS: Turn OFF the ones that is of no interest to you
-   # ---- by default all is OFF: except 'g2log-FATAL-example -----
+   # ---- by default all is OFF: except 'g3log-FATAL-example -----
    # ---- the reason for this is that
    # ----- 1) the performance tests were only thoroughly tested on Ubuntu, not windows-
-   #           (g2log windows/linux, but Google's glog only on linux)
+   #           (g3log windows/linux, but Google's glog only on linux)
    #
    #       2) The unit test were tested windows/linux,. but must be unzipped
    #          before it can be "cmake'd" and compiled --- leaving it as OFF for now
    # ============================================================================
 
 
-   # Unit test for g2log  (cmake -DUSE_G2LOG_UNIT_TEST=ON ..)
-   #    remember to unzip gtest at g2log/3rdParty/gtest
-   option (USE_G2LOG_UNIT_TEST "g2log unit tests" OFF)
+   # Unit test for g3log  (cmake -DUSE_G3LOG_UNIT_TEST=ON ..)
+   #    remember to unzip gtest at g3log/3rdParty/gtest
+   option (USE_G3LOG_UNIT_TEST "g3log unit tests" OFF)
 
 
-   # 4. create the unit tests for g2log --- ONLY TESTED THE UNIT TEST ON LINUX
+   # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
    # =========================
-   IF (USE_G2LOG_UNIT_TEST)
+   IF (USE_G3LOG_UNIT_TEST)
       set(DIR_UNIT_TEST ${g3log_SOURCE_DIR}/test_unit)
-      MESSAGE("-DUSE_G2LOG_UNIT_TEST=ON")  
+      MESSAGE("-DUSE_G3LOG_UNIT_TEST=ON")  
       set(GTEST_DIR ${g3log_SOURCE_DIR}/3rdParty/gtest/gtest-1.7.0)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
       include_directories(${GTEST_INCLUDE_DIRECTORIES})
@@ -72,5 +72,5 @@ option (USE_G2LOG_UNIT_TEST
        target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_SHARED_LIBRARY} -ldl  gtest_170_lib )
     ENDIF()
 ELSE() 
-  MESSAGE("-DUSE_G2LOG_UNIT_TEST=OFF") 
-ENDIF (USE_G2LOG_UNIT_TEST)
+  MESSAGE("-DUSE_G3LOG_UNIT_TEST=OFF") 
+ENDIF (USE_G3LOG_UNIT_TEST)

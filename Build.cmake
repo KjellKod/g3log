@@ -42,7 +42,7 @@ ELSEIF(MSVC)
    MESSAGE("")
    MESSAGE("Windows: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 11\" ..]")
    MESSAGE("if cmake finishes OK, do 'msbuild g3log.sln /p:Configuration=Release'")
-   MESSAGE("then run 'Release\\g2log-FATAL-*' examples")
+   MESSAGE("then run 'Release\\g3log-FATAL-*' examples")
    MESSAGE("")
 ENDIF()
 
@@ -52,7 +52,7 @@ ENDIF()
    # GENERIC STEPS
    file(GLOB SRC_FILES ${LOG_SRC}/*.h ${LOG_SRC}/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
    file(GLOB HEADER_FILES ${LOG_SRC}/*.h ${LOG_SRC}/*.hpp)
-   MESSAGE(" HEADER FILES ARE: ${HEADER_FILES}")
+   #MESSAGE(" HEADER FILES ARE: ${HEADER_FILES}")
 
    IF (MSVC OR MINGW) 
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
@@ -62,9 +62,9 @@ ENDIF()
 
    set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
  
-   # Create the g2log library
+   # Create the g3log library
    include_directories(${LOG_SRC})
-   MESSAGE("  g3logger files: [${SRC_FILES}]")
+   #MESSAGE("  g3logger files: [${SRC_FILES}]")
    add_library(g3logger ${SRC_FILES})
    set_target_properties(g3logger PROPERTIES LINKER_LANGUAGE CXX)
    add_library(g3logger_shared SHARED ${SRC_FILES})
