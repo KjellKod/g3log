@@ -1,0 +1,17 @@
+   SET(CPACK_INSTALL_PREFIX "/usr/local/")
+   INSTALL( TARGETS g3logger_shared
+            ARCHIVE
+            LIBRARY DESTINATION lib/g3log
+            COMPONENT libraries)
+
+   INSTALL( FILES ${HEADER_FILES}
+            DESTINATION include
+            COMPONENT headers)
+
+  SET(CPACK_COMPONENTS_ALL libraries headers)
+  SET(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "G3Log libraries")
+  SET(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "G3Log C++ headers")
+
+   #SET(CPACK_GENERATOR "DEB")
+   #SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Kjell Hedstrom")
+   INCLUDE(CPack)
