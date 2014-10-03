@@ -157,20 +157,18 @@ int main(int argc, char**argv) {
 
 # BUILDING g3log: 
 -----------
-The default is to build an example binary 'g2log-FATAL'
-I suggest you start with that, run it and view the created log also.
+The default is to build an example binary 'g3log-FATAL-contract' and 'g3log-FATAL-sigsegv'. I suggest you start with that, run it and view the created log also.
 
 If you are interested in the performance or unit tests then you can 
-enable the creation of them in the g2log/CMakeLists.txt file. See that file for 
+enable the creation of them in the g3log/CMakeLists.txt file. See that file for 
 more details
 
 
 ```
-cd g2log
+cd g3log
 mkdir build
 cd build
 ```
-
 
 ** Building on Linux **
 ```
@@ -182,7 +180,7 @@ make
 Please use the Visual Studio 12 (2013) command prompt "Developer command prompt"
 ```
 cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
-msbuild g2log_by_kjellkod.sln /p:Configuration=Release
+msbuild g3log.sln /p:Configuration=Release
 ```
 
 ** Building on *nix with Clang:  **

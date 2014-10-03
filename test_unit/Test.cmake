@@ -28,7 +28,7 @@ option (USE_G2LOG_UNIT_TEST
    IF (USE_G2LOG_UNIT_TEST)
       set(DIR_UNIT_TEST ${g3log_SOURCE_DIR}/test_unit)
       MESSAGE("-DUSE_G2LOG_UNIT_TEST=ON")  
-      set(GTEST_DIR ../3rdParty/gtest/gtest-1.7.0)
+      set(GTEST_DIR ${g3log_SOURCE_DIR}/3rdParty/gtest/gtest-1.7.0)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
       include_directories(${GTEST_INCLUDE_DIRECTORIES})
       add_library(gtest_170_lib ${GTEST_DIR}/src/gtest-all.cc)
@@ -48,7 +48,7 @@ option (USE_G2LOG_UNIT_TEST
          IF(${test} STREQUAL "test_filechange")
            add_executable(${test} ${DIR_UNIT_TEST}/${test}.cpp ${helper})
          ELSE()
-           add_executable(${test} ../test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
+           add_executable(${test} ${g3log_SOURCE_DIR}/test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
          ENDIF(${test} STREQUAL "test_filechange")
 
         set_target_properties(${test} PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
