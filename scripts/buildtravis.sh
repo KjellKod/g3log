@@ -8,4 +8,8 @@ cd build_travis
 cmake -DUSE_G3LOG_UNIT_TEST=ON ..
 make -j
 ./test_concept_sink
-
+./test_configuration
+./test_dynamic_loaded_shared_lib
+./test_filechange
+./test_io
+./test_sink
