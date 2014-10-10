@@ -35,6 +35,7 @@ http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logge
 
 
 
+
 ## Benefits you get when using G3log ##
 1. Easy to use, clean syntax and a blazing fast logger. 
 
