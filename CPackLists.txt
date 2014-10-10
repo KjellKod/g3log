@@ -1,17 +1,50 @@
-   SET(CPACK_INSTALL_PREFIX "/usr/local/")
+
+ #  INSTALL( TARGETS g3logger_shared
+ #           ARCHIVE
+ #           LIBRARY DESTINATION lib/g3log
+ #           COMPONENT libraries)
+
+ #  INSTALL( FILES ${HEADER_FILES}
+ #           DESTINATION include
+ #           COMPONENT headers)
+
+
+
    INSTALL( TARGETS g3logger_shared
             ARCHIVE
-            LIBRARY DESTINATION lib/g3log
+            LIBRARY DESTINATION /usr/local/lib
             COMPONENT libraries)
 
    INSTALL( FILES ${HEADER_FILES}
-            DESTINATION include
+            DESTINATION /usr/local/include/g3log
             COMPONENT headers)
+                      
 
   SET(CPACK_COMPONENTS_ALL libraries headers)
   SET(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "G3Log libraries")
   SET(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "G3Log C++ headers")
 
-   #SET(CPACK_GENERATOR "DEB")
-   #SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Kjell Hedstrom")
-   INCLUDE(CPack)
+  SET(CPACK_GENERATOR "DEB")
+  SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Kjell Hedstrom")
+
+
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_DESCRIPTION "Asynchronous 'crash safe' logger")
+set(CPACK_PACKAGE_CONTACT "Kjell Hedstrom hedstrom@kjellkod.cc")
+
+
+MESSAGE("\n\nTo install on Ubuntu\t\t(after cmake with options && make)")
+MESSAGE("make package")
+MESSAGE("sudo dpkg -i g3log-***Linux.deb\n\n")
+
+#SET(CPACK_INSTALL_PREFIX "/usr/local/")
+#CPACK_PACKAGE_INSTALL_DIRECTORY("/usr/local/g3log")
+INCLUDE(CPack)
+
+
+
+#  2094  sudo dpkg -r g3log
+# 2100  sudo dpkg -i g3log-1.1.0-Linux.deb 
+# 2101  sudo dpkg -L g3log
