@@ -18,7 +18,6 @@ LOGF(WARNING, "Printf-style syntax is also %s", "available");
     LOGF_IF(INFO, (less<more), "if %d<%d then this text will be logged", less,more);
 
 
-
 #### Design-by-Contract
 *CHECK(false)* will trigger a "fatal" message. It will be logged, and then the 
 application will exit.
