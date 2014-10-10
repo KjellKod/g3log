@@ -9,6 +9,7 @@ LOGF(WARNING, "Printf-style syntax is also %s", "available");
 ```
 
 
+
 #### Conditional logging
     int less = 1; int more = 2
     LOG_IF(INFO, (less<more)) <<"If [true], then this text will be logged";
