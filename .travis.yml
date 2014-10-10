@@ -7,5 +7,5 @@ script:
    - sudo apt-get install gcc-4.8
    - sudo apt-get install cmake
    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50
-   "./scripts/buildtravis.sh"
+   - "./scripts/buildtravis.sh"
 
