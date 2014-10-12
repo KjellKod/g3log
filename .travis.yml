@@ -8,12 +8,32 @@ compiler:
     - clang
 
 before_install: 
+   # use http://lint.travis-ci.org/ to validate changes
+   
    if [ ${TRAVIS_OS_NAME} = 'linux' ]; 
    then 
        sudo add-apt-repository -y ppa:h-rayflood/llvm; 
        sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; 
-      sudo apt-get update -qq;
+       sudo apt-get install --allow-unauthenticated -qq clang-3.4
+       sudo apt-get update -qq;
    fi
+
+install:
+  # clang 3.4
+  - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
+  - if [ "$CXX" == "clang++" ]; then export CXXFLAGS="-std=c++0x -stdlib=libc++"; fi
+  - if [ "$CXX" == "clang++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk libcxx; fi
+
+  - if [ "$CXX" == "clang++" ]; then cd libcxx/lib && bash buildit; fi
+  - if [ "$CXX" == "clang++" ]; then sudo cp ./libc++.so.1.0 /usr/lib/; fi
+  - if [ "$CXX" == "clang++" ]; then sudo mkdir /usr/include/c++/v1; fi
+  - if [ "$CXX" == "clang++" ]; then cd .. && sudo cp -r include/* /usr/include/c++/v1/; fi
+  - if [ "$CXX" == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
+  - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
+
+  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
+
+
 
 script: "
  echo ${TRAVIS_OS_NAME};
@@ -39,10 +59,15 @@ script: "
       brew update; 
   fi
 
-  if [ {$TRAVIS_OS_NAME} = 'osx' ] && [ '$CC' = 'gcc' ]; 
+ if [ '$CXX' = 'g++' ]; 
  then 
-    export CC=gcc-4.8; 
     export CXX=g++-4.8; 
  fi
 
+ if [ '$CXX' = 'clang++' ]; 
+ then 
+    export CXX=clang++-3.4; 
+ fi
+  
+ echo $CXX --version
  ./scripts/buildAndRunTests.sh"
