@@ -69,5 +69,5 @@ script: "
     export CXX=clang++-3.4; 
  fi
   
- echo $CXX --version
+ echo $CXX --version;
  ./scripts/buildAndRunTests.sh"
