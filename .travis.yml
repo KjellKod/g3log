@@ -40,6 +40,8 @@ install:
   - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
   # - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then  brew update;  fi
   - echo $PWD
+  - if [ "$CXX" == "clang++" ]; then cd build/KjellKod/g3log || true; fi
+  - echo $PWD
  
 script: "./scripts/buildAndRunTests.sh"
  
