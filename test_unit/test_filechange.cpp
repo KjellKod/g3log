@@ -30,24 +30,6 @@ namespace { // anonymous
   g2::SinkHandle<g2::FileSink>* g_filesink_handler = nullptr;
   LogFileCleaner* g_cleaner_ptr = nullptr;
 
-  bool isTextAvailableInContent(const std::string &total_text, std::string msg_to_find) {
-    std::string content(total_text);
-    size_t location = content.find(msg_to_find);
-    return (location != std::string::npos);
-  }
-
-  std::string readFileToText(std::string filename) {
-    std::ifstream in;
-    in.open(filename.c_str(), std::ios_base::in);
-    if (!in.is_open()) {
-      return ""; // error just return empty string - test will 'fault'
-    }
-    std::ostringstream oss;
-    oss << in.rdbuf();
-    std::string content(oss.str());
-    return content;
-  }
-
   std::string setLogNameAndAddCount(std::string new_file_to_create) {
     static std::mutex m;
     static int count;

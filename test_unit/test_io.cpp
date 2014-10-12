@@ -19,7 +19,6 @@
 #include <chrono>
 #include <exception>
 namespace {
-const int k_wait_time = 5; // 5s wait between LOG/CHECK FATAL till we say it's too long time
 const std::string log_directory = "./";
 const std::string t_info = "test INFO ";
 const std::string t_info2 = "test INFO 123";
