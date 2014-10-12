@@ -10,7 +10,8 @@ compiler:
     - clang
 
 script: "
- echo ${TRAVIS_OS_NAME}
+ echo ${TRAVIS_OS_NAME};
+ echo ${TRAVIS_OS_NAME};
  if [  ${TRAVIS_OS_NAME} = 'linux' ]; 
  then 
       sudo apt-get -qq update; 
@@ -37,6 +38,6 @@ script: "
  then 
     export CC=gcc-4.8; 
     export CXX=g++-4.8; 
- fi"
+ fi
 
-- "./scripts/buildAndRunTests.sh"
+ ./scripts/buildAndRunTests.sh"
