@@ -30,7 +30,7 @@ install:
   # clang 3.4
   - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
   - if [ "$CXX" == "clang++" ]; then sudo apt-get install libc++abi1; fi
-  - if [ "$CXX" == "clang++" ]; then sudo apt-get install libc++1 libc++abi-dev; fi
+  - if [ "$CXX" == "clang++" ]; then sudo apt-get install libc++1 libc++abi-dev || true; fi
 
   - if [ "$CXX" == "clang++" ]; then export CXXFLAGS="-std=c++0x -stdlib=libc++"; fi
   - if [ "$CXX" == "clang++" ]; then svn co --quiet http://llvm.org/svn/llvm-project/libcxx/trunk libcxx; fi
