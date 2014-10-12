@@ -40,13 +40,8 @@ install:
   - if [ "$CXX" == "clang++" ]; then cd /usr/lib && sudo ln -sf libc++.so.1.0 libc++.so; fi
   - if [ "$CXX" == "clang++" ]; then sudo ln -sf libc++.so.1.0 libc++.so.1 && cd $cwd; fi
   - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
+  - if [ "${TRAVIS_OS_NAME}" = "osx" ]; then  brew update;  fi
 
-
-
-script:
- - echo ${TRAVIS_OS_NAME};
- - if [ ${TRAVIS_OS_NAME} = 'osx' ]; then  brew update;  fi
- - if [ "$CXX" = "g++" ]; then export CXX=g++-4.8; fi
- - if [ "$CXX" = "clang++" ]; then export CXX=clang++-3.4; fi
- - ./scripts/buildAndRunTests.sh
+ 
+script: "./scripts/buildAndRunTests.sh"
  
