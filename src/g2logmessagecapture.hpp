@@ -61,7 +61,12 @@ struct LogCapture {
       char finished_message[kMaxMessageSize];
       va_list arglist;
       va_start(arglist, printf_like_message);
+
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
+      const int nbrcharacters = vsnprintf_s(finished_message, _countof(finished_message), _TRUNCATE, printf_like_message, arglist);
+#else      
       const int nbrcharacters = vsnprintf(finished_message, sizeof (finished_message), printf_like_message, arglist);
+#endif
       va_end(arglist);
       
       if (nbrcharacters <= 0) {
