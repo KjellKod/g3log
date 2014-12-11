@@ -4,8 +4,8 @@ os:
   - linux
 
 compiler: 
-    # - gcc
-    - clang
+     - gcc
+    #- clang
 
 before_install: 
    # use http://lint.travis-ci.org/ to validate changes
