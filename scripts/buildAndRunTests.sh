@@ -11,10 +11,10 @@ echo $TRAVIS_OS_NAME
 echo $CXX
 
 
-mkdir  build_travis
+mkdir -p  build_travis
 cd build_travis
 
-if [ "$CXX" = "g++-4.8" ]
+if [[ $CXX == *"g++"* ]]
 then
    echo "Testing with g++"
    cmake -DCMAKE_CXX_COMPILER=g++ -DUSE_G3LOG_UNIT_TEST=ON ..
