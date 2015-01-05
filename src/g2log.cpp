@@ -53,7 +53,7 @@ namespace g2 {
 
    void initializeLogging(LogWorker *bgworker) {
       std::call_once(g_initialize_flag, []() {
-         installSignalHandler(); });
+         installCrashHandler(); });
       std::lock_guard<std::mutex> lock(g_logging_init_mutex);
       CHECK(!internal::isLoggingInitialized());
       CHECK(bgworker != nullptr);
@@ -107,9 +107,8 @@ namespace g2 {
 
 
 
-      // explicits copy of all input. This is makes it possibly to use g3log across dynamically loaded libraries
-      // i.e. (dlopen + dlsym) 
-
+      /** explicits copy of all input. This is makes it possibly to use g3log across dynamically loaded libraries
+      * i.e. (dlopen + dlsym)  */
       void saveMessage(const char* entry, const char* file, int line, const char* function, const LEVELS& level,
               const char* boolean_expression, int fatal_signal, const char* stack_trace) {
          LEVELS msgLevel{level};

@@ -19,7 +19,7 @@ namespace internal {
 std::string signalName(int signal_number);
 
 /** return calling thread's stackdump*/
-std::string stackdump();
+std::string stackdump(const char* dump);
 
 /** Re-"throw" a fatal signal, previously caught. This will exit the application
  * This is an internal only function. Do not use it elsewhere. It is triggered
@@ -37,5 +37,5 @@ void exitWithDefaultSignalHandler(int signal_number);
   SIGILL   ILlegal instruction (ANSI)
   SIGSEGV  Segmentation violation i.e. illegal memory reference
   SIGTERM  TERMINATION (ANSI)  */
-void installSignalHandler();
+void installCrashHandler();
 }

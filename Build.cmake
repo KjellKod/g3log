@@ -32,6 +32,7 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
 
 ELSEIF(MSVC)
+  set(PLATFORM_LINK_LIBRIES dbghelp)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
       # https://github.com/anhstudios/swganh/pull/186/files
@@ -59,7 +60,7 @@ ENDIF()
    IF (MSVC OR MINGW) 
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
    ELSE()     
-         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_win.cpp)
+         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_win.cpp ${LOG_SRC}/stacktrace_windows.*)
    ENDIF (MSVC OR MINGW)
 
    set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
@@ -69,8 +70,11 @@ ENDIF()
    #MESSAGE("  g3logger files: [${SRC_FILES}]")
    add_library(g3logger ${SRC_FILES})
    set_target_properties(g3logger PROPERTIES LINKER_LANGUAGE CXX)
+   target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
+
    add_library(g3logger_shared SHARED ${SRC_FILES})
    set_target_properties(g3logger_shared PROPERTIES LINKER_LANGUAGE CXX)
+   target_link_libraries(g3logger_shared ${PLATFORM_LINK_LIBRIES})
   
    SET(G3LOG_SHARED_LIBRARY g3logger_shared)
    SET(G3LOG_LIBRARY g3logger)

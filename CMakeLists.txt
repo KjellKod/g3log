@@ -20,6 +20,7 @@
 #    mkdir build
 #    cd build;
 # 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio XXX" ..
+#     (cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12")
 #    (XXX is the Visual Studio version you are running)
 # 4. msbuild g3log.sln /p:Configuration=Release
 #
@@ -85,7 +86,7 @@ endif()
    # ============================================================================
    # EXAMPLE OPTIONS: By defauls is ON. This will create 'g3log-FATAL-* examples'
    # ============================================================================
-   # DISABLE WITH:  -DUSE_SIMPLE_EXAMPLE=OFF    
+   # DISABLE WITH:  -DUSE_FATAL_EXAMPLE=OFF    
    INCLUDE (${g3log_SOURCE_DIR}/example/Example.cmake)
 
 
