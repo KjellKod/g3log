@@ -38,7 +38,8 @@ FATAL{WARNING.value + 1, {"FATAL"}};
 
 namespace g2 {
    namespace internal {
-      const LEVELS CONTRACT{100, {"CONTRACT"}}, FATAL_SIGNAL{101, {"FATAL_SIGNAL"}};
+      const LEVELS CONTRACT{100, {"CONTRACT"}}, FATAL_SIGNAL{101, {"FATAL_SIGNAL"}}, 
+            FATAL_EXCEPTION{102, {"FATAL_EXCEPTION"}};
       bool wasFatal(const LEVELS& level);
    }
 

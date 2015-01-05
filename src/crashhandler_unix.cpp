@@ -48,7 +48,7 @@ void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
       std::ostringstream fatal_stream;
       fatal_stream << oss.str() << std::endl;
       fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;
-      LogCapture trigger(FATAL_SIGNAL, signal_number);
+      LogCapture trigger(FATAL_SIGNAL, signal_number, stackdump());
       trigger.stream() << fatal_stream.str();
    } // message sent to g2LogWorker
    // wait to die
@@ -79,7 +79,7 @@ namespace internal {
 
 /// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one 
 /// i.e. the latter case is only for Windows and test purposes
-std::string stackdump(const char* dump) {
+std::string stackdump(const char* dump = nullptr) {
    if (nullptr != dump && !std::string(dump).empty()) {
       return {dump};
    }
@@ -155,10 +155,28 @@ std::string signalName(int signal_number) {
    }
 }
 
+
+
+// KJELL : TODO.  The Fatal Message can contain a callback function that depending on OS and test scenario does 
+//       different things. 
+// exitWithDefaultSignalHandler is called from g2logworke::bgFatal AFTER all the logging sinks have been cleared
+// I.e. saving a function that has the value already encapsulated within. 
+// FatalMessagePtr msgPtr
+// Linux/OSX -->   msgPtr.get()->ContinueWithFatalExit();  --> exitWithDefaultSignalHandler(int signal_number);
+// Windows          .....       (if signal)                --> exitWithDefaultSignalHandler(int signal_number);
+//                              (if exception) ....        
+//                              the calling thread that is in a never-ending loop should break out of that loop
+//                                    i.e. an atomic flag should be set 
+//                              the next step should then be to re-throw the same exception
+//                              i.e. just call the next exception handler
+//                              we should make sure that 1) g2log exception handler is called BEFORE widows
+//                              it should continue and then be caught in Visual Studios exception handler
+//
+//
+
 // Triggered by g2log->g2LogWorker after receiving a FATAL trigger
 // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-
 void exitWithDefaultSignalHandler(int signal_number) {
    std::cerr << "Exiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
    struct sigaction action;

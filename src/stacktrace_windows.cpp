@@ -52,7 +52,7 @@ const std::map<size_t, std::string> kExceptionsAsText = {
 namespace stacktrace {
 /// return the text description of a Windows exception code
 /// From MSDN GetExceptionCode http://msdn.microsoft.com/en-us/library/windows/desktop/ms679356(v=vs.85).aspx
-std::string stacktrace::exceptionIdToText(size_t id) {
+std::string exceptionIdToText(size_t id) {
    const auto iter = kExceptionsAsText.find(id);
    if ( iter == kExceptionsAsText.end()) {
       std::string unknown {"Unknown/" + std::to_string(id)};

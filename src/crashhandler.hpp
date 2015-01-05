@@ -19,7 +19,7 @@ namespace internal {
 std::string signalName(int signal_number);
 
 /** return calling thread's stackdump*/
-std::string stackdump(const char* dump);
+std::string stackdump(const char* dump = nullptr);
 
 /** Re-"throw" a fatal signal, previously caught. This will exit the application
  * This is an internal only function. Do not use it elsewhere. It is triggered

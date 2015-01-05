@@ -16,9 +16,9 @@
 #include "g2log.hpp"
 
 struct LogCapture {
-
+  const int kExceptionAndNotASignal = -123456;
    /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-   LogCapture(const LEVELS & level, int fatal_signal, const char *dump = nullptr)
+   LogCapture(const LEVELS& level, int fatal_signal, const char* dump = nullptr)
       : LogCapture("", 0, "", level, "", fatal_signal, dump) {
    }
 
@@ -35,6 +35,11 @@ struct LogCapture {
    int fatal_signal = SIGABRT, const char *dump = nullptr)
       : _file(file), _line(line), _function(function), _level(level), _expression(expression), _fatal_signal(fatal_signal) {
 
+      //
+      // In case of LOG(FATAL) or CHECK then the stackdump has not yet been generated
+      // In the case of a fatal event like a signal or Windows-exception then we 
+      // should already have the stackdump given to us. 
+      //  ---- yes. The logic is a bit messy. Cleanup fun for anther day.
       if (g2::internal::wasFatal(level)) {
          _stack_trace = {"\n*******\tSTACKDUMP *******\n"};
          _stack_trace.append(g2::internal::stackdump(dump));
