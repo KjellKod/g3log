@@ -18,8 +18,19 @@
 #endif
 
 #include <string>
+#include <windows.h>
 
 namespace stacktrace {
 /// return the text description of a Windows exception code
 std::string exceptionIdToText(size_t id);
+
+/// helper function: retrieve stackdump from no excisting exception pointer
+std::string stackdump(); 
+
+/// helper function: retrieve stackdump, starting from an exception pointer
+std::string stackdump(EXCEPTION_POINTERS* info);
+
+/// main stackdump function. retrieve stackdump, from the given context
+std::string stackdump(CONTEXT* context);
+
 } // stacktrace
