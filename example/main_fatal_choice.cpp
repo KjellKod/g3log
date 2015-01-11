@@ -195,11 +195,14 @@ int ChoiceOfFatalExit() {
    }
 }
 
+void ForwardChoiceForFatalExit(bool runInNewThread, int fatalChoice) {
+   ExecuteDeathFunction(runInNewThread, fatalChoice);
+}
 
 void ChooseFatalExit() {
    const bool runInNewThread = AskForAsyncDeath();
-   const int choiceOfFatalExit = ChoiceOfFatalExit();
-   ExecuteDeathFunction(runInNewThread, choiceOfFatalExit);
+   const int exitChoice = ChoiceOfFatalExit();
+   ForwardChoiceForFatalExit(runInNewThread, exitChoice);
 }
 } // namespace
 
