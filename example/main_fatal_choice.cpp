@@ -32,41 +32,32 @@ void ToLower(std::string &str)
    }
 }
 
-void sleep_for(size_t seconds) {
-  std::this_thread::sleep_for(std::chrono::seconds(seconds));
-}
-
 void RaiseSIGABRT() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    raise(SIGABRT);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGFPE() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    raise(SIGFPE);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGSEGV() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    raise(SIGSEGV);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGILL() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    raise(SIGILL);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RAiseSIGTERM() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    raise(SIGTERM);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -75,7 +66,6 @@ int gShouldBeZero = 1;
 void DivisionByZero() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
    std::cout << "Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero << std::endl;
-   sleep_for(2);
    int value = 3;
    auto test = value / gShouldBeZero;
    LOG(WARNING) << "Expected to have died by now...";
@@ -83,7 +73,7 @@ void DivisionByZero() {
 
 void IllegalPrintf() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
+
    printf("ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
    LOGF(INFO, "2nd attempt at ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
    LOG(WARNING) << "Expected to have died by now...";
@@ -91,7 +81,6 @@ void IllegalPrintf() {
 
 void OutOfBoundsArrayIndexing() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    std::vector<int> v;
    v[0] = 5;
    LOG(WARNING) << "Expected to have died by now...";
@@ -100,7 +89,6 @@ void OutOfBoundsArrayIndexing() {
 
 void AccessViolation() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    char *ptr = 0;
    *ptr = 0;
    LOG(WARNING) << "Expected to have died by now...";

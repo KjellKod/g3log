@@ -22,6 +22,8 @@
 #include <cstdlib>
 #include <iostream> // to remove TODO
 #include <sstream> // TODO REMOVE
+#include <working_trace.hpp>
+ 
 #pragma once
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "stacktrace_win.cpp used but not on a windows system"
@@ -149,6 +151,7 @@ std::string exceptionIdToText(size_t id) {
 }
 
 
+
 /// helper function: retrieve stackdump from no excisting exception pointer
 std::string stackdump() {
    CONTEXT current_context;
@@ -166,7 +169,12 @@ std::string stackdump(EXCEPTION_POINTERS *info) {
 
 /// main stackdump function. retrieve stackdump, from the given context
 std::string stackdump(CONTEXT *context) {
-   {
+  stack_trace sttrace(context);     // if there is a windows exception then call it like THIS
+  auto crashreport = sttrace.to_string();
+  return crashreport;
+
+
+ /*  {
       static std::atomic<size_t> recursiveCounter = 0;
       ++recursiveCounter;
       assert(recursiveCounter.load() == 1 && "Never allow recursive crashes");
@@ -185,6 +193,7 @@ std::string stackdump(CONTEXT *context) {
    std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size); // C++11: size set and values are zeroed
    captureStackTrace(context, frame_pointers);
    return convertFramesToText(frame_pointers);
+   */
 }
 
 
