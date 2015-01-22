@@ -86,14 +86,15 @@ namespace g2 {
     * A thread that causes a FatalMessage will sleep forever until the
     * application has exited (after message flush) */
    struct FatalMessage : public LogMessage {
-      FatalMessage(const LogMessage& details, int signal_id);
+      FatalMessage(const LogMessage& details, size_t signal_id);
       FatalMessage(const FatalMessage&);
       virtual ~FatalMessage(){};
       
       LogMessage copyToLogMessage() const;
       std::string signal() const;
       
-      const int _signal_id;
+      const size_t _signal_id;
+      static const int FATAL_EXCEPTION_EXIT = 1243;
    };
    
    

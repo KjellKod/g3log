@@ -171,7 +171,7 @@ namespace g2 {
             internal::exitWithDefaultSignalHandler(message.get()->_signal_id);
          }
          g_logger_instance->fatal(message);
-         while (true) {
+         while (blockForFatalHandling()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
          }
       }

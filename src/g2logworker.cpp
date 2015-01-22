@@ -12,6 +12,7 @@
  * ********************************************* */
 
 #include "g2logworker.hpp"
+#include "g2logmessage.hpp"
 
 #include <cassert>
 #include <functional>
@@ -51,7 +52,12 @@ namespace g2 {
 
       std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
       uniqueMsg->write().append("\nExiting after fatal event  (").append(uniqueMsg->level());
-      uniqueMsg->write().append("). Exiting with signal: ").append(signal)
+      std::string exiting = {"Exiting with signal: "};
+      if (fatal_signal_id >= FatalMessage::FATAL_EXCEPTION_EXIT) {
+        exiting = {"Caught fatal windows exception: "};
+      }
+
+      uniqueMsg->write().append("). ").append(exiting).append(" ").append(signal)
               .append("\nLog content flushed flushed sucessfully to sink\n\n");
 
       std::cerr << uniqueMsg->message() << std::flush;

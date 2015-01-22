@@ -128,7 +128,7 @@ namespace g2 {
       return oss.str();
    }
 
-   FatalMessage::FatalMessage(const LogMessage& details, int signal_id) 
+   FatalMessage::FatalMessage(const LogMessage& details, size_t signal_id) 
    : LogMessage(details), _signal_id(signal_id) { }
 
    
@@ -142,7 +142,7 @@ namespace g2 {
    }
    
    std::string FatalMessage::signal() const{
-      return internal::signalName(_signal_id);
+      return internal::exitReasonName(_signal_id);
    }
 
    

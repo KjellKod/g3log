@@ -41,13 +41,13 @@ void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
    using namespace g2::internal;
 
    std::ostringstream oss;
-   oss << "Received fatal signal: " << g2::internal::signalName(signal_number);
+   oss << "Received fatal signal: " << g2::internal::exitReasonName(signal_number);
    oss << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
 
    {  // Local scope, trigger send
       std::ostringstream fatal_stream;
       fatal_stream << oss.str() << std::endl;
-      fatal_stream << "\n***** SIGNAL " << signalName(signal_number) << "(" << signal_number << ")" << std::endl;
+      fatal_stream << "\n***** SIGNAL " << exitReasonName(signal_number) << "(" << signal_number << ")" << std::endl;
       LogCapture trigger(FATAL_SIGNAL, signal_number, stackdump());
       trigger.stream() << fatal_stream.str();
    } // message sent to g2LogWorker
@@ -76,6 +76,9 @@ namespace g2 {
 //          http://stackoverflow.com/questions/6878546/why-doesnt-parent-process-return-to-the-exact-location-after-handling-signal_number
 namespace internal {
 
+bool blockForFatalHandling() {
+   return true;  // For windows we will after fatal processing change it to false
+}
 
 /// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one 
 /// i.e. the latter case is only for Windows and test purposes
@@ -136,7 +139,7 @@ std::string stackdump(const char* dump = nullptr) {
 
 
 /// string representation of signal ID
-std::string signalName(int signal_number) {
+std::string exitReasonName(size_t signal_number) {
    switch (signal_number) {
    case SIGABRT: return "SIGABRT";
       break;

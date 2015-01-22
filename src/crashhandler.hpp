@@ -15,16 +15,27 @@
 
 namespace g2 {
 namespace internal {
-/** \return signal_name. Ref: signum.hpp and \ref installSignalHandler */
-std::string signalName(int signal_number);
+/** return whether or any fatal handling is still ongoing
+ *  this is used by g2log::fatalCallToLogger
+ *  only in the case of Windows exceptions (not fatal signals)
+ *  are we interested in changing this from false to true to 
+ *  help any other exceptions handler work with 'EXCEPTION_CONTINUE_SEARCH'*/
+ bool blockForFatalHandling();
+
+
+/** \return signal_name Ref: signum.hpp and \ref installSignalHandler 
+*  or for Windows exception name */
+std::string exitReasonName(size_t signal_number);
 
 /** return calling thread's stackdump*/
 std::string stackdump(const char* dump = nullptr);
 
+
+
 /** Re-"throw" a fatal signal, previously caught. This will exit the application
  * This is an internal only function. Do not use it elsewhere. It is triggered
  * from g2log, g2LogWorker after flushing messages to file */
-void exitWithDefaultSignalHandler(int signal_number);
+void exitWithDefaultSignalHandler(size_t signal_number);
 } // end g2::internal
 
 
