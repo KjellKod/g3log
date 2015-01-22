@@ -7,6 +7,13 @@ compiler:
      - gcc
     #- clang
 
+# whitelist
+branches:
+  only:
+    - master
+    - windows-crashhandler
+
+
 before_install: 
    # use http://lint.travis-ci.org/ to validate changes
        # sudo add-apt-repository -y ppa:h-rayflood/llvm; 
