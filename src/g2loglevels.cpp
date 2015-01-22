@@ -15,6 +15,19 @@
 #include "g2log.hpp"
 #include <atomic>
 #include <cassert>
+
+namespace {
+void checkLevel(const int level) {
+#if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
+   CHECK((level >= DBUG.value) && (level <= FATAL.value));
+#else
+   CHECK((level >= DEBUG.value) && (level <= FATAL.value));
+#endif
+}
+} // anonymous namespace
+
+
+ 
 namespace g2 {
    namespace internal {
       bool wasFatal(const LEVELS& level) {
@@ -29,11 +42,10 @@ namespace g2 {
    } // internal
 
 #ifdef G2_DYNAMIC_LOGGING
-
    void setLogLevel(LEVELS log_level, bool enabled) {
       assert(internal::g_level_size == 4 && "Mismatch between number of logging levels and their use");
       int level = log_level.value;
-      CHECK((level >= DEBUG.value) && (level <= FATAL.value));
+      setLogLevel(level);
       internal::g_log_level_status[level].store(enabled, std::memory_order_release);
    }
 #endif
@@ -41,7 +53,7 @@ namespace g2 {
    bool logLevel(LEVELS log_level) {
 #ifdef G2_DYNAMIC_LOGGING
       int level = log_level.value;
-      CHECK((level >= DEBUG.value) && (level <= FATAL.value));
+      setLogLevel(level);
       bool status = (internal::g_log_level_status[level].load(std::memory_order_acquire));
       return status;
 #endif

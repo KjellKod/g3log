@@ -205,7 +205,7 @@ int main(int argc, char **argv)
              << "The logfile is generated at:  [" << log_file_name.get() << "]\n\n" << std::endl;
 
 
-   LOGF(INFO, "Fatal exit example starts now, it's as easy as  %d", 123);
+   LOGF(DEBUG, "Fatal exit example starts now, it's as easy as  %d", 123);
    LOG(INFO) << "Feel free to read the source code also in g3log/example/main_fatal_choice.cpp";
 
    while (true) {
