@@ -25,7 +25,7 @@
 #include "stacktrace_windows.hpp"
 #include "g2logmessage.hpp"
 #include "g2logmessagecapture.hpp"
-#include <working_trace.hpp>
+#include "working_trace.hpp"
 
 #include <iostream>  // TODO REMOVE
 
