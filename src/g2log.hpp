@@ -77,8 +77,6 @@ namespace g2 {
       // Shutdown logging, but ONLY if the active logger corresponds to the one currently initialized
       bool shutDownLoggingForActiveOnly(LogWorker* active);
 
-
-
       /** By default the g2log will call g2LogWorker::fatal(...) which will
        * abort() the system after flushing the logs to file. This makes unit
        * test of FATAL level cumbersome. A work around is to change the
@@ -87,7 +85,10 @@ namespace g2 {
        *  The bool return values in the fatal_call is whether or not the fatal_call should
        *  
        */
-      void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessagePtr) > fatal_call);
+      void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call);
+
+
+      
    } // internal
 } // g2
 
@@ -173,5 +174,6 @@ And here is possible output
 // Throws std::runtime_eror if contract breaks
 #define CHECK_F(boolean_expression, printf_like_message, ...)    \
   if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
+
 
 

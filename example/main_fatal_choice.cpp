@@ -40,24 +40,28 @@ void RaiseSIGABRT() {
 
 void RaiseSIGFPE() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by"); 
    raise(SIGFPE);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGSEGV() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+   LOG(DEBUG) << "Exit by SIGSEGV";
    raise(SIGSEGV);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGILL() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+   LOGF(DEBUG, "Exit by %s", "SIGILL");
    raise(SIGILL);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RAiseSIGTERM() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by"); 
    raise(SIGTERM);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -66,6 +70,7 @@ int gShouldBeZero = 1;
 void DivisionByZero() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
    std::cout << "Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero << std::endl;
+   LOG(INFO) << "Division by zero is a big no-no";
    int value = 3;
    auto test = value / gShouldBeZero;
    LOG(WARNING) << "Expected to have died by now...";
@@ -73,7 +78,7 @@ void DivisionByZero() {
 
 void IllegalPrintf() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-
+   LOG(DEBUG) << "Impending doom due to illeteracy";
    printf("ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
    LOGF(INFO, "2nd attempt at ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
    LOG(WARNING) << "Expected to have died by now...";
@@ -90,6 +95,7 @@ void OutOfBoundsArrayIndexing() {
 void AccessViolation() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
    char *ptr = 0;
+   LOG(INFO) << "Death by access violation is imminent";
    *ptr = 0;
    LOG(WARNING) << "Expected to have died by now...";
 }

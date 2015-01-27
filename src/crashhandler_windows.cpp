@@ -170,8 +170,6 @@ void exitWithDefaultSignalHandler(size_t signal_number) {
      return;
   }
 
-
-
    // Restore our signalhandling to default
    if (SIG_ERR == signal(SIGABRT, SIG_DFL))
       perror("signal - SIGABRT");
@@ -188,20 +186,31 @@ void exitWithDefaultSignalHandler(size_t signal_number) {
 }
 
 void installSignalHandler() {
+   g2::installSignalHandlerForThread();
+   
    if (SIG_ERR == signal(SIGABRT, signalHandler))
       perror("signal - SIGABRT");
-   if (SIG_ERR == signal(SIGFPE, signalHandler))
-      perror("signal - SIGFPE");
-   if (SIG_ERR == signal(SIGSEGV, signalHandler))
-      perror("signal - SIGSEGV");
-   if (SIG_ERR == signal(SIGILL, signalHandler))
-      perror("signal - SIGILL");
    if (SIG_ERR == signal(SIGTERM, signalHandler))
       perror("signal - SIGTERM");
 }
 
 
 } // end g2::internal
+
+
+///  SIGFPE, SIGILL, and SIGSEGV handling must be installed per thread
+/// on Windows. This is automatically done if you do at least one LOG(...) call
+/// you can also use this function call, per thread so make sure these three
+/// fatal signals are covered in your thread (even if you don't do a LOG(...) call
+void installSignalHandlerForThread() {
+   if (SIG_ERR == signal(SIGFPE, signalHandler))
+      perror("signal - SIGFPE");
+   if (SIG_ERR == signal(SIGSEGV, signalHandler))
+      perror("signal - SIGSEGV");
+   if (SIG_ERR == signal(SIGILL, signalHandler))
+      perror("signal - SIGILL");
+   
+}
 
 void installCrashHandler() {
    internal::installSignalHandler();

@@ -193,7 +193,7 @@ namespace g2 {
        * This function switches the function pointer so that only
        * 'unitTest' mock-fatal calls are made.
        * */
-      void changeFatalInitHandlerForUnitTesting(std::function<void(FatalMessagePtr) > fatal_call) {
+      void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
          g_fatal_to_g2logworker_function_ptr = fatal_call;
       }
    } // internal

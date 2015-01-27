@@ -4,7 +4,7 @@
  * 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 #include <string>
@@ -14,23 +14,30 @@
 // implementationsfilen kan vara den samma
 
 namespace g2 {
+
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+///  SIGFPE, SIGILL, and SIGSEGV handling must be installed per thread
+/// on Windows. This is automatically done if you do at least one LOG(...) call
+/// you can also use this function call, per thread so make sure these three
+/// fatal signals are covered in your thread (even if you don't do a LOG(...) call
+void installSignalHandlerForThread();
+#endif
+
+
 namespace internal {
 /** return whether or any fatal handling is still ongoing
  *  this is used by g2log::fatalCallToLogger
  *  only in the case of Windows exceptions (not fatal signals)
- *  are we interested in changing this from false to true to 
+ *  are we interested in changing this from false to true to
  *  help any other exceptions handler work with 'EXCEPTION_CONTINUE_SEARCH'*/
- bool blockForFatalHandling();
+bool blockForFatalHandling();
 
-
-/** \return signal_name Ref: signum.hpp and \ref installSignalHandler 
+/** \return signal_name Ref: signum.hpp and \ref installSignalHandler
 *  or for Windows exception name */
 std::string exitReasonName(size_t signal_number);
 
 /** return calling thread's stackdump*/
-std::string stackdump(const char* dump = nullptr);
-
-
+std::string stackdump(const char *dump = nullptr);
 
 /** Re-"throw" a fatal signal, previously caught. This will exit the application
  * This is an internal only function. Do not use it elsewhere. It is triggered
