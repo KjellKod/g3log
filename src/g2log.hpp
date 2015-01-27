@@ -85,7 +85,7 @@ namespace g2 {
        *  The bool return values in the fatal_call is whether or not the fatal_call should
        *  
        */
-      void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call);
+      void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
 
 
       
