@@ -71,7 +71,7 @@ void signalHandler(int signal_number) {
    const auto dump = sttrace.to_string();
    /************ STOP HACk ***********/
 
-   LogCapture trigger(FATAL_SIGNAL, signal_number, dump.c_str());
+   LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), dump.c_str());
    trigger.stream() << fatal_stream.str();
 } // scope exit - message sent to LogWorker, wait to die...
 
@@ -149,7 +149,7 @@ std::string stackdump(const char *dump) {
 
 
 /// string representation of signal ID or Windows exception id
-std::string exitReasonName(const LEVELS &level, size_t fatal_id) {
+std::string exitReasonName(const LEVELS &level, g2::SignalType fatal_id) {
    //
    std::cout << __FUNCTION__ << " exit reason: " << fatal_id << std::endl;
    if (level == g2::internal::FATAL_EXCEPTION) {
@@ -178,7 +178,7 @@ std::string exitReasonName(const LEVELS &level, size_t fatal_id) {
 // Triggered by g2log::LogWorker after receiving a FATAL trigger
 // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-void exitWithDefaultSignalHandler(const LEVELS &level, size_t signal_number) {
+void exitWithDefaultSignalHandler(const LEVELS &level, g2::SignalType fatal_signal_id) {
 
    ReverseToOriginalFatalHandling();
    // For windows exceptions we want to continue the possibility of exception handling
@@ -190,6 +190,8 @@ void exitWithDefaultSignalHandler(const LEVELS &level, size_t signal_number) {
       return;
    }
 
+
+   const int signal_number = static_cast<int>(fatal_signal_id);
    raise(signal_number);
 }
 

@@ -15,12 +15,16 @@
 // implementationsfilen kan vara den samma
 namespace g2 {
 
+
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+   typedef unsigned long SignalType;
 ///  SIGFPE, SIGILL, and SIGSEGV handling must be installed per thread
 /// on Windows. This is automatically done if you do at least one LOG(...) call
 /// you can also use this function call, per thread so make sure these three
 /// fatal signals are covered in your thread (even if you don't do a LOG(...) call
 void installSignalHandlerForThread();
+#else 
+typedef int SignalType;
 #endif
 
 
@@ -34,7 +38,7 @@ bool blockForFatalHandling();
 
 /** \return signal_name Ref: signum.hpp and \ref installSignalHandler
 *  or for Windows exception name */
-std::string exitReasonName(const LEVELS& level, size_t signal_number);
+std::string exitReasonName(const LEVELS& level, g2::SignalType signal_number);
 
 /** return calling thread's stackdump*/
 std::string stackdump(const char *dump = nullptr);
@@ -42,7 +46,7 @@ std::string stackdump(const char *dump = nullptr);
 /** Re-"throw" a fatal signal, previously caught. This will exit the application
  * This is an internal only function. Do not use it elsewhere. It is triggered
  * from g2log, g2LogWorker after flushing messages to file */
-void exitWithDefaultSignalHandler(const LEVELS& level, size_t signal_number);
+void exitWithDefaultSignalHandler(const LEVELS& level, g2::SignalType signal_number);
 } // end g2::internal
 
 

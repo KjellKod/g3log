@@ -22,8 +22,8 @@
 #include "g2loglevels.hpp"
 #include "g2time.hpp"
 #include "g2moveoncopy.hpp"
+#include "crashhandler.hpp"
 #include <memory>
-
 namespace g2 {
 
    /** LogMessage contains all the data collected from the LOG(...) call.
@@ -86,14 +86,14 @@ namespace g2 {
     * A thread that causes a FatalMessage will sleep forever until the
     * application has exited (after message flush) */
    struct FatalMessage : public LogMessage {
-      FatalMessage(const LogMessage& details, size_t signal_id);
+      FatalMessage(const LogMessage& details, g2::SignalType signal_id);
       FatalMessage(const FatalMessage&);
       virtual ~FatalMessage(){};
       
       LogMessage copyToLogMessage() const;
       std::string reason() const;
       
-      const size_t _signal_id;
+      const SignalType _signal_id;
       static const int FATAL_EXCEPTION_EXIT = 1243;
    };
    

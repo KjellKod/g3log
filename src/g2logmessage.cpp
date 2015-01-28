@@ -184,7 +184,7 @@ std::string LogMessage::threadID() const {
    return oss.str();
 }
 
-FatalMessage::FatalMessage(const LogMessage &details, size_t signal_id)
+FatalMessage::FatalMessage(const LogMessage &details, g2::SignalType signal_id)
    : LogMessage(details), _signal_id(signal_id) { }
 
 

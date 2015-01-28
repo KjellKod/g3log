@@ -48,7 +48,7 @@ void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
       std::ostringstream fatal_stream;
       fatal_stream << oss.str() << std::endl;
       fatal_stream << "\n***** SIGNAL " << exitReasonName(signal_number) << "(" << signal_number << ")" << std::endl;
-      LogCapture trigger(FATAL_SIGNAL, signal_number, stackdump());
+      LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), stackdump());
       trigger.stream() << fatal_stream.str();
    } // message sent to g2LogWorker
    // wait to die
@@ -180,7 +180,8 @@ std::string exitReasonName(size_t signal_number) {
 // Triggered by g2log->g2LogWorker after receiving a FATAL trigger
 // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-void exitWithDefaultSignalHandler(int signal_number) {
+void exitWithDefaultSignalHandler(SignalType fatal_signal_id) {
+   const int signal_number = static_cast<int>(fatal_signal_id);
    std::cerr << "Exiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
    struct sigaction action;
    memset(&action, 0, sizeof (action)); //
