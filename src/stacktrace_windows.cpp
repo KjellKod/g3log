@@ -60,7 +60,7 @@ const std::map<g2::SignalType, std::string> kExceptionsAsText = {
 
 // Using the given context, fill in all the stack frames.
 // Which then later can be interpreted to human readable text
-void captureStackTrace(CONTEXT *context, std::vector<uint64_t> &frame_pointers) {
+void captureStackTrace(CONTEXT* context, std::vector<uint64_t> &frame_pointers) {
    DWORD machine_type = 0;
    STACKFRAME64 frame = {};
    frame.AddrPC.Mode = AddrModeFlat;
@@ -105,7 +105,7 @@ std::string getSymbolInformation(size_t index, std::vector<uint64_t> &frame_poin
    DWORD64 displacement64;
    DWORD displacement;
    char symbol_buffer[sizeof(SYMBOL_INFO) + 256];
-   SYMBOL_INFO *symbol = reinterpret_cast<SYMBOL_INFO *>(symbol_buffer);
+   SYMBOL_INFO* symbol = reinterpret_cast<SYMBOL_INFO*>(symbol_buffer);
    symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
    symbol->MaxNameLen = MAX_SYM_NAME;
 
@@ -163,14 +163,14 @@ std::string stackdump() {
 }
 
 /// helper function: retrieve stackdump, starting from an exception pointer
-std::string stackdump(EXCEPTION_POINTERS *info) {
+std::string stackdump(EXCEPTION_POINTERS* info) {
    auto context = info->ContextRecord;
    return stackdump(context);
 
 }
 
 /// main stackdump function. retrieve stackdump, from the given context
-std::string stackdump(CONTEXT *context) {
+std::string stackdump(CONTEXT* context) {
    stack_trace sttrace(context);     // if there is a windows exception then call it like THIS
    auto crashreport = sttrace.to_string();
    return crashreport;

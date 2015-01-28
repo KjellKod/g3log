@@ -34,7 +34,7 @@
 //      not all signal handlers need to be re-installed
 namespace {
 std::atomic<bool> gBlockForFatal {true};
-void *g_vector_exception_handler = nullptr;
+void* g_vector_exception_handler = nullptr;
 LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
 
 // Restore back to default fatal event handling
@@ -79,7 +79,7 @@ void signalHandler(int signal_number) {
 
 //
 // Unhandled exception catching
-LONG WINAPI exceptionHandling(EXCEPTION_POINTERS *info) {
+LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info) {
    const g2::SignalType exception_code = info->ExceptionRecord->ExceptionCode;
    //const auto exceptionText = stacktrace::exceptionIdToText(exception_code);
    /**** START HACK   ****/
@@ -103,7 +103,7 @@ LONG WINAPI exceptionHandling(EXCEPTION_POINTERS *info) {
 
 //
 // Unhandled exception catching
-LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS *info) {
+LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS* info) {
    ReverseToOriginalFatalHandling();
    return exceptionHandling(info);
 }
@@ -138,7 +138,7 @@ bool blockForFatalHandling() {
 
 /// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one
 /// i.e. the latter case is only for Windows and test purposes
-std::string stackdump(const char *dump) {
+std::string stackdump(const char* dump) {
    if (nullptr != dump && !std::string(dump).empty()) {
       return {dump};
    }
@@ -149,7 +149,7 @@ std::string stackdump(const char *dump) {
 
 
 /// string representation of signal ID or Windows exception id
-std::string exitReasonName(const LEVELS &level, g2::SignalType fatal_id) {
+std::string exitReasonName(const LEVELS& level, g2::SignalType fatal_id) {
    //
    std::cout << __FUNCTION__ << " exit reason: " << fatal_id << std::endl;
    if (level == g2::internal::FATAL_EXCEPTION) {
@@ -178,7 +178,7 @@ std::string exitReasonName(const LEVELS &level, g2::SignalType fatal_id) {
 // Triggered by g2log::LogWorker after receiving a FATAL trigger
 // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-void exitWithDefaultSignalHandler(const LEVELS &level, g2::SignalType fatal_signal_id) {
+void exitWithDefaultSignalHandler(const LEVELS& level, g2::SignalType fatal_signal_id) {
 
    ReverseToOriginalFatalHandling();
    // For windows exceptions we want to continue the possibility of exception handling

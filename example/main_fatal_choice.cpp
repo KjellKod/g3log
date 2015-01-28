@@ -40,7 +40,7 @@ void RaiseSIGABRT() {
 
 void RaiseSIGFPE() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by"); 
+   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by");
    raise(SIGFPE);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -61,7 +61,7 @@ void RaiseSIGILL() {
 
 void RAiseSIGTERM() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by"); 
+   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by");
    raise(SIGTERM);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -94,7 +94,7 @@ void OutOfBoundsArrayIndexing() {
 
 void AccessViolation() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   char *ptr = 0;
+   char* ptr = 0;
    LOG(INFO) << "Death by access violation is imminent";
    *ptr = 0;
    LOG(WARNING) << "Expected to have died by now...";
@@ -200,7 +200,7 @@ void ChooseFatalExit() {
 }
 } // namespace
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
    auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
    g2::initializeLogging(logger_n_handle.worker.get());
