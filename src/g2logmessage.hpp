@@ -94,7 +94,6 @@ namespace g2 {
       std::string reason() const;
       
       const SignalType _signal_id;
-      static const int FATAL_EXCEPTION_EXIT = 1243;
    };
    
    

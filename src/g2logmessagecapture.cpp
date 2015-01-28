@@ -35,7 +35,7 @@ LogCapture::~LogCapture() {
 
 
 /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-LogCapture::LogCapture(const LEVELS &level, int fatal_signal, const char *dump)
+LogCapture::LogCapture(const LEVELS &level, g2::SignalType fatal_signal, const char *dump)
    : LogCapture("", 0, "", level, "", fatal_signal, dump) {
 }
 
@@ -46,7 +46,7 @@ LogCapture::LogCapture(const LEVELS &level, int fatal_signal, const char *dump)
  * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
  */
 LogCapture::LogCapture(const char *file, const int line, const char *function, const LEVELS &level,
-                       const char *expression, int fatal_signal, const char *dump)
+                       const char *expression, g2::SignalType fatal_signal, const char *dump)
    : _file(file), _line(line), _function(function), _level(level), _expression(expression), _fatal_signal(fatal_signal) {
 
    if (g2::internal::wasFatal(level)) {

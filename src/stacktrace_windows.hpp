@@ -19,10 +19,11 @@
 
 #include <string>
 #include <windows.h>
-
+#include "crashhandler.hpp"
+ 
 namespace stacktrace {
 /// return the text description of a Windows exception code
-std::string exceptionIdToText(size_t id);
+std::string exceptionIdToText(g2::SignalType id);
 
 /// helper function: retrieve stackdump from no excisting exception pointer
 std::string stackdump(); 

@@ -80,19 +80,19 @@ void signalHandler(int signal_number) {
 //
 // Unhandled exception catching
 LONG WINAPI exceptionHandling(EXCEPTION_POINTERS *info) {
-   const size_t exception_code = info->ExceptionRecord->ExceptionCode;
+   const g2::SignalType exception_code = info->ExceptionRecord->ExceptionCode;
    //const auto exceptionText = stacktrace::exceptionIdToText(exception_code);
    /**** START HACK   ****/
    stack_trace sttrace(info->ContextRecord);
    // if there is a windows exception then call it like THIS
    auto exceptionText = sttrace.to_string();
+   const auto fatal_id = static_cast<g2::SignalType>(exception_code);
 
    /**** STOP HACK ***/
-   std::cout << __FUNCTION__ << " " << __LINE__ << "exception id:  " << exception_code
-             << ", windows exc: " << stacktrace::exceptionIdToText(exception_code) <<    std::endl;
-   assert(exception_code > g2::FatalMessage::FATAL_EXCEPTION_EXIT);
+   std::cout << __FUNCTION__ << " " << __LINE__ << "exception id:  " << fatal_id
+             << ", windows exc: " << stacktrace::exceptionIdToText(fatal_id) <<    std::endl;
 
-   LogCapture trigger(g2::internal::FATAL_EXCEPTION, exception_code, exceptionText.c_str());
+   LogCapture trigger(g2::internal::FATAL_EXCEPTION, static_cast<g2::SignalType>(exception_code), exceptionText.c_str());
    return EXCEPTION_CONTINUE_SEARCH; //EXCEPTION_EXECUTE_HANDLER;
 }
 

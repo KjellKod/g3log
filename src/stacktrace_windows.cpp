@@ -24,7 +24,7 @@
 #include <sstream> // TODO REMOVE
 #include "working_trace.hpp"
 
- 
+
 #pragma once
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "stacktrace_win.cpp used but not on a windows system"
@@ -33,7 +33,7 @@
 #define g2_MAP_PAIR_STRINGIFY(x) {x, #x}
 
 namespace {
-const std::map<size_t, std::string> kExceptionsAsText = {
+const std::map<g2::SignalType, std::string> kExceptionsAsText = {
    g2_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_ARRAY_BOUNDS_EXCEEDED)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_BREAKPOINT)
@@ -113,9 +113,9 @@ std::string getSymbolInformation(size_t index, std::vector<uint64_t> &frame_poin
    line.SizeOfStruct = sizeof(IMAGEHLP_LINE64);
    std::string lineInformation;
    std::string callInformation;
-   if (SymFromAddr(GetCurrentProcess(),addr, &displacement64,symbol)){
+   if (SymFromAddr(GetCurrentProcess(), addr, &displacement64, symbol)) {
       callInformation.append(" ").append({symbol->Name, symbol->NameLen});
-      if (SymGetLineFromAddr64(GetCurrentProcess(), addr,&displacement,&line)){
+      if (SymGetLineFromAddr64(GetCurrentProcess(), addr, &displacement, &line)) {
          lineInformation.append("\t").append(line.FileName).append(" L: ");
          lineInformation.append(std::to_string(line.LineNumber));
       }
@@ -139,9 +139,10 @@ std::string convertFramesToText(std::vector<uint64_t> &frame_pointers) {
 
 
 namespace stacktrace {
+
 /// return the text description of a Windows exception code
 /// From MSDN GetExceptionCode http://msdn.microsoft.com/en-us/library/windows/desktop/ms679356(v=vs.85).aspx
-std::string exceptionIdToText(size_t id) {
+std::string exceptionIdToText(g2::SignalType id) {
    const auto iter = kExceptionsAsText.find(id);
    if ( iter == kExceptionsAsText.end()) {
       std::string unknown {"Unknown/" + std::to_string(id)};
@@ -170,31 +171,31 @@ std::string stackdump(EXCEPTION_POINTERS *info) {
 
 /// main stackdump function. retrieve stackdump, from the given context
 std::string stackdump(CONTEXT *context) {
-  stack_trace sttrace(context);     // if there is a windows exception then call it like THIS
-  auto crashreport = sttrace.to_string();
-  return crashreport;
+   stack_trace sttrace(context);     // if there is a windows exception then call it like THIS
+   auto crashreport = sttrace.to_string();
+   return crashreport;
 
 
- /*  {
-      static std::atomic<size_t> recursiveCounter = 0;
-      ++recursiveCounter;
-      assert(recursiveCounter.load() == 1 && "Never allow recursive crashes");
-   }
+   /*  {
+        static std::atomic<size_t> recursiveCounter = 0;
+        ++recursiveCounter;
+        assert(recursiveCounter.load() == 1 && "Never allow recursive crashes");
+     }
 
-   const BOOL kLoadSymModules = TRUE;
-   const auto initialized = SymInitialize(GetCurrentProcess(), nullptr, kLoadSymModules);
-   std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void *) {
-      if (initialized) {
-         SymCleanup(GetCurrentProcess());
-      }
-   }); // Raii sym cleanup
+     const BOOL kLoadSymModules = TRUE;
+     const auto initialized = SymInitialize(GetCurrentProcess(), nullptr, kLoadSymModules);
+     std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void *) {
+        if (initialized) {
+           SymCleanup(GetCurrentProcess());
+        }
+     }); // Raii sym cleanup
 
 
-   const size_t kmax_frame_dump_size = 64;
-   std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size); // C++11: size set and values are zeroed
-   captureStackTrace(context, frame_pointers);
-   return convertFramesToText(frame_pointers);
-   */
+     const size_t kmax_frame_dump_size = 64;
+     std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size); // C++11: size set and values are zeroed
+     captureStackTrace(context, frame_pointers);
+     return convertFramesToText(frame_pointers);
+     */
 }
 
 

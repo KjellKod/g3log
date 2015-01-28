@@ -13,6 +13,7 @@
 #include <csignal>
 #include "g2loglevels.hpp"
 #include "g2log.hpp"
+ #include "crashhandler.hpp"
 
 /**
  * Simple struct for capturing log/fatal entries. At destruction the captured message is
@@ -22,7 +23,7 @@
 */
 struct LogCapture {
    /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-   LogCapture(const LEVELS &level, int fatal_signal, const char *dump = nullptr);
+   LogCapture(const LEVELS &level, g2::SignalType fatal_signal, const char *dump = nullptr);
 
 
    /**
@@ -32,7 +33,7 @@ struct LogCapture {
     * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
     */
    LogCapture(const char *file, const int line, const char *function, const LEVELS &level,
-              const char *expression = "", int fatal_signal = SIGABRT, const char *dump = nullptr);
+              const char *expression = "", g2::SignalType fatal_signal = SIGABRT, const char *dump = nullptr);
 
 
    // At destruction the message will be forwarded to the g2log worker.
@@ -65,7 +66,7 @@ struct LogCapture {
    const char *_function;
    const LEVELS &_level;
    const char *_expression;
-   const int _fatal_signal;
+   const g2::SignalType _fatal_signal;
 
 };
 //} // g2
