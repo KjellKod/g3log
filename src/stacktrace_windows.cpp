@@ -61,7 +61,7 @@ const std::map<g2::SignalType, std::string> kExceptionsAsText = {
 // Using the given context, fill in all the stack frames.
 // Which then later can be interpreted to human readable text
 void captureStackTrace(CONTEXT *context, std::vector<uint64_t> &frame_pointers) {
-   size_t machine_type = 0;
+   DWORD machine_type = 0;
    STACKFRAME64 frame = {};
    frame.AddrPC.Mode = AddrModeFlat;
    frame.AddrFrame.Mode = AddrModeFlat;
