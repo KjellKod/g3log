@@ -33,16 +33,34 @@
 // TODO for every LOG or CHECK i should have a thread_local to re-instantiate the signal-handler if we are on windows
 //      not all signal handlers need to be re-installed
 namespace {
-   std::atomic<bool> gBlockForFatal{true};
-   void* g_vector_exception_handler = nullptr;
-   LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
+std::atomic<bool> gBlockForFatal {true};
+void *g_vector_exception_handler = nullptr;
+LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
+
+// Restore back to default fatal event handling
+void ReverseToOriginalFatalHandling() {
+   SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
+   RemoveVectoredExceptionHandler (g_vector_exception_handler);
+   // Restore our signalhandling to default
+   if (SIG_ERR == signal(SIGABRT, SIG_DFL))
+      perror("signal - SIGABRT");
+   if (SIG_ERR == signal(SIGFPE, SIG_DFL))
+      perror("signal - SIGABRT");
+   if (SIG_ERR == signal(SIGSEGV, SIG_DFL))
+      perror("signal - SIGABRT");
+   if (SIG_ERR == signal(SIGILL, SIG_DFL))
+      perror("signal - SIGABRT");
+   if (SIG_ERR == signal(SIGTERM, SIG_DFL))
+      perror("signal - SIGABRT");
+}
+
 
 
 void signalHandler(int signal_number) {
    using namespace g2::internal;
    std::ostringstream fatal_stream;
    fatal_stream << "\n\n***** FATAL TRIGGER RECEIVED ******* " << std::endl;
-   fatal_stream << "\n***** RETHROWING SIGNAL " << exitReasonName(signal_number) << "(" << signal_number << ")" << std::endl;
+   fatal_stream << "\n***** RETHROWING SIGNAL " << exitReasonName(g2::internal::FATAL_SIGNAL, signal_number) << "(" << signal_number << ")" << std::endl;
 
    //const auto dump = stackdump();
    /***********    START HACK ************/
@@ -70,8 +88,8 @@ LONG WINAPI exceptionHandling(EXCEPTION_POINTERS *info) {
    auto exceptionText = sttrace.to_string();
 
    /**** STOP HACK ***/
-   std::cout << __FUNCTION__ << " " << __LINE__ << "exception id:  " << exception_code 
-      << ", windows exc: " << stacktrace::exceptionIdToText(exception_code) <<    std::endl;
+   std::cout << __FUNCTION__ << " " << __LINE__ << "exception id:  " << exception_code
+             << ", windows exc: " << stacktrace::exceptionIdToText(exception_code) <<    std::endl;
    assert(exception_code > g2::FatalMessage::FATAL_EXCEPTION_EXIT);
 
    LogCapture trigger(g2::internal::FATAL_EXCEPTION, exception_code, exceptionText.c_str());
@@ -79,10 +97,14 @@ LONG WINAPI exceptionHandling(EXCEPTION_POINTERS *info) {
 }
 
 
+
+
+
+
 //
 // Unhandled exception catching
 LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS *info) {
-   SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
+   ReverseToOriginalFatalHandling();
    return exceptionHandling(info);
 }
 
@@ -92,10 +114,9 @@ LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS *info) {
 /// Ref: http://blogs.msdn.com/b/zhanli/archive/2010/06/25/c-tips-addvectoredexceptionhandler-addvectoredcontinuehandler-and-setunhandledexceptionfilter.aspx
 LONG WINAPI vectorExceptionHandling(PEXCEPTION_POINTERS p) {
    std::cout << "\nIn my vectored exception_filter: " << __FUNCTION__ << std::endl;
-   RemoveVectoredExceptionHandler (g_vector_exception_handler);
+   ReverseToOriginalFatalHandling();
    return exceptionHandling(p);
 }
-
 
 
 
@@ -108,7 +129,7 @@ namespace g2 {
 namespace internal {
 
 
-// For windows exceptions this might ONCE be set to false, in case of a 
+// For windows exceptions this might ONCE be set to false, in case of a
 // windows exceptions and not a signal
 bool blockForFatalHandling() {
    return gBlockForFatal;
@@ -128,13 +149,12 @@ std::string stackdump(const char *dump) {
 
 
 /// string representation of signal ID or Windows exception id
-std::string exitReasonName(size_t fatal_id) {
-   // 
+std::string exitReasonName(const LEVELS &level, size_t fatal_id) {
+   //
    std::cout << __FUNCTION__ << " exit reason: " << fatal_id << std::endl;
-   if(fatal_id >= FatalMessage::FATAL_EXCEPTION_EXIT) {
-     return stacktrace::exceptionIdToText(fatal_id);
-   } 
-
+   if (level == g2::internal::FATAL_EXCEPTION) {
+      return stacktrace::exceptionIdToText(fatal_id);
+   }
 
    switch (fatal_id) {
    case SIGABRT: return "SIGABRT";
@@ -158,36 +178,24 @@ std::string exitReasonName(size_t fatal_id) {
 // Triggered by g2log::LogWorker after receiving a FATAL trigger
 // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-void exitWithDefaultSignalHandler(size_t signal_number) {
+void exitWithDefaultSignalHandler(const LEVELS &level, size_t signal_number) {
 
-  
-  // For windows exceptions we want to continue the possibility of exception handling
-  // now when the log and stacktrace are flushed to sinks. We therefore avoid to kill
-  // the preocess here. Instead it will be the exceptionHandling functions above that 
-  // will let exception handling continue with: EXCEPTION_CONTINUE_SEARCH
-  if (FatalMessage::FATAL_EXCEPTION_EXIT <= signal_number) {
-     gBlockForFatal = false;
-     return;
-  }
-
-   // Restore our signalhandling to default
-   if (SIG_ERR == signal(SIGABRT, SIG_DFL))
-      perror("signal - SIGABRT");
-   if (SIG_ERR == signal(SIGFPE, SIG_DFL))
-      perror("signal - SIGABRT");
-   if (SIG_ERR == signal(SIGSEGV, SIG_DFL))
-      perror("signal - SIGABRT");
-   if (SIG_ERR == signal(SIGILL, SIG_DFL))
-      perror("signal - SIGABRT");
-   if (SIG_ERR == signal(SIGTERM, SIG_DFL))
-      perror("signal - SIGABRT");
+   ReverseToOriginalFatalHandling();
+   // For windows exceptions we want to continue the possibility of exception handling
+   // now when the log and stacktrace are flushed to sinks. We therefore avoid to kill
+   // the preocess here. Instead it will be the exceptionHandling functions above that
+   // will let exception handling continue with: EXCEPTION_CONTINUE_SEARCH
+   if (g2::internal::FATAL_EXCEPTION == level) {
+      gBlockForFatal = false;
+      return;
+   }
 
    raise(signal_number);
 }
 
 void installSignalHandler() {
    g2::installSignalHandlerForThread();
-   
+
    if (SIG_ERR == signal(SIGABRT, signalHandler))
       perror("signal - SIGABRT");
    if (SIG_ERR == signal(SIGTERM, signalHandler))
@@ -209,7 +217,7 @@ void installSignalHandlerForThread() {
       perror("signal - SIGSEGV");
    if (SIG_ERR == signal(SIGILL, signalHandler))
       perror("signal - SIGILL");
-   
+
 }
 
 void installCrashHandler() {

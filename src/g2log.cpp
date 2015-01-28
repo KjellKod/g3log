@@ -165,10 +165,10 @@ namespace g2 {
          if (!isLoggingInitialized()) {
             std::ostringstream error;
             error << "FATAL CALL but logger is NOT initialized\n"
-                    << "SIGNAL: " << message.get()->signal()
+                    << "CAUSE: " << message.get()->reason()
                     << "\nMessage: \n" << message.get()->toString() << std::flush;
             std::cerr << error.str() << std::flush;
-            internal::exitWithDefaultSignalHandler(message.get()->_signal_id);
+            internal::exitWithDefaultSignalHandler(message.get()->_level, message.get()->_signal_id);
          }
          g_logger_instance->fatal(message);
          while (blockForFatalHandling()) {

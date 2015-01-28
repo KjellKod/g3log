@@ -9,10 +9,10 @@
  * ============================================================================*/
 #include <string>
 #include <csignal>
-
+#include "g2loglevels.hpp"
+ 
 // kjell. Separera på crashhandler.hpp och crashhanlder_internal.hpp
 // implementationsfilen kan vara den samma
-
 namespace g2 {
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -34,7 +34,7 @@ bool blockForFatalHandling();
 
 /** \return signal_name Ref: signum.hpp and \ref installSignalHandler
 *  or for Windows exception name */
-std::string exitReasonName(size_t signal_number);
+std::string exitReasonName(const LEVELS& level, size_t signal_number);
 
 /** return calling thread's stackdump*/
 std::string stackdump(const char *dump = nullptr);
@@ -42,7 +42,7 @@ std::string stackdump(const char *dump = nullptr);
 /** Re-"throw" a fatal signal, previously caught. This will exit the application
  * This is an internal only function. Do not use it elsewhere. It is triggered
  * from g2log, g2LogWorker after flushing messages to file */
-void exitWithDefaultSignalHandler(size_t signal_number);
+void exitWithDefaultSignalHandler(const LEVELS& level, size_t signal_number);
 } // end g2::internal
 
 

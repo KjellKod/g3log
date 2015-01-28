@@ -47,17 +47,19 @@ namespace g2 {
       // safe to shutdown logging now
       g2::internal::shutDownLogging();
 
-      std::string signal = msgPtr.get()->signal();
-      auto fatal_signal_id = msgPtr.get()->_signal_id;
+      std::string reason = msgPtr.get()->reason();
+      const auto level = msgPtr.get()->_level;
+      const auto fatal_id = msgPtr.get()->_signal_id;
+
 
       std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
       uniqueMsg->write().append("\nExiting after fatal event  (").append(uniqueMsg->level());
-      std::string exiting = {"Exiting with signal: "};
-      if (fatal_signal_id >= FatalMessage::FATAL_EXCEPTION_EXIT) {
-        exiting = {"Caught fatal windows exception: "};
-      }
+     
 
-      uniqueMsg->write().append("). ").append(exiting).append(" ").append(signal)
+     // Change output in case of a fatal signal (or windows exception)
+      std::string exiting = {"Fatal type: "};
+
+      uniqueMsg->write().append("). ").append(exiting).append(" ").append(reason)
               .append("\nLog content flushed flushed sucessfully to sink\n\n");
 
       std::cerr << uniqueMsg->message() << std::flush;
@@ -70,7 +72,7 @@ namespace g2 {
       // This clear is absolutely necessary
       // All sinks are forced to receive the fatal message above before we continue
       _sinks.clear(); // flush all queues
-      internal::exitWithDefaultSignalHandler(fatal_signal_id);
+      internal::exitWithDefaultSignalHandler(level, fatal_id);
       
       // should never reach this point
       perror("g2log exited after receiving FATAL trigger. Flush message status: ");

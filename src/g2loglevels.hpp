@@ -39,12 +39,17 @@ struct LEVELS {
    : value(other.value), text(other.text.c_str()) {}
 
    LEVELS(int id, const char* idtext) : value(id), text(idtext) {}
+
+   friend bool operator==(const LEVELS & lhs, const LEVELS & rhs) { return (lhs.value == rhs.value && lhs.text == rhs.text); }
+
    const int value;
    const std::string text;
 };
 
-static const int kDebugVaulue = 0;
 
+
+
+static const int kDebugVaulue = 0;
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
 const LEVELS DBUG{kDebugVaulue, {"DEBUG"}}, 
 #else

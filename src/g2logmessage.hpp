@@ -91,7 +91,7 @@ namespace g2 {
       virtual ~FatalMessage(){};
       
       LogMessage copyToLogMessage() const;
-      std::string signal() const;
+      std::string reason() const;
       
       const size_t _signal_id;
       static const int FATAL_EXCEPTION_EXIT = 1243;

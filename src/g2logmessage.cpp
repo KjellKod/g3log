@@ -2,7 +2,7 @@
  * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================
  * Filename:g2logmessage.cpp  Part of Framework for Logging and Design By Contract
@@ -18,68 +18,124 @@
 #include <mutex>
 
 namespace {
-   std::once_flag g_start_time_flag;
-   std::chrono::steady_clock::time_point g_start_time;
+std::once_flag g_start_time_flag;
+std::chrono::steady_clock::time_point g_start_time;
 
-   int64_t  microsecondsCounter() {
-      std::call_once(g_start_time_flag, []() { g_start_time = std::chrono::steady_clock::now(); });
-      auto  now = std::chrono::steady_clock::now();
-      return std::chrono::duration_cast<std::chrono::microseconds>(now - g_start_time).count();
-   }
+int64_t  microsecondsCounter() {
+   std::call_once(g_start_time_flag, []() {
+      g_start_time = std::chrono::steady_clock::now();
+   });
+   auto  now = std::chrono::steady_clock::now();
+   return std::chrono::duration_cast<std::chrono::microseconds>(now - g_start_time).count();
+}
 
-   std::string splitFileName(const std::string& str) {
-      size_t found;
-      found = str.find_last_of("(/\\");
-      return str.substr(found + 1);
-   }
+std::string splitFileName(const std::string &str) {
+   size_t found;
+   found = str.find_last_of("(/\\");
+   return str.substr(found + 1);
+}
 } // anonymous
 
 
 
 namespace g2 {
 
-   std::string LogMessage::toString() const {
+
+   // helper for setting the normal log details in an entry
+   std::string LogDetailsToString(const LogMessage& msg) {
       std::string out;
-      out.append("\n" + timestamp() + "." + microseconds() +  "\t"
-              + level() + " [" + file() + " L: " + line() + "]\t");
-
-      // Non-fatal Log Message
-      if (false == wasFatal()) {
-         out.append('"' + message() + '"');
-         return out;
-      }
-
-      if (internal::FATAL_SIGNAL.value == _level.value) {
-         out.clear(); // clear any previous text and formatting
-         out.append("\n" + timestamp() + "." + microseconds() 
-                 + "\n\n***** FATAL SIGNAL RECEIVED ******* \n"
-                 + '"' + message() + '"');
-         return out;
-      }
-
-      // Not crash scenario but LOG or CONTRACT
-      auto level_value = _level.value;
-      if (FATAL.value == level_value) {
-         static const std::string fatalExitReason = {"EXIT trigger caused by LOG(FATAL) entry: "};
-         out.append("\n\t*******\t " + fatalExitReason + "\n\t" + '"' + message() + '"');
-      } else if (internal::CONTRACT.value == level_value) {
-         static const std::string contractExitReason = {"EXIT trigger caused by broken Contract:"};
-         out.append("\n\t*******\t " + contractExitReason + " CHECK(" + _expression + ")\n\t" 
-                 + '"' + message() + '"');
-      } else {
-         static const std::string errorUnknown = {"UNKNOWN Log Message Type"};
-         out.append("\n\t*******" + errorUnknown + "\t\n" + '"' + message() + '"');
-      }
- 
+      out.append("\n" + msg.timestamp() + "." + msg.microseconds() +  "\t"
+      + msg.level() + " [" + msg.file() + " L: " + msg.line() + "]\t");
       return out;
    }
 
-     std::string LogMessage::timestamp(const std::string & time_look) const {
-        return  localtime_formatted(_timestamp, time_look);
+
+// helper for normal
+std::string normalToString(const LogMessage& msg) {
+   auto out = LogDetailsToString(msg);
+   out.append('"' + msg.message() + '"');
+   return out;
+}
+
+// helper for fatal signal
+std::string  fatalSignalToString(const LogMessage &msg) {
+   std::string out; // clear any previous text and formatting
+   out.append("\n" + msg.timestamp() + "." + msg.microseconds()
+      + "\n\n***** FATAL SIGNAL RECEIVED ******* \n"
+      + '"' + msg.message() + '"');
+   return out;
+}
+
+
+// helper for fatal exception (windows only)
+std::string  fatalExceptionToString(const LogMessage &msg) {
+   std::string out; // clear any previous text and formatting
+   out.append("\n" + msg.timestamp() + "." + msg.microseconds()
+      + "\n\n***** FATAL EXCEPTION RECEIVED ******* \n"
+      + '"' + msg.message() + '"');
+   return out;
+}
+
+
+// helper for fatal LOG 
+std::string fatalLogToString(const LogMessage& msg) {
+   auto out = LogDetailsToString(msg);
+   static const std::string fatalExitReason = {"EXIT trigger caused by LOG(FATAL) entry: "};
+   out.append("\n\t*******\t " + fatalExitReason + "\n\t" + '"' + msg.message() + '"');
+   return out;
+}
+
+// helper for fatal CHECK 
+std::string fatalCheckToString(const LogMessage& msg) {
+   auto out = LogDetailsToString(msg);
+   static const std::string contractExitReason = {"EXIT trigger caused by broken Contract:"};
+   out.append("\n\t*******\t " + contractExitReason + " CHECK(" + msg.expression() + ")\n\t"
+      + '"' +msg. message() + '"');
+   return out;
+}
+
+
+// Format the log message according to it's type
+std::string LogMessage::toString() const {
+   if (false == wasFatal()) {
+      return normalToString(*this);
    }
 
-   LogMessage::LogMessage(const std::string &file, const int line,
-           const std::string& function, const LEVELS& level)
+   const auto level_value = _level.value;
+   if (internal::FATAL_SIGNAL.value == _level.value) {
+      return fatalSignalToString(*this);
+   } 
+
+   if (internal::FATAL_EXCEPTION.value == _level.value) {
+      return fatalExceptionToString(*this);
+   }
+
+   if (FATAL.value == _level.value) {
+      return fatalLogToString(*this);
+   } 
+
+   if (internal::CONTRACT.value == level_value) {
+      return fatalCheckToString(*this);
+   }
+
+   // What? Did we hit a custom made level?
+   auto out = LogDetailsToString(*this);
+   static const std::string errorUnknown = {"UNKNOWN or Custom made Log Message Type"};
+   out.append("\n\t*******" + errorUnknown + "\t\n" + '"' + message() + '"');
+   return out;
+}
+
+
+
+std::string LogMessage::timestamp(const std::string &time_look) const {
+   return  localtime_formatted(_timestamp, time_look);
+}
+
+
+
+
+LogMessage::LogMessage(const std::string &file, const int line,
+                       const std::string &function, const LEVELS &level)
    : _timestamp(g2::systemtime_now())
    , _call_thread_id(std::this_thread::get_id())
    , _microseconds(microsecondsCounter())
@@ -90,12 +146,12 @@ namespace g2 {
 {}
 
 
-   LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
+LogMessage::LogMessage(const std::string &fatalOsSignalCrashMessage)
    : LogMessage({""}, 0, {""}, internal::FATAL_SIGNAL) {
-      _message.append(fatalOsSignalCrashMessage);
-   }
-   
-   LogMessage::LogMessage(const LogMessage& other) 
+   _message.append(fatalOsSignalCrashMessage);
+}
+
+LogMessage::LogMessage(const LogMessage &other)
    : _timestamp(other._timestamp)
    , _call_thread_id(other._call_thread_id)
    , _microseconds(other._microseconds)
@@ -105,11 +161,11 @@ namespace g2 {
    , _level(other._level)
    , _expression(other._expression)
    , _message(other._message)
-   {
-   }
+{
+}
 
-  
-   LogMessage::LogMessage(LogMessage&& other)
+
+LogMessage::LogMessage(LogMessage &&other)
    : _timestamp(other._timestamp)
    , _call_thread_id(other._call_thread_id)
    , _microseconds(other._microseconds)
@@ -119,31 +175,31 @@ namespace g2 {
    , _level(other._level)
    , _expression(std::move(other._expression))
    , _message(std::move(other._message)) {
-   }    
-   
-   
-   std::string LogMessage::threadID() const {
-      std::ostringstream oss;
-      oss << _call_thread_id;
-      return oss.str();
-   }
+}
 
-   FatalMessage::FatalMessage(const LogMessage& details, size_t signal_id) 
+
+std::string LogMessage::threadID() const {
+   std::ostringstream oss;
+   oss << _call_thread_id;
+   return oss.str();
+}
+
+FatalMessage::FatalMessage(const LogMessage &details, size_t signal_id)
    : LogMessage(details), _signal_id(signal_id) { }
 
-   
-   
-   FatalMessage::FatalMessage(const FatalMessage& other) 
+
+
+FatalMessage::FatalMessage(const FatalMessage &other)
    : LogMessage(other), _signal_id(other._signal_id) {}
 
-      
-   LogMessage  FatalMessage::copyToLogMessage() const {
-      return LogMessage(*this);
-   }
-   
-   std::string FatalMessage::signal() const{
-      return internal::exitReasonName(_signal_id);
-   }
 
-   
+LogMessage  FatalMessage::copyToLogMessage() const {
+   return LogMessage(*this);
+}
+
+std::string FatalMessage::reason() const {
+   return internal::exitReasonName(_level, _signal_id);
+}
+
+
 } // g2
