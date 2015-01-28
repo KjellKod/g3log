@@ -64,10 +64,26 @@ namespace g2 {
       void saveMessage(const char* message, const char* file, int line, const char* function, const LEVELS& level,
               const char* boolean_expression, int fatal_signal, const char* stack_trace);
 
+      // forwards the message to all sinks
       void pushMessageToLogger(LogMessagePtr log_entry);
+
+      
+      // forwards a FATAL message to all sinks,. after which the g2logworker
+      // will trigger crashhandler / g2::internal::exitWithDefaultSignalHandler
+      // 
+      // By default the "fatalCall" will forward a Fatalessageptr to this function
+      // this behaviour can be changed if you set a different fatal handler through
+      // "setFatalExitHandler"
+      void pushFatalMessageToLogger(FatalMessagePtr message);
+
 
       // Save the created FatalMessage to any existing sinks and exit with 
       // the originating fatal signal,. or SIGABRT if it originated from a broken contract
+      // By default forwards to: pushFatalMessageToLogger, see "setFatalExitHandler" to override
+      //
+      // If you override it then you probably want to call "pushFatalMessageToLogger" after your
+      // custom fatal handler is done. This will make sure that the fatal message the pushed
+      // to sinks as well as shutting down the process
       void fatalCall(FatalMessagePtr message);
 
 

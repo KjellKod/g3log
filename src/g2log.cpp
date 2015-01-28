@@ -161,7 +161,7 @@ namespace g2 {
        * will sleep forever (i.e. until the background thread catches up, saves the fatal
        * message and kills the software with the fatal signal.
        */
-      void fatalCallToLogger(FatalMessagePtr message) {
+      void pushFatalMessageToLogger(FatalMessagePtr message) {
          if (!isLoggingInitialized()) {
             std::ostringstream error;
             error << "FATAL CALL but logger is NOT initialized\n"
@@ -177,8 +177,8 @@ namespace g2 {
       }
 
 
-      // By default this function pointer goes to \ref fatalCallToLogger;
-      std::function<void(FatalMessagePtr) > g_fatal_to_g2logworker_function_ptr = fatalCallToLogger;
+      // By default this function pointer goes to \ref pushFatalMessageToLogger;
+      std::function<void(FatalMessagePtr) > g_fatal_to_g2logworker_function_ptr = pushFatalMessageToLogger;
 
       /** The default, initial, handling to send a 'fatal' event to g2logworker
        *  the caller will stay here, eternally, until the software is aborted
