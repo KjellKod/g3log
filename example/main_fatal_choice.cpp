@@ -105,6 +105,15 @@ void NoExitFunction() {
    CHECK(false) << "This function should never be called";
 }
 
+void RaiseSIGABRTAndAccessViolation() {
+   std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+
+   auto f1 = std::async(std::launch::async, &RaiseSIGABRT);
+   auto f2 = std::async(std::launch::async, &AccessViolation);
+   f1.wait();
+   f2.wait();
+}
+
 
 void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
@@ -119,6 +128,7 @@ void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    case 7: exitFunction = &IllegalPrintf;  break;
    case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
    case 9: exitFunction = &AccessViolation;  break;
+   case 10: exitFunction = &RaiseSIGABRTAndAccessViolation; break;
    default: break;
    }
    if (runInNewThread) {
@@ -173,12 +183,13 @@ int ChoiceOfFatalExit() {
       std::cout << "[7] Illegal printf" << std::endl;
       std::cout << "[8] Out of bounds array indexing  " << std::endl;
       std::cout << "[9] Access violation  \n\n" << std::endl;
-      std::cout << std::flush;
+      std::cout << "[10] Rasing SIGABRT in one thread and Access Violation in another thread simultaneously" << std::endl;
+      std::cout << std::flush; 
 
       try {
          std::getline(std::cin, option);
          choice = std::stoi(option);
-         if (choice <= 0 || choice > 9) {
+         if (choice <= 0 || choice > 10) {
             std::cout << "Invalid choice: [" << option << "\n\n";
          }  else {
             return choice;

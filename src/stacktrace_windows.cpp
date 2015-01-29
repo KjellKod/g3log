@@ -171,9 +171,10 @@ std::string stackdump(EXCEPTION_POINTERS* info) {
 
 /// main stackdump function. retrieve stackdump, from the given context
 std::string stackdump(CONTEXT* context) {
-   stack_trace sttrace(context);     // if there is a windows exception then call it like THIS
-   auto crashreport = sttrace.to_string();
-   return crashreport;
+
+ stack_trace sttrace(context);     // if there is a windows exception then call it like THIS
+ auto crashreport = sttrace.to_string();
+ return crashreport;
 
 
    /*  {

@@ -9,6 +9,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <mutex>
 
 // temporary
 #include <cassert>
@@ -146,6 +147,13 @@ class stack_trace
 public:
    stack_trace(CONTEXT* context)
    {
+
+      // TODO:  does thread_local exist on Windows VS2012,. we should somehow check for 
+      // the same thread entering this secion twice. If that happens we should just exit/abort the process since
+    // we have a loop h   
+      static std::mutex m;
+      std::lock_guard<std::mutex> lock(m);
+
       ZeroMemory(m_frame_ptrs, sizeof(m_frame_ptrs));
       sym_handler::get_instance().capture_stack_trace(context,
             m_frame_ptrs,
