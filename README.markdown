@@ -76,7 +76,7 @@ The code is given for free as public domain. This gives the option to change, us
 
 The *std::string* comes pre-formatted. The *g2::LogMessageMover* is a wrapped struct that contains the raw data for custom handling in your own sink.
 
-It is easy to either use pre-made sinks or make your own. When a sink is set to be used by the G3log  it is added to the logger inside a ```std::unique_ptr```.  The sink can be called though its public API through a *handler* which will asynchronously forward the call to the receiving sink. 
+A sink is *owned* by the G3log and is added to the logger inside a ```std::unique_ptr```.  The sink can be called though its public API through a *handler* which will asynchronously forward the call to the receiving sink. 
 ```
 auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
                                      &CustomSink::ReceiveLogMessage);

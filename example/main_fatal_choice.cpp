@@ -32,41 +32,36 @@ void ToLower(std::string &str)
    }
 }
 
-void sleep_for(size_t seconds) {
-  std::this_thread::sleep_for(std::chrono::seconds(seconds));
-}
-
 void RaiseSIGABRT() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    raise(SIGABRT);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGFPE() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
+   LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
    raise(SIGFPE);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGSEGV() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
+   LOG(DEBUG) << "Exit by SIGSEGV";
    raise(SIGSEGV);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RaiseSIGILL() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
+   LOGF(DEBUG, "Exit by %s", "SIGILL");
    raise(SIGILL);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void RAiseSIGTERM() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
+   LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
    raise(SIGTERM);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -75,23 +70,21 @@ int gShouldBeZero = 1;
 void DivisionByZero() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
    std::cout << "Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero << std::endl;
-   sleep_for(2);
+   LOG(INFO) << "Division by zero is a big no-no";
    int value = 3;
    auto test = value / gShouldBeZero;
-   LOG(WARNING) << "Expected to have died by now...";
+   LOG(WARNING) << "Expected to have died by now..., test value: " << test;
 }
 
 void IllegalPrintf() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
-   printf("ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
+   LOG(DEBUG) << "Impending doom due to illeteracy";
    LOGF(INFO, "2nd attempt at ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
    LOG(WARNING) << "Expected to have died by now...";
 }
 
 void OutOfBoundsArrayIndexing() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
    std::vector<int> v;
    v[0] = 5;
    LOG(WARNING) << "Expected to have died by now...";
@@ -100,8 +93,8 @@ void OutOfBoundsArrayIndexing() {
 
 void AccessViolation() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   sleep_for(2);
-   char *ptr = 0;
+   char* ptr = 0;
+   LOG(INFO) << "Death by access violation is imminent";
    *ptr = 0;
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -111,6 +104,23 @@ void NoExitFunction() {
    CHECK(false) << "This function should never be called";
 }
 
+void RaiseSIGABRTAndAccessViolation() {
+   std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+
+   auto f1 = std::async(std::launch::async, &RaiseSIGABRT);
+   auto f2 = std::async(std::launch::async, &AccessViolation);
+   f1.wait();
+   f2.wait();
+}
+
+
+void CallActualExitFunction(std::function<void()> fatal_function) {
+   fatal_function();
+}
+
+void CallExitFunction(std::function<void()> fatal_function) {
+   CallActualExitFunction(fatal_function);
+}
 
 void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
@@ -121,17 +131,18 @@ void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    case 3: exitFunction = &RaiseSIGSEGV;  break;
    case 4: exitFunction = &RaiseSIGILL;  break;
    case 5: exitFunction = &RAiseSIGTERM;  break;
-   case 6: exitFunction = &DivisionByZero;  gShouldBeZero = 0; break;
+   case 6: exitFunction = &DivisionByZero;  gShouldBeZero = 0; DivisionByZero();  break;
    case 7: exitFunction = &IllegalPrintf;  break;
    case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
    case 9: exitFunction = &AccessViolation;  break;
+   case 10: exitFunction = &RaiseSIGABRTAndAccessViolation; break;
    default: break;
    }
    if (runInNewThread) {
-      auto dieInNearFuture = std::async(std::launch::async, exitFunction);
+      auto dieInNearFuture = std::async(std::launch::async, CallExitFunction, exitFunction);
       dieInNearFuture.wait();
    } else {
-      exitFunction();
+      CallExitFunction(exitFunction);
    }
 
    std::string unexpected = "Expected to exit by FATAL event. That did not happen (printf choice in Windows?).";
@@ -178,13 +189,14 @@ int ChoiceOfFatalExit() {
       std::cout << "[6] Division By Zero" << std::endl;
       std::cout << "[7] Illegal printf" << std::endl;
       std::cout << "[8] Out of bounds array indexing  " << std::endl;
-      std::cout << "[9] Access violation  \n\n" << std::endl;
-      std::cout << std::flush;
+      std::cout << "[9] Access violation" << std::endl;
+      std::cout << "[10] Rasing SIGABRT + Access Violation in two separate threads" << std::endl;
+      std::cout << std::flush; 
 
       try {
          std::getline(std::cin, option);
          choice = std::stoi(option);
-         if (choice <= 0 || choice > 9) {
+         if (choice <= 0 || choice > 10) {
             std::cout << "Invalid choice: [" << option << "\n\n";
          }  else {
             return choice;
@@ -195,15 +207,18 @@ int ChoiceOfFatalExit() {
    }
 }
 
+void ForwardChoiceForFatalExit(bool runInNewThread, int fatalChoice) {
+   ExecuteDeathFunction(runInNewThread, fatalChoice);
+}
 
 void ChooseFatalExit() {
    const bool runInNewThread = AskForAsyncDeath();
-   const int choiceOfFatalExit = ChoiceOfFatalExit();
-   ExecuteDeathFunction(runInNewThread, choiceOfFatalExit);
+   const int exitChoice = ChoiceOfFatalExit();
+   ForwardChoiceForFatalExit(runInNewThread, exitChoice);
 }
 } // namespace
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
    auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
    g2::initializeLogging(logger_n_handle.worker.get());
@@ -214,7 +229,7 @@ int main(int argc, char **argv)
              << "The logfile is generated at:  [" << log_file_name.get() << "]\n\n" << std::endl;
 
 
-   LOGF(INFO, "Fatal exit example starts now, it's as easy as  %d", 123);
+   LOGF(DEBUG, "Fatal exit example starts now, it's as easy as  %d", 123);
    LOG(INFO) << "Feel free to read the source code also in g3log/example/main_fatal_choice.cpp";
 
    while (true) {
