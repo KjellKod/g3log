@@ -1,8 +1,9 @@
 /** ==========================================================================
- * 2014 by KjellKod.cc AND Robert Engeln.
- * The stacktrace code was given as a public domain dedication by Robert Engeln
- * It was originally published at: http://code-freeze.blogspot.com/2012/01/generating-stack-traces-from-c.html
- * It was (here) modified for g3log purposes.
+ * Original code made by Robert Engeln. Given as a PUBLIC DOMAIN dedication for
+ * the benefit of g3log.  It was originally published at:
+ * http://code-freeze.blogspot.com/2012/01/generating-stack-traces-from-c.html
+
+ * 2014-2015: adapted for g3log by Kjell Hedstrom (KjellKod).
  *
  * This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
@@ -20,9 +21,7 @@
 #include <cassert>
 #include <vector>
 #include <cstdlib>
-#include <iostream> // to remove TODO
-#include <sstream> // TODO REMOVE
-#include "working_trace.hpp"
+#include <mutex>
 
 
 #pragma once
@@ -30,9 +29,14 @@
 #error "stacktrace_win.cpp used but not on a windows system"
 #endif
 
+
+
 #define g2_MAP_PAIR_STRINGIFY(x) {x, #x}
+#define thread_local __declspec(thread) 
 
 namespace {
+thread_local bool g_thread_local_recursive_crash_check = false;
+
 const std::map<g2::SignalType, std::string> kExceptionsAsText = {
    g2_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_ARRAY_BOUNDS_EXCEEDED)
@@ -60,9 +64,9 @@ const std::map<g2::SignalType, std::string> kExceptionsAsText = {
 
 // Using the given context, fill in all the stack frames.
 // Which then later can be interpreted to human readable text
-void captureStackTrace(CONTEXT* context, std::vector<uint64_t> &frame_pointers) {
+void captureStackTrace(CONTEXT* context, std::vector<uint64_t>& frame_pointers) {
    DWORD machine_type = 0;
-   STACKFRAME64 frame = {};
+   STACKFRAME64 frame = {}; // force zeroeing
    frame.AddrPC.Mode = AddrModeFlat;
    frame.AddrFrame.Mode = AddrModeFlat;
    frame.AddrStack.Mode = AddrModeFlat;
@@ -78,29 +82,31 @@ void captureStackTrace(CONTEXT* context, std::vector<uint64_t> &frame_pointers) 
    machine_type = IMAGE_FILE_MACHINE_I386;
 #endif
    auto noErrors = TRUE; // Why, Oh Why have Microsoft redefined bool?
-   for (size_t index = 0; noErrors && index < frame_pointers.size(); ++index)
+   for (size_t index = 0; index < frame_pointers.size(); ++index)
    {
-      noErrors = StackWalk64(machine_type,
-                             GetCurrentProcess(),
-                             GetCurrentThread(),
-                             &frame,
-                             context,
-                             NULL,
-                             SymFunctionTableAccess64,
-                             SymGetModuleBase64,
-                             NULL);
-      if (noErrors) {
+      if (StackWalk64(machine_type,
+                      GetCurrentProcess(),
+                      GetCurrentThread(),
+                      &frame,
+                      context,
+                      NULL,
+                      SymFunctionTableAccess64,
+                      SymGetModuleBase64,
+                      NULL)) {
          frame_pointers[index] = frame.AddrPC.Offset;
+      } else {
+         break;
       }
    }
 }
 
+
+
 // extract readable text from a given stack frame. All thanks to
 // using SymFromAddr and SymGetLineFromAddr64 with the stack pointer
-std::string getSymbolInformation(size_t index, std::vector<uint64_t> &frame_pointers) {
+std::string getSymbolInformation(const size_t index, const std::vector<uint64_t>& frame_pointers) {
    auto addr = frame_pointers[index];
    std::string frame_dump = "stack dump [" + std::to_string(index) + "]\t";
-
 
    DWORD64 displacement64;
    DWORD displacement;
@@ -126,20 +132,21 @@ std::string getSymbolInformation(size_t index, std::vector<uint64_t> &frame_poin
 
 
 // Retrieves all the symbols for the stack frames, fills them witin a text representation and returns it
-std::string convertFramesToText(std::vector<uint64_t> &frame_pointers) {
+std::string convertFramesToText(std::vector<uint64_t>& frame_pointers) {
    std::string dump; // slightly more efficient than ostringstream
-   const size_t size = frame_pointers.size();
-   for (size_t index = 0; index < size && frame_pointers[index]; ++index) {
+   const size_t kSize = frame_pointers.size();
+   for (size_t index = 0; index < kSize && frame_pointers[index]; ++index) {
       dump += getSymbolInformation(index, frame_pointers);
       dump += "\n";
    }
    return dump;
 }
-} // anonymou
+} // anonymous
+
+
 
 
 namespace stacktrace {
-
 /// return the text description of a Windows exception code
 /// From MSDN GetExceptionCode http://msdn.microsoft.com/en-us/library/windows/desktop/ms679356(v=vs.85).aspx
 std::string exceptionIdToText(g2::SignalType id) {
@@ -169,38 +176,41 @@ std::string stackdump(EXCEPTION_POINTERS* info) {
 
 }
 
+
 /// main stackdump function. retrieve stackdump, from the given context
 std::string stackdump(CONTEXT* context) {
 
- stack_trace sttrace(context);     // if there is a windows exception then call it like THIS
- auto crashreport = sttrace.to_string();
- return crashreport;
+   if (g_thread_local_recursive_crash_check) {
+    std::string recursive_crash = {"\n\n\n***** Recursive crash detected"};
+    recursive_crash.append(", cannot continue stackdump traversal. *****\n\n\n");
+    return recursive_crash;
+   }
+   g_thread_local_recursive_crash_check = true;
+
+   static std::mutex m;
+   std::lock_guard<std::mutex> lock(m);
+
+   const BOOL kLoadSymModules = TRUE;
+   const auto initialized = SymInitialize(GetCurrentProcess(), nullptr, kLoadSymModules);
+   if (TRUE != initialized) {
+      return {"Error: Cannot call SymInitialize(...) for retrieving symbols in stack"};
+   }
 
 
-   /*  {
-        static std::atomic<size_t> recursiveCounter = 0;
-        ++recursiveCounter;
-        assert(recursiveCounter.load() == 1 && "Never allow recursive crashes");
-     }
-
-     const BOOL kLoadSymModules = TRUE;
-     const auto initialized = SymInitialize(GetCurrentProcess(), nullptr, kLoadSymModules);
-     std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void *) {
-        if (initialized) {
-           SymCleanup(GetCurrentProcess());
-        }
-     }); // Raii sym cleanup
+   std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void*) {
+      SymCleanup(GetCurrentProcess());
+   }); // Raii sym cleanup
 
 
-     const size_t kmax_frame_dump_size = 64;
-     std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size); // C++11: size set and values are zeroed
-     captureStackTrace(context, frame_pointers);
-     return convertFramesToText(frame_pointers);
-     */
+   const size_t kmax_frame_dump_size = 64;
+   std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size); 
+   // C++11: size set and values are zeroed
+   
+   assert(frame_pointers.size() == kmax_frame_dump_size);
+   captureStackTrace(context, frame_pointers);
+   return convertFramesToText(frame_pointers);
+
 }
-
-
-
 
 } // stacktrace
 

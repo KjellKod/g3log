@@ -182,8 +182,8 @@ int ChoiceOfFatalExit() {
       std::cout << "[6] Division By Zero" << std::endl;
       std::cout << "[7] Illegal printf" << std::endl;
       std::cout << "[8] Out of bounds array indexing  " << std::endl;
-      std::cout << "[9] Access violation  \n\n" << std::endl;
-      std::cout << "[10] Rasing SIGABRT in one thread and Access Violation in another thread simultaneously" << std::endl;
+      std::cout << "[9] Access violation" << std::endl;
+      std::cout << "[10] Rasing SIGABRT + Access Violation in two separate threads" << std::endl;
       std::cout << std::flush; 
 
       try {
