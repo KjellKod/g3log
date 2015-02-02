@@ -111,7 +111,7 @@ namespace testing_helpers {
       using namespace g2;
       g2::initializeLogging(_scope->_currentWorker.get());
       clearMockFatal();
-      internal::changeFatalInitHandlerForUnitTesting(&mockFatalCall);
+      internal::setFatalExitHandler(&mockFatalCall);
 
       auto filename = _handle->call(&FileSink::fileName);
       if (!filename.valid()) ADD_FAILURE();

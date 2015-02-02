@@ -20,6 +20,7 @@
 #    mkdir build
 #    cd build;
 # 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio XXX" ..
+#     (cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12")
 #    (XXX is the Visual Studio version you are running)
 # 4. msbuild g3log.sln /p:Configuration=Release
 #
@@ -75,17 +76,19 @@ endif()
 
 
    # ============================================================================
-   # G3LOG DYNAMIC LEVELS OPTIONS
+   # G3LOG OPTIONAL FEATURES
    # ============================================================================
-   # ENABLE WITH:     -USE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
-   INCLUDE (${g3log_SOURCE_DIR}/Dynamic.cmake)
+   # Dynamic logging:  ENABLE WITH:     -DUSE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
+   # DBUG instead of DEBUG logging level: ENABLE WITH: -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON
+   INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
 
 
+   
 
    # ============================================================================
    # EXAMPLE OPTIONS: By defauls is ON. This will create 'g3log-FATAL-* examples'
    # ============================================================================
-   # DISABLE WITH:  -DUSE_SIMPLE_EXAMPLE=OFF    
+   # DISABLE WITH:  -DUSE_FATAL_EXAMPLE=OFF    
    INCLUDE (${g3log_SOURCE_DIR}/example/Example.cmake)
 
 

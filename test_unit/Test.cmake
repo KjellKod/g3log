@@ -39,7 +39,11 @@ option (USE_G3LOG_UNIT_TEST
      # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
   
 
-      SET(tests_to_run test_filechange test_io test_configuration test_concept_sink test_sink)
+     IF (MSVC OR MINGW)  
+        SET(OS_SPECIFIC_TEST test_crashhandler_windows)
+     ENDIF(MSVC OR MINGW)
+
+      SET(tests_to_run test_filechange test_io test_configuration test_concept_sink test_sink ${OS_SPECIFIC_TEST})
       SET(helper ${DIR_UNIT_TEST}/testing_helpers.h ${DIR_UNIT_TEST}/testing_helpers.cpp)
       include_directories(${DIR_UNIT_TEST})
 
@@ -56,7 +60,7 @@ option (USE_G3LOG_UNIT_TEST
         IF( NOT(MSVC))
            set_target_properties(${test} PROPERTIES COMPILE_FLAGS "-isystem -pthread ")
         ENDIF( NOT(MSVC)) 
-        target_link_libraries(${test} g3logger gtest_170_lib ${PLATFORM_LINK_LIBRIES})
+        target_link_libraries(${test} g3logger gtest_170_lib)
       ENDFOREACH(test)
    
     #
