@@ -61,7 +61,7 @@ LogCapture::LogCapture(const char* file, const int line, const char* function, c
 * capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF
 * See also for the attribute formatting ref:  http://www.codemaestro.com/reviews/18
 */
-void LogCapture::capturef(const char* printf_like_message, ...) __attribute__((format(printf, 2, 3))) {
+void LogCapture::capturef(const char* printf_like_message, ...) {
    static const int kMaxMessageSize = 2048;
    static const std::string kTruncatedWarningText = "[...truncated...]";
    char finished_message[kMaxMessageSize];

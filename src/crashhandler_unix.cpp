@@ -39,17 +39,15 @@ namespace {
 // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
 void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
    using namespace g2::internal;
-
-   std::ostringstream oss;
-   oss << "Received fatal signal: " << g2::internal::exitReasonName(signal_number);
-   oss << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
-
-   {  // Local scope, trigger send
+   {
+      const auto dump = stackdump();
       std::ostringstream fatal_stream;
-      fatal_stream << oss.str() << std::endl;
-      fatal_stream << "\n***** SIGNAL " << exitReasonName(signal_number) << "(" << signal_number << ")" << std::endl;
-      LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), stackdump());
-      trigger.stream() << fatal_stream.str();
+      const auto fatal_reason = exitReasonName(g2::internal::FATAL_SIGNAL, signal_number);
+      fatal_stream << "Received fatal signal: " << fatal_reason;
+      fatal_stream << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
+      fatal_stream << "\n***** SIGNAL " << fatal_reason << "(" << signal_number << ")" << std::endl;
+      LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), dump.c_str());
+                         trigger.stream() << fatal_stream.str();
    } // message sent to g2LogWorker
    // wait to die
 }
@@ -80,11 +78,11 @@ bool blockForFatalHandling() {
    return true;  // For windows we will after fatal processing change it to false
 }
 
-/// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one 
+/// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one
 /// i.e. the latter case is only for Windows and test purposes
-std::string stackdump(const char* dump = nullptr) {
-   if (nullptr != dump && !std::string(dump).empty()) {
-      return {dump};
+std::string stackdump(const char *rawdump) {
+   if (nullptr != rawdump && !std::string(rawdump).empty()) {
+      return {rawdump};
    }
 
    const size_t max_dump_size = 50;
@@ -139,7 +137,9 @@ std::string stackdump(const char* dump = nullptr) {
 
 
 /// string representation of signal ID
-std::string exitReasonName(size_t signal_number) {
+std::string exitReasonName(const LEVELS& level, g2::SignalType fatal_id) {
+
+   int signal_number = static_cast<int>(fatal_id);
    switch (signal_number) {
    case SIGABRT: return "SIGABRT";
       break;
@@ -153,23 +153,23 @@ std::string exitReasonName(size_t signal_number) {
       break;
    default:
       std::ostringstream oss;
-      oss << "UNKNOWN SIGNAL(" << signal_number << ")";
+      oss << "UNKNOWN SIGNAL(" << signal_number << ") for " << level.text;
       return oss.str();
    }
 }
 
 
 
-// KJELL : TODO.  The Fatal Message can contain a callback function that depending on OS and test scenario does 
-//       different things. 
+// KJELL : TODO.  The Fatal Message can contain a callback function that depending on OS and test scenario does
+//       different things.
 // exitWithDefaultSignalHandler is called from g2logworke::bgFatal AFTER all the logging sinks have been cleared
-// I.e. saving a function that has the value already encapsulated within. 
+// I.e. saving a function that has the value already encapsulated within.
 // FatalMessagePtr msgPtr
 // Linux/OSX -->   msgPtr.get()->ContinueWithFatalExit();  --> exitWithDefaultSignalHandler(int signal_number);
 // Windows          .....       (if signal)                --> exitWithDefaultSignalHandler(int signal_number);
-//                              (if exception) ....        
+//                              (if exception) ....
 //                              the calling thread that is in a never-ending loop should break out of that loop
-//                                    i.e. an atomic flag should be set 
+//                                    i.e. an atomic flag should be set
 //                              the next step should then be to re-throw the same exception
 //                              i.e. just call the next exception handler
 //                              we should make sure that 1) g2log exception handler is called BEFORE widows
@@ -180,9 +180,9 @@ std::string exitReasonName(size_t signal_number) {
 // Triggered by g2log->g2LogWorker after receiving a FATAL trigger
 // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
 // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-void exitWithDefaultSignalHandler(SignalType fatal_signal_id) {
+void exitWithDefaultSignalHandler(const LEVELS& level, g2::SignalType fatal_signal_id) {
    const int signal_number = static_cast<int>(fatal_signal_id);
-   std::cerr << "Exiting - FATAL SIGNAL: " << signal_number << "   " << std::flush;
+   std::cerr << "Exiting due to " << level.text << ", " << signal_number << "   " << std::flush;
    struct sigaction action;
    memset(&action, 0, sizeof (action)); //
    sigemptyset(&action.sa_mask);

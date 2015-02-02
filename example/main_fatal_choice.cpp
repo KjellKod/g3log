@@ -40,7 +40,7 @@ void RaiseSIGABRT() {
 
 void RaiseSIGFPE() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by");
+   LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
    raise(SIGFPE);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -61,7 +61,7 @@ void RaiseSIGILL() {
 
 void RAiseSIGTERM() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-   LOGF_IF(INFO, false != true, "Exiting %s SIGFPE", "by");
+   LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
    raise(SIGTERM);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -73,13 +73,12 @@ void DivisionByZero() {
    LOG(INFO) << "Division by zero is a big no-no";
    int value = 3;
    auto test = value / gShouldBeZero;
-   LOG(WARNING) << "Expected to have died by now...";
+   LOG(WARNING) << "Expected to have died by now..., test value: " << test;
 }
 
 void IllegalPrintf() {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
    LOG(DEBUG) << "Impending doom due to illeteracy";
-   printf("ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
    LOGF(INFO, "2nd attempt at ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
    LOG(WARNING) << "Expected to have died by now...";
 }
@@ -115,6 +114,14 @@ void RaiseSIGABRTAndAccessViolation() {
 }
 
 
+void CallActualExitFunction(std::function<void()> fatal_function) {
+   fatal_function();
+}
+
+void CallExitFunction(std::function<void()> fatal_function) {
+   CallActualExitFunction(fatal_function);
+}
+
 void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
    auto exitFunction = &NoExitFunction;
@@ -124,7 +131,7 @@ void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    case 3: exitFunction = &RaiseSIGSEGV;  break;
    case 4: exitFunction = &RaiseSIGILL;  break;
    case 5: exitFunction = &RAiseSIGTERM;  break;
-   case 6: exitFunction = &DivisionByZero;  gShouldBeZero = 0; break;
+   case 6: exitFunction = &DivisionByZero;  gShouldBeZero = 0; DivisionByZero();  break;
    case 7: exitFunction = &IllegalPrintf;  break;
    case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
    case 9: exitFunction = &AccessViolation;  break;
@@ -132,10 +139,10 @@ void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    default: break;
    }
    if (runInNewThread) {
-      auto dieInNearFuture = std::async(std::launch::async, exitFunction);
+      auto dieInNearFuture = std::async(std::launch::async, CallExitFunction, exitFunction);
       dieInNearFuture.wait();
    } else {
-      exitFunction();
+      CallExitFunction(exitFunction);
    }
 
    std::string unexpected = "Expected to exit by FATAL event. That did not happen (printf choice in Windows?).";
