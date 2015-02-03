@@ -30,6 +30,7 @@ namespace {
 std::atomic<bool> gBlockForFatal {true};
 void* g_vector_exception_handler = nullptr;
 LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
+g2_thread_local bool g_installed_thread_signal_handler = false;
 
 
 
@@ -179,11 +180,6 @@ void exitWithDefaultSignalHandler(const LEVELS& level, g2::SignalType fatal_sign
 
 void installSignalHandler() {
    g2::installSignalHandlerForThread();
-   if (SIG_ERR == signal(SIGABRT, signalHandler))
-      perror("signal - SIGABRT");
-   
-   if (SIG_ERR == signal(SIGTERM, signalHandler))
-      perror("signal - SIGTERM");
 }
 
 
@@ -195,13 +191,19 @@ void installSignalHandler() {
 /// you can also use this function call, per thread so make sure these three
 /// fatal signals are covered in your thread (even if you don't do a LOG(...) call
 void installSignalHandlerForThread() {
-   if (SIG_ERR == signal(SIGFPE, signalHandler))
-      perror("signal - SIGFPE");
-   if (SIG_ERR == signal(SIGSEGV, signalHandler))
-      perror("signal - SIGSEGV");
-   if (SIG_ERR == signal(SIGILL, signalHandler))
-      perror("signal - SIGILL");
-
+   if (!g_installed_thread_signal_handler) {
+      g_installed_thread_signal_handler = true;
+      if (SIG_ERR == signal(SIGTERM, signalHandler))
+         perror("signal - SIGTERM");
+      if (SIG_ERR == signal(SIGABRT, signalHandler))
+         perror("signal - SIGABRT");
+      if (SIG_ERR == signal(SIGFPE, signalHandler))
+         perror("signal - SIGFPE");
+      if (SIG_ERR == signal(SIGSEGV, signalHandler))
+         perror("signal - SIGSEGV");
+      if (SIG_ERR == signal(SIGILL, signalHandler))
+         perror("signal - SIGILL");
+   }
 }
 
 void installCrashHandler() {
