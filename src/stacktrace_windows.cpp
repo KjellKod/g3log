@@ -32,10 +32,9 @@
 
 
 #define g2_MAP_PAIR_STRINGIFY(x) {x, #x}
-#define thread_local __declspec(thread) 
 
 namespace {
-thread_local bool g_thread_local_recursive_crash_check = false;
+g2_thread_local bool g_thread_local_recursive_crash_check = false;
 
 const std::map<g2::SignalType, std::string> kExceptionsAsText = {
    g2_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
@@ -189,27 +188,26 @@ std::string stackdump(CONTEXT* context) {
 
    static std::mutex m;
    std::lock_guard<std::mutex> lock(m);
+   {
+      const BOOL kLoadSymModules = TRUE;
+      const auto initialized = SymInitialize(GetCurrentProcess(), nullptr, kLoadSymModules);
+      if (TRUE != initialized) {
+         return{ "Error: Cannot call SymInitialize(...) for retrieving symbols in stack" };
+      }
 
-   const BOOL kLoadSymModules = TRUE;
-   const auto initialized = SymInitialize(GetCurrentProcess(), nullptr, kLoadSymModules);
-   if (TRUE != initialized) {
-      return {"Error: Cannot call SymInitialize(...) for retrieving symbols in stack"};
+      std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void*) {
+         SymCleanup(GetCurrentProcess());
+      }); // Raii sym cleanup
+
+
+      const size_t kmax_frame_dump_size = 64;
+      std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size);
+      // C++11: size set and values are zeroed
+
+      assert(frame_pointers.size() == kmax_frame_dump_size);
+      captureStackTrace(context, frame_pointers);
+      return convertFramesToText(frame_pointers);
    }
-
-
-   std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void*) {
-      SymCleanup(GetCurrentProcess());
-   }); // Raii sym cleanup
-
-
-   const size_t kmax_frame_dump_size = 64;
-   std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size); 
-   // C++11: size set and values are zeroed
-   
-   assert(frame_pointers.size() == kmax_frame_dump_size);
-   captureStackTrace(context, frame_pointers);
-   return convertFramesToText(frame_pointers);
-
 }
 
 } // stacktrace
