@@ -28,7 +28,7 @@
 
 namespace {
 std::atomic<bool> gBlockForFatal {true};
-void* g_vector_exception_handler = nullptr;
+//void* g_vector_exception_handler = nullptr;
 LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
 g2_thread_local bool g_installed_thread_signal_handler = false;
 
@@ -37,7 +37,7 @@ g2_thread_local bool g_installed_thread_signal_handler = false;
 // Restore back to default fatal event handling
 void ReverseToOriginalFatalHandling() {
    SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
-   RemoveVectoredExceptionHandler (g_vector_exception_handler);
+   //RemoveVectoredExceptionHandler (g_vector_exception_handler);
 
    if (SIG_ERR == signal(SIGABRT, SIG_DFL))
       perror("signal - SIGABRT");
@@ -74,7 +74,7 @@ void signalHandler(int signal_number) {
 
 // Unhandled exception catching
 LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info) {
-   std::string dump = stacktrace::stackdump();
+   std::string dump = stacktrace::stackdump(info);
 
    std::ostringstream fatal_stream;
    const g2::SignalType exception_code = info->ExceptionRecord->ExceptionCode;
@@ -99,11 +99,12 @@ LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS* info) {
 
 /// Setup through (Windows API) AddVectoredExceptionHandler
 /// Ref: http://blogs.msdn.com/b/zhanli/archive/2010/06/25/c-tips-addvectoredexceptionhandler-addvectoredcontinuehandler-and-setunhandledexceptionfilter.aspx
+#if 0
 LONG WINAPI vectorExceptionHandling(PEXCEPTION_POINTERS p) {
    ReverseToOriginalFatalHandling();
    return exceptionHandling(p);
 }
-
+#endif
 
 
 
@@ -210,7 +211,7 @@ void installCrashHandler() {
    internal::installSignalHandler();
    //const size_t kFirstExceptionHandler = 1;   // Kept here for documentational purposes. last exception seems more what we want
    const size_t kLastExceptionHandler = 0;
-   g_vector_exception_handler = AddVectoredExceptionHandler(kLastExceptionHandler, vectorExceptionHandling);
+   //g_vector_exception_handler = AddVectoredExceptionHandler(kLastExceptionHandler, vectorExceptionHandling);
    g_previous_unexpected_exception_handler = SetUnhandledExceptionFilter(unexpectedExceptionHandling);
 }
 
