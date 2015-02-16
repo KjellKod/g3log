@@ -136,7 +136,7 @@ void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
    case 9: exitFunction = &AccessViolation;  break;
    case 10: exitFunction = &RaiseSIGABRTAndAccessViolation; break;
-   case 11: throw 123456789; break;
+   case 11: throw 1233210; break;
    default: break;
    }
    if (runInNewThread) {
