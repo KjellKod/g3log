@@ -146,19 +146,24 @@ std::string convertFramesToText(std::vector<uint64_t>& frame_pointers) {
 
 
 namespace stacktrace {
+const std::string kUnknown = {"UNKNOWN EXCEPTION"};  
 /// return the text description of a Windows exception code
 /// From MSDN GetExceptionCode http://msdn.microsoft.com/en-us/library/windows/desktop/ms679356(v=vs.85).aspx
 std::string exceptionIdToText(g2::SignalType id) {
    const auto iter = kExceptionsAsText.find(id);
    if ( iter == kExceptionsAsText.end()) {
-      std::string unknown {"Unknown/" + std::to_string(id)};
+      std::string unknown = {kUnknown + ":" + std::to_string(id)};
       return unknown;
    }
-
    return iter->second;
 }
 
-
+/// Yes a double lookup: first for isKnownException and then exceptionIdToText
+/// for vectored exceptions we only deal with known exceptions so this tiny 
+/// overhead we can live with
+bool isKnownException(g2::SignalType id) {
+   return (kExceptionsAsText.end() != kExceptionsAsText.find(id));
+}
 
 /// helper function: retrieve stackdump from no excisting exception pointer
 std::string stackdump() {

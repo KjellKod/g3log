@@ -24,20 +24,24 @@
 #include "g2logmessage.hpp"
 #include "g2logmessagecapture.hpp"
 
-
-
 namespace {
 std::atomic<bool> gBlockForFatal {true};
-//void* g_vector_exception_handler = nullptr;
 LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
 g2_thread_local bool g_installed_thread_signal_handler = false;
+
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+   void* g_vector_exception_handler = nullptr;
+#endif
 
 
 
 // Restore back to default fatal event handling
 void ReverseToOriginalFatalHandling() {
    SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
-   //RemoveVectoredExceptionHandler (g_vector_exception_handler);
+
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+   RemoveVectoredExceptionHandler (g_vector_exception_handler);
+#endif
 
    if (SIG_ERR == signal(SIGABRT, SIG_DFL))
       perror("signal - SIGABRT");
@@ -73,37 +77,41 @@ void signalHandler(int signal_number) {
 
 
 // Unhandled exception catching
-LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info) {
+LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info, const std::string& handler) {
    std::string dump = stacktrace::stackdump(info);
 
    std::ostringstream fatal_stream;
    const g2::SignalType exception_code = info->ExceptionRecord->ExceptionCode;
-   fatal_stream << "\n***** Received fatal exception " << g2::internal::exitReasonName(g2::internal::FATAL_EXCEPTION, exception_code);
+   fatal_stream << "\n***** " << handler << ": Received fatal exception " << g2::internal::exitReasonName(g2::internal::FATAL_EXCEPTION, exception_code);
    fatal_stream << "\tPID: " << getpid() << std::endl;
 
    const auto fatal_id = static_cast<g2::SignalType>(exception_code);
    LogCapture trigger(g2::internal::FATAL_EXCEPTION, fatal_id, dump.c_str());
    trigger.stream() << fatal_stream.str();
-   return EXCEPTION_CONTINUE_SEARCH; //EXCEPTION_EXECUTE_HANDLER;
+   return EXCEPTION_EXECUTE_HANDLER; // FATAL Exception: It stops here
 }
-
-
 
 
 // Unhandled exception catching
 LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS* info) {
    ReverseToOriginalFatalHandling();
-   return exceptionHandling(info);
+   return exceptionHandling(info, "Unexpected Exception Handler");
 }
 
 
 /// Setup through (Windows API) AddVectoredExceptionHandler
 /// Ref: http://blogs.msdn.com/b/zhanli/archive/2010/06/25/c-tips-addvectoredexceptionhandler-addvectoredcontinuehandler-and-setunhandledexceptionfilter.aspx
-#if 0
-LONG WINAPI vectorExceptionHandling(PEXCEPTION_POINTERS p) {
-   ReverseToOriginalFatalHandling();
-   return exceptionHandling(p);
-}
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+   LONG WINAPI vectorExceptionHandling(PEXCEPTION_POINTERS p) {
+      const g2::SignalType exception_code = p->ExceptionRecord->ExceptionCode;
+      if (false == stacktrace::isKnownException(exception_code)) {
+         LOG(WARNING) << "Vectored exception handling received an UNKNOWN exception: " << exception_code << ". The exception is IGNORED and hopefully caught by another exception handler";
+         return EXCEPTION_CONTINUE_SEARCH;
+      } else {
+         ReverseToOriginalFatalHandling();
+         return exceptionHandling(p, "Vectored Exception Handler");
+      }
+   }
 #endif
 
 
@@ -124,7 +132,7 @@ bool blockForFatalHandling() {
 
 
 /// Generate stackdump. Or in case a stackdump was pre-generated and
-/// non-empty just use that one.   i.e. the latter case is only for 
+/// non-empty just use that one.   i.e. the latter case is only for
 /// Windows and test purposes
 std::string stackdump(const char* dump) {
    if (nullptr != dump && !std::string(dump).empty()) {
@@ -209,10 +217,15 @@ void installSignalHandlerForThread() {
 
 void installCrashHandler() {
    internal::installSignalHandler();
-   //const size_t kFirstExceptionHandler = 1;   // Kept here for documentational purposes. last exception seems more what we want
-   const size_t kLastExceptionHandler = 0;
-   //g_vector_exception_handler = AddVectoredExceptionHandler(kLastExceptionHandler, vectorExceptionHandling);
    g_previous_unexpected_exception_handler = SetUnhandledExceptionFilter(unexpectedExceptionHandling);
+
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+      // const size_t kFirstExceptionHandler = 1;
+      // kFirstExeptionsHandler is kept here for documentational purposes.
+      // The last exception seems more what we want
+      const size_t kLastExceptionHandler = 0;
+      g_vector_exception_handler = AddVectoredExceptionHandler(kLastExceptionHandler, vectorExceptionHandling);
+#endif
 }
 
 } // end namespace g2

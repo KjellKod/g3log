@@ -136,6 +136,7 @@ void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
    case 9: exitFunction = &AccessViolation;  break;
    case 10: exitFunction = &RaiseSIGABRTAndAccessViolation; break;
+   case 11: throw 123456789; break;
    default: break;
    }
    if (runInNewThread) {
@@ -191,12 +192,14 @@ int ChoiceOfFatalExit() {
       std::cout << "[8] Out of bounds array indexing  " << std::endl;
       std::cout << "[9] Access violation" << std::endl;
       std::cout << "[10] Rasing SIGABRT + Access Violation in two separate threads" << std::endl;
+      std::cout << "[11] Just throw" << std::endl;
+
       std::cout << std::flush; 
 
       try {
          std::getline(std::cin, option);
          choice = std::stoi(option);
-         if (choice <= 0 || choice > 10) {
+         if (choice <= 0 || choice > 11) {
             std::cout << "Invalid choice: [" << option << "\n\n";
          }  else {
             return choice;
