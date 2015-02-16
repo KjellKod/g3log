@@ -88,7 +88,10 @@ LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info, const std::string& handl
    const auto fatal_id = static_cast<g2::SignalType>(exception_code);
    LogCapture trigger(g2::internal::FATAL_EXCEPTION, fatal_id, dump.c_str());
    trigger.stream() << fatal_stream.str();
-   return EXCEPTION_EXECUTE_HANDLER; // FATAL Exception: It stops here
+   // FATAL Exception: It stops here,
+   // https://msdn.microsoft.com/en-us/library/6wxdsc38.aspx
+   return EXCEPTION_EXECUTE_HANDLER; 
+
 }
 
 
