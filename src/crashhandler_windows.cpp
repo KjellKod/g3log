@@ -11,6 +11,7 @@
 #endif
 
 #include <windows.h>
+#include <intrin.h>
 #include <csignal>
 #include <cstring>
 #include <cstdlib>
@@ -24,21 +25,29 @@
 #include "g2logmessage.hpp"
 #include "g2logmessagecapture.hpp"
 
-
-
 namespace {
 std::atomic<bool> gBlockForFatal {true};
-//void* g_vector_exception_handler = nullptr;
 LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
+
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
 g2_thread_local bool g_installed_thread_signal_handler = false;
+#endif
+
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+   void* g_vector_exception_handler = nullptr;
+#endif
 
 
 
 // Restore back to default fatal event handling
 void ReverseToOriginalFatalHandling() {
    SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
-   //RemoveVectoredExceptionHandler (g_vector_exception_handler);
 
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+   RemoveVectoredExceptionHandler (g_vector_exception_handler);
+#endif
+
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
    if (SIG_ERR == signal(SIGABRT, SIG_DFL))
       perror("signal - SIGABRT");
 
@@ -53,7 +62,9 @@ void ReverseToOriginalFatalHandling() {
 
    if (SIG_ERR == signal(SIGTERM, SIG_DFL))
       perror("signal - SIGABRT");
+#endif
 }
+
 
 
 // called for fatal signals SIGABRT, SIGFPE, SIGSEGV, SIGILL, SIGTERM
@@ -68,42 +79,61 @@ void signalHandler(int signal_number) {
 
    LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), dump.c_str());
    trigger.stream() << fatal_stream.str();
+   
+   // Trigger debug break point, if we're in debug. This breakpoint CAN cause a slowdown when it happens. 
+   // Be patient. The "Debug" dialogue should pop-up eventually if you doing it in Visual Studio.
+   // For fatal signals only, not exceptions. 
+   // This is a way to tell the IDE (if in dev mode) that it can stop at this breakpoint
+   // Note that at this time the fatal log event with stack trace is NOT yet flushed to the logger
+#if (!defined(NDEBUG) && defined(DEBUG_BREAK_AT_FATAL_SIGNAL))
+   __debugbreak(); 
+#endif
 } // scope exit - message sent to LogWorker, wait to die...
 
 
 
 // Unhandled exception catching
-LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info) {
+LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info, const std::string& handler) {
    std::string dump = stacktrace::stackdump(info);
 
    std::ostringstream fatal_stream;
    const g2::SignalType exception_code = info->ExceptionRecord->ExceptionCode;
-   fatal_stream << "\n***** Received fatal exception " << g2::internal::exitReasonName(g2::internal::FATAL_EXCEPTION, exception_code);
+   fatal_stream << "\n***** " << handler << ": Received fatal exception " << g2::internal::exitReasonName(g2::internal::FATAL_EXCEPTION, exception_code);
    fatal_stream << "\tPID: " << getpid() << std::endl;
 
    const auto fatal_id = static_cast<g2::SignalType>(exception_code);
    LogCapture trigger(g2::internal::FATAL_EXCEPTION, fatal_id, dump.c_str());
    trigger.stream() << fatal_stream.str();
-   return EXCEPTION_CONTINUE_SEARCH; //EXCEPTION_EXECUTE_HANDLER;
+   // FATAL Exception: It doesn't necessarily stop here we pass on continue search
+   // if no one else will catch that then it's goodbye anyhow,
+   // the RISK here is if someone is cathing this and returning "EXCEPTION_EXECUTE_HANDLER"
+   // but does not shutdown then the software will be running with g3log shutdown.
+   // .... However... this must be seen as a bug from standard handling of fatal exceptions
+   // https://msdn.microsoft.com/en-us/library/6wxdsc38.aspx
+   return EXCEPTION_CONTINUE_SEARCH;
 }
-
-
 
 
 // Unhandled exception catching
 LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS* info) {
    ReverseToOriginalFatalHandling();
-   return exceptionHandling(info);
+   return exceptionHandling(info, "Unexpected Exception Handler");
 }
 
 
 /// Setup through (Windows API) AddVectoredExceptionHandler
 /// Ref: http://blogs.msdn.com/b/zhanli/archive/2010/06/25/c-tips-addvectoredexceptionhandler-addvectoredcontinuehandler-and-setunhandledexceptionfilter.aspx
-#if 0
-LONG WINAPI vectorExceptionHandling(PEXCEPTION_POINTERS p) {
-   ReverseToOriginalFatalHandling();
-   return exceptionHandling(p);
-}
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+   LONG WINAPI vectorExceptionHandling(PEXCEPTION_POINTERS p) {
+      const g2::SignalType exception_code = p->ExceptionRecord->ExceptionCode;
+      if (false == stacktrace::isKnownException(exception_code)) {
+         LOG(WARNING) << "Vectored exception handling received an UNKNOWN exception: " << exception_code << ". The exception is IGNORED and hopefully caught by another exception handler";
+         return EXCEPTION_CONTINUE_SEARCH;
+      } else {
+         ReverseToOriginalFatalHandling();
+         return exceptionHandling(p, "Vectored Exception Handler");
+      }
+   }
 #endif
 
 
@@ -124,7 +154,7 @@ bool blockForFatalHandling() {
 
 
 /// Generate stackdump. Or in case a stackdump was pre-generated and
-/// non-empty just use that one.   i.e. the latter case is only for 
+/// non-empty just use that one.   i.e. the latter case is only for
 /// Windows and test purposes
 std::string stackdump(const char* dump) {
    if (nullptr != dump && !std::string(dump).empty()) {
@@ -192,6 +222,7 @@ void installSignalHandler() {
 /// you can also use this function call, per thread so make sure these three
 /// fatal signals are covered in your thread (even if you don't do a LOG(...) call
 void installSignalHandlerForThread() {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
    if (!g_installed_thread_signal_handler) {
       g_installed_thread_signal_handler = true;
       if (SIG_ERR == signal(SIGTERM, signalHandler))
@@ -205,14 +236,20 @@ void installSignalHandlerForThread() {
       if (SIG_ERR == signal(SIGILL, signalHandler))
          perror("signal - SIGILL");
    }
+#endif
 }
 
 void installCrashHandler() {
    internal::installSignalHandler();
-   //const size_t kFirstExceptionHandler = 1;   // Kept here for documentational purposes. last exception seems more what we want
-   const size_t kLastExceptionHandler = 0;
-   //g_vector_exception_handler = AddVectoredExceptionHandler(kLastExceptionHandler, vectorExceptionHandling);
    g_previous_unexpected_exception_handler = SetUnhandledExceptionFilter(unexpectedExceptionHandling);
+
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+      // const size_t kFirstExceptionHandler = 1;
+      // kFirstExeptionsHandler is kept here for documentational purposes.
+      // The last exception seems more what we want
+      const size_t kLastExceptionHandler = 0;
+      g_vector_exception_handler = AddVectoredExceptionHandler(kLastExceptionHandler, vectorExceptionHandling);
+#endif
 }
 
 } // end namespace g2

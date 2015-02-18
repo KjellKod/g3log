@@ -9,7 +9,6 @@
 #include "g2logmessagecapture.hpp"
 #include "crashhandler.hpp"
 
-
 // For Windows we need force a thread_local install per thread of three
 // signals that must have a signal handler instealled per thread-basis
 // It is really a royal pain. Seriously Microsoft? Seriously?

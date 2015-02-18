@@ -37,7 +37,7 @@ namespace {
 // Dump of stack,. then exit through g2log background worker
 // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
 // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
-void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
+void signalHandler(int signal_number, siginfo_t* info, void* unused_context) {
    using namespace g2::internal;
    {
       const auto dump = stackdump();
@@ -47,7 +47,7 @@ void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
       fatal_stream << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
       fatal_stream << "\n***** SIGNAL " << fatal_reason << "(" << signal_number << ")" << std::endl;
       LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), dump.c_str());
-                         trigger.stream() << fatal_stream.str();
+      trigger.stream() << fatal_stream.str();
    } // message sent to g2LogWorker
    // wait to die
 }
@@ -80,22 +80,22 @@ bool blockForFatalHandling() {
 
 /// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one
 /// i.e. the latter case is only for Windows and test purposes
-std::string stackdump(const char *rawdump) {
+std::string stackdump(const char* rawdump) {
    if (nullptr != rawdump && !std::string(rawdump).empty()) {
       return {rawdump};
    }
 
    const size_t max_dump_size = 50;
-   void *dump[max_dump_size];
+   void* dump[max_dump_size];
    size_t size = backtrace(dump, max_dump_size);
-   char **messages = backtrace_symbols(dump, size); // overwrite sigaction with caller's address
+   char** messages = backtrace_symbols(dump, size); // overwrite sigaction with caller's address
 
    // dump stack: skip first frame, since that is here
    std::ostringstream oss;
    for (size_t idx = 1; idx < size && messages != nullptr; ++idx) {
-      char *mangled_name = 0, *offset_begin = 0, *offset_end = 0;
+      char* mangled_name = 0, *offset_begin = 0, *offset_end = 0;
       // find parantheses and +address offset surrounding mangled name
-      for (char *p = messages[idx]; *p; ++p) {
+      for (char* p = messages[idx]; *p; ++p) {
          if (*p == '(') {
             mangled_name = p;
          } else if (*p == '+') {
@@ -114,7 +114,7 @@ std::string stackdump(const char *rawdump) {
          *offset_end++ = '\0';
 
          int status;
-         char *real_name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
+         char* real_name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
          // if demangling is successful, output the demangled function name
          if (status == 0) {
             oss << "\n\tstack dump [" << idx << "]  " << messages[idx] << " : " << real_name << "+";
@@ -183,11 +183,15 @@ std::string exitReasonName(const LEVELS& level, g2::SignalType fatal_id) {
 void exitWithDefaultSignalHandler(const LEVELS& level, g2::SignalType fatal_signal_id) {
    const int signal_number = static_cast<int>(fatal_signal_id);
    std::cerr << "Exiting due to " << level.text << ", " << signal_number << "   " << std::flush;
+
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
    struct sigaction action;
    memset(&action, 0, sizeof (action)); //
    sigemptyset(&action.sa_mask);
    action.sa_handler = SIG_DFL; // take default action for the signal
    sigaction(signal_number, &action, NULL);
+#endif
+
    kill(getpid(), signal_number);
    abort(); // should never reach this
 }
@@ -198,6 +202,7 @@ void exitWithDefaultSignalHandler(const LEVELS& level, g2::SignalType fatal_sign
 // Installs FATAL signal handler that is enough to handle most fatal events
 //  on *NIX systems
 void installSignalHandler() {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
    struct sigaction action;
    memset(&action, 0, sizeof (action));
    sigemptyset(&action.sa_mask);
@@ -216,6 +221,7 @@ void installSignalHandler() {
       perror("sigaction - SIGSEGV");
    if (sigaction(SIGTERM, &action, NULL) < 0)
       perror("sigaction - SIGTERM");
+#endif
 }
 
 

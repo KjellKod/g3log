@@ -31,7 +31,7 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 
 
 
-ELSEIF(MSVC)
+ELSEIF (MSVC OR MINGW) 
   set(PLATFORM_LINK_LIBRIES dbghelp)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
