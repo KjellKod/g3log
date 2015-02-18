@@ -11,6 +11,7 @@
 #endif
 
 #include <windows.h>
+#include <intrin.h>
 #include <csignal>
 #include <cstring>
 #include <cstdlib>
@@ -27,7 +28,10 @@
 namespace {
 std::atomic<bool> gBlockForFatal {true};
 LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
+
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
 g2_thread_local bool g_installed_thread_signal_handler = false;
+#endif
 
 #if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
    void* g_vector_exception_handler = nullptr;
@@ -43,6 +47,7 @@ void ReverseToOriginalFatalHandling() {
    RemoveVectoredExceptionHandler (g_vector_exception_handler);
 #endif
 
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
    if (SIG_ERR == signal(SIGABRT, SIG_DFL))
       perror("signal - SIGABRT");
 
@@ -57,7 +62,9 @@ void ReverseToOriginalFatalHandling() {
 
    if (SIG_ERR == signal(SIGTERM, SIG_DFL))
       perror("signal - SIGABRT");
+#endif
 }
+
 
 
 // called for fatal signals SIGABRT, SIGFPE, SIGSEGV, SIGILL, SIGTERM
@@ -72,6 +79,15 @@ void signalHandler(int signal_number) {
 
    LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), dump.c_str());
    trigger.stream() << fatal_stream.str();
+   
+   // Trigger debug break point, if we're in debug. This breakpoint CAN cause a slowdown when it happens. 
+   // Be patient. The "Debug" dialogue should pop-up eventually if you doing it in Visual Studio.
+   // For fatal signals only, not exceptions. 
+   // This is a way to tell the IDE (if in dev mode) that it can stop at this breakpoint
+   // Note that at this time the fatal log event with stack trace is NOT yet flushed to the logger
+#if (!defined(NDEBUG) && defined(DEBUG_BREAK_AT_FATAL_SIGNAL))
+   __debugbreak(); 
+#endif
 } // scope exit - message sent to LogWorker, wait to die...
 
 
@@ -88,10 +104,13 @@ LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info, const std::string& handl
    const auto fatal_id = static_cast<g2::SignalType>(exception_code);
    LogCapture trigger(g2::internal::FATAL_EXCEPTION, fatal_id, dump.c_str());
    trigger.stream() << fatal_stream.str();
-   // FATAL Exception: It stops here,
+   // FATAL Exception: It doesn't necessarily stop here we pass on continue search
+   // if no one else will catch that then it's goodbye anyhow,
+   // the RISK here is if someone is cathing this and returning "EXCEPTION_EXECUTE_HANDLER"
+   // but does not shutdown then the software will be running with g3log shutdown.
+   // .... However... this must be seen as a bug from standard handling of fatal exceptions
    // https://msdn.microsoft.com/en-us/library/6wxdsc38.aspx
-   return EXCEPTION_EXECUTE_HANDLER; 
-
+   return EXCEPTION_CONTINUE_SEARCH;
 }
 
 
@@ -203,6 +222,7 @@ void installSignalHandler() {
 /// you can also use this function call, per thread so make sure these three
 /// fatal signals are covered in your thread (even if you don't do a LOG(...) call
 void installSignalHandlerForThread() {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
    if (!g_installed_thread_signal_handler) {
       g_installed_thread_signal_handler = true;
       if (SIG_ERR == signal(SIGTERM, signalHandler))
@@ -216,6 +236,7 @@ void installSignalHandlerForThread() {
       if (SIG_ERR == signal(SIGILL, signalHandler))
          perror("signal - SIGILL");
    }
+#endif
 }
 
 void installCrashHandler() {

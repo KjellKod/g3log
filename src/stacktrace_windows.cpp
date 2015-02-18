@@ -34,7 +34,7 @@
 #define g2_MAP_PAIR_STRINGIFY(x) {x, #x}
 
 namespace {
-g2_thread_local bool g_thread_local_recursive_crash_check = false;
+g2_thread_local size_t g_thread_local_recursive_crash_check = 0;
 
 const std::map<g2::SignalType, std::string> kExceptionsAsText = {
    g2_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
@@ -184,12 +184,12 @@ std::string stackdump(EXCEPTION_POINTERS* info) {
 /// main stackdump function. retrieve stackdump, from the given context
 std::string stackdump(CONTEXT* context) {
 
-   if (g_thread_local_recursive_crash_check) {
+   if (g_thread_local_recursive_crash_check >= 2) { // In Debug scenarious we allow one extra pass
     std::string recursive_crash = {"\n\n\n***** Recursive crash detected"};
     recursive_crash.append(", cannot continue stackdump traversal. *****\n\n\n");
     return recursive_crash;
    }
-   g_thread_local_recursive_crash_check = true;
+   ++g_thread_local_recursive_crash_check;
 
    static std::mutex m;
    std::lock_guard<std::mutex> lock(m);
