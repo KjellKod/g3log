@@ -38,6 +38,8 @@ std::mutex g_logging_init_mutex;
 std::unique_ptr<g2::LogMessage> g_first_unintialized_msg = {nullptr};
 std::once_flag g_set_first_uninitialized_flag;
 std::once_flag g_save_first_unintialized_flag;
+const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = []{ /*does nothing */};
+std::function<void(void)> g_fatal_pre_logging_hook;
 
 }
 
@@ -52,7 +54,7 @@ namespace g2 {
 //                    for all other practical use, it shouldn't!
 
 void initializeLogging(LogWorker* bgworker) {
-   std::call_once(g_initialize_flag, []() {
+   std::call_once(g_initialize_flag, [] {
       installCrashHandler();
    });
    std::lock_guard<std::mutex> lock(g_logging_init_mutex);
@@ -67,6 +69,9 @@ void initializeLogging(LogWorker* bgworker) {
    });
 
    g_logger_instance = bgworker;
+   // by default the pre fatal logging hook does nothing
+   // if it WOULD do something it would happen in 
+   internal::setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing); 
 }
 
 
@@ -120,6 +125,8 @@ void saveMessage(const char* entry, const char* file, int line, const char* func
    if (internal::wasFatal(level)) {
       message.get()->write().append(stack_trace);
       FatalMessagePtr fatal_message {std2::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal)};
+      g_fatal_pre_logging_hook(); // pre-fatal hook
+
       // At destruction, flushes fatal message to g2LogWorker
       // either we will stay here until the background worker has received the fatal
       // message, flushed the crash message to the sinks and exits with the same fatal signal
@@ -177,6 +184,17 @@ void pushFatalMessageToLogger(FatalMessagePtr message) {
    }
 }
 
+
+
+/**
+*  default does nothing, @ref ::g_pre_fatal_hook_that_does_nothing
+*  It will be called just before sending the fatal message, @ref pushFatalmessageToLogger
+*  It will be reset to do nothing in ::initializeLogging(...)
+*     so please call this function, if you ever need to, after initializeLogging(...)
+*/
+void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook) {
+   g_fatal_pre_logging_hook = pre_fatal_hook;
+}
 
 // By default this function pointer goes to \ref pushFatalMessageToLogger;
 std::function<void(FatalMessagePtr) > g_fatal_to_g2logworker_function_ptr = pushFatalMessageToLogger;

@@ -56,6 +56,16 @@ namespace g2 {
    void initializeLogging(LogWorker *logger);
 
    
+   //
+   // internal namespace is for completely internal or semi-hidden from the g2 namespace due to that it is unlikely
+   // that you will use these
+   // That said:  
+   //    1) setFatalExitHandler() can be used to set your own custom fatal handler. Please see g2log.cpp
+   //             so that you shut down and clean up fatal handlers in a good way
+   // 
+   //    2) setFatalPreLoggingHook() can be used for either an extra step before the fatalExitHandler is called 
+   //       examples here could be "cleanup" while keeping the normal default fatal handler
+   //       another good example is to put a break point in programatically        
    namespace internal {
       /// @returns true if logger is initialized
       bool isLoggingInitialized();
@@ -86,22 +96,32 @@ namespace g2 {
       // to sinks as well as shutting down the process
       void fatalCall(FatalMessagePtr message);
 
+      // Set a function-hook before a fatal message will be sent to the logger
+      // i.e. this is a great place to put a break point, either in your debugger
+      // or programatically to catch LOG(FATAL), CHECK(...) or an OS fatal event (exception or signal)
+      // This will be reset to default (does nothing) at initializeLogging(...);
+      //
+      // Example usage:
+      // Windows: g2::SetPreFatalHook([]{__debugbreak();}); // remember #include <intrin.h>
+      // Linux:   g2::SetPreFatalHook([]{ raise(SIGTRAP); }); 
+      void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
+
+      /** By default the g2log will call g2LogWorker::fatalCall(...) which will
+       * abort() the system after flushing the logs to file. This makes unit
+       * test of FATAL level cumbersome. A work around is to change the
+       * 'fatal call'  which can be done here 
+       *  The bool return values in the fatal_call is whether or not the fatal_call should
+       *  
+       */
+      void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
+
+
 
       // Shuts down logging. No object cleanup but further LOG(...) calls will be ignored.
       void shutDownLogging();
 
       // Shutdown logging, but ONLY if the active logger corresponds to the one currently initialized
       bool shutDownLoggingForActiveOnly(LogWorker* active);
-
-      /** By default the g2log will call g2LogWorker::fatal(...) which will
-       * abort() the system after flushing the logs to file. This makes unit
-       * test of FATAL level cumbersome. A work around is to change the
-       * 'fatal call'  which can be done here 
-       * 
-       *  The bool return values in the fatal_call is whether or not the fatal_call should
-       *  
-       */
-      void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
 
 
       
