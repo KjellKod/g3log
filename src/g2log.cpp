@@ -71,7 +71,32 @@ void initializeLogging(LogWorker* bgworker) {
    g_logger_instance = bgworker;
    // by default the pre fatal logging hook does nothing
    // if it WOULD do something it would happen in 
-   internal::setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing); 
+   setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing); 
+}
+
+
+/**
+*  default does nothing, @ref ::g_pre_fatal_hook_that_does_nothing
+*  It will be called just before sending the fatal message, @ref pushFatalmessageToLogger
+*  It will be reset to do nothing in ::initializeLogging(...)
+*     so please call this function, if you ever need to, after initializeLogging(...)
+*/
+void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook) {
+   g_fatal_pre_logging_hook = pre_fatal_hook;
+}
+
+
+
+
+// By default this function pointer goes to \ref pushFatalMessageToLogger;
+std::function<void(FatalMessagePtr) > g_fatal_to_g2logworker_function_ptr = internal::pushFatalMessageToLogger;
+
+/** REPLACE fatalCallToLogger for fatalCallForUnitTest
+ * This function switches the function pointer so that only
+ * 'unitTest' mock-fatal calls are made.
+ * */
+void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
+   g_fatal_to_g2logworker_function_ptr = fatal_call;
 }
 
 
@@ -184,21 +209,6 @@ void pushFatalMessageToLogger(FatalMessagePtr message) {
    }
 }
 
-
-
-/**
-*  default does nothing, @ref ::g_pre_fatal_hook_that_does_nothing
-*  It will be called just before sending the fatal message, @ref pushFatalmessageToLogger
-*  It will be reset to do nothing in ::initializeLogging(...)
-*     so please call this function, if you ever need to, after initializeLogging(...)
-*/
-void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook) {
-   g_fatal_pre_logging_hook = pre_fatal_hook;
-}
-
-// By default this function pointer goes to \ref pushFatalMessageToLogger;
-std::function<void(FatalMessagePtr) > g_fatal_to_g2logworker_function_ptr = pushFatalMessageToLogger;
-
 /** The default, initial, handling to send a 'fatal' event to g2logworker
  *  the caller will stay here, eternally, until the software is aborted
  * ... in the case of unit testing it is the given "Mock" fatalCall that will
@@ -208,13 +218,7 @@ void fatalCall(FatalMessagePtr message) {
    g_fatal_to_g2logworker_function_ptr(FatalMessagePtr {std::move(message)});
 }
 
-/** REPLACE fatalCallToLogger for fatalCallForUnitTest
- * This function switches the function pointer so that only
- * 'unitTest' mock-fatal calls are made.
- * */
-void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
-   g_fatal_to_g2logworker_function_ptr = fatal_call;
-}
+
 } // internal
 } // g2
 

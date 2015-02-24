@@ -15,8 +15,8 @@
 
  
 TEST(CrashHandler_Windows, ExceptionType) {
-   EXPECT_EQ(stacktrace::exceptionIdToText(123), "Unknown/123");
-   EXPECT_EQ(stacktrace::exceptionIdToText(1), "Unknown/1");
+   EXPECT_EQ(stacktrace::exceptionIdToText(123), "UNKNOWN EXCEPTION:123");
+   EXPECT_EQ(stacktrace::exceptionIdToText(1), "UNKNOWN EXCEPTION:1");
 
    EXPECT_EQ(stacktrace::exceptionIdToText(EXCEPTION_ACCESS_VIOLATION), "EXCEPTION_ACCESS_VIOLATION");
    EXPECT_EQ(stacktrace::exceptionIdToText(EXCEPTION_ARRAY_BOUNDS_EXCEEDED), "EXCEPTION_ARRAY_BOUNDS_EXCEEDED");

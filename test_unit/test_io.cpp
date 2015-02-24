@@ -279,7 +279,7 @@ TEST(LogTest, LOG_preFatalLogging_hook) {
       RestoreFileLogger logger(log_directory);
       ASSERT_FALSE(mockFatalWasCalled());
       g_fatal_counter.store(0);
-      g2::internal::setFatalPreLoggingHook(fatalCounter);   
+      g2::setFatalPreLoggingHook(fatalCounter);   
       LOG(FATAL) << "This message is fatal";
       logger.reset();
       EXPECT_EQ(g_fatal_counter.load(), 1);
