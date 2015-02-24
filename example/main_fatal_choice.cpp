@@ -113,6 +113,13 @@ void RaiseSIGABRTAndAccessViolation() {
    f2.wait();
 }
 
+void ThrowInt() {
+   throw 1233210;
+}
+
+void FailedCHECK() {
+   CHECK(false) << "This is fatal";
+}
 
 void CallActualExitFunction(std::function<void()> fatal_function) {
    fatal_function();
@@ -121,6 +128,8 @@ void CallActualExitFunction(std::function<void()> fatal_function) {
 void CallExitFunction(std::function<void()> fatal_function) {
    CallActualExitFunction(fatal_function);
 }
+
+
 
 void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
@@ -136,7 +145,8 @@ void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
    case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
    case 9: exitFunction = &AccessViolation;  break;
    case 10: exitFunction = &RaiseSIGABRTAndAccessViolation; break;
-   case 11: throw 1233210; break;
+   case 11: exitFunction = &ThrowInt; break; 
+   case 12: exitFunction = &FailedCHECK; break; 
    default: break;
    }
    if (runInNewThread) {
@@ -192,14 +202,16 @@ int ChoiceOfFatalExit() {
       std::cout << "[8] Out of bounds array indexing  " << std::endl;
       std::cout << "[9] Access violation" << std::endl;
       std::cout << "[10] Rasing SIGABRT + Access Violation in two separate threads" << std::endl;
-      std::cout << "[11] Just throw" << std::endl;
+      std::cout << "[11] Just throw (in this thread)" << std::endl;
+      std::cout << "[12] Just CHECK(false) (in this thread)" << std::endl;
+
 
       std::cout << std::flush; 
 
       try {
          std::getline(std::cin, option);
          choice = std::stoi(option);
-         if (choice <= 0 || choice > 11) {
+         if (choice <= 0 || choice > 12) {
             std::cout << "Invalid choice: [" << option << "\n\n";
          }  else {
             return choice;

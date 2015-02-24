@@ -26,6 +26,12 @@ const std::string t_debug = "test DEBUG ";
 const std::string t_debug2 = "test DEBUG 1.123456";
 const std::string t_warning = "test WARNING ";
 const std::string t_warning2 = "test WARNING yello";
+
+std::atomic<size_t> g_fatal_counter = {0};
+void fatalCounter() {
+   ++g_fatal_counter;
+}
+
 } // end anonymous namespace
 
 
@@ -266,9 +272,35 @@ TEST(LogTest, LOGF__FATAL) {
    EXPECT_TRUE(verifyContent(file_content, "This message should throw 0")) << "\n****" << file_content;
    EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
+
+
+TEST(LogTest, LOG_preFatalLogging_hook) {
+   {
+      RestoreFileLogger logger(log_directory);
+      ASSERT_FALSE(mockFatalWasCalled());
+      g_fatal_counter.store(0);
+      g2::setFatalPreLoggingHook(fatalCounter);   
+      LOG(FATAL) << "This message is fatal";
+      logger.reset();
+      EXPECT_EQ(g_fatal_counter.load(), 1);
+   }
+   {  // Now with no fatal pre-logging-hook
+      RestoreFileLogger logger(log_directory);
+      ASSERT_FALSE(mockFatalWasCalled());
+      g_fatal_counter.store(0);
+      LOG(FATAL) << "This message is fatal";
+      EXPECT_EQ(g_fatal_counter.load(), 0);
+   }
+}
+
+
+
 TEST(LogTest, LOG_FATAL) {
    RestoreFileLogger logger(log_directory);
    ASSERT_FALSE(mockFatalWasCalled());
+   
+   
+   
    LOG(FATAL) << "This message is fatal";
    EXPECT_TRUE(mockFatalWasCalled());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
