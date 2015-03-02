@@ -50,7 +50,7 @@ http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logge
 4. It is thread safe, so using it from multiple threads is completely fine. 
 
 5. It is *CRASH SAFE*. It will save the made logs to the sink before it shuts down. 
-The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal OS exceptions and signals)* , so if your application  crashes due to, say a segmentation fault, *SIGSEGV*  it will  log and save the crash and all previously buffered log  entries before exiting.
+The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal OS exceptions and signals)* , so if your application  crashes due to, say a segmentation fault, *SIGSEGV*,  it will  log and save the crash and all previously buffered log  entries before exiting.
 
  
 6. It is cross platform. Tested and used by me or by clients on OSX, Windows, Ubuntu, CentOS
