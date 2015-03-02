@@ -17,8 +17,6 @@
 #error "stacktrace_win.cpp used but not on a windows system"
 #endif
 
-#define g2_thread_local __declspec(thread) 
-
 #include <string>
 #include <windows.h>
 #include "crashhandler.hpp"
