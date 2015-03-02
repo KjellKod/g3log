@@ -33,15 +33,12 @@
 #define __PRETTY_FUNCTION__   __FUNCTION__
 #endif
 
-
 // thread_local doesn't exist on VS2013 but it might soon? (who knows)
-// to avoid future issues, let's define g2_thread_local that should continue
 // to work after Microsoft has updated to be C++11 compliant
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-#define g2_thread_local __declspec(thread) 
-#else 
-#define g2_thread_local thread_local
-#endif
+#if !(defined(thread_local)) && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#define thread_local __declspec(thread) 
+#endif 
+
 
 /** namespace for LOG() and CHECK() frameworks
  * History lesson:   Why the names 'g2' and 'g2log'?:

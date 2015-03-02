@@ -24,6 +24,8 @@
 #include <csignal>
 #include <memory>
 #include <iostream>
+#include <thread>
+#include <atomic>
 
 #include "std2_make_unique.hpp"
 #include "g2logworker.hpp"
@@ -42,7 +44,7 @@ const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = []{ /*does 
 std::function<void(void)> g_fatal_pre_logging_hook;
 
 
-g2_thread_local size_t g_fatal_hook_recursive_counter = {0};
+std::atomic<size_t> g_fatal_hook_recursive_counter = {0};
 }
 
 
@@ -74,6 +76,8 @@ void initializeLogging(LogWorker* bgworker) {
    // by default the pre fatal logging hook does nothing
    // if it WOULD do something it would happen in 
    setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing); 
+   // recurvise crash counter re-set to zero
+   g_fatal_hook_recursive_counter.store(0);
 }
 
 
@@ -158,7 +162,7 @@ void saveMessage(const char* entry, const char* file, int line, const char* func
       // In case the fatal_pre logging actually will cause a crash in its turn
       // let's not do recursive crashing!
       setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing);
-      ++g_fatal_hook_recursive_counter; // thread_local counter
+      ++g_fatal_hook_recursive_counter; // thread safe counter
       // "benign" race here. If two threads crashes, with recursive crashes
       // then it's possible that the "other" fatal stack trace will be shown
       // that's OK since it was anyhow the first crash detected
@@ -166,12 +170,11 @@ void saveMessage(const char* entry, const char* file, int line, const char* func
       fatalhook();
       message.get()->write().append(stack_trace);
 
-      if (g_fatal_hook_recursive_counter > 1) {
+      if (g_fatal_hook_recursive_counter.load() > 1) {
          message.get()->write()
             .append("\n\n\nWARNING\n"
             "A recursive crash detected. It is likely the hook set with 'setFatalPreLoggingHook(...)' is responsible\n\n")
             .append("---First crash stacktrace: ").append(first_stack_trace).append("\n---End of first stacktrace\n");
-
       }
       FatalMessagePtr fatal_message{ std2::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal) };
       // At destruction, flushes fatal message to g2LogWorker

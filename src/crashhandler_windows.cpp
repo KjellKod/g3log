@@ -30,7 +30,7 @@ std::atomic<bool> gBlockForFatal {true};
 LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
 
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-g2_thread_local bool g_installed_thread_signal_handler = false;
+thread_local bool g_installed_thread_signal_handler = false;
 #endif
 
 #if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))

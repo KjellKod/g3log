@@ -35,7 +35,7 @@
 #define g2_MAP_PAIR_STRINGIFY(x) {x, #x}
 
 namespace {
-g2_thread_local size_t g_thread_local_recursive_crash_check = 0;
+thread_local size_t g_thread_local_recursive_crash_check = 0;
 
 const std::map<g2::SignalType, std::string> kExceptionsAsText = {
    g2_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
