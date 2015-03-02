@@ -50,23 +50,18 @@ http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logge
 4. It is thread safe, so using it from multiple threads is completely fine. 
 
 5. It is *CRASH SAFE*. It will save the made logs to the sink before it shuts down. 
-The logger will catch certain fatal signals, so if your application  crashes due to, say a segmentation fault, *SIGSEGV*,  or some other fatal signal it will  log and save the crash and all previously buffered log
- entries before exiting.
+The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal OS exceptions and signals)* , so if your application  crashes due to, say a segmentation fault, *SIGSEGV*  it will  log and save the crash and all previously buffered log  entries before exiting.
 
  
 6. It is cross platform. Tested and used by me or by clients on OSX, Windows, Ubuntu, CentOS
 
-7. On *Nix* systems a caught fatal signal will generate a stack dump to the log. A Beta version exist on Windows and can be released on request.
- 
-
-8. G2log is used world wide in commercial products as well as hobby projects since early 2011.
+7. G3log and G2log is used world wide in commercial products as well as hobby projects. G2log is used since early 2011.
 The code is given for free as public domain. This gives the option to change, use,
  and do whatever with it, no strings attached.
 
-9. Three versions of g2log exist. 
-    * This version: *[g3log](https://bitbucket.org/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013)
-    * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio. 
-    * [g2log-dev](https://bitbucket.org/KjellKod/g2log-dev)*: Acting as feature try-out and playground. 
+8. Two versions of g2log exist that are under active development.
+    * This version: *[g3log](https://bitbucket.org/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013). My recommendation is to go with g3log if you have full C++11 support. 
+    * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio.  The focus on g2log is stability and compiler support. Only well, time tested, features from g3log will make it into g2log. 
 
 
 
