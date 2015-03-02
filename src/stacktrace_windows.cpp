@@ -13,6 +13,7 @@
  * ============================================================================*/
 
 #include "stacktrace_windows.hpp"
+#include "g2log.hpp"
 #include <windows.h>
 #include <DbgHelp.h>
 #include <map>
@@ -34,12 +35,11 @@
 #define g2_MAP_PAIR_STRINGIFY(x) {x, #x}
 
 namespace {
-g2_thread_local size_t g_thread_local_recursive_crash_check = 0;
+thread_local size_t g_thread_local_recursive_crash_check = 0;
 
 const std::map<g2::SignalType, std::string> kExceptionsAsText = {
    g2_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_ARRAY_BOUNDS_EXCEEDED)
-   , g2_MAP_PAIR_STRINGIFY(EXCEPTION_BREAKPOINT)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_DATATYPE_MISALIGNMENT)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DENORMAL_OPERAND)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DIVIDE_BY_ZERO)
@@ -56,8 +56,10 @@ const std::map<g2::SignalType, std::string> kExceptionsAsText = {
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_INVALID_DISPOSITION)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_NONCONTINUABLE_EXCEPTION)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_PRIV_INSTRUCTION)
-   , g2_MAP_PAIR_STRINGIFY(EXCEPTION_SINGLE_STEP)
    , g2_MAP_PAIR_STRINGIFY(EXCEPTION_STACK_OVERFLOW)
+   , g2_MAP_PAIR_STRINGIFY(EXCEPTION_BREAKPOINT)
+   , g2_MAP_PAIR_STRINGIFY(EXCEPTION_SINGLE_STEP)
+
 };
 
 

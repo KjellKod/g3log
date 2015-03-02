@@ -33,6 +33,13 @@
 #define __PRETTY_FUNCTION__   __FUNCTION__
 #endif
 
+// thread_local doesn't exist on VS2013 but it might soon? (who knows)
+// to work after Microsoft has updated to be C++11 compliant
+#if !(defined(thread_local)) && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#define thread_local __declspec(thread) 
+#endif 
+
+
 /** namespace for LOG() and CHECK() frameworks
  * History lesson:   Why the names 'g2' and 'g2log'?:
  * The framework was made in my own free time as PUBLIC DOMAIN but the 
@@ -62,8 +69,12 @@ namespace g2 {
    * This will be reset to default (does nothing) at initializeLogging(...);
    *
    * Example usage:
-   * Windows: g2::SetPreFatalHook([]{__debugbreak();}); // remember #include <intrin.h>
-   * Linux:   g2::SetPreFatalHook([]{ raise(SIGTRAP); }); 
+   * Windows: g2::setFatalPreLoggingHook([]{__debugbreak();}); // remember #include <intrin.h>
+   *         WARNING: '__debugbreak()' when not running in Debug in your Visual Studio IDE will likely
+   *                   trigger a recursive crash if used here. It should only be used when debugging
+   *                   in your Visual Studio IDE. Recursive crashes are handled but are unnecessary.
+   *
+   * Linux:   g2::setFatalPreLoggingHook([]{ raise(SIGTRAP); }); 
    */
    void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
 

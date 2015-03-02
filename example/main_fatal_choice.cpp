@@ -233,10 +233,18 @@ void ChooseFatalExit() {
 }
 } // namespace
 
+void breakHere() {
+ #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+   __debugbreak(); 
+ #endif
+}
+
 int main(int argc, char** argv)
 {
    auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
    g2::initializeLogging(logger_n_handle.worker.get());
+   g2::setFatalPreLoggingHook(&breakHere);
+
    std::future<std::string> log_file_name = logger_n_handle.sink->call(&g2::FileSink::fileName);
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
              << "Choose your type of fatal exit, then "
