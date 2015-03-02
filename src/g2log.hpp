@@ -73,6 +73,10 @@ namespace g2 {
    *
    * Example usage:
    * Windows: g2::setFatalPreLoggingHook([]{__debugbreak();}); // remember #include <intrin.h>
+   *         WARNING: '__debugbreak()' when not running in Debug in your Visual Studio IDE will likely
+   *                   trigger a recursive crash if used here. It should only be used when debugging
+   *                   in your Visual Studio IDE. Recursive crashes are handled but are unnecessary.
+   *
    * Linux:   g2::setFatalPreLoggingHook([]{ raise(SIGTRAP); }); 
    */
    void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
