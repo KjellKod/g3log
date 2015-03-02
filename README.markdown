@@ -182,7 +182,7 @@ msbuild g3log.sln /p:Configuration=Release
 
 ** Building on *nix with Clang:  **
 ```
-cmake -DCMAKE_CXX_COMPILER=clang++ .. -DCMAKE_BUILD_TYPE=Release ..
+cmake -DCMAKE_CXX_COMPILER=clang++      -DCMAKE_BUILD_TYPE=Release ..
 make 
 ```
 
