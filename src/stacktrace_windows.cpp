@@ -15,7 +15,7 @@
 #include "stacktrace_windows.hpp"
 #include "g2log.hpp"
 #include <windows.h>
-#include <DbgHelp.h>
+#include <dbghelp.h>
 #include <map>
 #include <memory>
 #include <atomic>

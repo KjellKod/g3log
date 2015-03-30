@@ -24,14 +24,16 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
    MESSAGE("cmake for GCC ")
    IF (APPLE)
        set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP")
+   ELSEIF (MINGW)
+       set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
    ELSE()
        set(PLATFORM_LINK_LIBRIES rt)
        set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
    ENDIF()
+ENDIF()
 
 
-
-ELSEIF (MSVC OR MINGW) 
+IF (MSVC OR MINGW)
   set(PLATFORM_LINK_LIBRIES dbghelp)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
