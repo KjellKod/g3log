@@ -2,7 +2,7 @@
  * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================
  * Filename:g2loglevels.cpp  Part of Framework for Logging and Design By Contract
@@ -27,7 +27,7 @@ void checkLevel(const int level) {
 } // anonymous namespace
 
 
- 
+
 
 
 
@@ -41,7 +41,7 @@ namespace g2 {
       // All levels are by default ON: i.e. for DEBUG, INFO, WARNING, FATAL
       const int g_level_size{FATAL.value + 1};
       std::atomic<bool> g_log_level_status[4]{{true},{true},{true},{true}};
-#endif	
+#endif
    } // internal
 
 #ifdef G2_DYNAMIC_LOGGING
