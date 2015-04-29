@@ -16,21 +16,6 @@
 #include <atomic>
 #include <cassert>
 
-namespace {
-void checkLevel(const int level) {
-#if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-   CHECK((level >= DBUG.value) && (level <= FATAL.value));
-#else
-   CHECK((level >= DEBUG.value) && (level <= FATAL.value));
-#endif
-}
-} // anonymous namespace
-
-
-
-
-
-
 namespace g2 {
    namespace internal {
       bool wasFatal(const LEVELS& level) {
