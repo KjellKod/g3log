@@ -62,7 +62,7 @@ namespace g2 {
 
       LogMessage(const LogMessage&);
       LogMessage(LogMessage&& other);
-      virtual ~LogMessage(){};
+      virtual ~LogMessage(){}
 
       //
       // Complete access to the raw data in case the helper functions above
@@ -88,7 +88,7 @@ namespace g2 {
    struct FatalMessage : public LogMessage {
       FatalMessage(const LogMessage& details, g2::SignalType signal_id);
       FatalMessage(const FatalMessage&);
-      virtual ~FatalMessage(){};
+      virtual ~FatalMessage(){}
 
       LogMessage copyToLogMessage() const;
       std::string reason() const;
