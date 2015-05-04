@@ -2,7 +2,7 @@
  * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================
  * Filename:g2logmessage.hpp  Part of Framework for Logging and Design By Contract
@@ -44,28 +44,28 @@ namespace g2 {
       //  default look is Y/M/D H:M:S
       std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
       std::string microseconds() const { return std::to_string(_microseconds); }
-      
+
       std::string message() const  {  return _message; }
       std::string& write() const {  return _message; }
-      
+
       std::string expression() const  { return _expression; }
       bool wasFatal() const { return internal::wasFatal(_level); }
-      
+
       std::string threadID() const;
 
       std::string toString() const;
-      void setExpression(const std::string expression) { _expression = expression; } 
-      
-      
+      void setExpression(const std::string expression) { _expression = expression; }
+
+
       LogMessage(const std::string &file, const int line, const std::string& function, const LEVELS& level);
       explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
- 
-      LogMessage(const LogMessage&);      
+
+      LogMessage(const LogMessage&);
       LogMessage(LogMessage&& other);
-      virtual ~LogMessage(){};
-      
+      virtual ~LogMessage(){}
+
       //
-      // Complete access to the raw data in case the helper functions above 
+      // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
       std::time_t _timestamp;
@@ -78,9 +78,9 @@ namespace g2 {
       std::string _expression; // only with content for CHECK(...) calls
       mutable std::string _message;
    };
-   
-   
-   
+
+
+
 
    /** Trigger for flushing the message queue and exiting the application
     * A thread that causes a FatalMessage will sleep forever until the
@@ -88,15 +88,15 @@ namespace g2 {
    struct FatalMessage : public LogMessage {
       FatalMessage(const LogMessage& details, g2::SignalType signal_id);
       FatalMessage(const FatalMessage&);
-      virtual ~FatalMessage(){};
-      
+      virtual ~FatalMessage(){}
+
       LogMessage copyToLogMessage() const;
       std::string reason() const;
-      
+
       const SignalType _signal_id;
    };
-   
-   
+
+
    typedef MoveOnCopy<std::unique_ptr<FatalMessage>> FatalMessagePtr;
    typedef MoveOnCopy<std::unique_ptr<LogMessage>> LogMessagePtr;
    typedef MoveOnCopy<LogMessage> LogMessageMover;
