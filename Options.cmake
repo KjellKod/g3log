@@ -36,9 +36,9 @@ option (ENABLE_FATAL_SIGNALHANDLING
 
 IF(NOT ENABLE_FATAL_SIGNALHANDLING)
   add_definitions(-DDISABLE_FATAL_SIGNALHANDLING)
-  MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=OFF\t\t\tFatal signal handler is disabled")
+    MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=ON\t\t\tFatal signal handler is disabled. Make sure to have \n\t\t[#define DISABLE_FATAL_SIGNALHANDLING 1] in your source code") 
   ELSE() 
-    MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=ON\t\t\tFatal signal handler is enabled. Make sure to have \n\t\t[#define DISABLE_FATAL_SIGNALHANDLING 1] in your source code") 
+  MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=OFF\t\t\tFatal signal handler is enabled")
 ENDIF(NOT ENABLE_FATAL_SIGNALHANDLING)
 
 
