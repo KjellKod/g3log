@@ -80,7 +80,8 @@ namespace g2 {
       std::ostringstream ss_entry;
       //  Day Month Date Time Year: is written as "%a %b %d %H:%M:%S %Y" and formatted output as : Wed Sep 19 08:28:16 2012
       ss_entry << "\t\tg2log created log at: " << g2::localtime_formatted(g2::systemtime_now(), "%a %b %d %H:%M:%S %Y") << "\n";
-      ss_entry << "\t\tLOG format: [YYYY/MM/DD hh:mm:ss.uuu* LEVEL FILE:LINE] message\n\n"; 
+      ss_entry << "\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE:LINE] message"; 
+      ss_entry << "\t\t(uuu*: microsecond counter since initialization of log worker)\n\n"; 
       return ss_entry.str();
     }
 

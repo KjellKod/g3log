@@ -44,7 +44,7 @@ namespace g2 {
    // helper for setting the normal log details in an entry
    std::string LogDetailsToString(const LogMessage& msg) {
       std::string out;
-      out.append("\n" + msg.timestamp() + "." + msg.microseconds() +  "\t"
+      out.append("\n" + msg.timestamp() + " " + msg.microseconds() +  "\t"
       + msg.level() + " [" + msg.file() + " L: " + msg.line() + "]\t");
       return out;
    }
