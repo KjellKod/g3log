@@ -25,7 +25,6 @@
 #include <mutex>
 
 
-#pragma once
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "stacktrace_win.cpp used but not on a windows system"
 #endif
@@ -82,7 +81,6 @@ void captureStackTrace(CONTEXT* context, std::vector<uint64_t>& frame_pointers) 
    frame.AddrPC.Offset = context->Esp;
    machine_type = IMAGE_FILE_MACHINE_I386;
 #endif
-   auto noErrors = TRUE; // Why, Oh Why have Microsoft redefined bool?
    for (size_t index = 0; index < frame_pointers.size(); ++index)
    {
       if (StackWalk64(machine_type,
