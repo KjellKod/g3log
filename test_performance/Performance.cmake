@@ -32,6 +32,13 @@
      target_link_libraries(g3log-performance-threaded_worst  
                             ${G3LOG_LIBRARY}  ${PLATFORM_LINK_LIBRIES})
 
+    # 10 threads how long time it takes to write 1 million log entries together
+    # the focus is to look at the maximum latency for each of the threads
+    add_executable(g3log-worst-latency 
+                    ${DIR_PERFORMANCE}/main_worst_case_latency.cpp)
+     target_link_libraries(g3log-worst-latency 
+                            ${G3LOG_LIBRARY}  ${PLATFORM_LINK_LIBRIES})
+
    ELSE()
       MESSAGE("-DUSE_G3LOG_PERFORMANCE=OFF")
    ENDIF(USE_G3LOG_PERFORMANCE)
