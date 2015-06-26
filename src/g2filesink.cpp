@@ -20,9 +20,9 @@ FileSink::FileSink(const std::string& log_prefix, const std::string& log_directo
 , _outptr(new std::ofstream)
 {
    _log_prefix_backup = prefixSanityFix(log_prefix);
-   if (!isValidFilename(_log_prefix_backup)) {
-      std::cerr << "g2log: forced abort due to illegal log prefix [" << log_prefix << "]" << std::endl;
-      abort();
+   if (_log_prefix_backup.empty()) {
+      _log_prefix_backup = "g3log";
+      std::cerr << "Illegal log prefix [" << log_prefix << "] is  replaced by 'g3log'" << std::endl;
    }
 
    std::string file_name = createLogFileName(_log_prefix_backup);
@@ -40,7 +40,7 @@ FileSink::FileSink(const std::string& log_prefix, const std::string& log_directo
 
 
 FileSink::~FileSink() {
-   std::string exit_msg{"\ng2log g2FileSink shutdown at: "};
+   std::string exit_msg{"\ng3log g2FileSink shutdown at: "};
    exit_msg.append(localtime_formatted(systemtime_now(), internal::time_formatted));
    filestream() << exit_msg << std::flush;
 

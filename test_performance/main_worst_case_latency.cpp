@@ -24,6 +24,21 @@ const uint64_t g_iterations{1000000};
 
 
 std::atomic<size_t> g_counter = {0};
+
+void WriteToFile(std::string result_filename, std::string content) {
+
+   std::ofstream out;
+   std::ios_base::openmode mode = std::ios_base::out | std::ios_base::app;
+   ;
+   out.open(result_filename.c_str(), mode);
+   if (!out.is_open()) {
+      std::cerr << "Error writing to " << result_filename << std::endl;
+   }
+   out << content << std::flush;
+   std::cout << content;
+}
+
+
 void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t>& result) {
 
    while (true) {
@@ -41,17 +56,21 @@ void MeasurePeakDuringLogWrites(const size_t id, std::vector<uint64_t>& result) 
 }
 
 
-void   PrintStats(const size_t number_of_threads,   const std::map<size_t, std::vector<uint64_t>>& threads_result, const uint64_t total_time_in_us) {
+void   PrintStats(const std::string& filename, const size_t number_of_threads,   const std::map<size_t, std::vector<uint64_t>>& threads_result, const uint64_t total_time_in_us) {
 
    size_t idx = 0;
-   for (auto t_result: threads_result) {
+   std::ostringstream oss;
+      for (auto t_result : threads_result) {
       uint64_t worstUs = (*std::max_element(t_result.second.begin(), t_result.second.end()));
-      std::cout << idx++ << " the worst thread latency was:" <<  worstUs / uint64_t(1000) << " ms  (" << worstUs << " us)] " << std::endl;
+     oss << idx++ << " the worst thread latency was:" <<  worstUs / uint64_t(1000) << " ms  (" << worstUs << " us)] " << std::endl;
    }
 
-   std::cout << "Total time :" << total_time_in_us / uint64_t(1000) << " ms (" << total_time_in_us
-             << " us)" << std::endl;
-   std::cout << "Average time: " << total_time_in_us / 1000000 << std::endl;
+
+   oss << "Total time :" << total_time_in_us / uint64_t(1000) << " ms (" << total_time_in_us
+       << " us)" << std::endl;
+   oss << "Average time: " << double(total_time_in_us) / double(g_iterations) << " us" << std::endl;
+   WriteToFile(filename, oss.str());
+
 }
 
 
@@ -82,16 +101,12 @@ void SaveResultToBucketFile(std::string result_filename, const std::map<size_t, 
    for (const auto ms_bucket : buckets) {
       oss << ms_bucket.first << "\t, " << ms_bucket.second << std::endl;
    }
-
-   std::ofstream out;
-   std::ios_base::openmode mode = std::ios_base::out | std::ios_base::trunc;
-   ;
-   out.open(result_filename.c_str(), mode);
-   if (!out.is_open()) {
-      std::cerr << "Error writing to " << result_filename << std::endl;
-   }
-   out << oss.str() << std::flush;
+   WriteToFile(result_filename, oss.str());
+   std::cout << "ms bucket result is in file: " << result_filename << std::endl;
 }
+
+
+
 
 } // anonymous
 
@@ -124,13 +139,19 @@ int main(int argc, char** argv) {
       threads_result[idx].reserve(g_iterations);
    }
 
-   auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(argv[0], "./");
+   std::string filename_choice;
+   std::cout << "Choose filename prefix to log to" << std::endl;
+   std::getline(std::cin, filename_choice);
+   auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(filename_choice, "./");
    g2::initializeLogging(logger_n_handle.worker.get());
    std::future<std::string> log_file_name = logger_n_handle.sink->call(&g2::FileSink::fileName);
    auto filename = log_file_name.get();
+   auto filename_result = filename + ".result.csv";
 
-   std::cout << "Using " << number_of_threads;
-   std::cout << " to log in total 1 million log entries to " << filename << std::endl;
+                          std::ostringstream oss;
+   oss << "Using " << number_of_threads;
+   oss << " to log in total 1 million log entries to " << filename << std::endl;
+   WriteToFile(filename_result, oss.str());
 
 
    auto start_time_application_total = std::chrono::high_resolution_clock::now();
@@ -144,7 +165,7 @@ int main(int argc, char** argv) {
 
    uint64_t total_time_in_us = std::chrono::duration_cast<std::chrono::microseconds>(stop_time_application_total - start_time_application_total).count();
 
-   PrintStats(number_of_threads, threads_result, total_time_in_us);
-   SaveResultToBucketFile(filename + ".result.csv", threads_result);
+   PrintStats(filename_result, number_of_threads, threads_result, total_time_in_us);
+   SaveResultToBucketFile(filename_result, threads_result);
    return 0;
 }
