@@ -186,7 +186,11 @@ cmake -DCMAKE_CXX_COMPILER=clang++      -DCMAKE_BUILD_TYPE=Release ..
 make 
 ```
 
+#Performance
+G3log aims to keep all background logging to sinks with as little log overhead as possible to the logging sink. Depending on platform the average logging overhead will differ. On my laptop the average call, when doing extreme performance testing, will be about ~2 us.
 
+The worst case latency is kept very stabile with no extreme peaks, in spite of any sudden extreme pressure.  I have a blog post regarding comparing worst case latency for g3log and other loggers which might be of interest. 
+You can find it here: https://kjellkod.wordpress.com/2015/06/30/the-worlds-fastest-logger-vs-g3log/
      
 #Enjoy
 If you like this logger (or not) it would be nice with some feedback. That way I can improve g3log and g2log and it is also nice to see if someone is using it.
