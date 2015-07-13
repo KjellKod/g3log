@@ -1,9 +1,12 @@
-# -DUSE_G3LOG_UNIT_TEST=ON   : unit tests 
+# g3log is a KjellKod Logger
+# 2015 @author Kjell Hedström, hedstrom@kjellkod.cc 
+# ==================================================================
+# 2015 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
+#    risk and comes  with no warranties.
 #
-#
-option (USE_G3LOG_UNIT_TEST
-       "Turn ON/OFF unit tests for G3Log" OFF)
-
+# This code is yours to share, use and modify with no strings attached
+#   and no restrictions or obligations.
+# ===================================================================
 
 
    # ============================================================================
@@ -20,14 +23,14 @@ option (USE_G3LOG_UNIT_TEST
 
    # Unit test for g3log  (cmake -DUSE_G3LOG_UNIT_TEST=ON ..)
    #    remember to unzip gtest at g3log/3rdParty/gtest
-   option (USE_G3LOG_UNIT_TEST "g3log unit tests" OFF)
+   option (ADD_G3LOG_UNIT_TEST "g3log unit tests" OFF)
 
 
    # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
    # =========================
-   IF (USE_G3LOG_UNIT_TEST)
+   IF (ADD_G3LOG_UNIT_TEST)
       set(DIR_UNIT_TEST ${g3log_SOURCE_DIR}/test_unit)
-      MESSAGE("-DUSE_G3LOG_UNIT_TEST=ON")  
+      MESSAGE("-DADD_G3LOG_UNIT_TEST=ON")  
       set(GTEST_DIR ${g3log_SOURCE_DIR}/3rdParty/gtest/gtest-1.7.0)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
       include_directories(${GTEST_INCLUDE_DIRECTORIES})
@@ -76,5 +79,5 @@ option (USE_G3LOG_UNIT_TEST
        target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_SHARED_LIBRARY} -ldl  gtest_170_lib )
     ENDIF()
 ELSE() 
-  MESSAGE("-DUSE_G3LOG_UNIT_TEST=OFF") 
-ENDIF (USE_G3LOG_UNIT_TEST)
+  MESSAGE("-DADD_G3LOG_UNIT_TEST=OFF") 
+ENDIF (ADD_G3LOG_UNIT_TEST)

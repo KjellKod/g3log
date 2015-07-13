@@ -1,5 +1,5 @@
 # g3log is a KjellKod Logger
-# 2011 @author Kjell Hedström, hedstrom@kjellkod.cc 
+# 2010 @author Kjell Hedström, hedstrom@kjellkod.cc 
 # ==================================================================
 # 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
 #    risk and comes  with no warranties.
@@ -47,7 +47,7 @@
 #                
 # ============================================================================
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.2)
 ENABLE_LANGUAGE(CXX)
 set(CMAKE_BUILD_TYPE Release)
 
@@ -67,28 +67,30 @@ endif()
 
 
 
+   # ============================================================================
+   # G3LOG OPTIONAL FEATURES
+   # ============================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
+
+
+   # =========================================================================
+   # G3 Macro definitions in Options.cmake are written to file
+   #    this avoids having to re-state your definitions in your source code 
+   #    or compile options
+   #==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
+
    # =========================================================================
    # G3LOG BUILD
    #==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/Build.cmake)
-
-
-
-
-   # ============================================================================
-   # G3LOG OPTIONAL FEATURES
-   # ============================================================================
-   # Dynamic logging:  ENABLE WITH:     -DUSE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
-   # DBUG instead of DEBUG logging level: ENABLE WITH: -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON
-   INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
-
 
    
 
    # ============================================================================
    # EXAMPLE OPTIONS: By defauls is ON. This will create 'g3log-FATAL-* examples'
    # ============================================================================
-   # DISABLE WITH:  -DUSE_FATAL_EXAMPLE=OFF    
+   # DISABLE WITH:  -DADD_FATAL_EXAMPLE=OFF    
    INCLUDE (${g3log_SOURCE_DIR}/example/Example.cmake)
 
 
@@ -96,7 +98,7 @@ endif()
    # ============================================================================
    # PERFORMANCE TEST OPTIONS: Performance operations for g3log
    # ============================================================================
-   # ENABLE WITH:  -USE_G3LOG_PERFORMANCE=ON  
+   # ENABLE WITH:  -DADD_G3LOG_PERFORMANCE=ON  
    INCLUDE (${g3log_SOURCE_DIR}/test_performance/Performance.cmake)
 
       
@@ -104,7 +106,7 @@ endif()
    # ==========================================================================
    # UNIT TEST OPTIONS: 
    # ============================================================================
-   # ENABLE WITH:  -DUSE_G2LOG_UNIT_TEST=ON  
+   # ENABLE WITH:  -DADD_G2LOG_UNIT_TEST=ON  
    INCLUDE (${g3log_SOURCE_DIR}/test_unit/Test.cmake)
 
 

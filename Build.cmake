@@ -1,3 +1,15 @@
+# g3log is a KjellKod Logger
+# 2015 @author Kjell Hedström, hedstrom@kjellkod.cc 
+# ==================================================================
+# 2015 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
+#    risk and comes  with no warranties.
+#
+# This code is yours to share, use and modify with no strings attached
+#   and no restrictions or obligations.
+# ===================================================================
+
+
+
 SET(LOG_SRC ${g3log_SOURCE_DIR}/src)
 include_directories(${LOG_SRC})
 SET(ACTIVE_CPP0xx_DIR "Release")
@@ -50,9 +62,6 @@ IF (MSVC OR MINGW)
    MESSAGE("then run 'Release\\g3log-FATAL-*' examples")
    MESSAGE("")
 ENDIF()
-
-
-
 
    # GENERIC STEPS
    file(GLOB SRC_FILES ${LOG_SRC}/*.h ${LOG_SRC}/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
