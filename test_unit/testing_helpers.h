@@ -14,9 +14,9 @@
 #include <chrono>
 #include <thread>
 #include <algorithm>
-#include "g2logworker.hpp"
-#include "g2logmessage.hpp"
-#include "g2filesink.hpp"
+#include "g3log/logworker.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/filesink.hpp"
 
 namespace testing_helpers {
 

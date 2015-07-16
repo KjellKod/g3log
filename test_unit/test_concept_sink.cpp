@@ -16,11 +16,11 @@
 #include <atomic>
 
 #include "testing_helpers.h"
-#include "std2_make_unique.hpp"
-#include "g2sink.hpp"
-#include "g2sinkwrapper.hpp"
-#include "g2sinkhandle.hpp"
-#include "g2logmessage.hpp"
+#include "g3log/std2_make_unique.hpp"
+#include "g3log/sink.hpp"
+#include "g3log/sinkwrapper.hpp"
+#include "g3log/sinkhandle.hpp"
+#include "g3log/logmessage.hpp"
 
 
 using namespace std;

@@ -1,8 +1,18 @@
-/**
-* 2013/12/28 Bugfix for Visual Studio 2013 which does not handle well 
+/** ==========================================================================
+* 2013  This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+*
+* For more information see g3log/LICENSE or refer refer to http://unlicense.org
+*
+*
+* 2013/12/28 Bugfix for Visual Studio 2013 which does not handle well
 * std::packaged_task<void()>. Thanks to Michael Rasmussen (lap777)
 * Ref: workarounds at http://connect.microsoft.com/VisualStudio/feedback/details/791185/std-packaged-task-t-where-t-is-void-or-a-reference-class-are-not-movable
-*/
+* ============================================================================*/
+
+
+
 #pragma once
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
 namespace std {
@@ -18,28 +28,28 @@ namespace std {
       }
 
       template<class _Fty2>
-      explicit packaged_task(_Fty2&& _Fnarg)
+      explicit packaged_task(_Fty2 &&_Fnarg)
          : _my_func(_Fnarg) {
       }
 
-      packaged_task(packaged_task&& _Other)
+      packaged_task(packaged_task &&_Other)
          : _my_promise(move(_Other._my_promise)),
-         _my_func(move(_Other._my_func)) {
+           _my_func(move(_Other._my_func)) {
       }
 
-      packaged_task& operator=(packaged_task&& _Other) {
+      packaged_task &operator=(packaged_task && _Other) {
          _my_promise = move(_Other._my_promise);
          _my_func = move(_Other._my_func);
          return (*this);
       }
 
-      packaged_task(const packaged_task&) = delete;
-      packaged_task& operator=(const packaged_task&) = delete;
+      packaged_task(const packaged_task &) = delete;
+      packaged_task &operator=(const packaged_task &) = delete;
 
       ~packaged_task() {
       }
 
-      void swap(packaged_task& _Other) {
+      void swap(packaged_task &_Other) {
          swap(_my_promise, _Other._my_promise);
          swap(_my_func, _Other._my_func);
       }

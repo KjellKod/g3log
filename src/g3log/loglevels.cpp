@@ -1,31 +1,28 @@
 /** ==========================================================================
- * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
- * with no warranties. This code is yours to share, use and modify with no
- * strings attached and no restrictions or obligations.
- *
- * For more information see g3log/LICENSE or refer refer to http://unlicense.org
- * ============================================================================
- * Filename:g2loglevels.cpp  Part of Framework for Logging and Design By Contract
- * Created: 2012 by Kjell Hedström
- *
- * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
- * ********************************************* */
+* 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* 
+* For more information see g3log/LICENSE or refer refer to http://unlicense.org
+* ============================================================================*/
 
-#include "g2loglevels.hpp"
-#include "g2log.hpp"
+#include "g3log/loglevels.hpp"
+#include "g3log/g3log.hpp"
 #include <atomic>
 #include <cassert>
 
 namespace g2 {
    namespace internal {
-      bool wasFatal(const LEVELS& level) {
+      bool wasFatal(const LEVELS &level) {
          return level.value >= FATAL.value;
       }
 
 #ifdef G2_DYNAMIC_LOGGING
       // All levels are by default ON: i.e. for DEBUG, INFO, WARNING, FATAL
-      const int g_level_size{FATAL.value + 1};
-      std::atomic<bool> g_log_level_status[4]{{true},{true},{true},{true}};
+      const int g_level_size {
+         FATAL.value + 1
+      };
+      std::atomic<bool> g_log_level_status[4] {{true}, {true}, {true}, {true}};
 #endif
    } // internal
 

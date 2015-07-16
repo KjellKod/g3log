@@ -1,12 +1,11 @@
-# g3log is a KjellKod Logger
-# 2010 @author Kjell Hedström, hedstrom@kjellkod.cc 
-# ==================================================================
-# 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
-#    risk and comes  with no warranties.
-#
-# This code is yours to share, use and modify with no strings attached
-#   and no restrictions or obligations.
-# ===================================================================
+# ==========================================================================
+# 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+# with no warranties. This code is yours to share, use and modify with no
+# strings attached and no restrictions or obligations.
+# 
+# For more information see g3log/LICENSE or refer refer to http://unlicense.org
+# ============================================================================*/
+
 
 # Below are details for compiling on Windows and Linux
 # by default only an example g3log binary is created
@@ -52,14 +51,6 @@ ENABLE_LANGUAGE(CXX)
 set(CMAKE_BUILD_TYPE Release)
 
 project (g3log)
-
-MESSAGE("Run 'make clean-cmake-files' to purge your build directory of CMake generated cache files")
-add_custom_target(clean-cmake-files
-   COMMAND ${CMAKE_COMMAND} -P ${g3log_SOURCE_DIR}/CleanAll.cmake
-)
-
-
-
 
 # Detect 64 or 32 bit
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
@@ -131,6 +122,17 @@ endif()
 # ==========================================================================
 # INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 
+
+MESSAGE("\n\n
+        *******************************************************************
+        Please do 'make clean-cmake-files' before next cmake generation. 
+           It is a good idea to purge your build directory of CMake 
+           generated cache files
+        *******************************************************************
+         ")
+add_custom_target(clean-cmake-files
+   COMMAND ${CMAKE_COMMAND} -P ${g3log_SOURCE_DIR}/CleanAll.cmake
+)
 
 
 

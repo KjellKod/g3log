@@ -5,8 +5,7 @@
  * 
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
-#ifndef PERFORMANCE_G2_TEST_H_
-#define PERFORMANCE_G2_TEST_H_
+#pragma once
 
 #include <iostream>
 #include <sstream>
@@ -22,7 +21,6 @@
 
 #if defined(G2LOG_PERFORMANCE)
 #include "g2log.hpp"
-#include "g2logworker.hpp"
 using namespace g2::internal;
 
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
@@ -126,6 +124,3 @@ inline void doLogWrites(const std::string& title)
 
 
 } // end namespace
-
-
-#endif // fPERFORMANCE_G2_TEST_H_

@@ -6,8 +6,8 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
-#include "g2logmessagecapture.hpp"
-#include "crashhandler.hpp"
+#include "g3log/logcapture.hpp"
+#include "g3log/crashhandler.hpp"
 
 // For Windows we need force a thread_local install per thread of three
 // signals that must have a signal handler instealled per thread-basis
@@ -34,8 +34,7 @@ LogCapture::~LogCapture() {
 
 
 /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-LogCapture::LogCapture(const LEVELS &level, g2::SignalType fatal_signal, const char* dump)
-   : LogCapture("", 0, "", level, "", fatal_signal, dump) {
+LogCapture::LogCapture(const LEVELS &level, g2::SignalType fatal_signal, const char *dump) : LogCapture("", 0, "", level, "", fatal_signal, dump) {
 }
 
 /**
@@ -44,8 +43,8 @@ LogCapture::LogCapture(const LEVELS &level, g2::SignalType fatal_signal, const c
  * @expression for CHECK calls
  * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
  */
-LogCapture::LogCapture(const char* file, const int line, const char* function, const LEVELS &level,
-                       const char* expression, g2::SignalType fatal_signal, const char* dump)
+LogCapture::LogCapture(const char *file, const int line, const char *function, const LEVELS &level,
+                       const char *expression, g2::SignalType fatal_signal, const char *dump)
    : _file(file), _line(line), _function(function), _level(level), _expression(expression), _fatal_signal(fatal_signal) {
 
    if (g2::internal::wasFatal(level)) {
@@ -60,7 +59,7 @@ LogCapture::LogCapture(const char* file, const int line, const char* function, c
 * capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF
 * See also for the attribute formatting ref:  http://www.codemaestro.com/reviews/18
 */
-void LogCapture::capturef(const char* printf_like_message, ...) {
+void LogCapture::capturef(const char *printf_like_message, ...) {
    static const int kMaxMessageSize = 2048;
    static const std::string kTruncatedWarningText = "[...truncated...]";
    char finished_message[kMaxMessageSize];

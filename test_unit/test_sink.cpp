@@ -17,9 +17,9 @@
 #include <future>
 
 #include "testing_helpers.h"
-#include "g2logmessage.hpp"
-#include "g2logworker.hpp"
-#include "std2_make_unique.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/logworker.hpp"
+#include "g3log/std2_make_unique.hpp"
 
 using namespace testing_helpers;
 using namespace std;

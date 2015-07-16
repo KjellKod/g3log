@@ -15,8 +15,8 @@
 #include <exception>
 #include <functional>
 #include <memory>
-#include "g2time.hpp"
-#include "g2future.hpp"
+#include "g3log/time.hpp"
+#include "g3log/future.hpp"
 
 TEST(Configuration, LOG)
 { // ref: http://www.cplusplus.com/reference/clibrary/ctime/strftime/

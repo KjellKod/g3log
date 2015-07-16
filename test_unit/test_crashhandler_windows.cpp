@@ -10,7 +10,7 @@
 #include <gtest/gtest.h>
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-#include "stacktrace_windows.hpp"
+#include "g3log/stacktrace_windows.hpp"
 #include <windows.h>
 
  

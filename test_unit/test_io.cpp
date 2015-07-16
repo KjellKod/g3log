@@ -7,10 +7,10 @@
  * ============================================================================*/
 
 #include <gtest/gtest.h>
-#include "g2log.hpp"
-#include "g2logworker.hpp"
+#include "g3log/g3log.hpp"
+#include "g3log/logworker.hpp"
 #include "testing_helpers.h"
-#include "g2loglevels.hpp"
+#include "g3log/loglevels.hpp"
 
 #include <memory>
 #include <string>
@@ -282,14 +282,14 @@ TEST(LogTest, LOG_preFatalLogging_hook) {
       g2::setFatalPreLoggingHook(fatalCounter);   
       LOG(FATAL) << "This message is fatal";
       logger.reset();
-      EXPECT_EQ(g_fatal_counter.load(), 1);
+      EXPECT_EQ(g_fatal_counter.load(), size_t{1});
    }
    {  // Now with no fatal pre-logging-hook
       RestoreFileLogger logger(log_directory);
       ASSERT_FALSE(mockFatalWasCalled());
       g_fatal_counter.store(0);
       LOG(FATAL) << "This message is fatal";
-      EXPECT_EQ(g_fatal_counter.load(), 0);
+      EXPECT_EQ(g_fatal_counter.load(), size_t{0});
    }
 }
 

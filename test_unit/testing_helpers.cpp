@@ -11,9 +11,8 @@
 #include <iostream>
 #include "testing_helpers.h"
 #include "g2log.hpp"
-#include "g2logworker.hpp"
-#include "std2_make_unique.hpp"
-#include "g2logmessage.hpp"
+#include "g3log/std2_make_unique.hpp"
+#include "g3log/logmessage.hpp"
 #include <fstream>
 
 using namespace std;

@@ -2,7 +2,7 @@
 * 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
@@ -18,23 +18,31 @@ namespace g2 {
    struct MoveOnCopy {
       mutable Moveable _move_only;
 
-      explicit MoveOnCopy(Moveable&& m) : _move_only(std::move(m)) {}
-      MoveOnCopy(MoveOnCopy const& t) : _move_only(std::move(t._move_only)) {}
-      MoveOnCopy(MoveOnCopy&& t) : _move_only(std::move(t._move_only)) {}
+      explicit MoveOnCopy(Moveable &&m) : _move_only(std::move(m)) {}
+      MoveOnCopy(MoveOnCopy const &t) : _move_only(std::move(t._move_only)) {}
+      MoveOnCopy(MoveOnCopy &&t) : _move_only(std::move(t._move_only)) {}
 
-      MoveOnCopy& operator=(MoveOnCopy const& other) {
+      MoveOnCopy &operator=(MoveOnCopy const &other) {
          _move_only = std::move(other._move_only);
          return *this;
       }
 
-      MoveOnCopy& operator=(MoveOnCopy&& other) {
+      MoveOnCopy &operator=(MoveOnCopy && other) {
          _move_only = std::move(other._move_only);
          return *this;
       }
 
-      void operator()() { _move_only(); }
-      Moveable& get() { return _move_only; }
-      Moveable release() { return std::move(_move_only); }
+      void operator()() {
+         _move_only();
+      }
+
+      Moveable &get() {
+         return _move_only;
+      }
+      
+      Moveable release() {
+         return std::move(_move_only);
+      }
    };
 
 } // g2

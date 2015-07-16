@@ -6,8 +6,8 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
-#include "g2logworker.hpp"
 #include "g2log.hpp"
+
 #include <iomanip>
 #include <thread>
 #include <iostream>
@@ -15,39 +15,39 @@
 namespace
 {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-const std::string path_to_log_file = "./";
+   const std::string path_to_log_file = "./";
 #else
-const std::string path_to_log_file = "/tmp/";
+   const std::string path_to_log_file = "/tmp/";
 #endif
 }
 
 namespace example_fatal
 {
-// on Ubunti this caused get a compiler warning with gcc4.6
-// from gcc 4.7.2 (at least) it causes a crash (as expected)
-// On windows it'll probably crash too.
-void tryToKillWithIllegalPrintout()
-{
-   std::cout << "\n\n***** Be ready this last example may 'abort' if on Windows/Linux_gcc4.7 " << std::endl << std::flush;
-   std::cout << "************************************************************\n\n" << std::endl << std::flush;
-   std::this_thread::sleep_for(std::chrono::seconds(1));
-   const std::string logging = "logging";
-   LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
-}
+   // on Ubunti this caused get a compiler warning with gcc4.6
+   // from gcc 4.7.2 (at least) it causes a crash (as expected)
+   // On windows it'll probably crash too.
+   void tryToKillWithIllegalPrintout()
+   {
+      std::cout << "\n\n***** Be ready this last example may 'abort' if on Windows/Linux_gcc4.7 " << std::endl << std::flush;
+      std::cout << "************************************************************\n\n" << std::endl << std::flush;
+      std::this_thread::sleep_for(std::chrono::seconds(1));
+      const std::string logging = "logging";
+      LOGF(DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
+   }
 
 
-// The function above 'tryToKillWithIllegalPrintout' IS system / compiler dependent. Older compilers sometimes did NOT generate a SIGSEGV
-// fault as expected by the illegal printf-format usage. just in case we exit by zero division"
-void  killByZeroDivision(int value)
-{
-   int zero = 0; // trying to fool the compiler to automatically warn
-   LOG(INFO) << "This is a bad operation [value/zero] : " << value / zero;
-}
+   // The function above 'tryToKillWithIllegalPrintout' IS system / compiler dependent. Older compilers sometimes did NOT generate a SIGSEGV
+   // fault as expected by the illegal printf-format usage. just in case we exit by zero division"
+   void  killByZeroDivision(int value)
+   {
+      int zero = 0; // trying to fool the compiler to automatically warn
+      LOG(INFO) << "This is a bad operation [value/zero] : " << value / zero;
+   }
 } // example fatal
 
 
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
    double pi_d = 3.1415926535897932384626433832795;
    float pi_f = 3.1415926535897932384626433832795f;

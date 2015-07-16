@@ -1,10 +1,9 @@
-#ifndef G2_LOG_WORKER_H_
-#define G2_LOG_WORKER_H_
+#pragma once
 /** ==========================================================================
  * 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================
  * Filename:g2logworker.h  Framework for Logging and Design By Contract
@@ -12,19 +11,17 @@
  *
  * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
  * ********************************************* */
-
+#include "g3log/g3log.hpp"
+#include "g3log/sinkwrapper.hpp"
+#include "g3log/sinkhandle.hpp"
+#include "g3log/filesink.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/std2_make_unique.hpp"
 
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-
-#include "g2log.hpp"
-#include "g2sinkwrapper.hpp"
-#include "g2sinkhandle.hpp"
-#include "g2filesink.hpp"
-#include "g2logmessage.hpp"
-#include "std2_make_unique.hpp"
 
 
 namespace g2 {
@@ -32,7 +29,7 @@ namespace g2 {
    struct LogWorkerImpl;
 
    struct DefaultFileLogger {
-      DefaultFileLogger(const std::string& log_prefix, const std::string& log_directory);
+      DefaultFileLogger(const std::string &log_prefix, const std::string &log_directory);
       std::unique_ptr<LogWorker> worker;
       std::unique_ptr<g2::SinkHandle<g2::FileSink>> sink;
 
@@ -49,8 +46,8 @@ namespace g2 {
       void bgSave(g2::LogMessagePtr msgPtr);
       void bgFatal(FatalMessagePtr msgPtr);
 
-      LogWorkerImpl(const LogWorkerImpl&) = delete;
-      LogWorkerImpl& operator=(const LogWorkerImpl&) = delete;
+      LogWorkerImpl(const LogWorkerImpl &) = delete;
+      LogWorkerImpl &operator=(const LogWorkerImpl &) = delete;
    };
 
    class LogWorker final {
@@ -58,13 +55,13 @@ namespace g2 {
       void addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> wrapper);
 
       LogWorkerImpl _impl;
-      LogWorker(const LogWorker&) = delete;
-      LogWorker& operator=(const LogWorker&) = delete;
+      LogWorker(const LogWorker &) = delete;
+      LogWorker &operator=(const LogWorker &) = delete;
 
 
    public:
       ~LogWorker();
-      static g2::DefaultFileLogger createWithDefaultLogger(const std::string& log_prefix, const std::string& log_directory);
+      static g2::DefaultFileLogger createWithDefaultLogger(const std::string &log_prefix, const std::string &log_directory);
       static std::unique_ptr<LogWorker> createWithNoSink();
 
 
@@ -86,5 +83,3 @@ namespace g2 {
       }
    };
 } // g2
-
-#endif // LOG_WORKER_H_

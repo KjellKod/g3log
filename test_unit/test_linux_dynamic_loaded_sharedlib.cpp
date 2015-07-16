@@ -7,10 +7,10 @@
 * ============================================================================*/
 
 
-#include <g2log.hpp>
-#include <g2logworker.hpp>
-#include <g2filesink.hpp>
-#include <std2_make_unique.hpp>
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
+#include <g3log/filesink.hpp>
+#include <g3log/std2_make_unique.hpp>
 
 #include <gtest/gtest.h>
 #include <string>
