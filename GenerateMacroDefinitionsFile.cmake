@@ -1,28 +1,32 @@
 # Prerequisite : Options.cmake should run first
    
    SET(HEADER  "/** ==========================================================================
- * Original code made by Robert Engeln. Given as a PUBLIC DOMAIN dedication for
- * the benefit of g3log.  It was originally published at:
- * http://code-freeze.blogspot.com/2012/01/generating-stack-traces-from-c.html
-
- * 2014-2015: adapted for g3log by Kjell Hedstrom (KjellKod).
- *
- * This is PUBLIC DOMAIN to use at your own risk and comes
- * with no warranties. This code is yours to share, use and modify with no
- * strings attached and no restrictions or obligations.
- *
- * For more information see g3log/LICENSE or refer refer to http://unlicense.org
- * ============================================================================*/")
+* 2015 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+* 
+* For more information see g3log/LICENSE or refer refer to http://unlicense.org
+* ============================================================================*/")
 
 
 
 
 MESSAGE("COMPILE_DEFINITIONS:  ${G3_DEFINITIONS}")
 MESSAGE("End of COMPILE_DEFINITIONS")
-FILE(WRITE g3log/definitions.hpp "// AUTO GENERATED MACRO DEFINITIONS FOR G3LOG\n\n")
-FILE(APPEND g3log/definitions.hpp ${HEADER}"\n")
-FILE(APPEND g3log/definitions.hpp "#pragma once\n\n")
+SET(GENERATED_G3_DEFINITIONS src/g3log/generated_definitions.hpp)
+file(REMOVE ${GENERATED_G3_DEFINITIONS} )
+FILE(WRITE ${GENERATED_G3_DEFINITIONS} "// AUTO GENERATED MACRO DEFINITIONS FOR G3LOG\n\n")
+FILE(APPEND ${GENERATED_G3_DEFINITIONS} ${HEADER}"\n")
+FILE(APPEND ${GENERATED_G3_DEFINITIONS} "#pragma once\n\n")
+FILE(APPEND ${GENERATED_G3_DEFINITIONS} "// CMake induced definitions below. See g3log/Options.cmake for details.\n\n")
 
 FOREACH(definition ${G3_DEFINITIONS} )
-   FILE(APPEND g3log/definitions.hpp "#define ${definition}\n")
+   FILE(APPEND ${GENERATED_G3_DEFINITIONS} "#define ${definition}\n")
 ENDFOREACH(definition)
+
+MESSAGE("Generated ${GENERATED_G3_DEFINITIONS}")
+file(READ ${GENERATED_G3_DEFINITIONS} generated_content)
+
+MESSAGE("******************** START *************************")
+MESSAGE(${generated_content})
+MESSAGE("******************** END *************************")

@@ -53,6 +53,12 @@ set(CMAKE_BUILD_TYPE Release)
 
 project (g3log)
 
+MESSAGE("Run 'make clean-cmake-files' to purge your build directory of CMake generated cache files")
+add_custom_target(clean-cmake-files
+   COMMAND ${CMAKE_COMMAND} -P ${g3log_SOURCE_DIR}/CleanAll.cmake
+)
+
+
 
 
 # Detect 64 or 32 bit
