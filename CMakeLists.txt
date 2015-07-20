@@ -46,7 +46,7 @@
 #                
 # ============================================================================
 
-cmake_minimum_required (VERSION 3.2)
+cmake_minimum_required (VERSION 2.8)
 ENABLE_LANGUAGE(CXX)
 set(CMAKE_BUILD_TYPE Release)
 
