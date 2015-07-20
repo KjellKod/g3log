@@ -103,7 +103,7 @@ endif()
    # ==========================================================================
    # UNIT TEST OPTIONS: 
    # ============================================================================
-   # ENABLE WITH:  -DADD_G2LOG_UNIT_TEST=ON  
+   # ENABLE WITH:  -DADD_G3LOG_UNIT_TEST=ON  
    INCLUDE (${g3log_SOURCE_DIR}/test_unit/Test.cmake)
 
 

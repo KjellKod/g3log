@@ -32,33 +32,33 @@
 
 
 
-#define g2_MAP_PAIR_STRINGIFY(x) {x, #x}
+#define g3_MAP_PAIR_STRINGIFY(x) {x, #x}
 
 namespace {
    thread_local size_t g_thread_local_recursive_crash_check = 0;
 
-   const std::map<g2::SignalType, std::string> kExceptionsAsText = {
-      g2_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_ARRAY_BOUNDS_EXCEEDED)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_DATATYPE_MISALIGNMENT)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DENORMAL_OPERAND)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DIVIDE_BY_ZERO)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INVALID_OPERATION)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_OVERFLOW)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_STACK_CHECK)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_UNDERFLOW)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_ILLEGAL_INSTRUCTION)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_IN_PAGE_ERROR)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_INT_DIVIDE_BY_ZERO)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_INT_OVERFLOW)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_INVALID_DISPOSITION)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_NONCONTINUABLE_EXCEPTION)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_PRIV_INSTRUCTION)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_STACK_OVERFLOW)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_BREAKPOINT)
-      , g2_MAP_PAIR_STRINGIFY(EXCEPTION_SINGLE_STEP)
+   const std::map<g3::SignalType, std::string> kExceptionsAsText = {
+      g3_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_ARRAY_BOUNDS_EXCEEDED)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_DATATYPE_MISALIGNMENT)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DENORMAL_OPERAND)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DIVIDE_BY_ZERO)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INVALID_OPERATION)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_OVERFLOW)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_STACK_CHECK)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_UNDERFLOW)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_ILLEGAL_INSTRUCTION)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_IN_PAGE_ERROR)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_INT_DIVIDE_BY_ZERO)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_INT_OVERFLOW)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_INVALID_DISPOSITION)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_NONCONTINUABLE_EXCEPTION)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_PRIV_INSTRUCTION)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_STACK_OVERFLOW)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_BREAKPOINT)
+      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_SINGLE_STEP)
 
    };
 
@@ -150,7 +150,7 @@ namespace stacktrace {
    const std::string kUnknown = {"UNKNOWN EXCEPTION"};
    /// return the text description of a Windows exception code
    /// From MSDN GetExceptionCode http://msdn.microsoft.com/en-us/library/windows/desktop/ms679356(v=vs.85).aspx
-   std::string exceptionIdToText(g2::SignalType id) {
+   std::string exceptionIdToText(g3::SignalType id) {
       const auto iter = kExceptionsAsText.find(id);
       if ( iter == kExceptionsAsText.end()) {
          std::string unknown = {kUnknown + ":" + std::to_string(id)};
@@ -162,7 +162,7 @@ namespace stacktrace {
    /// Yes a double lookup: first for isKnownException and then exceptionIdToText
    /// for vectored exceptions we only deal with known exceptions so this tiny
    /// overhead we can live with
-   bool isKnownException(g2::SignalType id) {
+   bool isKnownException(g3::SignalType id) {
       return (kExceptionsAsText.end() != kExceptionsAsText.find(id));
    }
 

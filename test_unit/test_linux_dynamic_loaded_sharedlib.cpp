@@ -33,12 +33,12 @@ TEST(DynamicLoadOfLibrary, JustLoadAndExit) {
    std::vector<std::string> receiver;
    
    { // scope to flush logs at logworker exit
-      auto worker = g2::LogWorker::createWithNoSink();
+      auto worker = g3::LogWorker::createWithNoSink();
       auto handle = worker->addSink(std2::make_unique<LogMessageCounter>(std::ref(receiver)), &LogMessageCounter::countMessages);
       
       // add another sink just for more throughput of data
-      auto fileHandle = worker->addSink(std2::make_unique<g2::FileSink>("runtimeLoadOfDynamiclibs", "/tmp"), &g2::FileSink::fileWrite);
-      g2::initializeLogging(worker.get());
+      auto fileHandle = worker->addSink(std2::make_unique<g3::FileSink>("runtimeLoadOfDynamiclibs", "/tmp"), &g3::FileSink::fileWrite);
+      g3::initializeLogging(worker.get());
 
       void* libHandle = dlopen("libtester_sharedlib.so", RTLD_LAZY | RTLD_GLOBAL);
       EXPECT_FALSE(nullptr == libHandle);

@@ -6,7 +6,8 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
-#include "g2log.hpp"
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
 
 #include <iomanip>
 #include <thread>
@@ -52,7 +53,7 @@ int main(int argc, char **argv)
    double pi_d = 3.1415926535897932384626433832795;
    float pi_f = 3.1415926535897932384626433832795f;
 
-   using namespace g2;
+   using namespace g3;
 
    std::unique_ptr<LogWorker> logworker {LogWorker::createWithNoSink()};
    auto sinkHandle = logworker->addSink(std2::make_unique<FileSink>(argv[0], path_to_log_file),
@@ -60,9 +61,9 @@ int main(int argc, char **argv)
 
    initializeLogging(logworker.get());
    std::future<std::string> log_file_name = sinkHandle->call(&FileSink::fileName);
-   std::cout << "*   This is an example of g2log. It WILL exit by a FATAL trigger" << std::endl;
+   std::cout << "*   This is an example of g3log. It WILL exit by a FATAL trigger" << std::endl;
    std::cout << "*   Please see the generated log and compare to the code at" << std::endl;
-   std::cout << "*   g2log/test_example/main.cpp" << std::endl;
+   std::cout << "*   g3log/test_example/main.cpp" << std::endl;
    std::cout << "*\n* Log file: [" << log_file_name.get() << "]\n\n" << std::endl;
 
 

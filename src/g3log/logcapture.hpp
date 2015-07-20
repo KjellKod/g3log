@@ -25,19 +25,19 @@
 */
 struct LogCapture {
    /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-   LogCapture(const LEVELS &level, g2::SignalType fatal_signal, const char *dump = nullptr);
+   LogCapture(const LEVELS &level, g3::SignalType fatal_signal, const char *dump = nullptr);
 
 
    /**
-    * @file, line, function are given in g2log.hpp from macros
+    * @file, line, function are given in g3log.hpp from macros
     * @level INFO/DEBUG/WARNING/FATAL
     * @expression for CHECK calls
     * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
     */
-   LogCapture(const char *file, const int line, const char *function, const LEVELS &level, const char *expression = "", g2::SignalType fatal_signal = SIGABRT, const char *dump = nullptr);
+   LogCapture(const char *file, const int line, const char *function, const LEVELS &level, const char *expression = "", g3::SignalType fatal_signal = SIGABRT, const char *dump = nullptr);
 
 
-   // At destruction the message will be forwarded to the g2log worker.
+   // At destruction the message will be forwarded to the g3log worker.
    // in case of dynamically (at runtime) loaded libraries the important thing to know is that
    // all strings are copied so the original are not destroyed at the receiving end, only the copy
    virtual ~LogCapture();
@@ -67,7 +67,7 @@ struct LogCapture {
    const char *_function;
    const LEVELS &_level;
    const char *_expression;
-   const g2::SignalType _fatal_signal;
+   const g3::SignalType _fatal_signal;
 
 };
-//} // g2
+//} // g3

@@ -6,17 +6,17 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
-// through CMakeLists.txt   #define of GOOGLE_GLOG_PERFORMANCE and G2LOG_PERFORMANCE
+// through CMakeLists.txt   #define of GOOGLE_GLOG_PERFORMANCE and G3LOG_PERFORMANCE
 #include "performance.h"
 #include <thread>
 #include <iostream>
 
-#if defined(G2LOG_PERFORMANCE)
-const std::string title = "G2LOG";
+#if defined(G3LOG_PERFORMANCE)
+const std::string title = "G3LOG";
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
 const std::string title = "GOOGLE__GLOG";
 #else
-#error G2LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
+#error G3LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
 #endif
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -24,14 +24,14 @@ const std::string g_path = "./";
 #else
 const std::string g_path = "/tmp/";
 #endif
-using namespace g2_test;
+using namespace g3_test;
 
 int main(int argc, char **argv)
 {
-#ifdef G2_DYNAMIC_LOGGING
-   std::cerr << "G2_DYNAMIC_LOGGING is enabled" << std::endl;
+#ifdef G3_DYNAMIC_LOGGING
+   std::cerr << "G3_DYNAMIC_LOGGING is enabled" << std::endl;
 #else
-   std::cerr << "G2_DYNAMIC_LOGGING is DISABLED" << std::endl;
+   std::cerr << "G3_DYNAMIC_LOGGING is DISABLED" << std::endl;
 #endif
 
    size_t number_of_threads = 0;
@@ -59,9 +59,9 @@ int main(int argc, char **argv)
    writeTextToFile(g_measurement_dump, oss.str(), kAppend);
    oss.str(""); // clear the stream
 
-#if defined(G2LOG_PERFORMANCE)
-   auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
-   g2::initializeLogging(logger_n_handle.worker.get());
+#if defined(G3LOG_PERFORMANCE)
+   auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
+   g3::initializeLogging(logger_n_handle.worker.get());
 
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::InitGoogleLogging(argv[0]);
@@ -86,7 +86,7 @@ int main(int argc, char **argv)
    auto application_end_time = std::chrono::high_resolution_clock::now();
    delete [] threads;
 
-#if defined(G2LOG_PERFORMANCE)
+#if defined(G3LOG_PERFORMANCE)
    logger_n_handle.worker.reset(); // will flush anything in the queue to file
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::ShutdownGoogleLogging();

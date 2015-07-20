@@ -6,7 +6,7 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
-// through CMakeLists.txt   #define of GOOGLE_GLOG_PERFORMANCE and G2LOG_PERFORMANCE
+// through CMakeLists.txt   #define of GOOGLE_GLOG_PERFORMANCE and G3LOG_PERFORMANCE
 #include "performance.h"
 
 #include <thread>
@@ -15,16 +15,16 @@
 #include <algorithm>
 #include <cmath>
 
-#if defined(G2LOG_PERFORMANCE)
+#if defined(G3LOG_PERFORMANCE)
 const std::string title {
-   "G2LOG"
+   "G3LOG"
 };
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
 const std::string title {
    "GOOGLE__GLOG"
 };
 #else
-#error G2LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
+#error G3LOG_PERFORMANCE or GOOGLE_GLOG_PERFORMANCE was not defined
 #endif
 
 
@@ -40,7 +40,7 @@ const std::string g_path {
 
 
 
-using namespace g2_test;
+using namespace g3_test;
 
 
 //
@@ -83,9 +83,9 @@ int main(int argc, char** argv)
    writeTextToFile(g_measurement_dump, oss.str(), kAppend);
    oss.str(""); // clear the stream
 
-#if defined(G2LOG_PERFORMANCE)
-   auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
-   g2::initializeLogging(logger_n_handle.worker.get());
+#if defined(G3LOG_PERFORMANCE)
+   auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
+   g3::initializeLogging(logger_n_handle.worker.get());
 
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::InitGoogleLogging(argv[0]);
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
    delete [] threads;
 
 
-#if defined(G2LOG_PERFORMANCE)
+#if defined(G3LOG_PERFORMANCE)
    logger_n_handle.worker.reset(); // will flush anything in the queue to file
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::ShutdownGoogleLogging();

@@ -16,7 +16,7 @@
 #include <iomanip>
 
 
-namespace g2 {
+namespace g3 {
    namespace internal {
       // This mimics the original "std::put_time(const std::tm* tmb, const charT* fmt)"
       // This is needed since latest version (at time of writing) of gcc4.7 does not implement this library function yet.
@@ -45,11 +45,11 @@ namespace g2 {
 #endif
       }
    } // internal
-} // g2
+} // g3
 
 
 
-namespace g2 {
+namespace g3 {
 
    std::time_t systemtime_now() {
       system_time_point system_now = std::chrono::system_clock::now();
@@ -72,6 +72,6 @@ namespace g2 {
 
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) {
       std::tm t = localtime(time_snapshot); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)
-      return g2::internal::put_time(&t, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
+      return g3::internal::put_time(&t, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
    }
-} // g2
+} // g3

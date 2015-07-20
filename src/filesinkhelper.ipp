@@ -18,7 +18,7 @@
 #include <string>
 
 
-namespace g2 {
+namespace g3 {
    namespace internal {
       static const std::string file_name_time_formatted = "%Y%m%d-%H%M%S";
 
@@ -79,7 +79,7 @@ namespace g2 {
       std::string header() {
          std::ostringstream ss_entry;
          //  Day Month Date Time Year: is written as "%a %b %d %H:%M:%S %Y" and formatted output as : Wed Sep 19 08:28:16 2012
-         ss_entry << "\t\tg2log created log at: " << g2::localtime_formatted(g2::systemtime_now(), "%a %b %d %H:%M:%S %Y") << "\n";
+         ss_entry << "\t\tg3log created log at: " << g3::localtime_formatted(g3::systemtime_now(), "%a %b %d %H:%M:%S %Y") << "\n";
          ss_entry << "\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE:LINE] message";
          ss_entry << "\t\t(uuu*: microsecond counter since initialization of log worker)\n\n";
          return ss_entry.str();
@@ -87,8 +87,8 @@ namespace g2 {
 
       std::string createLogFileName(const std::string &verified_prefix) {
          std::stringstream oss_name;
-         oss_name << verified_prefix << ".g2log.";
-         oss_name << g2::localtime_formatted(g2::systemtime_now(), file_name_time_formatted);
+         oss_name << verified_prefix << ".g3log.";
+         oss_name << g3::localtime_formatted(g3::systemtime_now(), file_name_time_formatted);
          oss_name << ".log";
          return oss_name.str();
       }

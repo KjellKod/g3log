@@ -6,7 +6,7 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================
  *
- * Filename:g2log.cpp  Framework for Logging and Design By Contract
+ * Filename:g3log.cpp  Framework for Logging and Design By Contract
  * Created: 2011 by Kjell Hedström
  *
  * PUBLIC DOMAIN and Not copywrited since it was built on public-domain software and at least in "spirit" influenced
@@ -35,10 +35,10 @@
 
 namespace {
    std::once_flag g_initialize_flag;
-   g2::LogWorker *g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
+   g3::LogWorker *g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
    std::mutex g_logging_init_mutex;
 
-   std::unique_ptr<g2::LogMessage> g_first_unintialized_msg = {nullptr};
+   std::unique_ptr<g3::LogMessage> g_first_unintialized_msg = {nullptr};
    std::once_flag g_set_first_uninitialized_flag;
    std::once_flag g_save_first_unintialized_flag;
    const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = [] { /*does nothing */};
@@ -52,7 +52,7 @@ namespace {
 
 
 
-namespace g2 {
+namespace g3 {
    // signalhandler and internal clock is only needed to install once
    // for unit testing purposes the initializeLogging might be called
    // several times...
@@ -98,14 +98,14 @@ namespace g2 {
 
 
    // By default this function pointer goes to \ref pushFatalMessageToLogger;
-   std::function<void(FatalMessagePtr) > g_fatal_to_g2logworker_function_ptr = internal::pushFatalMessageToLogger;
+   std::function<void(FatalMessagePtr) > g_fatal_to_g3logworker_function_ptr = internal::pushFatalMessageToLogger;
 
    /** REPLACE fatalCallToLogger for fatalCallForUnitTest
     * This function switches the function pointer so that only
     * 'unitTest' mock-fatal calls are made.
     * */
    void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
-      g_fatal_to_g2logworker_function_ptr = fatal_call;
+      g_fatal_to_g3logworker_function_ptr = fatal_call;
    }
 
 
@@ -136,9 +136,9 @@ namespace g2 {
       bool shutDownLoggingForActiveOnly(LogWorker *active) {
          if (isLoggingInitialized() && nullptr != active && (active != g_logger_instance)) {
             LOG(WARNING) << "\n\t\tAttempted to shut down logging, but the ID of the Logger is not the one that is active."
-                         << "\n\t\tHaving multiple instances of the g2::LogWorker is likely a BUG"
+                         << "\n\t\tHaving multiple instances of the g3::LogWorker is likely a BUG"
                          << "\n\t\tEither way, this call to shutDownLogging was ignored"
-                         << "\n\t\tTry g2::internal::shutDownLogging() instead";
+                         << "\n\t\tTry g3::internal::shutDownLogging() instead";
             return false;
          }
          shutDownLogging();
@@ -178,7 +178,7 @@ namespace g2 {
                .append("---First crash stacktrace: ").append(first_stack_trace).append("\n---End of first stacktrace\n");
             }
             FatalMessagePtr fatal_message { std2::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal) };
-            // At destruction, flushes fatal message to g2LogWorker
+            // At destruction, flushes fatal message to g3LogWorker
             // either we will stay here until the background worker has received the fatal
             // message, flushed the crash message to the sinks and exits with the same fatal signal
             //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
@@ -235,18 +235,18 @@ namespace g2 {
          }
       }
 
-      /** The default, initial, handling to send a 'fatal' event to g2logworker
+      /** The default, initial, handling to send a 'fatal' event to g3logworker
        *  the caller will stay here, eternally, until the software is aborted
        * ... in the case of unit testing it is the given "Mock" fatalCall that will
        * define the behaviour.
        */
       void fatalCall(FatalMessagePtr message) {
-         g_fatal_to_g2logworker_function_ptr(FatalMessagePtr {std::move(message)});
+         g_fatal_to_g3logworker_function_ptr(FatalMessagePtr {std::move(message)});
       }
 
 
    } // internal
-} // g2
+} // g3
 
 
 

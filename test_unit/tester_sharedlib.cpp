@@ -7,7 +7,8 @@
  * ============================================================================*/
 
 
-#include <g2log.hpp>
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
 #include "tester_sharedlib.h"
 
 struct RuntimeLoadedLib : public SomeLibrary {

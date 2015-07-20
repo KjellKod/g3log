@@ -13,7 +13,7 @@
 
 // kjell. Separera på crashhandler.hpp och crashhanlder_internal.hpp
 // implementationsfilen kan vara den samma
-namespace g2 {
+namespace g3 {
 
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -30,7 +30,7 @@ namespace g2 {
 
    namespace internal {
       /** return whether or any fatal handling is still ongoing
-       *  this is used by g2log::fatalCallToLogger
+       *  this is used by g3log::fatalCallToLogger
        *  only in the case of Windows exceptions (not fatal signals)
        *  are we interested in changing this from false to true to
        *  help any other exceptions handler work with 'EXCEPTION_CONTINUE_SEARCH'*/
@@ -38,16 +38,16 @@ namespace g2 {
 
       /** \return signal_name Ref: signum.hpp and \ref installSignalHandler
       *  or for Windows exception name */
-      std::string exitReasonName(const LEVELS &level, g2::SignalType signal_number);
+      std::string exitReasonName(const LEVELS &level, g3::SignalType signal_number);
 
       /** return calling thread's stackdump*/
       std::string stackdump(const char *dump = nullptr);
 
       /** Re-"throw" a fatal signal, previously caught. This will exit the application
        * This is an internal only function. Do not use it elsewhere. It is triggered
-       * from g2log, g2LogWorker after flushing messages to file */
-      void exitWithDefaultSignalHandler(const LEVELS &level, g2::SignalType signal_number);
-   } // end g2::internal
+       * from g3log, g3LogWorker after flushing messages to file */
+      void exitWithDefaultSignalHandler(const LEVELS &level, g3::SignalType signal_number);
+   } // end g3::internal
 
 
    // PUBLIC API:

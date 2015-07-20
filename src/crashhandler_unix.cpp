@@ -34,21 +34,21 @@
 
 
 namespace {
-   // Dump of stack,. then exit through g2log background worker
+   // Dump of stack,. then exit through g3log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
    // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
    void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
-      using namespace g2::internal;
+      using namespace g3::internal;
       {
          const auto dump = stackdump();
          std::ostringstream fatal_stream;
-         const auto fatal_reason = exitReasonName(g2::internal::FATAL_SIGNAL, signal_number);
+         const auto fatal_reason = exitReasonName(g3::internal::FATAL_SIGNAL, signal_number);
          fatal_stream << "Received fatal signal: " << fatal_reason;
          fatal_stream << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
          fatal_stream << "\n***** SIGNAL " << fatal_reason << "(" << signal_number << ")" << std::endl;
-         LogCapture trigger(FATAL_SIGNAL, static_cast<g2::SignalType>(signal_number), dump.c_str());
+         LogCapture trigger(FATAL_SIGNAL, static_cast<g3::SignalType>(signal_number), dump.c_str());
          trigger.stream() << fatal_stream.str();
-      } // message sent to g2LogWorker
+      } // message sent to g3LogWorker
       // wait to die
    }
 } // end anonymous namespace
@@ -58,9 +58,9 @@ namespace {
 
 
 
-// Redirecting and using signals. In case of fatal signals g2log should log the fatal signal
+// Redirecting and using signals. In case of fatal signals g3log should log the fatal signal
 // and flush the log queue and then "rethrow" the signal to exit
-namespace g2 {
+namespace g3 {
    // References:
    // sigaction : change the default action if a specific signal is received
    //             http://linux.die.net/man/2/sigaction
@@ -137,7 +137,7 @@ namespace g2 {
 
 
       /// string representation of signal ID
-      std::string exitReasonName(const LEVELS &level, g2::SignalType fatal_id) {
+      std::string exitReasonName(const LEVELS &level, g3::SignalType fatal_id) {
 
          int signal_number = static_cast<int>(fatal_id);
          switch (signal_number) {
@@ -162,7 +162,7 @@ namespace g2 {
 
       // KJELL : TODO.  The Fatal Message can contain a callback function that depending on OS and test scenario does
       //       different things.
-      // exitWithDefaultSignalHandler is called from g2logworke::bgFatal AFTER all the logging sinks have been cleared
+      // exitWithDefaultSignalHandler is called from g3logworke::bgFatal AFTER all the logging sinks have been cleared
       // I.e. saving a function that has the value already encapsulated within.
       // FatalMessagePtr msgPtr
       // Linux/OSX -->   msgPtr.get()->ContinueWithFatalExit();  --> exitWithDefaultSignalHandler(int signal_number);
@@ -172,15 +172,15 @@ namespace g2 {
       //                                    i.e. an atomic flag should be set
       //                              the next step should then be to re-throw the same exception
       //                              i.e. just call the next exception handler
-      //                              we should make sure that 1) g2log exception handler is called BEFORE widows
+      //                              we should make sure that 1) g3log exception handler is called BEFORE widows
       //                              it should continue and then be caught in Visual Studios exception handler
       //
       //
 
-      // Triggered by g2log->g2LogWorker after receiving a FATAL trigger
+      // Triggered by g3log->g3LogWorker after receiving a FATAL trigger
       // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
       // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-      void exitWithDefaultSignalHandler(const LEVELS &level, g2::SignalType fatal_signal_id) {
+      void exitWithDefaultSignalHandler(const LEVELS &level, g3::SignalType fatal_signal_id) {
          const int signal_number = static_cast<int>(fatal_signal_id);
          std::cerr << "Exiting due to " << level.text << ", " << signal_number << "   " << std::flush;
 
@@ -195,7 +195,7 @@ namespace g2 {
          kill(getpid(), signal_number);
          abort(); // should never reach this
       }
-   } // end g2::internal
+   } // end g3::internal
 
 
    //
@@ -228,8 +228,8 @@ namespace g2 {
 
    void installCrashHandler() {
       installSignalHandler();
-   } // namespace g2::internal
+   } // namespace g3::internal
 
 
-} // end namespace g2
+} // end namespace g3
 

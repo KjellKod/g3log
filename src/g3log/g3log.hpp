@@ -6,7 +6,7 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================
  *
- * Filename:g2log.hpp  Framework for Logging and Design By Contract
+ * Filename:g3log.hpp  Framework for Logging and Design By Contract
  * Created: 2011 by Kjell Hedström
  *
  * PUBLIC DOMAIN and Not copywrited since it was built on public-domain software and influenced
@@ -42,23 +42,23 @@
 
 
 /** namespace for LOG() and CHECK() frameworks
- * History lesson:   Why the names 'g2' and 'g2log'?:
+ * History lesson:   Why the names 'g3' and 'g3log'?:
  * The framework was made in my own free time as PUBLIC DOMAIN but the
- * first commercial project to use it used 'g2' as an internal denominator for
- * the current project. g2 as in 'generation 2'. I decided to keep the g2 and g2log names
+ * first commercial project to use it used 'g3' as an internal denominator for
+ * the current project. g3 as in 'generation 2'. I decided to keep the g3 and g3log names
  * to give credit to the people in that project (you know who you are :) and I guess also
  * for 'sentimental' reasons. That a big influence was google's glog is just a happy
- *  concidence or subconscious choice. Either way g2log became the name for this logger.
+ *  concidence or subconscious choice. Either way g3log became the name for this logger.
  *
- * --- Thanks for a great 2011 and good luck with 'g2' --- KjellKod
+ * --- Thanks for a great 2011 and good luck with 'g3' --- KjellKod
  */
-namespace g2 {
+namespace g3 {
    class LogWorker;
    struct LogMessage;
    struct FatalMessage;
 
-   /** Should be called at very first startup of the software with \ref g2LogWorker
-    *  pointer. Ownership of the \ref g2LogWorker is the responsibilkity of the caller */
+   /** Should be called at very first startup of the software with \ref g3LogWorker
+    *  pointer. Ownership of the \ref g3LogWorker is the responsibilkity of the caller */
    void initializeLogging(LogWorker *logger);
 
 
@@ -70,17 +70,17 @@ namespace g2 {
     * This will be reset to default (does nothing) at initializeLogging(...);
     *
     * Example usage:
-    * Windows: g2::setFatalPreLoggingHook([]{__debugbreak();}); // remember #include <intrin.h>
+    * Windows: g3::setFatalPreLoggingHook([]{__debugbreak();}); // remember #include <intrin.h>
     *         WARNING: '__debugbreak()' when not running in Debug in your Visual Studio IDE will likely
     *                   trigger a recursive crash if used here. It should only be used when debugging
     *                   in your Visual Studio IDE. Recursive crashes are handled but are unnecessary.
     *
-    * Linux:   g2::setFatalPreLoggingHook([]{ raise(SIGTRAP); });
+    * Linux:   g3::setFatalPreLoggingHook([]{ raise(SIGTRAP); });
     */
    void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
 
    /** If the @ref setFatalPreLoggingHook is not enough and full fatal exit handling is needed then
-    * use "setFatalExithandler".  Please see g2log.cpp and crashhandler_windows.cpp or crashhandler_unix for
+    * use "setFatalExithandler".  Please see g3log.cpp and crashhandler_windows.cpp or crashhandler_unix for
     * example of restoring signal and exception handlers, flushing the log and shutting down.
     */
    void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
@@ -88,7 +88,7 @@ namespace g2 {
 
 
 
-   // internal namespace is for completely internal or semi-hidden from the g2 namespace due to that it is unlikely
+   // internal namespace is for completely internal or semi-hidden from the g3 namespace due to that it is unlikely
    // that you will use these
    namespace internal {
       /// @returns true if logger is initialized
@@ -102,8 +102,8 @@ namespace g2 {
       void pushMessageToLogger(LogMessagePtr log_entry);
 
 
-      // forwards a FATAL message to all sinks,. after which the g2logworker
-      // will trigger crashhandler / g2::internal::exitWithDefaultSignalHandler
+      // forwards a FATAL message to all sinks,. after which the g3logworker
+      // will trigger crashhandler / g3::internal::exitWithDefaultSignalHandler
       //
       // By default the "fatalCall" will forward a Fatalessageptr to this function
       // this behaviour can be changed if you set a different fatal handler through
@@ -127,22 +127,22 @@ namespace g2 {
       bool shutDownLoggingForActiveOnly(LogWorker *active);
 
    } // internal
-} // g2
+} // g3
 
 #define INTERNAL_LOG_MESSAGE(level) LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
 
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
-   LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, g2::internal::CONTRACT, boolean_expression)
+   LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, g3::internal::CONTRACT, boolean_expression)
 
 
 // LOG(level) is the API for the stream log
-#define LOG(level) if(g2::logLevel(level)) INTERNAL_LOG_MESSAGE(level).stream()
+#define LOG(level) if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).stream()
 
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
    if(true == boolean_expression)  \
-      if(g2::logLevel(level))  INTERNAL_LOG_MESSAGE(level).stream()
+      if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).stream()
 
 // 'Design By Contract' stream API. For Broken Contracts:
 //         unit testing: it will throw std::runtime_error when a contract breaks
@@ -200,12 +200,12 @@ And here is possible output
 :      Width trick:    10
 :      A string  \endverbatim */
 #define LOGF(level, printf_like_message, ...)                 \
-   if(g2::logLevel(level)) INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
+   if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Conditional log printf syntax
 #define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
    if(true == boolean_expression)                                     \
-      if(g2::logLevel(level))  INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
+      if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Throws std::runtime_eror if contract breaks

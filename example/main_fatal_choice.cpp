@@ -6,9 +6,8 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
-#include <g2log.hpp>
-//#/g3log.hpp>
-
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
 
 #include <iostream>
 #include <cctype>
@@ -243,11 +242,11 @@ void breakHere() {
 
 int main(int argc, char **argv)
 {
-   auto logger_n_handle = g2::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
-   g2::initializeLogging(logger_n_handle.worker.get());
-   g2::setFatalPreLoggingHook(&breakHere);
+   auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
+   g3::initializeLogging(logger_n_handle.worker.get());
+   g3::setFatalPreLoggingHook(&breakHere);
 
-   std::future<std::string> log_file_name = logger_n_handle.sink->call(&g2::FileSink::fileName);
+   std::future<std::string> log_file_name = logger_n_handle.sink->call(&g3::FileSink::fileName);
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
              << "Choose your type of fatal exit, then "
              << " read the generated log and backtrace.\n"

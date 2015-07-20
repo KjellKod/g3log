@@ -21,7 +21,7 @@
 #include <thread>
 #include <memory>
 
-namespace g2 {
+namespace g3 {
 
    /** LogMessage contains all the data collected from the LOG(...) call.
    * If the sink receives a std::string it will be the std::string toString()... function
@@ -103,7 +103,7 @@ namespace g2 {
     * A thread that causes a FatalMessage will sleep forever until the
     * application has exited (after message flush) */
    struct FatalMessage : public LogMessage {
-      FatalMessage(const LogMessage &details, g2::SignalType signal_id);
+      FatalMessage(const LogMessage &details, g3::SignalType signal_id);
       FatalMessage(const FatalMessage &);
       virtual ~FatalMessage() {}
 
@@ -117,4 +117,4 @@ namespace g2 {
    typedef MoveOnCopy<std::unique_ptr<FatalMessage>> FatalMessagePtr;
    typedef MoveOnCopy<std::unique_ptr<LogMessage>> LogMessagePtr;
    typedef MoveOnCopy<LogMessage> LogMessageMover;
-} // g2
+} // g3

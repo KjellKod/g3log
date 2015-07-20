@@ -18,7 +18,7 @@ SET(ACTIVE_CPP0xx_DIR "Release")
   # WARNING: If Clang for Linux does not work with full C++11 support it might be your
   # installation that is faulty. When I tested Clang on Ubuntu I followed the following
   # description 
-  #  1) http://kjellkod.wordpress.com/2013/09/23/experimental-g2log-with-clang/
+  #  1) http://kjellkod.wordpress.com/2013/09/23/experimental-g3log-with-clang/
   #  2) https://github.com/maidsafe/MaidSafe/wiki/Hacking-with-Clang-llvm-abi-and-llvm-libc
 IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang")
    MESSAGE("")
@@ -64,14 +64,14 @@ IF (MSVC OR MINGW)
 ENDIF()
 
    # GENERIC STEPS
-   file(GLOB SRC_FILES ${LOG_SRC}/g3log/*.h ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/g3log/*.cpp ${LOG_SRC}/g3log/*.ipp)
+   file(GLOB SRC_FILES ${LOG_SRC}/g3log/*.h ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
    file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.hpp)
    #MESSAGE(" HEADER FILES ARE: ${HEADER_FILES}")
 
    IF (MSVC OR MINGW) 
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/g3log/crashhandler_unix.cpp)
    ELSE()     
-         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/g3log/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/g3log/stacktrace_windows.cpp)
+         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
    ENDIF (MSVC OR MINGW)
 
    set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})

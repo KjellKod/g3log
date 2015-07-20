@@ -45,28 +45,28 @@ struct LEVELS {
 
 
 
-namespace g2 {
+namespace g3 {
    static const int kDebugVaulue = 0;
 }
 
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
 const LEVELS DBUG {
-   g2::kDebugVaulue, {"DEBUG"}
+   g3::kDebugVaulue, {"DEBUG"}
 },
 #else
 const LEVELS DEBUG {
-   g2::kDebugVaulue, {"DEBUG"}
+   g3::kDebugVaulue, {"DEBUG"}
 },
 #endif
-INFO {g2::kDebugVaulue + 1, {"INFO"}},
+INFO {g3::kDebugVaulue + 1, {"INFO"}},
 WARNING {INFO.value + 1, {"WARNING"}},
 // Insert here *any* extra logging levels that is needed
 // 1) Remember to update the FATAL initialization below
-// 2) Remember to update the initialization of "g2loglevels.cpp/g_log_level_status"
+// 2) Remember to update the initialization of "g3loglevels.cpp/g_log_level_status"
 FATAL {WARNING.value + 1, {"FATAL"}};
 
 
-namespace g2 {
+namespace g3 {
    namespace internal {
       const LEVELS CONTRACT {
          100, {"CONTRACT"}
@@ -75,10 +75,10 @@ namespace g2 {
       bool wasFatal(const LEVELS &level);
    }
 
-#ifdef G2_DYNAMIC_LOGGING
+#ifdef G3_DYNAMIC_LOGGING
    // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
    void setLogLevel(LEVELS level, bool enabled_status);
 #endif
    bool logLevel(LEVELS level);
-} // g2
+} // g3
 

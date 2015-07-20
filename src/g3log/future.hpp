@@ -6,7 +6,7 @@
  *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================
-* Filename:g2future.hpp
+* Filename:g3future.hpp
 *          Helper functionality to put packaged_tasks in standard container. This
 *          is especially helpful for background thread processing a la async but through
 *          an actor pattern (active object), thread pool or similar.
@@ -30,7 +30,7 @@
 #include "g3log/moveoncopy.hpp"
 #include "g3log/stlpatch_future.hpp"
 
-namespace g2 {
+namespace g3 {
    // Generic helper function to avoid repeating the steps for managing
    // asynchronous task job (by active object) that returns a future results
    // could of course be made even more generic if done more in the way of
@@ -40,7 +40,7 @@ namespace g2 {
    //  std::unique_ptr<Active> bgWorker{Active::createActive()};
    //  ...
    //  auto msg_call=[=](){return ("Hello from the Background");};
-   //  auto future_msg = g2::spawn_task(msg_lambda, bgWorker.get());
+   //  auto future_msg = g3::spawn_task(msg_lambda, bgWorker.get());
    template <typename Func, class BgWorker>
    std::future<typename std::result_of<Func()>::type> spawn_task(Func func, BgWorker *worker)
    {
@@ -60,4 +60,4 @@ namespace g2 {
       worker->send(MoveOnCopy<task_type>(std::move(task)));
       return std::move(result);
    }
-} // end namespace g2
+} // end namespace g3

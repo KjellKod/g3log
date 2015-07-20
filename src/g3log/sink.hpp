@@ -18,7 +18,7 @@
 #include <functional>
 #include <type_traits>
 
-namespace g2 {
+namespace g3 {
    namespace internal {
       typedef std::function<void(LogMessageMover) > AsyncMessageCall;
 
@@ -71,9 +71,9 @@ namespace g2 {
 
          template<typename Call, typename... Args>
          auto async(Call call, Args &&... args)-> std::future< typename std::result_of<decltype(call)(T, Args...)>::type> {
-            return g2::spawn_task(std::bind(call, _real_sink.get(), std::forward<Args>(args)...), _bg.get());
+            return g3::spawn_task(std::bind(call, _real_sink.get(), std::forward<Args>(args)...), _bg.get());
          }
       };
    } // internal
-} // g2
+} // g3
 

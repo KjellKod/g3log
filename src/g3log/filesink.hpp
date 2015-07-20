@@ -11,7 +11,7 @@
 #include <memory>
 
 #include "g3log/logmessage.hpp"
-namespace g2 {
+namespace g3 {
 
    class FileSink {
    public:
@@ -38,5 +38,5 @@ namespace g2 {
       FileSink(const FileSink &other) = delete;
 
    };
-} // g2
+} // g3
 

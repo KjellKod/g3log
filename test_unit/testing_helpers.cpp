@@ -7,16 +7,20 @@
 * ============================================================================*/
 
 
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
+#include <g3log/std2_make_unique.hpp>
+#include <g3log/logmessage.hpp>
+
+#include "testing_helpers.h"
+
+
 #include <gtest/gtest.h>
 #include <iostream>
-#include "testing_helpers.h"
-#include "g2log.hpp"
-#include "g3log/std2_make_unique.hpp"
-#include "g3log/logmessage.hpp"
 #include <fstream>
 
 using namespace std;
-using namespace g2;
+using namespace g3;
 
 namespace testing_helpers {
 
@@ -41,7 +45,7 @@ namespace testing_helpers {
       g_mockFatal_signal = fatal_message.get()->_signal_id;
       g_mockFatalWasCalled = true;
       LogMessagePtr message{fatal_message.release()};
-      g2::internal::pushMessageToLogger(message); //fatal_message.copyToLogMessage());
+      g3::internal::pushMessageToLogger(message); //fatal_message.copyToLogMessage());
    }
 
    void clearMockFatal() {
@@ -98,17 +102,17 @@ namespace testing_helpers {
       }
    }
 
-   ScopedLogger::ScopedLogger() : _currentWorker(g2::LogWorker::createWithNoSink()) {}
+   ScopedLogger::ScopedLogger() : _currentWorker(g3::LogWorker::createWithNoSink()) {}
    ScopedLogger::~ScopedLogger() {}
 
-   g2::LogWorker* ScopedLogger::get() {
+   g3::LogWorker* ScopedLogger::get() {
       return _currentWorker.get();
    }
 
    RestoreFileLogger::RestoreFileLogger(std::string directory)
-   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std2::make_unique<g2::FileSink>("UNIT_TEST_LOGGER", directory), &g2::FileSink::fileWrite)) {
-      using namespace g2;
-      g2::initializeLogging(_scope->_currentWorker.get());
+   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std2::make_unique<g3::FileSink>("UNIT_TEST_LOGGER", directory), &g3::FileSink::fileWrite)) {
+      using namespace g3;
+      g3::initializeLogging(_scope->_currentWorker.get());
       clearMockFatal();
       setFatalExitHandler(&mockFatalCall);
 
@@ -116,16 +120,16 @@ namespace testing_helpers {
       if (!filename.valid()) ADD_FAILURE();
       _log_file = filename.get();
 
-#ifdef G2_DYNAMIC_LOGGING
-      g2::setLogLevel(INFO, true);
-      g2::setLogLevel(DEBUG, true);
-      g2::setLogLevel(WARNING, true);
-      g2::setLogLevel(FATAL, true);
+#ifdef G3_DYNAMIC_LOGGING
+      g3::setLogLevel(INFO, true);
+      g3::setLogLevel(DEBUG, true);
+      g3::setLogLevel(WARNING, true);
+      g3::setLogLevel(FATAL, true);
 #endif
    }
 
    RestoreFileLogger::~RestoreFileLogger() {
-      g2::internal::shutDownLogging(); // is done at reset. Added for test clarity
+      g3::internal::shutDownLogging(); // is done at reset. Added for test clarity
       reset();
 
       if (!removeFile(_log_file))
@@ -140,7 +144,7 @@ namespace testing_helpers {
          //     auto file =    logger.logFile()
          //     auto content = ReadContentFromFile(file)
          // ... it is not guaranteed that the content will contain (yet) the LOG(INFO)
-         std::future<std::string> filename = _handle->call(&g2::FileSink::fileName);
+         std::future<std::string> filename = _handle->call(&g3::FileSink::fileName);
          _log_file = filename.get();
       }
       return _log_file;
@@ -150,7 +154,7 @@ namespace testing_helpers {
    // since LOG(...) passes two queues but the handle::call only passes one queue 
    // the handle::call can happen faster
    std::string RestoreFileLogger::resetAndRetrieveContent() {
-      std::future<std::string> filename = _handle->call(&g2::FileSink::fileName);
+      std::future<std::string> filename = _handle->call(&g3::FileSink::fileName);
       reset(); // flush all queues to sinks
       EXPECT_TRUE(filename.valid());
       auto file = filename.get();

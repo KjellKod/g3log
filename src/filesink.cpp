@@ -7,10 +7,10 @@
  * ============================================================================*/
 
 #include "g3log/filesink.hpp"
-#include "g3log/filesinkhelper.ipp"
+#include "filesinkhelper.ipp"
 #include <cassert>
 
-namespace g2 {
+namespace g3 {
    using namespace internal;
 
 
@@ -21,7 +21,7 @@ namespace g2 {
    {
       _log_prefix_backup = prefixSanityFix(log_prefix);
       if (!isValidFilename(_log_prefix_backup)) {
-         std::cerr << "g2log: forced abort due to illegal log prefix [" << log_prefix << "]" << std::endl;
+         std::cerr << "g3log: forced abort due to illegal log prefix [" << log_prefix << "]" << std::endl;
          abort();
       }
 
@@ -40,7 +40,7 @@ namespace g2 {
 
 
    FileSink::~FileSink() {
-      std::string exit_msg {"\ng2log g2FileSink shutdown at: "};
+      std::string exit_msg {"\ng3log g3FileSink shutdown at: "};
       exit_msg.append(localtime_formatted(systemtime_now(), internal::time_formatted));
       filestream() << exit_msg << std::flush;
 
@@ -56,8 +56,8 @@ namespace g2 {
 
    std::string FileSink::changeLogFile(const std::string &directory) {
 
-      auto now = g2::systemtime_now();
-      auto now_formatted = g2::localtime_formatted(now, {internal::date_formatted + " " + internal::time_formatted});
+      auto now = g3::systemtime_now();
+      auto now_formatted = g3::localtime_formatted(now, {internal::date_formatted + " " + internal::time_formatted});
 
       std::string file_name = createLogFileName(_log_prefix_backup);
       std::string prospect_log = directory + file_name;
@@ -89,4 +89,4 @@ namespace g2 {
       filestream() << header();
    }
 
-} // g2
+} // g3

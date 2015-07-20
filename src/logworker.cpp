@@ -19,11 +19,11 @@
 #include <functional>
 
 
-namespace g2 {
+namespace g3 {
 
    LogWorkerImpl::LogWorkerImpl() : _bg(kjellkod::Active::createActive()) { }
 
-   void LogWorkerImpl::bgSave(g2::LogMessagePtr msgPtr) {
+   void LogWorkerImpl::bgSave(g3::LogMessagePtr msgPtr) {
       std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
 
       for (auto &sink : _sinks) {
@@ -32,7 +32,7 @@ namespace g2 {
       }
 
       if (_sinks.empty()) {
-         std::string err_msg {"g2logworker has no sinks. Message: ["};
+         std::string err_msg {"g3logworker has no sinks. Message: ["};
          err_msg.append(uniqueMsg.get()->toString()).append({"]\n"});
          std::cerr << err_msg;
       }
@@ -41,7 +41,7 @@ namespace g2 {
    void LogWorkerImpl::bgFatal(FatalMessagePtr msgPtr) {
       // this will be the last message. Only the active logworker can receive a FATAL call so it's
       // safe to shutdown logging now
-      g2::internal::shutDownLogging();
+      g3::internal::shutDownLogging();
 
       std::string reason = msgPtr.get()->reason();
       const auto level = msgPtr.get()->_level;
@@ -71,11 +71,11 @@ namespace g2 {
       internal::exitWithDefaultSignalHandler(level, fatal_id);
 
       // should never reach this point
-      perror("g2log exited after receiving FATAL trigger. Flush message status: ");
+      perror("g3log exited after receiving FATAL trigger. Flush message status: ");
    }
 
    LogWorker::~LogWorker() {
-      g2::internal::shutDownLoggingForActiveOnly(this);
+      g3::internal::shutDownLoggingForActiveOnly(this);
 
       // The sinks WILL automatically be cleared at exit of this destructor
       // However, the waiting below ensures that all messages until this point are taken care of
@@ -87,7 +87,7 @@ namespace g2 {
       //  *) If it is before the wait below then they will be executed
       //  *) If it is AFTER the wait below then they will be ignored and NEVER executed
       auto bg_clear_sink_call = [this] { _impl._sinks.clear(); };
-      auto token_cleared = g2::spawn_task(bg_clear_sink_call, _impl._bg.get());
+      auto token_cleared = g3::spawn_task(bg_clear_sink_call, _impl._bg.get());
       token_cleared.wait();
 
       // The background worker WILL be automatically cleared at the exit of the destructor
@@ -101,7 +101,7 @@ namespace g2 {
       //
       // If sinks would already have been added after the sink clear above then this reset will deal with it
       // without risking lambda execution with a partially deconstructed LogWorkerImpl
-      // Calling g2::spawn_task on a nullptr Active object will not crash but return
+      // Calling g3::spawn_task on a nullptr Active object will not crash but return
       // a future containing an appropriate exception.
       _impl._bg.reset(nullptr);
    }
@@ -114,15 +114,15 @@ namespace g2 {
       _impl._bg->send([this, fatal_message] {_impl.bgFatal(fatal_message); });
    }
 
-   void LogWorker::addWrappedSink(std::shared_ptr<g2::internal::SinkWrapper> sink) {
+   void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
       auto bg_addsink_call = [this, sink] {_impl._sinks.push_back(sink);};
-      auto token_done = g2::spawn_task(bg_addsink_call, _impl._bg.get());
+      auto token_done = g3::spawn_task(bg_addsink_call, _impl._bg.get());
       token_done.wait();
    }
 
 
-   g2::DefaultFileLogger LogWorker::createWithDefaultLogger(const std::string &log_prefix, const std::string &log_directory) {
-      return g2::DefaultFileLogger(log_prefix, log_directory);
+   g3::DefaultFileLogger LogWorker::createWithDefaultLogger(const std::string &log_prefix, const std::string &log_directory) {
+      return g3::DefaultFileLogger(log_prefix, log_directory);
    }
 
    std::unique_ptr<LogWorker> LogWorker::createWithNoSink() {
@@ -131,6 +131,6 @@ namespace g2 {
 
    DefaultFileLogger::DefaultFileLogger(const std::string &log_prefix, const std::string &log_directory)
       : worker(LogWorker::createWithNoSink())
-      , sink(worker->addSink(std2::make_unique<g2::FileSink>(log_prefix, log_directory), &FileSink::fileWrite)) { }
+      , sink(worker->addSink(std2::make_unique<g3::FileSink>(log_prefix, log_directory), &FileSink::fileWrite)) { }
 
-} // g2
+} // g3

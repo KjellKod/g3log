@@ -24,11 +24,11 @@
 
 namespace stacktrace {
    /// return the text description of a Windows exception code
-   std::string exceptionIdToText(g2::SignalType id);
+   std::string exceptionIdToText(g3::SignalType id);
 
    /// return whether or not the exception is a known exception, i.e.
    /// an exception that we should treat as a fatal event
-   bool isKnownException(g2::SignalType id);
+   bool isKnownException(g3::SignalType id);
 
    /// helper function: retrieve stackdump from no excisting exception pointer
    std::string stackdump();

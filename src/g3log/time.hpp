@@ -6,11 +6,11 @@
  *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================
-* Filename:g2time.h cross-platform, thread-safe replacement for C++11 non-thread-safe
+* Filename:g3time.h cross-platform, thread-safe replacement for C++11 non-thread-safe
 *                   localtime (and similar)
 * Created: 2012 by Kjell Hedström
 *
-* PUBLIC DOMAIN and Not under copywrite protection. First published for g2log at KjellKod.cc
+* PUBLIC DOMAIN and Not under copywrite protection. First published for g3log at KjellKod.cc
 * ********************************************* */
 
 #include <ctime>
@@ -18,10 +18,10 @@
 #include <chrono>
 
 // FYI:
-// namespace g2::internal ONLY in g2time.cpp
+// namespace g3::internal ONLY in g3time.cpp
 //          std::string put_time(const struct tm* tmb, const char* c_time_format)
 
-namespace g2
+namespace g3
 {
    namespace internal
    {
@@ -37,8 +37,8 @@ namespace g2
    std::time_t systemtime_now();
 
    /** return time representing POD struct (ref ctime + wchar) that is normally
-   * retrieved with std::localtime. g2::localtime is threadsafe which std::localtime is not.
-   * g2::localtime is probably used together with @ref g2::systemtime_now */
+   * retrieved with std::localtime. g3::localtime is threadsafe which std::localtime is not.
+   * g3::localtime is probably used together with @ref g3::systemtime_now */
    tm localtime(const std::time_t &time);
 
    /** format string must conform to std::put_time's demands.

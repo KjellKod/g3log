@@ -34,7 +34,7 @@ namespace {
 
 
 
-namespace g2 {
+namespace g3 {
 
 
    // helper for setting the normal log details in an entry
@@ -132,7 +132,7 @@ namespace g2 {
 
    LogMessage::LogMessage(const std::string &file, const int line,
                           const std::string &function, const LEVELS &level)
-      : _timestamp(g2::systemtime_now())
+      : _timestamp(g3::systemtime_now())
       , _call_thread_id(std::this_thread::get_id())
       , _microseconds(microsecondsCounter())
       , _file(splitFileName(file))
@@ -180,7 +180,7 @@ namespace g2 {
       return oss.str();
    }
 
-   FatalMessage::FatalMessage(const LogMessage &details, g2::SignalType signal_id)
+   FatalMessage::FatalMessage(const LogMessage &details, g3::SignalType signal_id)
       : LogMessage(details), _signal_id(signal_id) { }
 
 
@@ -198,4 +198,4 @@ namespace g2 {
    }
 
 
-} // g2
+} // g3

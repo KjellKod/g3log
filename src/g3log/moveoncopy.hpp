@@ -7,7 +7,7 @@
 * ============================================================================*/
 
 #pragma once
-namespace g2 {
+namespace g3 {
 
    // A straightforward technique to move around packaged_tasks.
    //  Instances of std::packaged_task are MoveConstructible and MoveAssignable, but
@@ -45,4 +45,4 @@ namespace g2 {
       }
    };
 
-} // g2
+} // g3
