@@ -46,13 +46,13 @@ TEST(DynamicLoadOfLibrary, JustLoadAndExit) {
       EXPECT_FALSE(nullptr == factory);
       SomeLibrary* loadedLibrary = factory->CreateLibrary();
 
-      for (size_t i = 0; i < 300; ++i) {
+      for (auto i = 0; i < 300; ++i) {
          loadedLibrary->action();
       }
 
       delete loadedLibrary;
       dlclose(libHandle);
    } // scope exit. All log entries must be flushed now
-   const int numberOfMessages = 2 + 300 + 1; // 2 library construction, 300 loop, 1 destoyed library  
+   const size_t numberOfMessages = 2 + 300 + 1; // 2 library construction, 300 loop, 1 destoyed library  
    EXPECT_EQ(receiver.size(), numberOfMessages);
 }

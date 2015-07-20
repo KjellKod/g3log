@@ -2,7 +2,7 @@
 * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
-* 
+*
 * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
@@ -10,7 +10,30 @@
 #include "g3log/g3log.hpp"
 #include <atomic>
 #include <cassert>
+#include <map>
 
+namespace {
+   namespace {
+      /// As suggested in: http://stackoverflow.com/questions/13193484/how-to-declare-a-vector-of-atomic-in-c
+      struct atomicbool {
+       private:
+         std::atomic<bool> value_;
+       public:
+         atomicbool(): value_ {false} {}
+         atomicbool(const bool &value): value_ {value} {}
+         atomicbool(const std::atomic<bool> &value) : value_ {value.load(std::memory_order_acquire)} {}
+         atomicbool(const atomicbool &other): value_ {other.value_.load(std::memory_order_acquire)} {}
+         atomicbool &operator=(const atomicbool &other) {
+            value_.store(other.value_.load(std::memory_order_acquire), std::memory_order_release);
+            return *this;
+         }
+         bool value() {return value_.load(std::memory_order_acquire);}
+         std::atomic<bool>& get() {return value_;}
+      };
+
+   } // anonymous
+
+}
 namespace g3 {
    namespace internal {
       bool wasFatal(const LEVELS &level) {
@@ -22,24 +45,37 @@ namespace g3 {
       const int g_level_size {
          FATAL.value + 1
       };
-      std::atomic<bool> g_log_level_status[4] {{true}, {true}, {true}, {true}};
+      //std::atomic<bool> g_log_level_status[4] {{true}, {true}, {true}, {true}};
+      std::map<int, atomicbool> g_log_level_status = {{DEBUG.value, true}, {INFO.value, true}, {WARNING.value, true}, {FATAL.value, true}};
 #endif
    } // internal
 
 #ifdef G3_DYNAMIC_LOGGING
-   void setLogLevel(LEVELS log_level, bool enabled) {
-      assert(internal::g_level_size == 4 && "Mismatch between number of logging levels and their use");
-      int level = log_level.value;
-      CHECK((level >= g3::kDebugVaulue) && (level <= FATAL.value));
-      internal::g_log_level_status[level].store(enabled, std::memory_order_release);
-   }
+   namespace only_change_at_initialization {
+      void setLogLevel(LEVELS log_level, bool enabled) {
+         int level = log_level.value;
+         internal::g_log_level_status[level].get().store(enabled, std::memory_order_release);
+      }
+
+      std::string printLevels() {
+         std::string levels;
+         for (auto& v : internal::g_log_level_status) {
+            levels += "value: " + std::to_string(v.first) + " status: " + std::to_string(v.second.value()) + "\n";
+         }
+         return levels;
+      }
+
+      void reset() {
+         internal::g_log_level_status.clear();
+         internal::g_log_level_status = {{DEBUG.value, true}, {INFO.value, true}, {WARNING.value, true}, {FATAL.value, true}};
+      }
+   } // only_change_at_initialization
 #endif
 
    bool logLevel(LEVELS log_level) {
 #ifdef G3_DYNAMIC_LOGGING
       int level = log_level.value;
-      CHECK((level >= g3::kDebugVaulue) && (level <= FATAL.value));
-      bool status = (internal::g_log_level_status[level].load(std::memory_order_acquire));
+      bool status = internal::g_log_level_status[level].value();
       return status;
 #endif
       return true;
