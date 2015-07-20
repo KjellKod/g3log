@@ -15,8 +15,8 @@
 #include <exception>
 #include <functional>
 #include <memory>
-#include "g2time.hpp"
-#include "g2future.hpp"
+#include "g3log/time.hpp"
+#include "g3log/future.hpp"
 
 TEST(Configuration, LOG)
 { // ref: http://www.cplusplus.com/reference/clibrary/ctime/strftime/
@@ -27,14 +27,14 @@ TEST(Configuration, LOG)
   // ---  the last example is such an example.
   try
   {
-    std::cout << g2::localtime_formatted(g2::systemtime_now(), "%a %b %d %H:%M:%S %Y")  << std::endl;
+    std::cout << g3::localtime_formatted(g3::systemtime_now(), "%a %b %d %H:%M:%S %Y")  << std::endl;
     std::this_thread::sleep_for(std::chrono::seconds(1));
-    std::cout << g2::localtime_formatted(g2::systemtime_now(), "%%Y/%%m/%%d %%H:%%M:%%S = %Y/%m/%d %H:%M:%S")  << std::endl;
+    std::cout << g3::localtime_formatted(g3::systemtime_now(), "%%Y/%%m/%%d %%H:%%M:%%S = %Y/%m/%d %H:%M:%S")  << std::endl;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
     std::cerr << "Formatting options skipped due to VS2012, C++11 non-conformance for" << std::endl;
     std::cerr << " some formatting options. The skipped code was:\n\t\t %EX %Ec, \n(see http://en.cppreference.com/w/cpp/io/manip/put_time for details)"  << std::endl;
 #else
-    std::cout << "C++11 new formatting options:\n" << g2::localtime_formatted(g2::systemtime_now(), "%%EX: %EX\n%%z: %z\n%%Ec: %Ec")  << std::endl;
+    std::cout << "C++11 new formatting options:\n" << g3::localtime_formatted(g3::systemtime_now(), "%%EX: %EX\n%%z: %z\n%%Ec: %Ec")  << std::endl;
 #endif
   }
 // This does not work. Other kinds of fatal exits (on Windows) seems to be used instead of exceptions
@@ -77,7 +77,7 @@ TEST(TestOf_CopyableCall, Expecting_SmoothSailing)
   MsgType type(str);
   std::unique_ptr<Active> bgWorker(Active::createActive());
   std::future<std::string> fstring =
-    g2::spawn_task(std::bind(&MsgType::msg, type), bgWorker.get());
+    g3::spawn_task(std::bind(&MsgType::msg, type), bgWorker.get());
   ASSERT_STREQ(str.c_str(), fstring.get().c_str());
 }
 
@@ -93,7 +93,7 @@ TEST(TestOf_CopyableLambdaCall, Expecting_AllFine)
   auto msg_lambda=[=](){return (str_standalone+str_standalone);};
   std::string expected(str_standalone+str_standalone);
 
-  auto fstring_standalone = g2::spawn_task(msg_lambda, bgWorker.get());
+  auto fstring_standalone = g3::spawn_task(msg_lambda, bgWorker.get());
   ASSERT_STREQ(expected.c_str(), fstring_standalone.get().c_str());
 }
 
@@ -110,7 +110,7 @@ std::future<typename std::result_of<F()>::type> ObsoleteSpawnTask(F f)
   std::future<result_type> result = task.get_future();
 
   std::vector<std::function<void()>> vec;
-  vec.push_back(g2::MoveOnCopy<task_type>(std::move(task)));
+  vec.push_back(g3::MoveOnCopy<task_type>(std::move(task)));
   std::thread(std::move(vec.back())).detach();
   result.wait();
   return std::move(result);
@@ -133,7 +133,7 @@ TEST(TestOf_ObsoleteSpawnTaskWithStringReturn, Expecting_FutureString)
 // --------------------------------------------------------------
 namespace WORKING
 {
-  using namespace g2;
+  using namespace g3;
 
 #include <gtest/gtest.h>
 
@@ -175,7 +175,7 @@ namespace WORKING
     return 42.2;
   }
 
-  std::string msg2(){return "msg2";}
+  std::string msg3(){return "msg3";}
 } // WORKING
 
 TEST(Yalla, Testar)
@@ -184,7 +184,7 @@ TEST(Yalla, Testar)
   auto f = spawn_task(get_res);
   std::cout << "Res = " << f.get() << std::endl;
 
-  auto f2 = spawn_task(msg2);
+  auto f2 = spawn_task(msg3);
   std::cout << "Res2 = " << f2.get() << std::endl;
 
 

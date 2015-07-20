@@ -31,7 +31,7 @@ CHECK(less > more) << "CHECK(false) triggers a FATAL message";
 
 
 ## What G3Log is: 
-* ***G3log*** is the acting name for the third version of g2log and it stands for **g2log with dynamic sinks**
+* ***G3log*** is the acting name for the third version of g2log and it stands for **g3log with dynamic sinks**
 * G3log is an asynchronous, "crash-safe" logger. You can read more about it here [[g2log version]](
 http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logger-using-Cplus)
 * You can choose to use the default log receiver which saves all LOG calls to file, **or** you can choose to use your own custom made log receiver(s), **or** both, **or** as many sinks as you need.
@@ -59,17 +59,17 @@ The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal 
 
 8. The code is given for free as public domain. This gives the option to change, use, and do whatever with it, no strings attached.
 
-9. Two versions of g2log exist that are under active development.
-    * This version: *[g3log](https://bitbucket.org/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013). My recommendation is to go with g3log if you have full C++11 support. 
-    * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio.  The focus on g2log is stability and compiler support. Only well, time tested, features from g3log will make it into g2log. 
+9. Two versions of g3log exist that are under active development.
+    * This version: *[g3log](https://github.com/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013). My recommendation is to go with g3log if you have full C++11 support. 
+    * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio.  The focus on g2log is "slow to change" and compiler support. Only well, time tested, features from g3log will make it into g2log. 
 
 
 
 
 # G3log with sinks
-[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G2log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either receive a LOG message as a  *std::string* **or** as a *g2::LogMessageMover*. 
+[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G3log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either receive a LOG message as a  *std::string* **or** as a *g3::LogMessageMover*. 
 
-The *std::string* comes pre-formatted. The *g2::LogMessageMover* is a wrapped struct that contains the raw data for custom handling in your own sink.
+The *std::string* comes pre-formatted. The *g3::LogMessageMover* is a wrapped struct that contains the raw data for custom handling in your own sink.
 
 A sink is *owned* by the G3log and is added to the logger inside a ```std::unique_ptr```.  The sink can be called though its public API through a *handler* which will asynchronously forward the call to the receiving sink. 
 ```
@@ -81,14 +81,14 @@ auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
 ```
 // main.cpp
-#include<g2log.hpp>
-#include<g2logworker.hpp>
-#include <std2_make_unique.hpp>
+#include <g3log/g3log.hpp>
+#include <g3log/g3logworker.hpp>
+#include <g3log/std2_make_unique.hpp>
 
 #include "CustomSink.h"
 
 int main(int argc, char**argv) {
-   using namespace g2;
+   using namespace g3;
    std::unique_ptr<LogWorker> logworker{ LogWorker::createWithNoSink() };
    auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
                                           &CustomSink::ReceiveLogMessage);
@@ -104,19 +104,19 @@ int main(int argc, char**argv) {
    std::future<void> received = sinkHandle->call(&CustomSink::Foo, 
                                                  param1, param2);
    
-   // If the LogWorker is initialized then at scope exit the g2::shutDownLogging() will be called. 
+   // If the LogWorker is initialized then at scope exit the g3::shutDownLogging() will be called. 
    // This is important since it protects from LOG calls from static or other entities that will go out of
    // scope at a later time. 
    //
    // It can also be called manually:
-   g2::shutDownLogging();
+   g3::shutDownLogging();
 }
 
 
 // some_file.cpp : To show how easy it is to get the logger to work
 // in other parts of your software
 
-#include <g2log.hpp>
+#include <g3log/g3log.hpp>
 
 void SomeFunction() {
    ...
@@ -127,19 +127,19 @@ void SomeFunction() {
 Example usage where a the default file logger is used **and** a custom sink is added
 ```
 // main.cpp
-#include<g2log.hpp>
-#include<g2logworker.hpp>
-#include <std2_make_unique.hpp>
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
+#include <g3log/std2_make_unique.hpp>
 
 #include "CustomSink.h"
 
 int main(int argc, char**argv) {
-   using namespace g2;
+   using namespace g3;
    auto defaultHandler = LogWorker::createWithDefaultLogger(argv[0], 
                                                  path_to_log_file);
    
    // logger is initialized
-   g2::initializeLogging(defaultHandler.worker.get());
+   g3::initializeLogging(defaultHandler.worker.get());
    
    LOG(DEBUG) << "Make log call, then add another sink";
    

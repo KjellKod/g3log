@@ -1,15 +1,10 @@
 /** ==========================================================================
- * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
- * with no warranties. This code is yours to share, use and modify with no
- * strings attached and no restrictions or obligations.
- *
- * For more information see g3log/LICENSE or refer refer to http://unlicense.org
- * ============================================================================
- * Filename:g2loglevels.hpp  Part of Framework for Logging and Design By Contract
- * Created: 2012 by Kjell Hedström
- *
- * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
- * ********************************************* */
+* 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+* with no warranties. This code is yours to share, use and modify with no
+* strings attached and no restrictions or obligations.
+*
+* For more information see g3log/LICENSE or refer refer to http://unlicense.org
+* ============================================================================*/
 
 #pragma once
 
@@ -35,12 +30,12 @@ struct LEVELS {
    // force internal copy of the const char*. This is a simple safeguard for when g3log is used in a
    // "dynamic, runtime loading of shared libraries"
 
-   LEVELS(const LEVELS& other)
+   LEVELS(const LEVELS &other)
       : value(other.value), text(other.text.c_str()) {}
 
-   LEVELS(int id, const char* idtext) : value(id), text(idtext) {}
+   LEVELS(int id, const char *idtext) : value(id), text(idtext) {}
 
-   friend bool operator==(const LEVELS& lhs, const LEVELS& rhs) {
+   friend bool operator==(const LEVELS &lhs, const LEVELS &rhs) {
       return (lhs.value == rhs.value && lhs.text == rhs.text);
    }
 
@@ -50,40 +45,40 @@ struct LEVELS {
 
 
 
-namespace g2 {
-  static const int kDebugVaulue = 0;
+namespace g3 {
+   static const int kDebugVaulue = 0;
 }
 
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
 const LEVELS DBUG {
-   g2::kDebugVaulue, {"DEBUG"}
+   g3::kDebugVaulue, {"DEBUG"}
 },
 #else
 const LEVELS DEBUG {
-   g2::kDebugVaulue, {"DEBUG"}
+   g3::kDebugVaulue, {"DEBUG"}
 },
 #endif
-INFO {g2::kDebugVaulue + 1, {"INFO"}},
+INFO {g3::kDebugVaulue + 1, {"INFO"}},
 WARNING {INFO.value + 1, {"WARNING"}},
 // Insert here *any* extra logging levels that is needed
 // 1) Remember to update the FATAL initialization below
-// 2) Remember to update the initialization of "g2loglevels.cpp/g_log_level_status"
+// 2) Remember to update the initialization of "g3loglevels.cpp/g_log_level_status"
 FATAL {WARNING.value + 1, {"FATAL"}};
 
 
-namespace g2 {
-namespace internal {
-const LEVELS CONTRACT {
-   100, {"CONTRACT"}
-}, FATAL_SIGNAL {101, {"FATAL_SIGNAL"}},
-FATAL_EXCEPTION {102, {"FATAL_EXCEPTION"}};
-bool wasFatal(const LEVELS& level);
-}
+namespace g3 {
+   namespace internal {
+      const LEVELS CONTRACT {
+         100, {"CONTRACT"}
+      }, FATAL_SIGNAL {101, {"FATAL_SIGNAL"}},
+      FATAL_EXCEPTION {102, {"FATAL_EXCEPTION"}};
+      bool wasFatal(const LEVELS &level);
+   }
 
-#ifdef G2_DYNAMIC_LOGGING
-// Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
-void setLogLevel(LEVELS level, bool enabled_status);
+#ifdef G3_DYNAMIC_LOGGING
+   // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
+   void setLogLevel(LEVELS level, bool enabled_status);
 #endif
-bool logLevel(LEVELS level);
-} // g2
+   bool logLevel(LEVELS level);
+} // g3
 

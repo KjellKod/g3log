@@ -17,25 +17,26 @@
 #error "stacktrace_win.cpp used but not on a windows system"
 #endif
 
+#include "g3log/crashhandler.hpp"
+
 #include <string>
 #include <windows.h>
-#include "crashhandler.hpp"
- 
+
 namespace stacktrace {
-/// return the text description of a Windows exception code
-std::string exceptionIdToText(g2::SignalType id);
+   /// return the text description of a Windows exception code
+   std::string exceptionIdToText(g3::SignalType id);
 
-/// return whether or not the exception is a known exception, i.e. 
-/// an exception that we should treat as a fatal event
-bool isKnownException(g2::SignalType id);
+   /// return whether or not the exception is a known exception, i.e.
+   /// an exception that we should treat as a fatal event
+   bool isKnownException(g3::SignalType id);
 
-/// helper function: retrieve stackdump from no excisting exception pointer
-std::string stackdump(); 
+   /// helper function: retrieve stackdump from no excisting exception pointer
+   std::string stackdump();
 
-/// helper function: retrieve stackdump, starting from an exception pointer
-std::string stackdump(EXCEPTION_POINTERS* info);
+   /// helper function: retrieve stackdump, starting from an exception pointer
+   std::string stackdump(EXCEPTION_POINTERS *info);
 
-/// main stackdump function. retrieve stackdump, from the given context
-std::string stackdump(CONTEXT* context);
+   /// main stackdump function. retrieve stackdump, from the given context
+   std::string stackdump(CONTEXT *context);
 
 } // stacktrace

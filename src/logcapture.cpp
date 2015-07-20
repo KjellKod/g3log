@@ -6,14 +6,14 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
-#include "g2logmessagecapture.hpp"
-#include "crashhandler.hpp"
+#include "g3log/logcapture.hpp"
+#include "g3log/crashhandler.hpp"
 
 // For Windows we need force a thread_local install per thread of three
 // signals that must have a signal handler instealled per thread-basis
 // It is really a royal pain. Seriously Microsoft? Seriously?
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-#define SIGNAL_HANDLER_VERIFY() g2::installSignalHandlerForThread()
+#define SIGNAL_HANDLER_VERIFY() g3::installSignalHandlerForThread()
 #else
 // Does nothing  --- enforces that semicolon must be written
 #define SIGNAL_HANDLER_VERIFY() do {} while(0)
@@ -25,32 +25,31 @@
 * captured message is forwarded to background worker.
 * As a safety precaution: No memory allocated here will be moved into the background
 * worker in case of dynamic loaded library reasons instead the arguments are copied
-* inside of g2log.cpp::saveMessage*/
+* inside of g3log.cpp::saveMessage*/
 LogCapture::~LogCapture() {
-   using namespace g2::internal;
+   using namespace g3::internal;
    SIGNAL_HANDLER_VERIFY();
    saveMessage(_stream.str().c_str(), _file, _line, _function, _level, _expression, _fatal_signal, _stack_trace.c_str());
 }
 
 
 /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-LogCapture::LogCapture(const LEVELS &level, g2::SignalType fatal_signal, const char* dump)
-   : LogCapture("", 0, "", level, "", fatal_signal, dump) {
+LogCapture::LogCapture(const LEVELS &level, g3::SignalType fatal_signal, const char *dump) : LogCapture("", 0, "", level, "", fatal_signal, dump) {
 }
 
 /**
- * @file, line, function are given in g2log.hpp from macros
+ * @file, line, function are given in g3log.hpp from macros
  * @level INFO/DEBUG/WARNING/FATAL
  * @expression for CHECK calls
  * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
  */
-LogCapture::LogCapture(const char* file, const int line, const char* function, const LEVELS &level,
-                       const char* expression, g2::SignalType fatal_signal, const char* dump)
+LogCapture::LogCapture(const char *file, const int line, const char *function, const LEVELS &level,
+                       const char *expression, g3::SignalType fatal_signal, const char *dump)
    : _file(file), _line(line), _function(function), _level(level), _expression(expression), _fatal_signal(fatal_signal) {
 
-   if (g2::internal::wasFatal(level)) {
+   if (g3::internal::wasFatal(level)) {
       _stack_trace = {"\n*******\tSTACKDUMP *******\n"};
-      _stack_trace.append(g2::internal::stackdump(dump));
+      _stack_trace.append(g3::internal::stackdump(dump));
    }
 }
 
@@ -60,7 +59,7 @@ LogCapture::LogCapture(const char* file, const int line, const char* function, c
 * capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF
 * See also for the attribute formatting ref:  http://www.codemaestro.com/reviews/18
 */
-void LogCapture::capturef(const char* printf_like_message, ...) {
+void LogCapture::capturef(const char *printf_like_message, ...) {
    static const int kMaxMessageSize = 2048;
    static const std::string kTruncatedWarningText = "[...truncated...]";
    char finished_message[kMaxMessageSize];

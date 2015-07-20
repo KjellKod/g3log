@@ -1,12 +1,11 @@
-# g3log is a KjellKod Logger
-# 2011 @author Kjell Hedström, hedstrom@kjellkod.cc 
-# ==================================================================
-# 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own
-#    risk and comes  with no warranties.
-#
-# This code is yours to share, use and modify with no strings attached
-#   and no restrictions or obligations.
-# ===================================================================
+# ==========================================================================
+# 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
+# with no warranties. This code is yours to share, use and modify with no
+# strings attached and no restrictions or obligations.
+# 
+# For more information see g3log/LICENSE or refer refer to http://unlicense.org
+# ============================================================================*/
+
 
 # Below are details for compiling on Windows and Linux
 # by default only an example g3log binary is created
@@ -53,8 +52,6 @@ set(CMAKE_BUILD_TYPE Release)
 
 project (g3log)
 
-
-
 # Detect 64 or 32 bit
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
    # 64-bit project
@@ -67,28 +64,30 @@ endif()
 
 
 
+   # ============================================================================
+   # G3LOG OPTIONAL FEATURES
+   # ============================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
+
+
+   # =========================================================================
+   # G3 Macro definitions in Options.cmake are written to file
+   #    this avoids having to re-state your definitions in your source code 
+   #    or compile options
+   #==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
+
    # =========================================================================
    # G3LOG BUILD
    #==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/Build.cmake)
-
-
-
-
-   # ============================================================================
-   # G3LOG OPTIONAL FEATURES
-   # ============================================================================
-   # Dynamic logging:  ENABLE WITH:     -DUSE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
-   # DBUG instead of DEBUG logging level: ENABLE WITH: -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON
-   INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
-
 
    
 
    # ============================================================================
    # EXAMPLE OPTIONS: By defauls is ON. This will create 'g3log-FATAL-* examples'
    # ============================================================================
-   # DISABLE WITH:  -DUSE_FATAL_EXAMPLE=OFF    
+   # DISABLE WITH:  -DADD_FATAL_EXAMPLE=OFF    
    INCLUDE (${g3log_SOURCE_DIR}/example/Example.cmake)
 
 
@@ -96,7 +95,7 @@ endif()
    # ============================================================================
    # PERFORMANCE TEST OPTIONS: Performance operations for g3log
    # ============================================================================
-   # ENABLE WITH:  -USE_G3LOG_PERFORMANCE=ON  
+   # ENABLE WITH:  -DADD_G3LOG_PERFORMANCE=ON  
    INCLUDE (${g3log_SOURCE_DIR}/test_performance/Performance.cmake)
 
       
@@ -104,7 +103,7 @@ endif()
    # ==========================================================================
    # UNIT TEST OPTIONS: 
    # ============================================================================
-   # ENABLE WITH:  -DUSE_G2LOG_UNIT_TEST=ON  
+   # ENABLE WITH:  -DADD_G3LOG_UNIT_TEST=ON  
    INCLUDE (${g3log_SOURCE_DIR}/test_unit/Test.cmake)
 
 
@@ -123,6 +122,17 @@ endif()
 # ==========================================================================
 # INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 
+
+MESSAGE("\n\n
+        *******************************************************************
+        Please do 'make clean-cmake-files' before next cmake generation. 
+           It is a good idea to purge your build directory of CMake 
+           generated cache files
+        *******************************************************************
+         ")
+add_custom_target(clean-cmake-files
+   COMMAND ${CMAKE_COMMAND} -P ${g3log_SOURCE_DIR}/CleanAll.cmake
+)
 
 
 

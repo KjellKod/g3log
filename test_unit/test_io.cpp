@@ -7,10 +7,10 @@
  * ============================================================================*/
 
 #include <gtest/gtest.h>
-#include "g2log.hpp"
-#include "g2logworker.hpp"
+#include "g3log/g3log.hpp"
+#include "g3log/logworker.hpp"
 #include "testing_helpers.h"
-#include "g2loglevels.hpp"
+#include "g3log/loglevels.hpp"
 
 #include <memory>
 #include <string>
@@ -23,9 +23,9 @@ const std::string log_directory = "./";
 const std::string t_info = "test INFO ";
 const std::string t_info2 = "test INFO 123";
 const std::string t_debug = "test DEBUG ";
-const std::string t_debug2 = "test DEBUG 1.123456";
+const std::string t_debug3 = "test DEBUG 1.123456";
 const std::string t_warning = "test WARNING ";
-const std::string t_warning2 = "test WARNING yello";
+const std::string t_warning3 = "test WARNING yello";
 
 std::atomic<size_t> g_fatal_counter = {0};
 void fatalCounter() {
@@ -44,13 +44,13 @@ using namespace testing_helpers;
 ///
 /// TODO : (gtest issue)
 ///Move out to separate unit test binary to ensure reordering of tests does not happen 
-#ifdef G2_DYNAMIC_LOGGING
+#ifdef G3_DYNAMIC_LOGGING
 TEST(Initialization, No_Logger_Initialized___LevelsAreONByDefault) {
-   EXPECT_FALSE(g2::internal::isLoggingInitialized());
-   EXPECT_TRUE(g2::logLevel(DEBUG));
-   EXPECT_TRUE(g2::logLevel(INFO));
-   EXPECT_TRUE(g2::logLevel(WARNING));
-   EXPECT_TRUE(g2::logLevel(FATAL));
+   EXPECT_FALSE(g3::internal::isLoggingInitialized());
+   EXPECT_TRUE(g3::logLevel(DEBUG));
+   EXPECT_TRUE(g3::logLevel(INFO));
+   EXPECT_TRUE(g3::logLevel(WARNING));
+   EXPECT_TRUE(g3::logLevel(FATAL));
    EXPECT_EQ(DEBUG.value, 0);
    EXPECT_EQ(INFO.value, 1);
    EXPECT_EQ(WARNING.value, 2);
@@ -58,16 +58,16 @@ TEST(Initialization, No_Logger_Initialized___LevelsAreONByDefault) {
 }
 
 TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
-   EXPECT_FALSE(g2::internal::isLoggingInitialized());
-   EXPECT_TRUE(g2::logLevel(INFO));
-   EXPECT_TRUE(g2::logLevel(FATAL));
-   EXPECT_TRUE(g2::logLevel(DEBUG));
-   EXPECT_TRUE(g2::logLevel(WARNING));
-   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g2logger)";
-   std::string err_msg2_ignored = "This uninitialized message should be ignored";
+   EXPECT_FALSE(g3::internal::isLoggingInitialized());
+   EXPECT_TRUE(g3::logLevel(INFO));
+   EXPECT_TRUE(g3::logLevel(FATAL));
+   EXPECT_TRUE(g3::logLevel(DEBUG));
+   EXPECT_TRUE(g3::logLevel(WARNING));
+   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g3logger)";
+   std::string err_msg3_ignored = "This uninitialized message should be ignored";
    try {
       LOG(INFO) << err_msg1; // nothing happened. level not ON
-      LOG(INFO) << err_msg2_ignored; // nothing happened. level not ON
+      LOG(INFO) << err_msg3_ignored; // nothing happened. level not ON
 
    } catch (std::exception& e) {
       ADD_FAILURE() << "Should never have thrown even if it is not instantiated. Ignored exception:  " << e.what();
@@ -79,22 +79,22 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    LOG(INFO) << good_msg1;
    auto content = logger.resetAndRetrieveContent(); // this synchronizes with the LOG(INFO) call if debug level would be ON.
    ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
-   ASSERT_FALSE(verifyContent(content, err_msg2_ignored)) << "Content: [" << content << "]";
+   ASSERT_FALSE(verifyContent(content, err_msg3_ignored)) << "Content: [" << content << "]";
    ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";       
 }
 #else
 TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
-   EXPECT_FALSE(g2::internal::isLoggingInitialized());
-   EXPECT_TRUE(g2::logLevel(INFO));
-   EXPECT_TRUE(g2::logLevel(FATAL));
-   EXPECT_TRUE(g2::logLevel(DEBUG));
-   EXPECT_TRUE(g2::logLevel(WARNING));
-   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g2logger)";
-   std::string err_msg2_ignored = "This uninitialized message should be ignored";
+   EXPECT_FALSE(g3::internal::isLoggingInitialized());
+   EXPECT_TRUE(g3::logLevel(INFO));
+   EXPECT_TRUE(g3::logLevel(FATAL));
+   EXPECT_TRUE(g3::logLevel(DEBUG));
+   EXPECT_TRUE(g3::logLevel(WARNING));
+   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g3logger)";
+   std::string err_msg3_ignored = "This uninitialized message should be ignored";
 
    try {
       LOG(INFO) << err_msg1;
-      LOG(INFO) << err_msg2_ignored;
+      LOG(INFO) << err_msg3_ignored;
 
    } catch (std::exception& e) {
       ADD_FAILURE() << "Should never have thrown even if it is not instantiated: " << e.what();
@@ -106,10 +106,10 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    LOG(INFO) << good_msg1;
    auto content = logger.resetAndRetrieveContent(); // this synchronizes with the LOG(INFO) call.
    ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
-   ASSERT_FALSE(verifyContent(content, err_msg2_ignored)) << "Content: [" << content << "]";
+   ASSERT_FALSE(verifyContent(content, err_msg3_ignored)) << "Content: [" << content << "]";
    ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";
  }
-#endif // #ifdef G2_DYNAMIC_LOGGING
+#endif // #ifdef G3_DYNAMIC_LOGGING
 
 
 TEST(Basics, Shutdown) {
@@ -132,7 +132,7 @@ TEST(Basics, Shutdownx2) {
       RestoreFileLogger logger(log_directory);
       LOG(INFO) << "Not yet shutdown. This message should make it";
       logger.reset(); // force flush of logger (which will trigger a shutdown)
-      g2::internal::shutDownLogging(); // already called in reset, but safe to call again
+      g3::internal::shutDownLogging(); // already called in reset, but safe to call again
       LOG(INFO) << "Logger is shutdown,. this message will not make it (but it's safe to try)";
       file_content = readFileToText(logger.logFile()); // already reset
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
@@ -146,7 +146,7 @@ TEST(Basics, ShutdownActiveLogger) {
    {
       RestoreFileLogger logger(log_directory);
       LOG(INFO) << "Not yet shutdown. This message should make it";
-      EXPECT_TRUE(g2::internal::shutDownLoggingForActiveOnly(logger._scope->get()));
+      EXPECT_TRUE(g3::internal::shutDownLoggingForActiveOnly(logger._scope->get()));
       LOG(INFO) << "Logger is shutdown,. this message will not make it (but it's safe to try)";
       file_content = logger.resetAndRetrieveContent();
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
@@ -160,8 +160,8 @@ TEST(Basics, DoNotShutdownActiveLogger) {
    {
       RestoreFileLogger logger(log_directory);
       LOG(INFO) << "Not yet shutdown. This message should make it";
-      std::unique_ptr<g2::LogWorker> duplicateLogWorker{g2::LogWorker::createWithNoSink()};
-      EXPECT_FALSE(g2::internal::shutDownLoggingForActiveOnly(duplicateLogWorker.get()));
+      std::unique_ptr<g3::LogWorker> duplicateLogWorker{g3::LogWorker::createWithNoSink()};
+      EXPECT_FALSE(g3::internal::shutDownLoggingForActiveOnly(duplicateLogWorker.get()));
       LOG(INFO) << "Logger is (NOT) shutdown,. this message WILL make it";
       file_content = logger.resetAndRetrieveContent();
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
@@ -175,16 +175,16 @@ TEST(LOGTest, LOG) {
    std::string file_content;
    {
       RestoreFileLogger logger(log_directory);
-      EXPECT_TRUE(g2::logLevel(INFO));
-      EXPECT_TRUE(g2::logLevel(FATAL));
+      EXPECT_TRUE(g3::logLevel(INFO));
+      EXPECT_TRUE(g3::logLevel(FATAL));
       LOG(INFO) << "test LOG(INFO)";
       logger.reset(); // force flush of logger
       file_content = readFileToText(logger.logFile());
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
    }
    EXPECT_TRUE(verifyContent(file_content, "test LOG(INFO)"));
-   EXPECT_TRUE(g2::logLevel(INFO));
-   EXPECT_TRUE(g2::logLevel(FATAL));
+   EXPECT_TRUE(g3::logLevel(INFO));
+   EXPECT_TRUE(g3::logLevel(FATAL));
 }
 
 
@@ -206,8 +206,8 @@ TEST(LogTest, LOG_F) {
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
    }
    ASSERT_TRUE(verifyContent(file_content, t_info2));
-   ASSERT_TRUE(verifyContent(file_content, t_debug2));
-   ASSERT_TRUE(verifyContent(file_content, t_warning2));
+   ASSERT_TRUE(verifyContent(file_content, t_debug3));
+   ASSERT_TRUE(verifyContent(file_content, t_warning3));
 }
 
 
@@ -226,8 +226,8 @@ TEST(LogTest, LOG) {
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
    }
    ASSERT_TRUE(verifyContent(file_content, t_info2));
-   ASSERT_TRUE(verifyContent(file_content, t_debug2));
-   ASSERT_TRUE(verifyContent(file_content, t_warning2));
+   ASSERT_TRUE(verifyContent(file_content, t_debug3));
+   ASSERT_TRUE(verifyContent(file_content, t_warning3));
 }
 
 
@@ -242,7 +242,7 @@ TEST(LogTest, LOG_F_IF) {
       SCOPED_TRACE("LOG_IF"); // Scope exit be prepared for destructor failure
    }
    ASSERT_TRUE(verifyContent(file_content, t_info2));
-   ASSERT_FALSE(verifyContent(file_content, t_debug2));
+   ASSERT_FALSE(verifyContent(file_content, t_debug3));
 }
 
 
@@ -257,7 +257,7 @@ TEST(LogTest, LOG_IF) {
       SCOPED_TRACE("LOG_IF"); // Scope exit be prepared for destructor failure
    }
    EXPECT_TRUE(verifyContent(file_content, t_info2));
-   EXPECT_FALSE(verifyContent(file_content, t_debug2));
+   EXPECT_FALSE(verifyContent(file_content, t_debug3));
 }
 TEST(LogTest, LOGF__FATAL) {
    RestoreFileLogger logger(log_directory);
@@ -279,17 +279,17 @@ TEST(LogTest, LOG_preFatalLogging_hook) {
       RestoreFileLogger logger(log_directory);
       ASSERT_FALSE(mockFatalWasCalled());
       g_fatal_counter.store(0);
-      g2::setFatalPreLoggingHook(fatalCounter);   
+      g3::setFatalPreLoggingHook(fatalCounter);   
       LOG(FATAL) << "This message is fatal";
       logger.reset();
-      EXPECT_EQ(g_fatal_counter.load(), 1);
+      EXPECT_EQ(g_fatal_counter.load(), size_t{1});
    }
    {  // Now with no fatal pre-logging-hook
       RestoreFileLogger logger(log_directory);
       ASSERT_FALSE(mockFatalWasCalled());
       g_fatal_counter.store(0);
       LOG(FATAL) << "This message is fatal";
-      EXPECT_EQ(g_fatal_counter.load(), 0);
+      EXPECT_EQ(g_fatal_counter.load(), size_t{0});
    }
 }
 
@@ -373,11 +373,11 @@ TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg) {
 TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This message is added to throw %s and %s";
-   std::string msg2 = "This message is added to throw message and log";
+   std::string msg3 = "This message is added to throw message and log";
    std::string arg1 = "message";
-   std::string arg2 = "log";
+   std::string arg3 = "log";
 
-   CHECK_F(1 >= 2, msg.c_str(), arg1.c_str(), arg2.c_str());
+   CHECK_F(1 >= 2, msg.c_str(), arg1.c_str(), arg3.c_str());
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
@@ -388,23 +388,23 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
 TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This message is added to throw %s and %s";
-   std::string msg2 = "This message is added to throw message and log";
+   std::string msg3 = "This message is added to throw message and log";
    std::string arg1 = "message";
-   std::string arg2 = "log";
-   CHECK(1 >= 2) << msg2;
+   std::string arg3 = "log";
+   CHECK(1 >= 2) << msg3;
 
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
    EXPECT_TRUE(verifyContent(file_content, "CONTRACT"));
-   EXPECT_TRUE(verifyContent(file_content, msg2));
+   EXPECT_TRUE(verifyContent(file_content, msg3));
 }
 TEST(CHECK, CHECK_ThatWontThrow) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This %s should never appear in the %s";
-   std::string msg2 = "This message should never appear in the log";
+   std::string msg3 = "This message should never appear in the log";
    std::string arg1 = "message";
-   std::string arg2 = "log";
+   std::string arg3 = "log";
 
    CHECK(1 == 1);
    CHECK_F(1 == 1, msg.c_str(), "message", "log");
@@ -412,15 +412,15 @@ TEST(CHECK, CHECK_ThatWontThrow) {
    EXPECT_FALSE(mockFatalWasCalled());
 
    std::string file_content = readFileToText(logger.logFile());
-   EXPECT_FALSE(verifyContent(file_content, msg2));
-   EXPECT_FALSE(verifyContent(mockFatalMessage(), msg2));
+   EXPECT_FALSE(verifyContent(file_content, msg3));
+   EXPECT_FALSE(verifyContent(mockFatalMessage(), msg3));
 }
 
 
 
 
 
-#ifdef G2_DYNAMIC_LOGGING 
+#ifdef G3_DYNAMIC_LOGGING 
 namespace {
    // Restore dynamic levels if turned off
 
@@ -428,51 +428,51 @@ namespace {
       RestoreDynamicLoggingLevels() {
       };
       ~RestoreDynamicLoggingLevels() {
-         g2::setLogLevel(DEBUG, false);
-         g2::setLogLevel(INFO, false);
-         g2::setLogLevel(WARNING, false);
-         g2::setLogLevel(FATAL, false);
+         g3::setLogLevel(DEBUG, false);
+         g3::setLogLevel(INFO, false);
+         g3::setLogLevel(WARNING, false);
+         g3::setLogLevel(FATAL, false);
       }
    };
 } // anonymous
 TEST(DynamicLogging, DynamicLogging_IS_ENABLED) {
    RestoreDynamicLoggingLevels raiiLevelRestore;
 
-   ASSERT_TRUE(g2::logLevel(DEBUG));
-   ASSERT_TRUE(g2::logLevel(INFO));
-   ASSERT_TRUE(g2::logLevel(WARNING));
-   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
-   g2::setLogLevel(DEBUG, false);
-   ASSERT_FALSE(g2::logLevel(DEBUG));
-   ASSERT_TRUE(g2::logLevel(INFO));
-   ASSERT_TRUE(g2::logLevel(WARNING));
-   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+   ASSERT_TRUE(g3::logLevel(DEBUG));
+   ASSERT_TRUE(g3::logLevel(INFO));
+   ASSERT_TRUE(g3::logLevel(WARNING));
+   ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+   g3::setLogLevel(DEBUG, false);
+   ASSERT_FALSE(g3::logLevel(DEBUG));
+   ASSERT_TRUE(g3::logLevel(INFO));
+   ASSERT_TRUE(g3::logLevel(WARNING));
+   ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 
-   g2::setLogLevel(INFO, false);
-   ASSERT_FALSE(g2::logLevel(DEBUG));
-   ASSERT_FALSE(g2::logLevel(INFO));
-   ASSERT_TRUE(g2::logLevel(WARNING));
-   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+   g3::setLogLevel(INFO, false);
+   ASSERT_FALSE(g3::logLevel(DEBUG));
+   ASSERT_FALSE(g3::logLevel(INFO));
+   ASSERT_TRUE(g3::logLevel(WARNING));
+   ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 
-   g2::setLogLevel(WARNING, false);
-   ASSERT_FALSE(g2::logLevel(DEBUG));
-   ASSERT_FALSE(g2::logLevel(INFO));
-   ASSERT_FALSE(g2::logLevel(WARNING));
-   ASSERT_TRUE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+   g3::setLogLevel(WARNING, false);
+   ASSERT_FALSE(g3::logLevel(DEBUG));
+   ASSERT_FALSE(g3::logLevel(INFO));
+   ASSERT_FALSE(g3::logLevel(WARNING));
+   ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 
-   g2::setLogLevel(FATAL, false);
-   ASSERT_FALSE(g2::logLevel(DEBUG));
-   ASSERT_FALSE(g2::logLevel(INFO));
-   ASSERT_FALSE(g2::logLevel(WARNING));
-   ASSERT_FALSE(g2::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
+   g3::setLogLevel(FATAL, false);
+   ASSERT_FALSE(g3::logLevel(DEBUG));
+   ASSERT_FALSE(g3::logLevel(INFO));
+   ASSERT_FALSE(g3::logLevel(WARNING));
+   ASSERT_FALSE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 }
 TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
    {
       RestoreFileLogger logger(log_directory);   
-      ASSERT_TRUE(g2::logLevel(DEBUG));
-      ASSERT_TRUE(g2::logLevel(INFO));
-      ASSERT_TRUE(g2::logLevel(WARNING));
-      ASSERT_TRUE(g2::logLevel(FATAL));
+      ASSERT_TRUE(g3::logLevel(DEBUG));
+      ASSERT_TRUE(g3::logLevel(INFO));
+      ASSERT_TRUE(g3::logLevel(WARNING));
+      ASSERT_TRUE(g3::logLevel(FATAL));
    }
 
    RestoreDynamicLoggingLevels raiiLevelRestore;
@@ -490,8 +490,8 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
 
       {
          RestoreFileLogger logger(log_directory);
-         g2::setLogLevel(DEBUG, false);
-         EXPECT_FALSE(g2::logLevel(DEBUG));
+         g3::setLogLevel(DEBUG, false);
+         EXPECT_FALSE(g3::logLevel(DEBUG));
          LOG(DEBUG) << msg_debugOff;
          auto content = logger.resetAndRetrieveContent();
          ASSERT_FALSE(verifyContent(content, "This message should never appear in the log")) << "Content: [" << content << "]";
@@ -505,10 +505,10 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
 TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {
    RestoreFileLogger logger(log_directory);
    RestoreDynamicLoggingLevels raiiLevelRestore;
-   ASSERT_TRUE(g2::logLevel(DEBUG));
-   ASSERT_TRUE(g2::logLevel(INFO));
-   ASSERT_TRUE(g2::logLevel(WARNING));
-   ASSERT_TRUE(g2::logLevel(FATAL));
+   ASSERT_TRUE(g3::logLevel(DEBUG));
+   ASSERT_TRUE(g3::logLevel(INFO));
+   ASSERT_TRUE(g3::logLevel(WARNING));
+   ASSERT_TRUE(g3::logLevel(FATAL));
 
    std::string msg1 = "This IS fatal (not crash, since it is unit test";
 
@@ -521,9 +521,9 @@ TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {
    EXPECT_FALSE(mockFatalWasCalled());
    
    
-   g2::setLogLevel(FATAL, false);
-   std::string msg2 = "This is NOT fatal (not crash, since it is unit test. FATAL is disabled";
-   LOG(FATAL) << msg2;
+   g3::setLogLevel(FATAL, false);
+   std::string msg3 = "This is NOT fatal (not crash, since it is unit test. FATAL is disabled";
+   LOG(FATAL) << msg3;
    EXPECT_FALSE(mockFatalWasCalled());
    EXPECT_TRUE(mockFatalMessage().empty());
 }
@@ -532,10 +532,10 @@ TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {
 TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disabled) {
    RestoreFileLogger logger(log_directory);
    RestoreDynamicLoggingLevels raiiLevelRestore;
-   ASSERT_TRUE(g2::logLevel(FATAL));
+   ASSERT_TRUE(g3::logLevel(FATAL));
 
    std::string msg1 = "dummy message to check if CHECK worked when fatal is enabled";
-   std::string msg2 = "dummy message to check if CHECK worked when fatal is disabled";
+   std::string msg3 = "dummy message to check if CHECK worked when fatal is disabled";
    LOG(FATAL) << msg1;
    EXPECT_TRUE(mockFatalWasCalled());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), msg1));
@@ -544,9 +544,9 @@ TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disab
    EXPECT_FALSE(mockFatalWasCalled());
  
    // Disable also CHECK calls
-   g2::setLogLevel(FATAL, false);
-   ASSERT_FALSE(g2::logLevel(FATAL));
-   LOG(FATAL) << msg2;
+   g3::setLogLevel(FATAL, false);
+   ASSERT_FALSE(g3::logLevel(FATAL));
+   LOG(FATAL) << msg3;
    EXPECT_FALSE(mockFatalWasCalled());
 }
 
@@ -554,9 +554,9 @@ TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disab
 
 #else 
 TEST(DynamicLogging, DynamicLogging_IS_NOT_ENABLED) {
-   ASSERT_TRUE(g2::logLevel(DEBUG));
-   //g2::setLogLevel(DEBUG, false);  this line will not compile since G2_DYNAMIC_LOGGING is not enabled. Kept for show.
-   //ASSERT_FALSE(g2::logLevel(DEBUG));
+   ASSERT_TRUE(g3::logLevel(DEBUG));
+   //g3::setLogLevel(DEBUG, false);  this line will not compile since G3_DYNAMIC_LOGGING is not enabled. Kept for show.
+   //ASSERT_FALSE(g3::logLevel(DEBUG));
 }
 #endif // Dynamic logging
 

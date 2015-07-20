@@ -14,16 +14,16 @@
 #include <chrono>
 #include <thread>
 #include <algorithm>
-#include "g2logworker.hpp"
-#include "g2logmessage.hpp"
-#include "g2filesink.hpp"
+#include "g3log/logworker.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/filesink.hpp"
 
 namespace testing_helpers {
 
    std::string mockFatalMessage();
    int mockFatalSignal();
    bool mockFatalWasCalled();
-   void mockFatalCall(g2::FatalMessagePtr fatal_message);
+   void mockFatalCall(g3::FatalMessagePtr fatal_message);
    void clearMockFatal();
 
    bool removeFile(std::string path_to_file);
@@ -77,8 +77,8 @@ struct ScopedLogger {
     ScopedLogger();
     virtual ~ScopedLogger();
     
-    g2::LogWorker* get();
-    std::unique_ptr<g2::LogWorker> _currentWorker;
+    g3::LogWorker* get();
+    std::unique_ptr<g3::LogWorker> _currentWorker;
 };
 
 
@@ -105,7 +105,7 @@ struct RestoreFileLogger {
   
 
 private:
-  std::unique_ptr<g2::SinkHandle<g2::FileSink>> _handle;
+  std::unique_ptr<g3::SinkHandle<g3::FileSink>> _handle;
   std::string _log_file;
 };
 

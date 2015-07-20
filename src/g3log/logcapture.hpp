@@ -7,13 +7,15 @@
  * ============================================================================*/
 
 #pragma once
+
+#include "g3log/loglevels.hpp"
+#include "g3log/g3log.hpp"
+#include "g3log/crashhandler.hpp"
+
 #include <string>
 #include <sstream>
 #include <cstdarg>
 #include <csignal>
-#include "g2loglevels.hpp"
-#include "g2log.hpp"
-#include "crashhandler.hpp"
 
 /**
  * Simple struct for capturing log/fatal entries. At destruction the captured message is
@@ -23,20 +25,19 @@
 */
 struct LogCapture {
    /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-   LogCapture(const LEVELS& level, g2::SignalType fatal_signal, const char* dump = nullptr);
+   LogCapture(const LEVELS &level, g3::SignalType fatal_signal, const char *dump = nullptr);
 
 
    /**
-    * @file, line, function are given in g2log.hpp from macros
+    * @file, line, function are given in g3log.hpp from macros
     * @level INFO/DEBUG/WARNING/FATAL
     * @expression for CHECK calls
     * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
     */
-   LogCapture(const char* file, const int line, const char* function, const LEVELS& level,
-              const char* expression = "", g2::SignalType fatal_signal = SIGABRT, const char* dump = nullptr);
+   LogCapture(const char *file, const int line, const char *function, const LEVELS &level, const char *expression = "", g3::SignalType fatal_signal = SIGABRT, const char *dump = nullptr);
 
 
-   // At destruction the message will be forwarded to the g2log worker.
+   // At destruction the message will be forwarded to the g3log worker.
    // in case of dynamically (at runtime) loaded libraries the important thing to know is that
    // all strings are copied so the original are not destroyed at the receiving end, only the copy
    virtual ~LogCapture();
@@ -49,11 +50,11 @@ struct LogCapture {
 #ifndef __GNUC__
 #define  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
 #endif
-   void capturef(const char* printf_like_message, ...) __attribute__((format(printf, 2, 3))); // 2,3 ref:  http://www.codemaestro.com/reviews/18
+   void capturef(const char *printf_like_message, ...) __attribute__((format(printf, 2, 3))); // 2,3 ref:  http://www.codemaestro.com/reviews/18
 
 
    /// prettifying API for this completely open struct
-   std::ostringstream& stream() {
+   std::ostringstream &stream() {
       return _stream;
    }
 
@@ -61,12 +62,12 @@ struct LogCapture {
 
    std::ostringstream _stream;
    std::string _stack_trace;
-   const char* _file;
+   const char *_file;
    const int _line;
-   const char* _function;
-   const LEVELS& _level;
-   const char* _expression;
-   const g2::SignalType _fatal_signal;
+   const char *_function;
+   const LEVELS &_level;
+   const char *_expression;
+   const g3::SignalType _fatal_signal;
 
 };
-//} // g2
+//} // g3

@@ -17,18 +17,18 @@
 #include <future>
 
 #include "testing_helpers.h"
-#include "g2logmessage.hpp"
-#include "g2logworker.hpp"
-#include "std2_make_unique.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/logworker.hpp"
+#include "g3log/std2_make_unique.hpp"
 
 using namespace testing_helpers;
 using namespace std;
 TEST(Sink, OneSink) {
-using namespace g2;
+using namespace g3;
    AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
    AtomicIntPtr count = make_shared < atomic<int >> (0);
    {
-      auto worker = g2::LogWorker::createWithNoSink();
+      auto worker = g3::LogWorker::createWithNoSink();
       auto handle = worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
@@ -49,7 +49,7 @@ namespace {
 }
 
 TEST(ConceptSink, OneHundredSinks) {
-   using namespace g2;
+   using namespace g3;
    BoolList flags;
    IntVector counts;
 
@@ -61,7 +61,7 @@ TEST(ConceptSink, OneHundredSinks) {
 
    {
       RestoreFileLogger logger{"./"};
-      g2::LogWorker* worker = logger._scope->get(); //g2LogWorker::createWithNoSink();
+      g3::LogWorker* worker = logger._scope->get(); //g3LogWorker::createWithNoSink();
       size_t index = 0;
       for (auto& flag : flags) {
          auto& count = counts[index++];
@@ -107,7 +107,7 @@ struct VoidReceiver {
 TEST(ConceptSink, VoidCall__NoCall_ExpectingNoAdd) {
    std::atomic<int> counter{0};
    {
-      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createWithNoSink()};
       auto handle = worker->addSink(std2::make_unique<VoidReceiver>(&counter), &VoidReceiver::receiveMsg);
    }  
    EXPECT_EQ(counter, 0);
@@ -116,7 +116,7 @@ TEST(ConceptSink, VoidCall__NoCall_ExpectingNoAdd) {
 TEST(ConceptSink, VoidCall__OneCall_ExpectingOneAdd) {
    std::atomic<int> counter{0};
    {
-      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createWithNoSink()};
       auto handle = worker->addSink(std2::make_unique<VoidReceiver>(&counter), &VoidReceiver::receiveMsg);
       std::future<void> ignored = handle->call(&VoidReceiver::incrementAtomic);
    }  
@@ -126,7 +126,7 @@ TEST(ConceptSink, VoidCall__OneCall_ExpectingOneAdd) {
 TEST(ConceptSink, VoidCall__TwoCalls_ExpectingTwoAdd) {
    std::atomic<int> counter{0};
    {
-      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createWithNoSink()};
       auto handle = worker->addSink(std2::make_unique<VoidReceiver>(&counter), &VoidReceiver::receiveMsg);
       auto  voidFuture1 = handle->call(&VoidReceiver::incrementAtomic);
       auto  voidFuture2 = handle->call(&VoidReceiver::incrementAtomic);
@@ -153,7 +153,7 @@ struct IntReceiver {
 TEST(ConceptSink, IntCall__TwoCalls_ExpectingTwoAdd) {
    std::atomic<int> counter{0};
    {
-      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createWithNoSink()};
       auto handle = worker->addSink(std2::make_unique<IntReceiver>(&counter), &IntReceiver::receiveMsgDoNothing);
       std::future<int> intFuture1 = handle->call(&IntReceiver::incrementAtomic);
       EXPECT_EQ(intFuture1.get(), 1);
@@ -179,7 +179,7 @@ void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
 TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
   auto FailedHelloWorld = []{ std::cout << "Hello World" << std::endl; };
   kjellkod::Active* active = nullptr;
-  auto failed = g2::spawn_task(FailedHelloWorld, active);
+  auto failed = g3::spawn_task(FailedHelloWorld, active);
   EXPECT_ANY_THROW(failed.get());
 }
 
@@ -190,7 +190,7 @@ TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    const size_t numberOfThreads = 100;
    threads.reserve(numberOfThreads);
 
-   g2::internal::shutDownLogging();
+   g3::internal::shutDownLogging();
     
    // Avoid annoying printouts at log shutdown
    stringstream cerr_buffer; 
@@ -210,16 +210,16 @@ TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    for (size_t create = 0; create < numberOfCycles; ++create) {
       std::cout << create << " ";
 
-      std::unique_ptr<g2::LogWorker> worker{g2::LogWorker::createWithNoSink()};
+      std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createWithNoSink()};
       auto handle = worker->addSink(std2::make_unique<IntReceiver>(&atomicCounter), &IntReceiver::receiveMsgIncrementAtomic);
-      g2::initializeLogging(worker.get());
+      g3::initializeLogging(worker.get());
   
      // wait till some LOGS streaming in
       atomicCounter = 0;
       while(atomicCounter.load() < 10) {
          std::this_thread::sleep_for(std::chrono::milliseconds(5));
       }
-   } // g2log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
+   } // g3log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
 
 
   // exit the threads

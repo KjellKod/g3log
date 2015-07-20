@@ -16,11 +16,11 @@
 #include <atomic>
 
 #include "testing_helpers.h"
-#include "std2_make_unique.hpp"
-#include "g2sink.hpp"
-#include "g2sinkwrapper.hpp"
-#include "g2sinkhandle.hpp"
-#include "g2logmessage.hpp"
+#include "g3log/std2_make_unique.hpp"
+#include "g3log/sink.hpp"
+#include "g3log/sinkwrapper.hpp"
+#include "g3log/sinkhandle.hpp"
+#include "g3log/logmessage.hpp"
 
 
 using namespace std;
@@ -35,14 +35,14 @@ class CoutSink {
 public:
    void clear() { buffer.str(""); }
    std::string string() { return buffer.str(); }
-   void save(g2::LogMessageMover msg) { std::cout << msg.get().message(); }
+   void save(g3::LogMessageMover msg) { std::cout << msg.get().message(); }
    virtual ~CoutSink() final {}
    static std::unique_ptr<CoutSink> createSink() { return std::unique_ptr<CoutSink>(new CoutSink);}
 };
 
 struct StringSink {
    std::string raw;
-   void append(g2::LogMessageMover entry) { raw.append(entry.get().message());}
+   void append(g3::LogMessageMover entry) { raw.append(entry.get().message());}
    std::string string() {
       return raw;
    }
@@ -50,10 +50,10 @@ struct StringSink {
 
 
 namespace {
-   typedef std::shared_ptr<g2::internal::SinkWrapper> SinkWrapperPtr;
+   typedef std::shared_ptr<g3::internal::SinkWrapper> SinkWrapperPtr;
 }
 
-namespace g2 {
+namespace g3 {
 
    class Worker {
       std::vector<SinkWrapperPtr> _container; // should be hidden in a pimple with a bg active object
@@ -61,7 +61,7 @@ namespace g2 {
 
       void bgSave(std::string msg) {
          for (auto& sink : _container) {
-            g2::LogMessage message("test", 0, "test", DEBUG);
+            g3::LogMessage message("test", 0, "test", DEBUG);
             message.write().append(msg);
             sink->send(LogMessageMover(std::move(message)));
          }
@@ -89,7 +89,7 @@ namespace g2 {
       std::unique_ptr< SinkHandle<T> > addSink(std::unique_ptr<T> unique, DefaultLogCall call) {
          auto sink = std::make_shared < internal::Sink<T> > (std::move(unique), call);
          auto add_sink_call = [this, sink] { _container.push_back(sink); };
-         auto wait_result = g2::spawn_task(add_sink_call, _bg.get());
+         auto wait_result = g3::spawn_task(add_sink_call, _bg.get());
          wait_result.wait();
 
          auto handle = std2::make_unique< SinkHandle<T> >(sink);
@@ -97,13 +97,13 @@ namespace g2 {
       }
    };
 
-} // g2
+} // g3
 
 
 
 
-using namespace g2;
-using namespace g2::internal;
+using namespace g3;
+using namespace g3::internal;
 
 TEST(ConceptSink, CreateHandle) {
    Worker worker;
@@ -196,7 +196,7 @@ TEST(Sink, OneSink) {
   AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
   AtomicIntPtr count = make_shared<atomic<int>>(0);
     {
-    auto worker = std::make_shared<g2LogWorker>();
+    auto worker = std::make_shared<g3LogWorker>();
     worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
     worker->save("this message should trigger an atomic increment at the sink");
 
@@ -211,7 +211,7 @@ TEST(Sink, OneSinkWithHandleOutOfScope) {
   AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
   AtomicIntPtr count = make_shared<atomic<int>>(0);
   {
-    auto worker = std::make_shared<g2LogWorker>();
+    auto worker = std::make_shared<g3LogWorker>();
     {
        auto handle =   worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
     }
@@ -238,7 +238,7 @@ TEST(Sink, OneHundredSinks) {
   }
 
   {
-    auto worker = std::make_shared<g2LogWorker>();
+    auto worker = std::make_shared<g3LogWorker>();
     size_t index = 0;
     for (auto& flag : flags) {
       auto& count = counts[index++];
