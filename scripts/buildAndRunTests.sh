@@ -17,8 +17,8 @@ cd build_travis
 if [[ $CXX == *"g++"* ]]
 then
    echo "Testing with g++"
-   cmake -DCMAKE_CXX_COMPILER=g++ -DUSE_G3LOG_UNIT_TEST=ON ..
-   make -j
+   cmake -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DADD_G3LOG_UNIT_TEST=ON ..
+    make -j
    ./test_concept_sink
    ./test_configuration
    ./test_dynamic_loaded_shared_lib
