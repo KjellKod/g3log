@@ -46,7 +46,7 @@ namespace g3 {
          FATAL.value + 1
       };
       //std::atomic<bool> g_log_level_status[4] {{true}, {true}, {true}, {true}};
-      std::map<int, atomicbool> g_log_level_status = {{DEBUG.value, true}, {INFO.value, true}, {WARNING.value, true}, {FATAL.value, true}};
+      std::map<int, atomicbool> g_log_level_status = {{g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {FATAL.value, true}};
 #endif
    } // internal
 
@@ -67,7 +67,7 @@ namespace g3 {
 
       void reset() {
          internal::g_log_level_status.clear();
-         internal::g_log_level_status = {{DEBUG.value, true}, {INFO.value, true}, {WARNING.value, true}, {FATAL.value, true}};
+         internal::g_log_level_status = {{g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {FATAL.value, true}};
       }
    } // only_change_at_initialization
 #endif
