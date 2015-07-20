@@ -23,6 +23,8 @@
 #include "g3log/logworker.hpp"
 #include "g3log/crashhandler.hpp"
 #include "g3log/logmessage.hpp"
+#include "g3log/loglevels.hpp"
+
 
 #include <cstdio>    // vsnprintf
 #include <mutex>
@@ -124,7 +126,12 @@ namespace g3 {
        */
       void shutDownLogging() {
          std::lock_guard<std::mutex> lock(g_logging_init_mutex);
+#ifdef G3_DYNAMIC_LOGGING
+         g3::only_change_at_initialization::reset();
+#endif
+
          g_logger_instance = nullptr;
+
       }
 
       /** Same as the Shutdown above but called by the destructor of the LogWorker, thus ensuring that no further

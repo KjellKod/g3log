@@ -8,18 +8,17 @@
 
 #pragma once
 
-
 // Users of Juce or other libraries might have a define DEBUG which clashes with
 // the DEBUG logging level for G3log. In that case they can instead use the define
 //  "CHANGE_G3LOG_DEBUG_TO_DBUG" and G3log's logging level DEBUG is changed to be DBUG
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-#if (defined(DBUG))
-#error "DEBUG is already defined elsewhere which clashes with G3Log's log level DEBUG"
-#endif
+   #if (defined(DBUG))
+      #error "DEBUG is already defined elsewhere which clashes with G3Log's log level DEBUG"
+   #endif
 #else
-#if (defined(DEBUG))
-#error "DEBUG is already defined elsewhere which clashes with G3Log's log level DEBUG"
-#endif
+   #if (defined(DEBUG))
+      #error "DEBUG is already defined elsewhere which clashes with G3Log's log level DEBUG"
+   #endif
 #endif
 
 #include <string>
@@ -52,8 +51,8 @@ const LEVELS DBUG {g3::kDebugVaulue, {"DEBUG"}},
 #else
 const LEVELS DEBUG {g3::kDebugVaulue, {"DEBUG"}},
 #endif
-INFO {g3::kDebugVaulue + 1, {"INFO"}},
-WARNING {INFO.value + 1, {"WARNING"}},
+      INFO {g3::kDebugVaulue + 1, {"INFO"}},
+      WARNING {INFO.value + 1, {"WARNING"}},
 
 
 
@@ -67,31 +66,37 @@ WARNING {INFO.value + 1, {"WARNING"}},
 //  const LEVELS MYFATAL {FATAL.value +1, {"MyFatalLevel"}};
 //
 // IMPORTANT: As of yet dynamic on/off of logging is NOT changed automatically
-//     any changes of this, if you use dynamic on/off must be done in loglevels.cpp, 
-//     g_log_level_status and 
+//     any changes of this, if you use dynamic on/off must be done in loglevels.cpp,
+//     g_log_level_status and
 //     void setLogLevel(LEVELS log_level, bool enabled) {...}
 //     bool logLevel(LEVELS log_level){...}
 
 
 // 1) Remember to update the FATAL initialization below
 // 2) Remember to update the initialization of "g3loglevels.cpp/g_log_level_status"
-FATAL {WARNING.value + 500, {"FATAL"}};
+      FATAL {500, {"FATAL"}};
 
 namespace g3 {
    namespace internal {
-      const LEVELS CONTRACT {1000, {"CONTRACT"}}, 
-      FATAL_SIGNAL {1001, {"FATAL_SIGNAL"}},
-      FATAL_EXCEPTION {1002, {"FATAL_EXCEPTION"}};
-      
+      const LEVELS CONTRACT {1000, {"CONTRACT"}},
+            FATAL_SIGNAL {1001, {"FATAL_SIGNAL"}},
+            FATAL_EXCEPTION {1002, {"FATAL_EXCEPTION"}};
+
       /// helper function to tell the logger if a log message was fatal. If it is it will force
       /// a shutdown after all log entries are saved to the sinks
       bool wasFatal(const LEVELS &level);
    }
 
 #ifdef G3_DYNAMIC_LOGGING
-   // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
-   void setLogLevel(LEVELS level, bool enabled_status);
+   // Only safe if done at initialization in a single-thread context
+   namespace only_change_at_initialization {
+      // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
+      void setLogLevel(LEVELS level, bool enabled_status);
+      std::string printLevels();
+      void reset();
+      
+   } // only_change_at_initialization
 #endif
-   bool logLevel(LEVELS level);
+      bool logLevel(LEVELS level);
 } // g3
 
