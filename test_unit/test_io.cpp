@@ -487,18 +487,6 @@ TEST(CustomLogLevels, AddANonFatal__ThenReset){
    EXPECT_FALSE(g3::logLevel(MYINFO));
 }
 
-TEST(CustomLogLevels, AddANonFatal__ThenResetByLoggingShutdown) {
-   const LEVELS MYINFO {WARNING.value + 2, {"MY_INFO_LEVEL"}};
-   {  
-      RestoreFileLogger logger(log_directory);
-      EXPECT_FALSE(g3::logLevel(MYINFO));
-      g3::only_change_at_initialization::setLogLevel(MYINFO, true);
-      EXPECT_TRUE(g3::logLevel(MYINFO));
-   }
-   EXPECT_FALSE(g3::logLevel(MYINFO)) << g3::only_change_at_initialization::printLevels();
-}
-
-
 
 TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue1){
    RestoreFileLogger logger(log_directory);

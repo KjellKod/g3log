@@ -126,10 +126,6 @@ namespace g3 {
        */
       void shutDownLogging() {
          std::lock_guard<std::mutex> lock(g_logging_init_mutex);
-#ifdef G3_DYNAMIC_LOGGING
-         g3::only_change_at_initialization::reset();
-#endif
-
          g_logger_instance = nullptr;
 
       }
