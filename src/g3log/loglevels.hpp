@@ -30,9 +30,7 @@ struct LEVELS {
    // force internal copy of the const char*. This is a simple safeguard for when g3log is used in a
    // "dynamic, runtime loading of shared libraries"
 
-   LEVELS(const LEVELS &other)
-      : value(other.value), text(other.text.c_str()) {}
-
+   LEVELS(const LEVELS &other): value(other.value), text(other.text.c_str()) {}
    LEVELS(int id, const char *idtext) : value(id), text(idtext) {}
 
    friend bool operator==(const LEVELS &lhs, const LEVELS &rhs) {
@@ -50,28 +48,43 @@ namespace g3 {
 }
 
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-const LEVELS DBUG {
-   g3::kDebugVaulue, {"DEBUG"}
-},
+const LEVELS DBUG {g3::kDebugVaulue, {"DEBUG"}},
 #else
-const LEVELS DEBUG {
-   g3::kDebugVaulue, {"DEBUG"}
-},
+const LEVELS DEBUG {g3::kDebugVaulue, {"DEBUG"}},
 #endif
 INFO {g3::kDebugVaulue + 1, {"INFO"}},
 WARNING {INFO.value + 1, {"WARNING"}},
-// Insert here *any* extra logging levels that is needed
+
+
+
+// Insert here *any* extra logging levels that is needed. You can do so in your own source file
+// If it is a FATAL you should keep it above (FATAL.value and below internal::CONTRACT.value
+// If it is a non-fatal you can keep it above (WARNING.value and below FATAL.value)
+//
+// example: MyLoggingLevel.h
+// #pragma once
+//  const LEVELS MYINFO {WARNING.value +1, {"MyInfoLevel"}};
+//  const LEVELS MYFATAL {FATAL.value +1, {"MyFatalLevel"}};
+//
+// IMPORTANT: As of yet dynamic on/off of logging is NOT changed automatically
+//     any changes of this, if you use dynamic on/off must be done in loglevels.cpp, 
+//     g_log_level_status and 
+//     void setLogLevel(LEVELS log_level, bool enabled) {...}
+//     bool logLevel(LEVELS log_level){...}
+
+
 // 1) Remember to update the FATAL initialization below
 // 2) Remember to update the initialization of "g3loglevels.cpp/g_log_level_status"
-FATAL {WARNING.value + 1, {"FATAL"}};
-
+FATAL {WARNING.value + 500, {"FATAL"}};
 
 namespace g3 {
    namespace internal {
-      const LEVELS CONTRACT {
-         100, {"CONTRACT"}
-      }, FATAL_SIGNAL {101, {"FATAL_SIGNAL"}},
-      FATAL_EXCEPTION {102, {"FATAL_EXCEPTION"}};
+      const LEVELS CONTRACT {1000, {"CONTRACT"}}, 
+      FATAL_SIGNAL {1001, {"FATAL_SIGNAL"}},
+      FATAL_EXCEPTION {1002, {"FATAL_EXCEPTION"}};
+      
+      /// helper function to tell the logger if a log message was fatal. If it is it will force
+      /// a shutdown after all log entries are saved to the sinks
       bool wasFatal(const LEVELS &level);
    }
 

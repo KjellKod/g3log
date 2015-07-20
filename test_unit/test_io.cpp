@@ -418,6 +418,37 @@ TEST(CHECK, CHECK_ThatWontThrow) {
 
 
 
+TEST(CustomLogLevels, AddANonFatal){
+   RestoreFileLogger logger(log_directory);
+   const LEVELS MYINFO {WARNING.value +1, {"MY_INFO_LEVEL"}};
+   LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
+   logger.reset();
+   std::string file_content = readFileToText(logger.logFile());
+   std::string expected;
+   expected += "MY_INFO_LEVEL [test_io.cpp L: " + std::to_string(line);
+   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content 
+   << "\n\nExpected: \n" << expected;
+}
+
+TEST(CustomLogLevels, AddFatal){
+   RestoreFileLogger logger(log_directory);
+   const LEVELS DEADLY {FATAL.value +1, {"DEADLY"}};
+   g_fatal_counter.store(0);
+   ASSERT_FALSE(mockFatalWasCalled());
+   g3::setFatalPreLoggingHook(fatalCounter);   
+
+   LOG(DEADLY) << "Testing my own custom level"; auto line = __LINE__;
+   logger.reset();
+   ASSERT_TRUE(mockFatalWasCalled());
+   EXPECT_EQ(size_t{1}, g_fatal_counter.load());
+
+   std::string file_content = readFileToText(logger.logFile());
+   std::string expected;
+   expected += "DEADLY [test_io.cpp L: " + std::to_string(line);
+   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content 
+   << "\n\nExpected: \n" << expected;
+   g_fatal_counter.store(0); // restore
+}
 
 
 #ifdef G3_DYNAMIC_LOGGING 
@@ -549,6 +580,7 @@ TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disab
    LOG(FATAL) << msg3;
    EXPECT_FALSE(mockFatalWasCalled());
 }
+
 
 
 
