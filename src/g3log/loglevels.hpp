@@ -7,6 +7,7 @@
 * ============================================================================*/
 
 #pragma once
+#include "g3log/generated_definitions.hpp"
 
 // Users of Juce or other libraries might have a define DEBUG which clashes with
 // the DEBUG logging level for G3log. In that case they can instead use the define

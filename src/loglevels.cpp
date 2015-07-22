@@ -41,11 +41,6 @@ namespace g3 {
       }
 
 #ifdef G3_DYNAMIC_LOGGING
-      // All levels are by default ON: i.e. for DEBUG, INFO, WARNING, FATAL
-      const int g_level_size {
-         FATAL.value + 1
-      };
-      //std::atomic<bool> g_log_level_status[4] {{true}, {true}, {true}, {true}};
       std::map<int, atomicbool> g_log_level_status = {{g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {FATAL.value, true}};
 #endif
    } // internal
