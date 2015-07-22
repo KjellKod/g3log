@@ -69,8 +69,8 @@ ENDIF()
    #MESSAGE(" HEADER FILES ARE: ${HEADER_FILES}")
 
    IF (MSVC OR MINGW) 
-         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/g3log/crashhandler_unix.cpp)
-   ELSE()     
+         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
+   ELSE()
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
    ENDIF (MSVC OR MINGW)
 
