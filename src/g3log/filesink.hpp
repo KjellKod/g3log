@@ -18,7 +18,7 @@ namespace g3 {
       FileSink(const std::string &log_prefix, const std::string &log_directory);
       virtual ~FileSink();
 
-      void fileWrite(LogMessageMover message);
+      void fileWrite(LogMessage message);
       std::string changeLogFile(const std::string &directory);
       std::string fileName();
 

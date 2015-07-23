@@ -24,54 +24,69 @@ namespace g3 {
    LogWorkerImpl::LogWorkerImpl() : _bg(kjellkod::Active::createActive()) { }
 
    void LogWorkerImpl::bgSave(g3::LogMessagePtr msgPtr) {
-      std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
+      LogMessage msg = *msgPtr.get();
 
       for (auto &sink : _sinks) {
-         LogMessage msg(*(uniqueMsg));
-         sink->send(LogMessageMover(std::move(msg)));
+         sink->send(msg);
       }
 
       if (_sinks.empty()) {
          std::string err_msg {"g3logworker has no sinks. Message: ["};
-         err_msg.append(uniqueMsg.get()->toString()).append({"]\n"});
+         err_msg.append(msg.toString()).append({"]\n"});
          std::cerr << err_msg;
       }
    }
 
+   //    void LogWorkerImpl::bgSave(g3::LogMessagePtr msgPtr) {
+   //    std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
+
+   //    for (auto &sink : _sinks) {
+   //       LogMessage msg(*(uniqueMsg));
+   //       sink->send(LogMessageMover(std::move(msg)));
+   //    }
+
+   //    if (_sinks.empty()) {
+   //       std::string err_msg {"g3logworker has no sinks. Message: ["};
+   //       err_msg.append(uniqueMsg.get()->toString()).append({"]\n"});
+   //       std::cerr << err_msg;
+   //    }
+   // }
+
+
    void LogWorkerImpl::bgFatal(FatalMessagePtr msgPtr) {
       // this will be the last message. Only the active logworker can receive a FATAL call so it's
       // safe to shutdown logging now
-      g3::internal::shutDownLogging();
+      // g3::internal::shutDownLogging();
 
-      std::string reason = msgPtr.get()->reason();
-      const auto level = msgPtr.get()->_level;
-      const auto fatal_id = msgPtr.get()->_signal_id;
-
-
-      std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
-      uniqueMsg->write().append("\nExiting after fatal event  (").append(uniqueMsg->level());
+      // std::string reason = msgPtr.get()->reason();
+      // const auto level = msgPtr.get()->_level;
+      // const auto fatal_id = msgPtr.get()->_signal_id;
 
 
-      // Change output in case of a fatal signal (or windows exception)
-      std::string exiting = {"Fatal type: "};
-
-      uniqueMsg->write().append("). ").append(exiting).append(" ").append(reason)
-      .append("\nLog content flushed flushed sucessfully to sink\n\n");
-
-      std::cerr << uniqueMsg->message() << std::flush;
-      for (auto &sink : _sinks) {
-         LogMessage msg(*(uniqueMsg));
-         sink->send(LogMessageMover(std::move(msg)));
-      }
+      // std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
+      // uniqueMsg->write().append("\nExiting after fatal event  (").append(uniqueMsg->level());
 
 
-      // This clear is absolutely necessary
-      // All sinks are forced to receive the fatal message above before we continue
-      _sinks.clear(); // flush all queues
-      internal::exitWithDefaultSignalHandler(level, fatal_id);
+      // // Change output in case of a fatal signal (or windows exception)
+      // std::string exiting = {"Fatal type: "};
 
-      // should never reach this point
-      perror("g3log exited after receiving FATAL trigger. Flush message status: ");
+      // uniqueMsg->write().append("). ").append(exiting).append(" ").append(reason)
+      // .append("\nLog content flushed flushed sucessfully to sink\n\n");
+
+      // std::cerr << uniqueMsg->message() << std::flush;
+      // for (auto &sink : _sinks) {
+      //    LogMessage msg(*(uniqueMsg));
+      //    sink->send(LogMessageMover(std::move(msg)));
+      // }
+
+
+      // // This clear is absolutely necessary
+      // // All sinks are forced to receive the fatal message above before we continue
+      // _sinks.clear(); // flush all queues
+      // internal::exitWithDefaultSignalHandler(level, fatal_id);
+
+      // // should never reach this point
+      // perror("g3log exited after receiving FATAL trigger. Flush message status: ");
    }
 
    LogWorker::~LogWorker() {
