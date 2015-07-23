@@ -84,8 +84,14 @@ int main(int argc, char** argv)
    oss.str(""); // clear the stream
 
 #if defined(G3LOG_PERFORMANCE)
-   auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
-   g3::initializeLogging(logger_n_handle.worker.get());
+   //auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
+   //g3::initializeLogging(logger_n_handle.worker.get());
+   auto logger = g3::LogWorker::createWithNoSink();
+   
+   for (auto i = 0; i < 10; ++i) {
+      auto handle = logger->addSink(std2::make_unique<g3::FileSink>(g_prefix_log_name+ "___" + std::to_string(i), g_path), &g3::FileSink::fileWrite);
+   }
+   g3::initializeLogging(logger.get());
 
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::InitGoogleLogging(argv[0]);
@@ -120,7 +126,7 @@ int main(int argc, char** argv)
 
 
 #if defined(G3LOG_PERFORMANCE)
-   logger_n_handle.worker.reset(); // will flush anything in the queue to file
+   logger.reset(); // will flush anything in the queue to file
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::ShutdownGoogleLogging();
 #endif
