@@ -33,8 +33,12 @@ struct LEVELS {
    LEVELS(const LEVELS &other): value(other.value), text(other.text.c_str()) {}
    LEVELS(int id, const char *idtext) : value(id), text(idtext) {}
 
-   friend bool operator==(const LEVELS &lhs, const LEVELS &rhs) {
-      return (lhs.value == rhs.value && lhs.text == rhs.text);
+   bool operator==(const LEVELS &rhs)  const {
+      return (value == rhs.value && text == rhs.text);
+   }
+
+   bool operator!=(const LEVELS &rhs) const {
+      return (value != rhs.value || text != rhs.text);
    }
 
    const int value;

@@ -18,6 +18,8 @@
 #include <thread>
 #include <chrono>
 #include <exception>
+#include <algorithm>
+
 namespace {
 const std::string log_directory = "./";
 const std::string t_info = "test INFO ";
@@ -112,6 +114,24 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
  }
 #endif // #ifdef G3_DYNAMIC_LOGGING
 
+TEST(Basics, Levels) {
+   std::vector<LEVELS> levels = {INFO, WARNING, FATAL};
+   auto info = INFO;
+   auto warning = WARNING;
+
+   auto found_info = std::find(levels.begin(), levels.end(), info);
+   EXPECT_TRUE(found_info != levels.end());
+   
+   auto found_warning = std::find(levels.begin(), levels.end(), WARNING);
+   EXPECT_TRUE(found_warning != levels.end());
+   
+   auto not_found_debug = std::find(levels.begin(), levels.end(), DEBUG);
+   EXPECT_FALSE(not_found_debug!= levels.end());  
+   EXPECT_NE(INFO, WARNING); 
+   EXPECT_EQ(info, INFO);
+   EXPECT_TRUE(INFO == INFO);
+   EXPECT_FALSE(info == WARNING);
+}
 
 TEST(Basics, Shutdown) {
    std::string file_content;
