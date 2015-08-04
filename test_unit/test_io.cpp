@@ -131,6 +131,8 @@ TEST(Basics, Levels) {
    EXPECT_EQ(info, INFO);
    EXPECT_TRUE(INFO == INFO);
    EXPECT_FALSE(info == WARNING);
+   EXPECT_TRUE(info != WARNING);
+   EXPECT_FALSE(info != INFO);
 }
 
 TEST(Basics, Shutdown) {
