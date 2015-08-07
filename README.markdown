@@ -167,20 +167,20 @@ mkdir build
 cd build
 ```
 
-** Building on Linux **
+## Building on Linux
 ```
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make 
 ```
 
-** Building on Windows **
+## Building on Windows
 Please use the Visual Studio 12 (2013) command prompt "Developer command prompt"
 ```
 cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
 msbuild g3log.sln /p:Configuration=Release
 ```
 
-** Building on *nix with Clang:  **
+## Building on *nix with Clang
 ```
 cmake -DCMAKE_CXX_COMPILER=clang++      -DCMAKE_BUILD_TYPE=Release ..
 make 
