@@ -114,9 +114,6 @@ namespace g3 {
          swap(first._message, second._message);
       }
 
-    private:
-      LogMessage() = default;  // only used for internal swap
-
    };
 
 

@@ -165,19 +165,18 @@ namespace g3 {
       , _message(other._message) {
    }
 
-   LogMessage::LogMessage(LogMessage&& other)
-      : _timestamp(0)
-      , _call_thread_id(0)
-      , _microseconds(0)
-      , _file("---")
-      , _line(0)
-      , _function("---")
-      , _level(DEBUG)
-      , _expression("---")
-      , _message("---") {
-
-      swap(*this, other);
+   LogMessage::LogMessage(LogMessage &&other)
+      : _timestamp(other._timestamp)
+      , _call_thread_id(other._call_thread_id)
+      , _microseconds(other._microseconds)
+      , _file(std::move(other._file))
+      , _line(other._line)
+      , _function(std::move(other._function))
+      , _level(other._level)
+      , _expression(std::move(other._expression))
+      , _message(std::move(other._message)) {
    }
+
 
 
    std::string LogMessage::threadID() const {
