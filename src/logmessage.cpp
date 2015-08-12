@@ -12,7 +12,6 @@
 #include "g3log/std2_make_unique.hpp"
 #include <algorithm>
 #include <mutex>
-#include <iostream>
 
 namespace {
    std::once_flag g_start_time_flag;
