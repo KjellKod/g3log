@@ -2,7 +2,7 @@
 * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
-* 
+*
 * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
@@ -47,7 +47,7 @@ namespace g3 {
 
       /// use a different format string to get a different look on the time.
       //  default look is Y/M/D H:M:S
-      std::string timestamp(const std::string &time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
+      std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
       std::string microseconds() const {
          return std::to_string(_microseconds);
       }
@@ -55,7 +55,7 @@ namespace g3 {
       std::string message() const  {
          return _message;
       }
-      std::string &write() const {
+      std::string& write() const {
          return _message;
       }
 
@@ -74,11 +74,14 @@ namespace g3 {
       }
 
 
-      LogMessage(const std::string &file, const int line, const std::string &function, const LEVELS &level);
-      explicit LogMessage(const std::string &fatalOsSignalCrashMessage);
+      LogMessage& operator=(LogMessage other);
 
-      LogMessage(const LogMessage &);
-      LogMessage(LogMessage &&other);
+
+      LogMessage(const std::string& file, const int line, const std::string& function, const LEVELS& level);
+
+      explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
+      LogMessage(const LogMessage& other);
+      LogMessage(LogMessage&& other);
       virtual ~LogMessage() {}
 
       //
@@ -94,6 +97,26 @@ namespace g3 {
       LEVELS _level;
       std::string _expression; // only with content for CHECK(...) calls
       mutable std::string _message;
+
+
+
+      friend void swap(LogMessage& first, LogMessage& second) {
+         // enable ADL (not necessary in our case, but good practice)
+         using std::swap;
+         swap(first._timestamp, second._timestamp);
+         swap(first._call_thread_id, second._call_thread_id);
+         swap(first._microseconds, second._microseconds);
+         swap(first._file, second._file);
+         swap(first._line, second._line);
+         swap(first._function, second._function);
+         swap(first._level, second._level);
+         swap(first._expression, second._expression);
+         swap(first._message, second._message);
+      }
+
+    private:
+      LogMessage() = default;  // only used for internal swap
+
    };
 
 
@@ -103,8 +126,8 @@ namespace g3 {
     * A thread that causes a FatalMessage will sleep forever until the
     * application has exited (after message flush) */
    struct FatalMessage : public LogMessage {
-      FatalMessage(const LogMessage &details, g3::SignalType signal_id);
-      FatalMessage(const FatalMessage &);
+      FatalMessage(const LogMessage& details, g3::SignalType signal_id);
+      FatalMessage(const FatalMessage&);
       virtual ~FatalMessage() {}
 
       LogMessage copyToLogMessage() const;

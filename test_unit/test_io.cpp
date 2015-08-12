@@ -2,7 +2,7 @@
  * 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
@@ -21,18 +21,18 @@
 #include <algorithm>
 
 namespace {
-const std::string log_directory = "./";
-const std::string t_info = "test INFO ";
-const std::string t_info2 = "test INFO 123";
-const std::string t_debug = "test DEBUG ";
-const std::string t_debug3 = "test DEBUG 1.123456";
-const std::string t_warning = "test WARNING ";
-const std::string t_warning3 = "test WARNING yello";
+   const std::string log_directory = "./";
+   const std::string t_info = "test INFO ";
+   const std::string t_info2 = "test INFO 123";
+   const std::string t_debug = "test DEBUG ";
+   const std::string t_debug3 = "test DEBUG 1.123456";
+   const std::string t_warning = "test WARNING ";
+   const std::string t_warning3 = "test WARNING yello";
 
-std::atomic<size_t> g_fatal_counter = {0};
-void fatalCounter() {
-   ++g_fatal_counter;
-}
+   std::atomic<size_t> g_fatal_counter = {0};
+   void fatalCounter() {
+      ++g_fatal_counter;
+   }
 
 } // end anonymous namespace
 
@@ -40,12 +40,12 @@ void fatalCounter() {
 using namespace testing_helpers;
 
 
-/// THIS MUST BE THE FIRST UNIT TEST TO RUN! If any unit test run before this 
+/// THIS MUST BE THE FIRST UNIT TEST TO RUN! If any unit test run before this
 /// one then it could fail. For dynamic levels all levels are turned on only AT
 /// instantiation so we do different test for dynamic logging levels
 ///
 /// TODO : (gtest issue)
-///Move out to separate unit test binary to ensure reordering of tests does not happen 
+///Move out to separate unit test binary to ensure reordering of tests does not happen
 #ifdef G3_DYNAMIC_LOGGING
 TEST(Initialization, No_Logger_Initialized___LevelsAreONByDefault) {
    EXPECT_FALSE(g3::internal::isLoggingInitialized());
@@ -83,7 +83,7 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    auto content = logger.resetAndRetrieveContent(); // this synchronizes with the LOG(INFO) call if debug level would be ON.
    ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
    ASSERT_FALSE(verifyContent(content, err_msg3_ignored)) << "Content: [" << content << "]";
-   ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";       
+   ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";
 }
 #else
 TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
@@ -111,23 +111,38 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    ASSERT_TRUE(verifyContent(content, err_msg1)) << "Content: [" << content << "]";
    ASSERT_FALSE(verifyContent(content, err_msg3_ignored)) << "Content: [" << content << "]";
    ASSERT_TRUE(verifyContent(content, good_msg1)) << "Content: [" << content << "]";
- }
+}
 #endif // #ifdef G3_DYNAMIC_LOGGING
 
-TEST(Basics, Levels) {
+TEST(Basics, Levels_StdFind) {
    std::vector<LEVELS> levels = {INFO, WARNING, FATAL};
    auto info = INFO;
    auto warning = WARNING;
-
+   auto debug = DEBUG;
    auto found_info = std::find(levels.begin(), levels.end(), info);
    EXPECT_TRUE(found_info != levels.end());
-   
-   auto found_warning = std::find(levels.begin(), levels.end(), WARNING);
-   EXPECT_TRUE(found_warning != levels.end());
-   
-   auto not_found_debug = std::find(levels.begin(), levels.end(), DEBUG);
-   EXPECT_FALSE(not_found_debug!= levels.end());  
-   EXPECT_NE(INFO, WARNING); 
+
+   bool wasFound = (levels.end() != std::find(levels.begin(), levels.end(), info));
+   EXPECT_TRUE(wasFound);
+
+   auto wasNotFound = (levels.end() == std::find(levels.begin(), levels.end(), debug));
+   EXPECT_TRUE(wasNotFound);
+
+   auto foundWarningIterator = std::find(levels.begin(), levels.end(), WARNING);
+   EXPECT_TRUE(foundWarningIterator != levels.end());
+
+   foundWarningIterator = std::find(levels.begin(), levels.end(), warning);
+   EXPECT_TRUE(foundWarningIterator != levels.end());
+
+   auto wasNotFoundIterator = std::find(levels.begin(), levels.end(), DEBUG);
+   EXPECT_FALSE(wasNotFoundIterator != levels.end());
+}
+
+
+TEST(Basics, Levels_Operator) {
+   auto info = INFO;
+   auto warning = WARNING;
+   EXPECT_NE(INFO, WARNING);
    EXPECT_EQ(info, INFO);
    EXPECT_TRUE(INFO == INFO);
    EXPECT_FALSE(info == WARNING);
@@ -302,12 +317,13 @@ TEST(LogTest, LOG_preFatalLogging_hook) {
       RestoreFileLogger logger(log_directory);
       ASSERT_FALSE(mockFatalWasCalled());
       g_fatal_counter.store(0);
-      g3::setFatalPreLoggingHook(fatalCounter);   
+      g3::setFatalPreLoggingHook(fatalCounter);
       LOG(FATAL) << "This message is fatal";
       logger.reset();
       EXPECT_EQ(g_fatal_counter.load(), size_t{1});
    }
-   {  // Now with no fatal pre-logging-hook
+   {
+      // Now with no fatal pre-logging-hook
       RestoreFileLogger logger(log_directory);
       ASSERT_FALSE(mockFatalWasCalled());
       g_fatal_counter.store(0);
@@ -321,14 +337,14 @@ TEST(LogTest, LOG_preFatalLogging_hook) {
 TEST(LogTest, LOG_FATAL) {
    RestoreFileLogger logger(log_directory);
    ASSERT_FALSE(mockFatalWasCalled());
-   
-   
-   
+
+
+
    LOG(FATAL) << "This message is fatal";
    EXPECT_TRUE(mockFatalWasCalled());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "This message is fatal"))
-           << "\ncontent: [[" << mockFatalMessage() << "]]";
+         << "\ncontent: [[" << mockFatalMessage() << "]]";
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "FATAL"));
 
    logger.reset();
@@ -441,31 +457,31 @@ TEST(CHECK, CHECK_ThatWontThrow) {
 
 
 
-TEST(CustomLogLevels, AddANonFatal){
+TEST(CustomLogLevels, AddANonFatal) {
    RestoreFileLogger logger(log_directory);
-   const LEVELS MYINFO {WARNING.value +1, {"MY_INFO_LEVEL"}};
-   #ifdef G3_DYNAMIC_LOGGING
+   const LEVELS MYINFO {WARNING.value + 1, {"MY_INFO_LEVEL"}};
+#ifdef G3_DYNAMIC_LOGGING
    g3::only_change_at_initialization::setLogLevel(MYINFO, true);
-   #endif
+#endif
    LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
    expected += "MY_INFO_LEVEL [test_io.cpp L: " + std::to_string(line);
-   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content 
-   << "\n\nExpected: \n" << expected;
+   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content
+         << "\n\nExpected: \n" << expected;
 }
 
-TEST(CustomLogLevels, AddFatal){
+TEST(CustomLogLevels, AddFatal) {
    RestoreFileLogger logger(log_directory);
-   const LEVELS DEADLY {FATAL.value +1, {"DEADLY"}};
+   const LEVELS DEADLY {FATAL.value + 1, {"DEADLY"}};
    EXPECT_TRUE(g3::internal::wasFatal(DEADLY));
    g_fatal_counter.store(0);
    ASSERT_FALSE(mockFatalWasCalled());
-   g3::setFatalPreLoggingHook(fatalCounter);   
-   #ifdef G3_DYNAMIC_LOGGING
+   g3::setFatalPreLoggingHook(fatalCounter);
+#ifdef G3_DYNAMIC_LOGGING
    g3::only_change_at_initialization::setLogLevel(DEADLY, true);
-   #endif 
+#endif
 
    LOG(DEADLY) << "Testing my own custom level"; auto line = __LINE__;
    logger.reset();
@@ -475,13 +491,13 @@ TEST(CustomLogLevels, AddFatal){
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
    expected += "DEADLY [test_io.cpp L: " + std::to_string(line);
-   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content 
-   << "\n\nExpected: \n" << expected;
+   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content
+         << "\n\nExpected: \n" << expected;
    g_fatal_counter.store(0); // restore
 }
 
 
-#ifdef G3_DYNAMIC_LOGGING 
+#ifdef G3_DYNAMIC_LOGGING
 namespace {
    // Restore dynamic levels if turned off
 
@@ -499,9 +515,9 @@ namespace {
 } // anonymous
 
 
-TEST(CustomLogLevels, AddANonFatal__ThenReset){
+TEST(CustomLogLevels, AddANonFatal__ThenReset) {
    RestoreFileLogger logger(log_directory);
-   const LEVELS MYINFO {WARNING.value +2, {"MY_INFO_LEVEL"}};
+   const LEVELS MYINFO {WARNING.value + 2, {"MY_INFO_LEVEL"}};
    EXPECT_FALSE(g3::logLevel(MYINFO));
    g3::only_change_at_initialization::setLogLevel(MYINFO, true);
    EXPECT_TRUE(g3::logLevel(MYINFO));
@@ -510,22 +526,22 @@ TEST(CustomLogLevels, AddANonFatal__ThenReset){
 }
 
 
-TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue1){
+TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue1) {
    RestoreFileLogger logger(log_directory);
-   const LEVELS MYINFO {WARNING.value +2, {"MY_INFO_LEVEL"}};
+   const LEVELS MYINFO {WARNING.value + 2, {"MY_INFO_LEVEL"}};
    LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
    logger.reset();
 
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
    expected += "MY_INFO_LEVEL [test_io.cpp L: " + std::to_string(line);
-   EXPECT_FALSE(verifyContent(file_content, expected)) << file_content  
-      << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::only_change_at_initialization::printLevels();
+   EXPECT_FALSE(verifyContent(file_content, expected)) << file_content
+         << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::only_change_at_initialization::printLevels();
 }
 
-TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue2){
+TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue2) {
    RestoreFileLogger logger(log_directory);
-   const LEVELS MYINFO {WARNING.value +2, {"MY_INFO_LEVEL"}};
+   const LEVELS MYINFO {WARNING.value + 2, {"MY_INFO_LEVEL"}};
    EXPECT_FALSE(g3::logLevel(MYINFO));
    LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
    logger.reset();
@@ -533,21 +549,21 @@ TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue2){
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
    expected += "MY_INFO_LEVEL [test_io.cpp L: " + std::to_string(line);
-   EXPECT_FALSE(verifyContent(file_content, expected)) << file_content  
-      << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::only_change_at_initialization::printLevels();
+   EXPECT_FALSE(verifyContent(file_content, expected)) << file_content
+         << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::only_change_at_initialization::printLevels();
 }
 
-TEST(CustomLogLevels, AddANonFatal__DidtAddItToEnabledValue){
+TEST(CustomLogLevels, AddANonFatal__DidtAddItToEnabledValue) {
    RestoreFileLogger logger(log_directory);
-   const LEVELS MYINFO {WARNING.value +3, {"MY_INFO_LEVEL"}};
+   const LEVELS MYINFO {WARNING.value + 3, {"MY_INFO_LEVEL"}};
    g3::only_change_at_initialization::setLogLevel(MYINFO, true);
    LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
    expected += "MY_INFO_LEVEL [test_io.cpp L: " + std::to_string(line);
-   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content 
-   << "\n\nExpected: \n" << expected;
+   EXPECT_TRUE(verifyContent(file_content, expected)) << file_content
+         << "\n\nExpected: \n" << expected;
 }
 
 
@@ -584,7 +600,7 @@ TEST(DynamicLogging, DynamicLogging_IS_ENABLED) {
 }
 TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
    {
-      RestoreFileLogger logger(log_directory);   
+      RestoreFileLogger logger(log_directory);
       ASSERT_TRUE(g3::logLevel(DEBUG));
       ASSERT_TRUE(g3::logLevel(INFO));
       ASSERT_TRUE(g3::logLevel(WARNING));
@@ -592,16 +608,16 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
    }
 
    RestoreDynamicLoggingLevels raiiLevelRestore;
-   
+
    std::string msg_debugOn = "This %s SHOULD  appear in the %s";
    std::string msg_debugOff = "This message should never appear in the log";
    std::string msg_info1 = "This info msg log";
    try {
       {
-              RestoreFileLogger logger(log_directory);   
-              LOGF(DEBUG, msg_debugOn.c_str(), "msg", "log");
-              auto content = logger.resetAndRetrieveContent();
-              ASSERT_TRUE(verifyContent(content, "This msg SHOULD  appear in the log")) << "Content: [" << content << "]";
+         RestoreFileLogger logger(log_directory);
+         LOGF(DEBUG, msg_debugOn.c_str(), "msg", "log");
+         auto content = logger.resetAndRetrieveContent();
+         ASSERT_TRUE(verifyContent(content, "This msg SHOULD  appear in the log")) << "Content: [" << content << "]";
       }
 
       {
@@ -612,8 +628,8 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
          auto content = logger.resetAndRetrieveContent();
          ASSERT_FALSE(verifyContent(content, "This message should never appear in the log")) << "Content: [" << content << "]";
       }
-      
-   } catch (std::exception const &e) {
+
+   } catch (std::exception const& e) {
       std::cerr << e.what() << std::endl;
       ADD_FAILURE() << "Should never have thrown";
    }
@@ -632,11 +648,11 @@ TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {
    EXPECT_TRUE(mockFatalWasCalled());
    EXPECT_FALSE(mockFatalMessage().empty());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), msg1));
-   
+
    clearMockFatal();
    EXPECT_FALSE(mockFatalWasCalled());
-   
-   
+
+
    g3::only_change_at_initialization::setLogLevel(FATAL, false);
    std::string msg3 = "This is NOT fatal (not crash, since it is unit test. FATAL is disabled";
    LOG(FATAL) << msg3;
@@ -655,10 +671,10 @@ TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disab
    LOG(FATAL) << msg1;
    EXPECT_TRUE(mockFatalWasCalled());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), msg1));
-   
+
    clearMockFatal();
    EXPECT_FALSE(mockFatalWasCalled());
- 
+
    // Disable also CHECK calls
    g3::only_change_at_initialization::setLogLevel(FATAL, false);
    ASSERT_FALSE(g3::logLevel(FATAL));
@@ -669,7 +685,7 @@ TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disab
 
 
 
-#else 
+#else
 TEST(DynamicLogging, DynamicLogging_IS_NOT_ENABLED) {
    ASSERT_TRUE(g3::logLevel(DEBUG));
    //g3::setLogLevel(DEBUG, false);  this line will not compile since G3_DYNAMIC_LOGGING is not enabled. Kept for show.
