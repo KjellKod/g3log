@@ -84,8 +84,9 @@ int main(int argc, char** argv)
    oss.str(""); // clear the stream
 
 #if defined(G3LOG_PERFORMANCE)
-   auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(g_prefix_log_name, g_path);
-   g3::initializeLogging(logger_n_handle.worker.get());
+   auto worker = g3::LogWorker::createLogWorker();
+   auto handle= worker->addDefaultLogger(g_prefix_log_name, g_path);
+   g3::initializeLogging(worker.get());
 
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::InitGoogleLogging(argv[0]);
@@ -120,7 +121,7 @@ int main(int argc, char** argv)
 
 
 #if defined(G3LOG_PERFORMANCE)
-   logger_n_handle.worker.reset(); // will flush anything in the queue to file
+   worker.reset(); // will flush anything in the queue to file
 #elif defined(GOOGLE_GLOG_PERFORMANCE)
    google::ShutdownGoogleLogging();
 #endif

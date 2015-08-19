@@ -102,7 +102,7 @@ namespace testing_helpers {
       }
    }
 
-   ScopedLogger::ScopedLogger() : _currentWorker(g3::LogWorker::createWithNoSink()) {}
+   ScopedLogger::ScopedLogger() : _currentWorker(g3::LogWorker::createLogWorker()) {}
    ScopedLogger::~ScopedLogger() {}
 
    g3::LogWorker* ScopedLogger::get() {

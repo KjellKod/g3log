@@ -27,14 +27,9 @@
 namespace g3 {
    class LogWorker;
    struct LogWorkerImpl;
+   using FileSinkHandle = g3::SinkHandle<g3::FileSink>;
 
-   struct DefaultFileLogger {
-      DefaultFileLogger(const std::string &log_prefix, const std::string &log_directory);
-      std::unique_ptr<LogWorker> worker;
-      std::unique_ptr<g3::SinkHandle<g3::FileSink>> sink;
-
-   };
-
+   /// Background side of the LogWorker. Internal use only
    struct LogWorkerImpl final {
       typedef std::shared_ptr<g3::internal::SinkWrapper> SinkWrapperPtr;
       std::vector<SinkWrapperPtr> _sinks;
@@ -46,33 +41,60 @@ namespace g3 {
       void bgSave(g3::LogMessagePtr msgPtr);
       void bgFatal(FatalMessagePtr msgPtr);
 
-      LogWorkerImpl(const LogWorkerImpl &) = delete;
-      LogWorkerImpl &operator=(const LogWorkerImpl &) = delete;
+      LogWorkerImpl(const LogWorkerImpl&) = delete;
+      LogWorkerImpl& operator=(const LogWorkerImpl&) = delete;
    };
 
+
+
+   /// Front end of the LogWorker.  API that is usefule is
+   /// addSink( sink, default_call ) which returns a handle to the sink. See below and REAME for usage example
+   /// save( msg ) : internal use
+   /// fatal ( fatal_msg ) : internal use
    class LogWorker final {
       LogWorker() = default;
       void addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> wrapper);
 
       LogWorkerImpl _impl;
-      LogWorker(const LogWorker &) = delete;
-      LogWorker &operator=(const LogWorker &) = delete;
+      LogWorker(const LogWorker&) = delete;
+      LogWorker& operator=(const LogWorker&) = delete;
 
 
-   public:
+    public:
       ~LogWorker();
-      static g3::DefaultFileLogger createWithDefaultLogger(const std::string &log_prefix, const std::string &log_directory);
-      static std::unique_ptr<LogWorker> createWithNoSink();
+
+      /// Creates the LogWorker with no sinks. See exampel below on @ref addSink for how to use it
+      /// if you want to use the default file logger then see below for @ref addDefaultLogger
+      static std::unique_ptr<LogWorker> createLogWorker();
+
+      
+      /**
+      A convenience function to add the default g3::FileSink to the log worker
+       
+       @param the worker (no, don't put in nullptr here!)
+       @param log_prefix that you want
+       @param log_directory where the log is to be stored.
+       @return a handle for API access to the sink. See the README for example usage
+
+       @verbatim
+       Example:
+       using namespace g3;
+       std::unique_ptr<LogWorker> logworker {LogWorker::createLogWorker()};
+       auto handle = addDefaultLogger("my_test_log", "/tmp");
+       initializeLogging(logworker.get()); // ref. g3log.hpp
+
+       std::future<std::string> log_file_name = sinkHandle->call(&FileSink::fileName);
+       std::cout << "The filename is: " << log_file_name.get() << std::endl;
+       //   something like: /tmp/
+       */
+       std::unique_ptr<FileSinkHandle> addDefaultLogger(const std::string& log_prefix, const std::string& log_directory);
 
 
-      /// pushes in background thread (asynchronously) input messages to log file
-      void save(LogMessagePtr entry);
 
-      /// Will push a fatal message on the queue, this is the last message to be processed
-      /// this way it's ensured that all existing entries were flushed before 'fatal'
-      /// Will abort the application!
-      void fatal(FatalMessagePtr fatal_message);
-
+      /// Adds a sink and returns the handle for access to the sink
+      /// @param real_sink unique_ptr ownership is passed to the log worker
+      /// @param call the default call that should receive either a std::string or a LogMessageMover message
+      /// @return handle to the sink for API access. See usage example below at @ref addDefaultLogger
       template<typename T, typename DefaultLogCall>
       std::unique_ptr<g3::SinkHandle<T>> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {
          using namespace g3;
@@ -81,5 +103,19 @@ namespace g3 {
          addWrappedSink(sink);
          return std2::make_unique<SinkHandle<T>> (sink);
       }
+
+
+
+      /// internal:
+      /// pushes in background thread (asynchronously) input messages to log file
+      void save(LogMessagePtr entry);
+
+      /// internal:
+      //  pushes a fatal message on the queue, this is the last message to be processed
+      /// this way it's ensured that all existing entries were flushed before 'fatal'
+      /// Will abort the application!
+      void fatal(FatalMessagePtr fatal_message);
+
+
    };
 } // g3
