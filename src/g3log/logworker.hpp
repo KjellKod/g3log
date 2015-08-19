@@ -70,8 +70,6 @@ namespace g3 {
       
       /**
       A convenience function to add the default g3::FileSink to the log worker
-       
-       @param the worker (no, don't put in nullptr here!)
        @param log_prefix that you want
        @param log_directory where the log is to be stored.
        @return a handle for API access to the sink. See the README for example usage
@@ -85,7 +83,7 @@ namespace g3 {
 
        std::future<std::string> log_file_name = sinkHandle->call(&FileSink::fileName);
        std::cout << "The filename is: " << log_file_name.get() << std::endl;
-       //   something like: /tmp/
+       //   something like: /tmp/my_test_log.g3log.20150819-100300.log
        */
        std::unique_ptr<FileSinkHandle> addDefaultLogger(const std::string& log_prefix, const std::string& log_directory);
 

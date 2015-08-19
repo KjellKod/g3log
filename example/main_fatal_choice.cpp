@@ -250,6 +250,7 @@ int main(int argc, char **argv)
    auto worker = g3::LogWorker::createLogWorker();
    auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
+   g3::setFatalPreLoggingHook(&breakHere);
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
              << "Choose your type of fatal exit, then "
