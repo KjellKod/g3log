@@ -35,9 +35,10 @@ int main(int argc, char **argv)
    double pi_d = 3.1415926535897932384626433832795;
    float pi_f = 3.1415926535897932384626433832795f;
 
-   auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
-   g3::initializeLogging(logger_n_handle.worker.get());
-   std::future<std::string> log_file_name = logger_n_handle.sink->call(&g3::FileSink::fileName);
+   auto worker = g3::LogWorker::createLogWorker();
+   auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
+   g3::initializeLogging(worker.get());
+   std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
    std::cout << "*   This is an example of g3log. It WILL exit by a failed CHECK(...)" << std::endl;
    std::cout << "*   that acts as a FATAL trigger. Please see the generated log and " << std::endl;
    std::cout << "*   compare to the code at:\n*  \t g3log/test_example/main_contract.cpp" << std::endl;

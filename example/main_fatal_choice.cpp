@@ -235,6 +235,10 @@ namespace
 } // namespace
 
 void breakHere() {
+   std::ostringstream oss;
+   oss << __FUNCTION__ << " was reached" << std::endl;
+   std::cout << oss.str() << std::endl;
+   
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    __debugbreak();
 #endif
@@ -242,11 +246,12 @@ void breakHere() {
 
 int main(int argc, char **argv)
 {
-   auto logger_n_handle = g3::LogWorker::createWithDefaultLogger(argv[0], path_to_log_file);
-   g3::initializeLogging(logger_n_handle.worker.get());
-   g3::setFatalPreLoggingHook(&breakHere);
 
-   std::future<std::string> log_file_name = logger_n_handle.sink->call(&g3::FileSink::fileName);
+   auto worker = g3::LogWorker::createLogWorker();
+   auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
+   g3::initializeLogging(worker.get());
+   g3::setFatalPreLoggingHook(&breakHere);
+   std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
              << "Choose your type of fatal exit, then "
              << " read the generated log and backtrace.\n"

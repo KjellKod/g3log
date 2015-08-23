@@ -33,7 +33,7 @@ TEST(DynamicLoadOfLibrary, JustLoadAndExit) {
    std::vector<std::string> receiver;
    
    { // scope to flush logs at logworker exit
-      auto worker = g3::LogWorker::createWithNoSink();
+      auto worker = g3::LogWorker::createLogWorker();
       auto handle = worker->addSink(std2::make_unique<LogMessageCounter>(std::ref(receiver)), &LogMessageCounter::countMessages);
       
       // add another sink just for more throughput of data

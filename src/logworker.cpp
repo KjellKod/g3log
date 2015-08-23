@@ -2,7 +2,7 @@
 * 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
-* 
+*
 * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
@@ -26,7 +26,7 @@ namespace g3 {
    void LogWorkerImpl::bgSave(g3::LogMessagePtr msgPtr) {
       std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));
 
-      for (auto &sink : _sinks) {
+      for (auto& sink : _sinks) {
          LogMessage msg(*(uniqueMsg));
          sink->send(LogMessageMover(std::move(msg)));
       }
@@ -59,7 +59,7 @@ namespace g3 {
       .append("\nLog content flushed flushed sucessfully to sink\n\n");
 
       std::cerr << uniqueMsg->message() << std::flush;
-      for (auto &sink : _sinks) {
+      for (auto& sink : _sinks) {
          LogMessage msg(*(uniqueMsg));
          sink->send(LogMessageMover(std::move(msg)));
       }
@@ -120,17 +120,15 @@ namespace g3 {
       token_done.wait();
    }
 
-
-   g3::DefaultFileLogger LogWorker::createWithDefaultLogger(const std::string &log_prefix, const std::string &log_directory) {
-      return g3::DefaultFileLogger(log_prefix, log_directory);
-   }
-
-   std::unique_ptr<LogWorker> LogWorker::createWithNoSink() {
+   std::unique_ptr<LogWorker> LogWorker::createLogWorker() {
       return std::unique_ptr<LogWorker>(new LogWorker);
    }
 
-   DefaultFileLogger::DefaultFileLogger(const std::string &log_prefix, const std::string &log_directory)
-      : worker(LogWorker::createWithNoSink())
-      , sink(worker->addSink(std2::make_unique<g3::FileSink>(log_prefix, log_directory), &FileSink::fileWrite)) { }
+   std::unique_ptr<FileSinkHandle>LogWorker::addDefaultLogger(const std::string& log_prefix, const std::string& log_directory) {
+      return addSink(std2::make_unique<g3::FileSink>(log_prefix, log_directory), &FileSink::fileWrite);
+   }
+
+
+
 
 } // g3

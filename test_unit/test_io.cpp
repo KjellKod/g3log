@@ -198,7 +198,7 @@ TEST(Basics, DoNotShutdownActiveLogger) {
    {
       RestoreFileLogger logger(log_directory);
       LOG(INFO) << "Not yet shutdown. This message should make it";
-      std::unique_ptr<g3::LogWorker> duplicateLogWorker{g3::LogWorker::createWithNoSink()};
+      std::unique_ptr<g3::LogWorker> duplicateLogWorker{g3::LogWorker::createLogWorker()};
       EXPECT_FALSE(g3::internal::shutDownLoggingForActiveOnly(duplicateLogWorker.get()));
       LOG(INFO) << "Logger is (NOT) shutdown,. this message WILL make it";
       file_content = logger.resetAndRetrieveContent();

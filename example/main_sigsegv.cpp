@@ -55,7 +55,8 @@ int main(int argc, char **argv)
 
    using namespace g3;
 
-   std::unique_ptr<LogWorker> logworker {LogWorker::createWithNoSink()};
+
+   std::unique_ptr<LogWorker> logworker {LogWorker::createLogWorker()};
    auto sinkHandle = logworker->addSink(std2::make_unique<FileSink>(argv[0], path_to_log_file),
                                         &FileSink::fileWrite);
 

@@ -111,9 +111,10 @@ int main(int argc, char *argv[]) {
     
     testing_helpers::ScopedOut scopedCerr(std::cerr, &cerrDump);
 
-    auto logger = g3::LogWorker::createWithDefaultLogger("ReplaceLogFile", name_path_1);
-    g_logger_ptr = logger.worker.get(); 
-    g_filesink_handler = logger.sink.get();
+    auto worker = g3::LogWorker::createLogWorker();
+    auto handle= worker->addDefaultLogger("ReplaceLogFile", name_path_1);
+    g_logger_ptr = worker.get(); 
+    g_filesink_handler = handle.get();
     last_log_file = g_filesink_handler->call(&g3::FileSink::fileName).get();
     cleaner.addLogToClean(last_log_file);
 

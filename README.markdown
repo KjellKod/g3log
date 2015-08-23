@@ -89,7 +89,7 @@ Example usage where a custom sink is added. A function is called though the sink
 
 int main(int argc, char**argv) {
    using namespace g3;
-   std::unique_ptr<LogWorker> logworker{ LogWorker::createWithNoSink() };
+   std::unique_ptr<LogWorker> logworker{ LogWorker::createLogWorker() };
    auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
                                           &CustomSink::ReceiveLogMessage);
    
@@ -135,7 +135,8 @@ Example usage where a the default file logger is used **and** a custom sink is a
 
 int main(int argc, char**argv) {
    using namespace g3;
-   auto defaultHandler = LogWorker::createWithDefaultLogger(argv[0], 
+   auto worker = LogWorker::createLogWorker();
+   auto defaultHandler = worker->addDefaultLogger(argv[0], 
                                                  path_to_log_file);
    
    // logger is initialized
@@ -143,7 +144,7 @@ int main(int argc, char**argv) {
    
    LOG(DEBUG) << "Make log call, then add another sink";
    
-   defaultHandler.worker->addSink(std2::make_unique<CustomSink>(),
+   worker->addSink(std2::make_unique<CustomSink>(),
                                   &CustomSink::ReceiveLogMessage);
    
    ...
