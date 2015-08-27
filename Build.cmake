@@ -28,7 +28,7 @@ IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang")
    ELSE()
        set(PLATFORM_LINK_LIBRIES rt  c++abi)
    ENDIF()
-  SET(CMAKE_CXX_FLAGS  "-Wall -std=c++11  -pthread -stdlib=libc++ -Wunused -D_GLIBCXX_USE_NANOSLEEP")
+  SET(CMAKE_CXX_FLAGS  "-Wall -std=c++11  -stdlib=libc++ -Wunused -D_GLIBCXX_USE_NANOSLEEP")
 
 
 

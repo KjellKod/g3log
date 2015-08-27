@@ -23,7 +23,7 @@
 #include <cstdlib>
 #include <sstream>
 #include <iostream>
-
+#include <thread> // temporary to be removed
 
 // Linux/Clang, OSX/Clang, OSX/gcc
 #if (defined(__clang__) || defined(__APPLE__))
@@ -34,10 +34,51 @@
 
 
 namespace {
+   bool shouldDoExit() {
+      static std::atomic<uint64_t> firstExit{0};
+      auto const count = firstExit.fetch_add(1, std::memory_order_relaxed);
+      return (0 == count);
+   }
+
+   void restoreSignalHandler(int signal_number) {
+      std::cerr << "\n\n" << __FUNCTION__ << " " << signal_number << " threadID: " << std::this_thread::get_id() << std::endl;
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
+      struct sigaction action;
+      memset(&action, 0, sizeof (action)); //
+      sigemptyset(&action.sa_mask);
+      action.sa_handler = SIG_DFL; // take default action for the signal
+      sigaction(signal_number, &action, NULL);
+#endif
+   }
+
    // Dump of stack,. then exit through g3log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
    // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
    void signalHandler(int signal_number, siginfo_t *info, void *unused_context) {
+
+      // Only one signal will be allowed past this point
+      if (false == shouldDoExit()) {
+         while (true) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+         }
+      }
+
+
+      Kjell 
+      // Does this make a difference?
+      // http://man7.org/linux/man-pages/man2/sigaltstack.2.html
+      stack_t ss;
+      ss.ss_sp = malloc(SIGSTKSZ);
+      if (ss.ss_sp == NULL) {
+         // Handle error -- no error handling at this moment
+      }
+      ss.ss_size = SIGSTKSZ;
+      ss.ss_flags = 0;
+      if (sigaltstack(&ss, NULL) == -1) {
+         std::cerr << "\n\n\n\n\nFAILED\n\n\n\n\n" << std::endl;
+         return;
+      }
+
       using namespace g3::internal;
       {
          const auto dump = stackdump();
@@ -74,9 +115,10 @@ namespace g3 {
    //          http://stackoverflow.com/questions/6878546/why-doesnt-parent-process-return-to-the-exact-location-after-handling-signal_number
    namespace internal {
 
-      bool blockForFatalHandling() {
+      bool shouldBlockForFatalHandling() {
          return true;  // For windows we will after fatal processing change it to false
       }
+
 
       /// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one
       /// i.e. the latter case is only for Windows and test purposes
@@ -180,20 +222,16 @@ namespace g3 {
       // Triggered by g3log->g3LogWorker after receiving a FATAL trigger
       // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
       // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-      void exitWithDefaultSignalHandler(const LEVELS &level, g3::SignalType fatal_signal_id) {
+      void exitWithDefaultSignalHandler(const LEVELS &level, g3::SignalType fatal_signal_id) {         
          const int signal_number = static_cast<int>(fatal_signal_id);
-         std::cerr << "Exiting due to " << level.text << ", " << signal_number << "   " << std::flush;
+         restoreSignalHandler(signal_number);
+         std::cerr << "\n\n" << __FUNCTION__ << ":" << __LINE__ << ". Exiting due to " << level.text << ", " << signal_number << "   \n\n" << std::flush;
 
-#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-         struct sigaction action;
-         memset(&action, 0, sizeof (action)); //
-         sigemptyset(&action.sa_mask);
-         action.sa_handler = SIG_DFL; // take default action for the signal
-         sigaction(signal_number, &action, NULL);
-#endif
-
-         kill(getpid(), signal_number);
-         abort(); // should never reach this
+         TODO kjell --- 
+         what is the difference between kill and exit?
+         does it have any significance for stack trace
+         exit(signal_number); //kill(getpid(), signal_number);
+         
       }
    } // end g3::internal
 
