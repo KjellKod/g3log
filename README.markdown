@@ -82,7 +82,7 @@ Example usage where a custom sink is added. A function is called though the sink
 ```
 // main.cpp
 #include <g3log/g3log.hpp>
-#include <g3log/g3logworker.hpp>
+#include <g3log/logworker.hpp>
 #include <g3log/std2_make_unique.hpp>
 
 #include "CustomSink.h"
