@@ -148,11 +148,9 @@ namespace {
 
 namespace g3 {
    namespace internal {
-
-
       // For windows exceptions this might ONCE be set to false, in case of a
       // windows exceptions and not a signal
-      bool blockForFatalHandling() {
+      bool shouldBlockForFatalHandling() {
          return gBlockForFatal;
       }
 

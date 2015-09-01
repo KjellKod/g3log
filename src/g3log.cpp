@@ -233,7 +233,7 @@ namespace g3 {
             internal::exitWithDefaultSignalHandler(message.get()->_level, message.get()->_signal_id);
          }
          g_logger_instance->fatal(message);
-         while (blockForFatalHandling()) {
+         while (shouldBlockForFatalHandling()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
          }
       }
