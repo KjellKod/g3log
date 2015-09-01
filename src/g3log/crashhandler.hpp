@@ -11,10 +11,21 @@
 #include <csignal>
 #include "g3log/loglevels.hpp"
 #include "g3log/generated_definitions.hpp"
- 
+
 // kjell. Separera på crashhandler.hpp och crashhanlder_internal.hpp
 // implementationsfilen kan vara den samma
 namespace g3 {
+
+   // PUBLIC API:
+   /** Install signal handler that catches FATAL C-runtime or OS signals
+     See the wikipedia site for details http://en.wikipedia.org/wiki/SIGFPE
+     See the this site for example usage: http://www.tutorialspoint.com/cplusplus/cpp_signal_handling.hpptm
+     SIGABRT  ABORT (ANSI), abnormal termination
+     SIGFPE   Floating point exception (ANSI)
+     SIGILL   ILlegal instruction (ANSI)
+     SIGSEGV  Segmentation violation i.e. illegal memory reference
+     SIGTERM  TERMINATION (ANSI)  */
+   void installCrashHandler();
 
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -35,30 +46,18 @@ namespace g3 {
        *  only in the case of Windows exceptions (not fatal signals)
        *  are we interested in changing this from false to true to
        *  help any other exceptions handler work with 'EXCEPTION_CONTINUE_SEARCH'*/
-      bool blockForFatalHandling();
+      bool shouldBlockForFatalHandling();
 
       /** \return signal_name Ref: signum.hpp and \ref installSignalHandler
       *  or for Windows exception name */
-      std::string exitReasonName(const LEVELS &level, g3::SignalType signal_number);
+      std::string exitReasonName(const LEVELS& level, g3::SignalType signal_number);
 
       /** return calling thread's stackdump*/
-      std::string stackdump(const char *dump = nullptr);
+      std::string stackdump(const char* dump = nullptr);
 
       /** Re-"throw" a fatal signal, previously caught. This will exit the application
        * This is an internal only function. Do not use it elsewhere. It is triggered
        * from g3log, g3LogWorker after flushing messages to file */
-      void exitWithDefaultSignalHandler(const LEVELS &level, g3::SignalType signal_number);
+      void exitWithDefaultSignalHandler(const LEVELS& level, g3::SignalType signal_number);
    } // end g3::internal
-
-
-   // PUBLIC API:
-   /** Install signal handler that catches FATAL C-runtime or OS signals
-     See the wikipedia site for details http://en.wikipedia.org/wiki/SIGFPE
-     See the this site for example usage: http://www.tutorialspoint.com/cplusplus/cpp_signal_handling.hpptm
-     SIGABRT  ABORT (ANSI), abnormal termination
-     SIGFPE   Floating point exception (ANSI)
-     SIGILL   ILlegal instruction (ANSI)
-     SIGSEGV  Segmentation violation i.e. illegal memory reference
-     SIGTERM  TERMINATION (ANSI)  */
-   void installCrashHandler();
-}
+} // g3

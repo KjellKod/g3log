@@ -16,6 +16,7 @@
 #include <string>
 #include <chrono>
 #include <thread>
+#include <exception>
 
 
 namespace
@@ -34,34 +35,34 @@ namespace
    }
 
    void RaiseSIGABRT() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
       raise(SIGABRT);
+      LOG(DEBUG) << " trigger exit";
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RaiseSIGFPE() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
       raise(SIGFPE);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RaiseSIGSEGV() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       LOG(DEBUG) << "Exit by SIGSEGV";
       raise(SIGSEGV);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RaiseSIGILL() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       LOGF(DEBUG, "Exit by %s", "SIGILL");
       raise(SIGILL);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RAiseSIGTERM() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
       raise(SIGTERM);
       LOG(WARNING) << "Expected to have died by now...";
@@ -69,8 +70,7 @@ namespace
 
    int gShouldBeZero = 1;
    void DivisionByZero() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
-      std::cout << "Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero << std::endl;
+      LOG(DEBUG) << " trigger exit   Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero;
       LOG(INFO) << "Division by zero is a big no-no";
       int value = 3;
       auto test = value / gShouldBeZero;
@@ -78,14 +78,14 @@ namespace
    }
 
    void IllegalPrintf() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       LOG(DEBUG) << "Impending doom due to illeteracy";
       LOGF(INFO, "2nd attempt at ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void OutOfBoundsArrayIndexing() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       std::vector<int> v;
       v[0] = 5;
       LOG(WARNING) << "Expected to have died by now...";
@@ -93,7 +93,7 @@ namespace
 
 
    void AccessViolation() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       char *ptr = 0;
       LOG(INFO) << "Death by access violation is imminent";
       *ptr = 0;
@@ -101,12 +101,12 @@ namespace
    }
 
    void NoExitFunction() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
       CHECK(false) << "This function should never be called";
    }
 
    void RaiseSIGABRTAndAccessViolation() {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << " trigger exit";
 
       auto f1 = std::async(std::launch::async, &RaiseSIGABRT);
       auto f2 = std::async(std::launch::async, &AccessViolation);
@@ -114,11 +114,44 @@ namespace
       f2.wait();
    }
 
-   void ThrowInt() {
-      throw 1233210;
+
+   using deathfunc =  void (*) (void);
+   void Death_x10000(deathfunc func, std::string funcname) noexcept {
+      LOG(DEBUG) << " trigger exit";
+      std::vector<std::future<void>> asyncs;
+      asyncs.reserve(10000);
+      for (auto idx = 0; idx < 10000; ++idx) {
+         asyncs.push_back(std::async(std::launch::async, func));
+      }
+
+      for (const auto& a : asyncs) {
+         a.wait();
+      }
+
+      std::cout << __FUNCTION__ << " unexpected result. Death by " << funcname << " did not crash and exit the system" << std::endl;
+   }
+
+
+   void Throw() noexcept {
+      LOG(DEBUG) << " trigger exit";
+      std::future<int> empty;
+      empty.get(); 
+      // --> thows future_error http://en.cppreference.com/w/cpp/thread/future_error
+      // example of std::exceptions can be found here: http://en.cppreference.com/w/cpp/error/exception
+   }
+
+
+   void SegFaultAttempt_x10000() noexcept {
+      deathfunc f = []{Throw(); *(char*)0 = 0; char* ptr = 0; *ptr = 1; AccessViolation();};
+      Death_x10000(f, "throw uncaught exception... and then some sigsegv calls");
+   }
+
+   void AccessViolation_x10000() {
+      Death_x10000(&AccessViolation, "AccessViolation");
    }
 
    void FailedCHECK() {
+      LOG(DEBUG) << " trigger exit";
       CHECK(false) << "This is fatal";
    }
 
@@ -133,7 +166,8 @@ namespace
 
 
    void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
-      std::cout << "Calling :" << __FUNCTION__ << " Line: " << __LINE__ << std::endl << std::flush;
+      LOG(DEBUG) << "trigger exit";
+
       auto exitFunction = &NoExitFunction;
       switch (fatalChoice) {
       case 1: exitFunction = &RaiseSIGABRT;  break;
@@ -146,8 +180,10 @@ namespace
       case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
       case 9: exitFunction = &AccessViolation;  break;
       case 10: exitFunction = &RaiseSIGABRTAndAccessViolation; break;
-      case 11: exitFunction = &ThrowInt; break;
+      case 11: exitFunction = &Throw; break;
       case 12: exitFunction = &FailedCHECK; break;
+      case 13: exitFunction = &AccessViolation_x10000; break;
+      case 14: exitFunction = &SegFaultAttempt_x10000; break;
       default: break;
       }
       if (runInNewThread) {
@@ -203,16 +239,17 @@ namespace
          std::cout << "[8] Out of bounds array indexing  " << std::endl;
          std::cout << "[9] Access violation" << std::endl;
          std::cout << "[10] Rasing SIGABRT + Access Violation in two separate threads" << std::endl;
-         std::cout << "[11] Just throw (in this thread)" << std::endl;
+         std::cout << "[11] Throw a std::future_error" << std::endl;
          std::cout << "[12] Just CHECK(false) (in this thread)" << std::endl;
-
+         std::cout << "[13] 10,000 Continious crashes with out of bounds array indexing" << std::endl;
+         std::cout << "[14] 10,000 Continious crashes with segmentation fault attempts" << std::endl;
 
          std::cout << std::flush;
 
          try {
             std::getline(std::cin, option);
             choice = std::stoi(option);
-            if (choice <= 0 || choice > 12) {
+            if (choice <= 0 || choice > 14) {
                std::cout << "Invalid choice: [" << option << "\n\n";
             }  else {
                return choice;
@@ -236,9 +273,9 @@ namespace
 
 void breakHere() {
    std::ostringstream oss;
-   oss << __FUNCTION__ << " was reached" << std::endl;
-   std::cout << oss.str() << std::endl;
-   
+   oss  << "Fatal hook function: " << __FUNCTION__ << ":" << __LINE__  << " was called";
+   oss << " through g3::setFatalPreLoggingHook(). setFatalPreLoggingHook should be called AFTER g3::initializeLogging()" << std::endl;
+   LOG(DEBUG) << oss.str();
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    __debugbreak();
 #endif
@@ -246,12 +283,13 @@ void breakHere() {
 
 int main(int argc, char **argv)
 {
-
    auto worker = g3::LogWorker::createLogWorker();
    auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
    g3::setFatalPreLoggingHook(&breakHere);
+
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
+
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
              << "Choose your type of fatal exit, then "
              << " read the generated log and backtrace.\n"

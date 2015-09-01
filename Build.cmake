@@ -85,9 +85,6 @@ ENDIF()
 
    add_library(g3logger_shared SHARED ${SRC_FILES})
    set_target_properties(g3logger_shared PROPERTIES LINKER_LANGUAGE CXX)
-   IF(APPLE)
-     set_target_properties(g3logger_shared PROPERTIES MACOSX_RPATH TRUE)
-   ENDIF(APPLE)
    target_link_libraries(g3logger_shared ${PLATFORM_LINK_LIBRIES})
   
    SET(G3LOG_SHARED_LIBRARY g3logger_shared)
