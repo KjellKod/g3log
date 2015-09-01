@@ -114,21 +114,23 @@ namespace
       f2.wait();
    }
 
-   void AccessViolation_x10000() {
+
+   using deathfunc =  void (*) (void);
+   void Death_x10000(deathfunc func, std::string funcname) {
       LOG(DEBUG) << " trigger exit";
       std::vector<std::future<void>> asyncs;
-      asyncs.reserve(1000);
-      for (auto idx = 0; idx < 1000; ++idx) {
-         asyncs.push_back(std::async(std::launch::async, &AccessViolation));
+      asyncs.reserve(10000);
+      for (auto idx = 0; idx < 10000; ++idx) {
+         asyncs.push_back(std::async(std::launch::async, func));
       }
 
-      for (const auto& a: asyncs) {
+      for (const auto& a : asyncs) {
          a.wait();
       }
 
-      std::cout << __FUNCTION__ << " unexpected result. AccessViolation x many did not crash and exit the system" << std::endl;
-
+      std::cout << __FUNCTION__ << " unexpected result. Death by " << funcname << " did not crash and exit the system" << std::endl;
    }
+
 
    void Throw() {
       LOG(DEBUG) << " trigger exit";
@@ -136,6 +138,15 @@ namespace
       empty.get(); 
       // --> thows future_error http://en.cppreference.com/w/cpp/thread/future_error
       // example of std::exceptions can be found here: http://en.cppreference.com/w/cpp/error/exception
+   }
+
+
+   void SegFaultAttempt_x10000() {
+      Death_x10000(&Throw, "throw uncaught exception");
+   }
+
+   void AccessViolation_x10000() {
+      Death_x10000(&AccessViolation, "AccessViolation");
    }
 
    void FailedCHECK() {
@@ -171,6 +182,7 @@ namespace
       case 11: exitFunction = &Throw; break;
       case 12: exitFunction = &FailedCHECK; break;
       case 13: exitFunction = &AccessViolation_x10000; break;
+      case 14: exitFunction = &SegFaultAttempt_x10000; break;
       default: break;
       }
       if (runInNewThread) {
@@ -228,15 +240,15 @@ namespace
          std::cout << "[10] Rasing SIGABRT + Access Violation in two separate threads" << std::endl;
          std::cout << "[11] Throw a std::future_error" << std::endl;
          std::cout << "[12] Just CHECK(false) (in this thread)" << std::endl;
-         std::cout << "[13] 1000 Continious crashes with out of counds array indexing" << std::endl;
-
+         std::cout << "[13] 10,000 Continious crashes with out of bounds array indexing" << std::endl;
+         std::cout << "[14] 10,000 Continious crashes with segmentation fault attempts" << std::endl;
 
          std::cout << std::flush;
 
          try {
             std::getline(std::cin, option);
             choice = std::stoi(option);
-            if (choice <= 0 || choice > 13) {
+            if (choice <= 0 || choice > 14) {
                std::cout << "Invalid choice: [" << option << "\n\n";
             }  else {
                return choice;
@@ -260,7 +272,7 @@ namespace
 
 void breakHere() {
    std::ostringstream oss;
-   oss  << "Fatal hook function: " << __FUNCTION__ << ":" << __LINE__ " was called";
+   oss  << "Fatal hook function: " << __FUNCTION__ << ":" << __LINE__  << " was called";
    oss << " through g3::setFatalPreLoggingHook(). setFatalPreLoggingHook should be called AFTER g3::initializeLogging()" << std::endl;
    LOG(DEBUG) << oss.str();
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))

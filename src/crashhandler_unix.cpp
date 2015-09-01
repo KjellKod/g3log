@@ -63,22 +63,6 @@ namespace {
          }
       }
 
-
-      Kjell 
-      // Does this make a difference?
-      // http://man7.org/linux/man-pages/man2/sigaltstack.2.html
-      stack_t ss;
-      ss.ss_sp = malloc(SIGSTKSZ);
-      if (ss.ss_sp == NULL) {
-         // Handle error -- no error handling at this moment
-      }
-      ss.ss_size = SIGSTKSZ;
-      ss.ss_flags = 0;
-      if (sigaltstack(&ss, NULL) == -1) {
-         std::cerr << "\n\n\n\n\nFAILED\n\n\n\n\n" << std::endl;
-         return;
-      }
-
       using namespace g3::internal;
       {
          const auto dump = stackdump();
@@ -227,14 +211,10 @@ namespace g3 {
          restoreSignalHandler(signal_number);
          std::cerr << "\n\n" << __FUNCTION__ << ":" << __LINE__ << ". Exiting due to " << level.text << ", " << signal_number << "   \n\n" << std::flush;
 
-         TODO kjell --- 
-         what is the difference between kill and exit?
-         does it have any significance for stack trace
          exit(signal_number); //kill(getpid(), signal_number);
          
       }
    } // end g3::internal
-
 
    //
    // Installs FATAL signal handler that is enough to handle most fatal events
