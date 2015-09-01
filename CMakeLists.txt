@@ -125,12 +125,12 @@ endif()
 
 MESSAGE("\n\n
         *******************************************************************
-        Please do 'make clean-cmake-files' before next cmake generation. 
+        Please do 'make clean-cmake' before next cmake generation. 
            It is a good idea to purge your build directory of CMake 
            generated cache files
         *******************************************************************
          ")
-add_custom_target(clean-cmake-files
+add_custom_target(clean-cmake
    COMMAND ${CMAKE_COMMAND} -P ${g3log_SOURCE_DIR}/CleanAll.cmake
 )
 
