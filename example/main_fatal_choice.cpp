@@ -18,6 +18,11 @@
 #include <thread>
 #include <exception>
 
+#ifndef _MSC_VER
+#define NOEXCEPT noexcept
+#else
+#define NOEXCEPT throw()
+#endif
 
 namespace
 {
@@ -116,7 +121,7 @@ namespace
 
 
    using deathfunc =  void (*) (void);
-   void Death_x10000(deathfunc func, std::string funcname) noexcept {
+   void Death_x10000(deathfunc func, std::string funcname) NOEXCEPT {
       LOG(DEBUG) << " trigger exit";
       std::vector<std::future<void>> asyncs;
       asyncs.reserve(10000);
@@ -132,7 +137,7 @@ namespace
    }
 
 
-   void Throw() noexcept {
+   void Throw() NOEXCEPT {
       LOG(DEBUG) << " trigger exit";
       std::future<int> empty;
       empty.get(); 
@@ -141,7 +146,7 @@ namespace
    }
 
 
-   void SegFaultAttempt_x10000() noexcept {
+   void SegFaultAttempt_x10000() NOEXCEPT {
       deathfunc f = []{Throw(); *(char*)0 = 0; char* ptr = 0; *ptr = 1; AccessViolation();};
       Death_x10000(f, "throw uncaught exception... and then some sigsegv calls");
    }
