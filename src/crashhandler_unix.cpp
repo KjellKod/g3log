@@ -26,6 +26,7 @@
 #include <iostream>
 #include <thread>
 #include <atomic>
+#include <map>
 
 // Linux/Clang, OSX/Clang, OSX/gcc
 #if (defined(__clang__) || defined(__APPLE__))
@@ -36,6 +37,18 @@
 
 
 namespace {
+
+   const std::map<int, std::string> kSignals = {
+      {SIGABRT, "SIGABRT"},
+      {SIGFPE,"SIGFPE"},
+      {SIGILL,"SIGILL"},
+      {SIGSEGV,"SIGSEGV"},
+      {SIGTERM,"SIGTERM"},      
+   };
+
+   std::map<int, std::string> gSignals = kSignals;
+
+
    bool shouldDoExit() {
       static std::atomic<uint64_t> firstExit{0};
       auto const count = firstExit.fetch_add(1, std::memory_order_relaxed);
@@ -52,6 +65,18 @@ namespace {
       sigaction(signal_number, &action, NULL);
 #endif
    }
+
+   void overrideSetupSignals(const std::map<int, std::string> overrideSignals) {
+      static std::mutex signalLock;
+      std::lock_guard<std::mutex> guard(signalLock);
+      gSignals = overrideSignals;
+      for(const auto& sig: kSignals) {
+         restoreSignalHandler(sig.first);         
+      }
+      g3::installCrashHandler();
+   }
+
+
 
    // Dump of stack,. then exit through g3log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
@@ -233,18 +258,27 @@ namespace g3 {
       action.sa_flags = SA_SIGINFO;
 
       // do it verbose style - install all signal actions
-      if (sigaction(SIGABRT, &action, NULL) < 0)
-         perror("sigaction - SIGABRT");
-      if (sigaction(SIGFPE, &action, NULL) < 0)
-         perror("sigaction - SIGFPE");
-      if (sigaction(SIGILL, &action, NULL) < 0)
-         perror("sigaction - SIGILL");
-      if (sigaction(SIGSEGV, &action, NULL) < 0)
-         perror("sigaction - SIGSEGV");
-      if (sigaction(SIGTERM, &action, NULL) < 0)
-         perror("sigaction - SIGTERM");
+
+      for (const auto& sig_pair : gSignals) {
+         if (sigaction(sig_pair.first, &action, nullptr) < 0) {
+            const std::string error = "sigaction - " + sig_pair.second;
+            perror(error.c_str());
+         }
+      }
+
+      // if (sigaction(SIGABRT, &action, NULL) < 0)
+      //    perror("sigaction - SIGABRT");
+      // if (sigaction(SIGFPE, &action, NULL) < 0)
+      //    perror("sigaction - SIGFPE");
+      // if (sigaction(SIGILL, &action, NULL) < 0)
+      //    perror("sigaction - SIGILL");
+      // if (sigaction(SIGSEGV, &action, NULL) < 0)
+      //    perror("sigaction - SIGSEGV");
+      // if (sigaction(SIGTERM, &action, NULL) < 0)
+      //    perror("sigaction - SIGTERM");
 #endif
    }
+
 
 
 
