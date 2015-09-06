@@ -140,7 +140,7 @@ int main(int argc, char**argv) {
                                                  path_to_log_file);
    
    // logger is initialized
-   g3::initializeLogging(defaultHandler.worker.get());
+   g3::initializeLogging(worker.get());
    
    LOG(DEBUG) << "Make log call, then add another sink";
    
