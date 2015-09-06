@@ -84,7 +84,7 @@ ENDIF()
    target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
    SET(G3LOG_LIBRARY g3logger)
 
-if(ADD_BUILD_SHARED)
+if(ADD_BUILD_WIN_SHARED OR NOT(MSVC OR MINGW))
    add_library(g3logger_shared SHARED ${SRC_FILES})
    set_target_properties(g3logger_shared PROPERTIES LINKER_LANGUAGE CXX)
    IF(APPLE)

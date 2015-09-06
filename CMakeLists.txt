@@ -77,7 +77,7 @@ endif()
    #==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
 
-   option (ADD_BUILD_SHARED  "Build shared library" ON)
+   option (ADD_BUILD_WIN_SHARED  "Build shared library on Windows" OFF)
 
    # =========================================================================
    # G3LOG BUILD
