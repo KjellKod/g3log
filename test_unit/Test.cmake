@@ -69,7 +69,7 @@
     #
     # Test for Linux, runtime loading of dynamic libraries
     #     
-    IF (NOT WIN32 AND NOT ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang"))
+    IF (NOT WIN32 AND NOT ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang") AND ADD_BUILD_SHARED)
        add_library(tester_sharedlib SHARED ${DIR_UNIT_TEST}/tester_sharedlib.h ${DIR_UNIT_TEST}/tester_sharedlib.cpp)
        target_link_libraries(tester_sharedlib ${G3LOG_SHARED_LIBRARY})
 
