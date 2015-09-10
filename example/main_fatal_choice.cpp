@@ -147,7 +147,8 @@ namespace
 
 
    void SegFaultAttempt_x10000() NOEXCEPT {
-      deathfunc f = []{Throw(); *(char*)0 = 0; char* ptr = 0; *ptr = 1; AccessViolation();};
+      
+      deathfunc f = []{char* ptr = 0; *ptr = 1; };
       Death_x10000(f, "throw uncaught exception... and then some sigsegv calls");
    }
 
@@ -293,6 +294,21 @@ int main(int argc, char **argv)
    g3::initializeLogging(worker.get());
    g3::setFatalPreLoggingHook(&breakHere);
 
+
+   // <sigh>: Not yet added example of fatal signals that can be overridden 
+   // Example: Running this with SIGTERM turned off, and choosing to "die by SIGTERM"
+   //          will exit the process without catching the signal
+   // 
+   // Enable the code below will override the signal setup, all signals active except SIGTERM
+   // g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"},{SIGILL, "SIGILL"},
+   //                         {SIGSEGV, "SIGSEGV"},});
+   //
+   // the code below.... can be used to restore the signal handler again
+   // In truth: I don't really see how this can be used 
+   // ...... maybe a separate signal handler for sigterm.... and running this in a unit test?
+   //g3::restoreSignalHandlerToDefault();
+   don't compile on purpose
+   
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
 
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
