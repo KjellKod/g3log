@@ -27,6 +27,7 @@
 #include <thread>
 #include <atomic>
 #include <map>
+#include <mutex>
 
 // Linux/Clang, OSX/Clang, OSX/gcc
 #if (defined(__clang__) || defined(__APPLE__))
