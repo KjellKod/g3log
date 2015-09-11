@@ -6,7 +6,7 @@
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
-
+    
 # Below are details for compiling on Windows and Linux
 # by default only an example g3log binary is created
 # the performance and unit tests creation can be enabled by switching their
