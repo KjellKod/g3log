@@ -147,7 +147,8 @@ namespace
 
 
    void SegFaultAttempt_x10000() NOEXCEPT {
-      deathfunc f = []{Throw(); *(char*)0 = 0; char* ptr = 0; *ptr = 1; AccessViolation();};
+      
+      deathfunc f = []{char* ptr = 0; *ptr = 1; };
       Death_x10000(f, "throw uncaught exception... and then some sigsegv calls");
    }
 
@@ -292,7 +293,6 @@ int main(int argc, char **argv)
    auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
    g3::setFatalPreLoggingHook(&breakHere);
-
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
 
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
