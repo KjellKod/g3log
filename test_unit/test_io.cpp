@@ -312,6 +312,57 @@ TEST(LogTest, LOGF__FATAL) {
 }
 
 
+TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {
+   RestoreFileLogger logger(log_directory);
+   g_fatal_counter.store(0);
+   g3::setFatalPreLoggingHook(fatalCounter);
+   raise(SIGTERM);
+   logger.reset();
+   EXPECT_EQ(g_fatal_counter.load(), size_t{1});
+}
+
+namespace {
+   std::atomic<size_t> customFatalCounter = {0};
+   std::atomic<int> lastEncounteredSignal = {0};
+   void customSignalHandler(int signal_number, siginfo_t* info, void* unused_context) {
+      lastEncounteredSignal.store(signal_number);
+      ++customFatalCounter;
+   }
+
+
+
+   void installCustomSIGTERM () {
+      struct sigaction action;
+      memset(&action, 0, sizeof (action));
+      sigemptyset(&action.sa_mask);
+      action.sa_sigaction = &customSignalHandler;
+      action.sa_flags = SA_SIGINFO;
+      sigaction(SIGTERM, &action, nullptr);
+   }
+
+} // anonymous
+
+TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
+   RestoreFileLogger logger(log_directory);
+   g_fatal_counter.store(0);
+   g3::setFatalPreLoggingHook(fatalCounter);
+   installCustomSIGTERM();
+   g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}});
+
+   installCustomSIGTERM();
+   EXPECT_EQ(customFatalCounter, 0);
+   EXPECT_EQ(lastEncounteredSignal.load(), 0);
+   
+
+   raise(SIGTERM);
+   logger.reset();
+   EXPECT_EQ(g_fatal_counter.load(), size_t{0});
+   EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
+   EXPECT_EQ(customFatalCounter, 1);
+}
+
+
+
 TEST(LogTest, LOG_preFatalLogging_hook) {
    {
       RestoreFileLogger logger(log_directory);
