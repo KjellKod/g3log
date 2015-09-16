@@ -41,7 +41,7 @@ namespace g3 {
    std::string LogDetailsToString(const LogMessage& msg) {
       std::string out;
       out.append("\n" + msg.timestamp() + " " + msg.microseconds() +  "\t"
-                 + msg.level() + " [" + msg.file() + ":" + msg.line() + "]\t");
+                 + msg.level() + " [" + msg.file() + "->" + msg.function() + ":" + msg.line() + "]\t");
       return out;
    }
 
