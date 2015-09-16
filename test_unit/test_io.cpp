@@ -518,7 +518,7 @@ TEST(CustomLogLevels, AddANonFatal) {
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
-   expected += "MY_INFO_LEVEL [test_io.cpp:" + std::to_string(line);
+   expected += "MY_INFO_LEVEL [test_io.cpp->" + std::string(__FUNCTION__) + ":" + std::to_string(line);
    EXPECT_TRUE(verifyContent(file_content, expected)) << file_content
          << "\n\nExpected: \n" << expected;
 }
@@ -541,7 +541,7 @@ TEST(CustomLogLevels, AddFatal) {
 
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
-   expected += "DEADLY [test_io.cpp:" + std::to_string(line);
+   expected += "DEADLY [test_io.cpp->" + std::string(__FUNCTION__) + ":" + std::to_string(line);
    EXPECT_TRUE(verifyContent(file_content, expected)) << file_content
          << "\n\nExpected: \n" << expected;
    g_fatal_counter.store(0); // restore
@@ -612,7 +612,7 @@ TEST(CustomLogLevels, AddANonFatal__DidtAddItToEnabledValue) {
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
-   expected += "MY_INFO_LEVEL [test_io.cpp:" + std::to_string(line);
+   expected += "MY_INFO_LEVEL [test_io.cpp->" + std::string(__FUNCTION__) + ":" + std::to_string(line);
    EXPECT_TRUE(verifyContent(file_content, expected)) << file_content
          << "\n\nExpected: \n" << expected;
 }
