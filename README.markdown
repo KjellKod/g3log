@@ -72,10 +72,50 @@ The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal 
 The *std::string* comes pre-formatted. The *g3::LogMessageMover* is a wrapped struct that contains the raw data for custom handling in your own sink.
 
 A sink is *owned* by the G3log and is added to the logger inside a ```std::unique_ptr```.  The sink can be called though its public API through a *handler* which will asynchronously forward the call to the receiving sink. 
-```
+
+Silly example to show what is needed to make a custom sink that is using custom log formatting but only using that
+for adding color to the default log formatting. The sink forwards the colored log to cout
+
+
+```cpp
+// in file Customsink.hpp
+#pragma once
+#include <string>
+#include <iostream>
+#include <g3log/logmessage.hpp>
+
+struct CustomSink {
+
+// Linux xterm color
+// http://stackoverflow.com/questions/2616906/how-do-i-output-coloured-text-to-a-linux-terminal
+  enum FG_Color {YELLOW = 33, RED = 31, GREEN=32, WHITE = 97};
+
+  FG_Color GetColor(const LEVELS level) const {
+     if (level.value == WARNING.value) { return YELLOW; }
+     if (level.value == DEBUG.value) { return GREEN; }
+     if (g3::internal::wasFatal(level)) { return RED; }
+
+     return WHITE;
+  }
+  
+  void ReceiveLogMessage(g3::LogMessageMover logEntry) {
+     auto level = logEntry.get()._level;
+     auto color = GetColor(level);
+
+     std::cout << "\033[" << color << "m" 
+       << logEntry.get().toString() << "\033[m" << std::endl;
+  }
+};
+
+// in main.cpp, main() function
+
 auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
                                      &CustomSink::ReceiveLogMessage);
 ```
+
+
+**More sinks** can be found in the repository **[github.com/KjellKod/g3sinks](https://github.com/KjellKod/g3sinks)**.
+
 
 #Code Examples
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
@@ -186,6 +226,21 @@ msbuild g3log.sln /p:Configuration=Release
 cmake -DCMAKE_CXX_COMPILER=clang++      -DCMAKE_BUILD_TYPE=Release ..
 make 
 ```
+
+# API description
+Most of the API that you need for using g3log is described in this readme. For more API documentation and examples please continue to read the [API readme](API.markdown). Examples of what you will find here are: 
+1. Sink creation and utilization
+2. Logging levels 
+..1. disable/enabled levels at runtime
+..2. custom logging levels
+3. Fatal handling
+..1. custom fatal handling
+..2. pre fatal hook
+..3. override of signal handling
+..4. disable fatal handling
+4. LOG calls
+5. CHECK calls
+
 
 #Performance
 G3log aims to keep all background logging to sinks with as little log overhead as possible to the logging sink and with as small "worst case latency" as possible. For this reason g3log is a good logger for many systems that deal with critical tasks. Depending on platform the average logging overhead will differ. On my laptop the average call, when doing extreme performance testing, will be about ~2 us.
