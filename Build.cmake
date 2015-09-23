@@ -79,6 +79,7 @@ ENDIF()
    add_library(g3logger ${SRC_FILES})
    set_target_properties(g3logger PROPERTIES LINKER_LANGUAGE CXX)
    target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
+   target_include_directories(g3logger PUBLIC ${LOG_SRC})
    SET(G3LOG_LIBRARY g3logger)
 
 if(ADD_BUILD_WIN_SHARED OR NOT(MSVC OR MINGW))
