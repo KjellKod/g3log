@@ -72,7 +72,7 @@ const LEVELS DEBUG {g3::kDebugVaulue, {"DEBUG"}},
 #endif
       INFO {g3::kDebugVaulue + 1, {"INFO"}},
       WARNING {INFO.value + 1, {"WARNING"}},
-
+      ERROR {WARNING.value + 1, {"ERROR"}},
 
 
 // Insert here *any* extra logging levels that is needed. You can do so in your own source file

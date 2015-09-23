@@ -44,6 +44,9 @@ ELSEIF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
    ELSEIF (MINGW)
        set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
        set(PLATFORM_LINK_LIBRIES dbghelp)
+
+       # ERROR level conflicts with windows.h
+       ADD_DEFINITIONS (-DNOGDI)
    ELSE()
        set(PLATFORM_LINK_LIBRIES rt)
        set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
@@ -52,6 +55,9 @@ ELSEIF(MSVC)
    set(PLATFORM_LINK_LIBRIES dbghelp)
    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
    set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
+
+   # ERROR level conflicts with windows.h
+   ADD_DEFINITIONS (-DNOGDI)
 ENDIF()
 
    # GENERIC STEPS
