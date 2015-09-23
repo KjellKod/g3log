@@ -43,29 +43,15 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
        set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP")
    ELSEIF (MINGW)
        set(CMAKE_CXX_FLAGS "-Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
+       set(PLATFORM_LINK_LIBRIES dbghelp)
    ELSE()
        set(PLATFORM_LINK_LIBRIES rt)
        set(CMAKE_CXX_FLAGS "-Wall -rdynamic -Wunused -std=c++11 -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
    ENDIF()
-ENDIF()
-
-
-IF (MSVC OR MINGW)
-  set(PLATFORM_LINK_LIBRIES dbghelp)
-      # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
-      #          add_definition(-D_VARIADIC_MAX=10)
-      # https://github.com/anhstudios/swganh/pull/186/files
-      ADD_DEFINITIONS (/D_VARIADIC_MAX=10)
-      MESSAGE(STATUS "- MSVC: Set variadic max to 10 for MSVC compatibility")
-      # Remember to set set target properties if using GTEST similar to done below on target "unit_test"
-      # "set_target_properties(unit_test  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-   MESSAGE("")
-   MESSAGE("Windows: Run cmake with the appropriate Visual Studio generator")
-   MESSAGE("The generator is one number below the official version number. I.e. VS2013 -> Generator 'Visual Studio 12'")
-   MESSAGE("I.e. if VS2013: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 12\" ..]")
-   MESSAGE("if cmake finishes OK, do 'msbuild g3log.sln /p:Configuration=Release'")
-   MESSAGE("then run 'Release\\g3log-FATAL-*' examples")
-   MESSAGE("")
+ELSEIF(MSVC)
+   set(PLATFORM_LINK_LIBRIES dbghelp)
+   set(CMAKE_CXX_FLAGS_RELEASE "/MT")
+   set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 ENDIF()
 
    # GENERIC STEPS
