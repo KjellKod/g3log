@@ -350,7 +350,7 @@ TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
    g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}});
 
    installCustomSIGTERM();
-   EXPECT_EQ(customFatalCounter, 0);
+   EXPECT_EQ(customFatalCounter.load(), size_t{0});
    EXPECT_EQ(lastEncounteredSignal.load(), 0);
    
 
@@ -358,7 +358,8 @@ TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
    logger.reset();
    EXPECT_EQ(g_fatal_counter.load(), size_t{0});
    EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
-   EXPECT_EQ(customFatalCounter, 1);
+   EXPECT_EQ(customFatalCounter.load(), size_t{1});
+
 }
 
 
