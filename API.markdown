@@ -33,23 +33,35 @@ The contract API follows closely the logging API with ```CHECK(<boolean-expressi
 If the ```<boolean-expression>``` evaluates to false then the the message for the failed contract will be logged in FIFO order with previously made messages. The process will then shut down after the message is sent to the sinks and the sinks have dealt with the fatal contract message. 
 
 ## Logging levels ```
- The default logging levels are ```DEBUG```, ```INFO```, ```WARNING``` and ```FATAL``` (see FATAL usage [above](#fatal_logging)). 
+ The default logging levels are ```DEBUG```, ```INFO```, ```WARNING``` and ```FATAL``` (see FATAL usage [above](#fatal_logging)). The logging levels are defined in [loglevels.hpp](src/g3log/loglevels.hpp).
 
  For some windows framework there is a clash with the ```DEBUG``` logging level. One of the CMake [Build options](#build_options) can be used to then change offending default level from ```DEBUG``` TO ```DBUG```.
 
  **CMake option: (default OFF) ** ```cmake -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON ..``` 
 
   ### disable/enabled levels at runtime
-  Logging levels can be disabled at runtime. There is a cmake option to enable the dynamic enable/disable of levels. 
-  When the option is enabled there will be a slight runtime overhead for each ```LOG``` call when the enable/disable status is checked. For most intent and purposes that runtime overhead is negligable. 
+  Logging levels can be disabled at runtime. The logic for this happens in
+  [loglevels.hpp](src/g3log/loglevels.hpp), [loglevels.cpp](src/loglevels.cpp) and [g3log.hpp](src/g3log/g3log.hpp).
+
+  There is a cmake option to enable the dynamic enable/disable of levels. 
+  When the option is enabled there will be a slight runtime overhead for each ```LOG``` call when the enable/disable status is checked. For most intent and purposes  runtime overhead is negligable. 
 
   There is **no** runtime overhead for checking if a level is enabled//disabled if the cmake option is turned off. If the dynamic logging cmake option is turned off then all logging levels are enabled.
 
 **CMake option: (default OFF)** ```cmake -DUSE_DYNAMIC_LOGGING_LEVELS=ON  ..``` 
+```
+
+
+  ### custom logging levels
+  Custom logging levels can be created and used. When defining a custom logging level you set the value for it as well as the text for it. You can re-use values for other levels such as INFO, WARNING etc or have your own values. Any value higher than the FATAL value will be considered a *FATAL* logging level. 
+
+  Example:
+  ```
+  MyCustomLoggingLevels.hpp
 
 
 
-  ### custom logging levels```FATAL``` (see FATAL usage above)
+  
 ## Sink <a name="sink_creation">creation</a> and utilization 
 ## Fatal handling
   ### custom fatal handling
