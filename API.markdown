@@ -14,6 +14,8 @@ Most of the API that you need for using g3log is described in this readme. For m
   * disable fatal handling
 * LOG calls
 * CHECK calls
+* Build Options
+
 
 ## Logging API: LOG calls
 It is optional to use either streaming ```LOG(INFO) << some text ``` or printf-like syntax ```LOGF(WARNING, "some number %d", 123); ```
@@ -31,9 +33,22 @@ The contract API follows closely the logging API with ```CHECK(<boolean-expressi
 If the ```<boolean-expression>``` evaluates to false then the the message for the failed contract will be logged in FIFO order with previously made messages. The process will then shut down after the message is sent to the sinks and the sinks have dealt with the fatal contract message. 
 
 ## Logging levels ```
- The default logging levels are ```DEBUG```, ```INFO```, ```WARNING``` and ```FATAL``` (see FATAL usage [above](#fatal_logging))
+ The default logging levels are ```DEBUG```, ```INFO```, ```WARNING``` and ```FATAL``` (see FATAL usage [above](#fatal_logging)). 
+
+ For some windows framework there is a clash with the ```DEBUG``` logging level. One of the CMake [Build options](#build_options) can be used to then change offending default level from ```DEBUG``` TO ```DBUG```.
+
+ **CMake option: (default OFF) ** ```cmake -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON ..``` 
 
   ### disable/enabled levels at runtime
+  Logging levels can be disabled at runtime. There is a cmake option to enable the dynamic enable/disable of levels. 
+  When the option is enabled there will be a slight runtime overhead for each ```LOG``` call when the enable/disable status is checked. For most intent and purposes that runtime overhead is negligable. 
+
+  There is **no** runtime overhead for checking if a level is enabled//disabled if the cmake option is turned off. If the dynamic logging cmake option is turned off then all logging levels are enabled.
+
+**CMake option: (default OFF)** ```cmake -DUSE_DYNAMIC_LOGGING_LEVELS=ON  ..``` 
+
+
+
   ### custom logging levels```FATAL``` (see FATAL usage above)
 ## Sink <a name="sink_creation">creation</a> and utilization 
 ## Fatal handling
@@ -41,5 +56,7 @@ If the ```<boolean-expression>``` evaluates to false then the the message for th
   ### pre fatal hook
   ### override of signal handlingboolean-expression>
   ### disable fatal handling
+  ## <a name="build_options">Build Options</a>
+  The build options are defined in the file [Options.cmake](Options.cmake)
 
 
