@@ -9,10 +9,12 @@ Most of the API that you need for using g3log is described in this readme. For m
 * Sink [creation](#sink_creation) and utilization 
 * LOG [flushing](#log_flushing)
 * Fatal handling
-  * custom fatal handling
-  * pre fatal hook
-  * override of signal handling
-  * disable fatal handling
+  * [Linux/*nix](#fatal_handling_linux)
+  * [Windows](#fatal_handling_windows)
+  * [Custom fatal handling](#fatal_custom_handling)
+  * [Pre fatal hook](#fatal_pre_hook)
+  * [Override of signal handling](#fatal_signalhandler_override)
+  * [Disable fatal handling](#fatal_handling_disabled)
 * Build Options
 
 
@@ -100,10 +102,46 @@ A programmatically triggered abrupt process exit such as a call to   ```exit(0)`
 
 
 ## Fatal handling
-  ### custom fatal handling
-  ### pre fatal hook
-  ### override of signal handlingboolean-expression>
-  ### disable fatal handling
+The default behaviour for G3log is to catch several fatal events before they force the process to exit. After <i>catching</i> a fatal event a stack dump is generated and all log entries, up to the point of the stack dump are together with the dump flushed to the sink(s).
+  ### <a name="fatal_handling_linux">Linux/*nix</a> 
+  The default fatal handling on Linux deals with fatal signals. At the time of writing these signals were   ```SIGABRT, SIGFPE, SIGILL, SIGILL, SIGSEGV, SIGSEGV, SIGTERM```.   A signal that commonly is associated with voluntarily process exit is ```SIGINT``` (ctrl + c) G3log does not deal with it. 
+
+   The fatal signals can be [disabled](#fatal_handling_disabled) or  [changed/added ](#fatal_signalhandler_override). 
+
+   An example of a Linux stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>.
+    ```
+    ***** FATAL SIGNAL RECEIVED ******* 
+    "Received fatal signal: SIGSEGV(11)     PID: 6571
+
+    ***** SIGNAL SIGSEGV(11)
+
+    ******* STACKDUMP *******
+            stack dump [1]  ./g3log-FATAL-sigsegv() [0x42a500]
+            stack dump [2]  /lib/x86_64-linux-gnu/libpthread.so.0+0x10340 [0x7f83636d5340]
+
+            stack dump [3]  ./g3log-FATAL-sigsegv : example_fatal::tryToKillWithAccessingIllegalPointer(std::unique_ptr<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::default_delete<std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > > >)+0x119 [0x4107b9]
+            stack dump [4]  ./g3log-FATAL-sigsegvmain+0xdec [0x40e51c]
+            stack dump [5]  /lib/x86_64-linux-gnu/libc.so.6__libc_start_main+0xf5 [0x7f8363321ec5]
+            stack dump [6]  ./g3log-FATAL-sigsegv() [0x40ffa2]
+
+    Exiting after fatal event  (FATAL_SIGNAL). Fatal type:  SIGSEGV
+    Log content flushed flushed sucessfully to sink
+
+    "
+    g3log g3FileSink shutdown at: 16:33:18
+
+    ```
+
+
+   ### <a name="fatal_handling_windows">Windows</a> 
+   
+
+
+   ### <a name="fatal_custom_handling">Custom fatal handling</a> 
+   ### <a name="fatal_pre_hook">Pre fatal hook</a> 
+   ### <a name="fatal_signalhandler_override">Override of signal handling</a> 
+   ### <a name="fatal_handling_disabled">Disable fatal handling</a> 
+
 
 
   ## <a name="build_options">Build Options</a>
