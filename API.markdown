@@ -10,11 +10,11 @@ Most of the API that you need for using g3log is described in this readme. For m
 * LOG [flushing](#log_flushing)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
-  * <strike>[TODO: Windows](#fatal_handling_windows)</strike>
-  * <strike>[TODO: Custom fatal handling](#fatal_custom_handling)</strike>
-  * <strike>[TODO: Pre fatal hook](#fatal_pre_hook)</strike>
-  * <strike>[TODO: Override of signal handling](#fatal_signalhandler_override)</strike>
-  * <strike>[TODO: Disable fatal handling](#fatal_handling_disabled)</strike>
+  * <strike>[TOWRITE: Windows](#fatal_handling_windows)</strike>
+  * <strike>[TOWRITE: Custom fatal handling](#fatal_custom_handling)</strike>
+  * <strike>[TOWRITE: Pre fatal hook](#fatal_pre_hook)</strike>
+  * <strike>[TOWRITE: Override of signal handling](#fatal_signalhandler_override)</strike>
+  * <strike>[TOWRITE: Disable fatal handling](#fatal_handling_disabled)</strike>
 * Build Options
 
 
@@ -133,14 +133,14 @@ The default behaviour for G3log is to catch several fatal events before they for
     ```
 
 
-   ### <strike><a name="fatal_handling_windows">TODO: Windows</a></strike> 
+   ### <strike><a name="fatal_handling_windows">TOWRITE: Windows</a></strike> 
    
 
 
-   ### <strike><a name="fatal_custom_handling">TODO: Custom fatal handling</a></strike> 
-   ### <strike><a name="fatal_pre_hook">TODO: Pre fatal hook</a> </strike> 
-   ### <strike><a name="fatal_signalhandler_override">TODO: Override of signal handling</a> </strike> 
-   ### <strike><a name="fatal_handling_disabled">TODO: Disable fatal handling</a> </strike> 
+   ### <strike><a name="fatal_custom_handling">TOWRITE: Custom fatal handling</a></strike> 
+   ### <strike><a name="fatal_pre_hook">TOWRITE: Pre fatal hook</a> </strike> 
+   ### <strike><a name="fatal_signalhandler_override">TOWRITE: Override of signal handling</a> </strike> 
+   ### <strike><a name="fatal_handling_disabled">TOWRITE: Disable fatal handling</a> </strike> 
 
 
 
