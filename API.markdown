@@ -103,8 +103,14 @@ A programmatically triggered abrupt process exit such as a call to   ```exit(0)`
 
 ## Fatal handling
 The default behaviour for G3log is to catch several fatal events before they force the process to exit. After <i>catching</i> a fatal event a stack dump is generated and all log entries, up to the point of the stack dump are together with the dump flushed to the sink(s).
+
+
   ### <a name="fatal_handling_linux">Linux/*nix</a> 
-  The default fatal handling on Linux deals with fatal signals. At the time of writing these signals were   ```SIGABRT, SIGFPE, SIGILL, SIGILL, SIGSEGV, SIGSEGV, SIGTERM```.   A signal that commonly is associated with voluntarily process exit is ```SIGINT``` (ctrl + c) G3log does not deal with it. 
+  The default fatal handling on Linux deals with fatal signals. At the time of writing these signals were   ```SIGABRT, SIGFPE, SIGILL, SIGILL, SIGSEGV, SIGSEGV, SIGTERM```.  The Linux fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp) and [crashhandler_unix.cpp](src/crashhandler_unix.cpp)
+
+
+
+   A signal that commonly is associated with voluntarily process exit is ```SIGINT``` (ctrl + c) G3log does not deal with it. 
 
    The fatal signals can be [disabled](#fatal_handling_disabled) or  [changed/added ](#fatal_signalhandler_override). 
 
@@ -133,8 +139,19 @@ The default behaviour for G3log is to catch several fatal events before they for
     ```
 
 
-   ### <strike><a name="fatal_handling_windows">TOWRITE: Windows</a></strike> 
+  <strikte>
+   ### <a name="fatal_handling_windows">TOWRITE: Windows</a>
+  Windows fatal handling also deals with fatal signals just like Linux. In addition to fatal signals it also deals with unhandled exceptions, vectored exceptions.  Windows fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp), [crashhandler_windows.cpp](src/crashhandler_windows.cpp), [stacktrace_windows.hpp](src/g3log/stacktrace_windows.hpp), [stacktrace_windows.cpp](src/stacktrace_windows.cpp)
    
+
+  An example of a Windows stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>. 
+    
+    .... MISSING CONTENT..... since my Windows computer is gone!
+
+   </strike> 
+   
+
+
 
 
    ### <strike><a name="fatal_custom_handling">TOWRITE: Custom fatal handling</a></strike> 
