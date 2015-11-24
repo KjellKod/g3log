@@ -1,4 +1,4 @@
-/** ==========================================================================
+/** ==========================================================================re
  * 2011 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
  * with no warranties. This code is yours to share, use and modify with no
  * strings attached and no restrictions or obligations.
@@ -54,10 +54,10 @@ TEST(Initialization, No_Logger_Initialized___LevelsAreONByDefault) {
    EXPECT_TRUE(g3::logLevel(WARNING));
    EXPECT_TRUE(g3::logLevel(FATAL));
    EXPECT_EQ(DEBUG.value, 0);
-   EXPECT_EQ(INFO.value, 1);
-   EXPECT_EQ(WARNING.value, 2);
-   EXPECT_EQ(FATAL.value, 500);
-   EXPECT_EQ(g3::internal::CONTRACT.value, 1000);
+   EXPECT_EQ(INFO.value, 100);
+   EXPECT_EQ(WARNING.value, 500);
+   EXPECT_EQ(FATAL.value, 1000);
+   EXPECT_EQ(g3::internal::CONTRACT.value, 2000);
 }
 
 TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKish) {
