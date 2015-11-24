@@ -37,7 +37,7 @@ http://www.codeproject.com/Articles/288827/g2log-An-efficient-asynchronous-logge
 * You can choose to use the default log receiver which saves all LOG calls to file, **or** you can choose to use your own custom made log receiver(s), **or** both, **or** as many sinks as you need.
 
 ## Detailed API documentation
-Please look at [API.readme](API.readme) for detailed API documentation
+Please look at [API.markdown](API.markdown) for detailed API documentation
 
 
 ## Benefits you get when using G3log ##
