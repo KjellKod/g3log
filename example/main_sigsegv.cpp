@@ -44,6 +44,15 @@ namespace example_fatal
       int zero = 0; // trying to fool the compiler to automatically warn
       LOG(INFO) << "This is a bad operation [value/zero] : " << value / zero;
    }
+
+   
+   void tryToKillWithAccessingIllegalPointer(std::unique_ptr<std::string> badStringPtr) {
+      auto badPtr = std::move(badStringPtr);
+      LOG(INFO) << "Function calls through a nullptr object will trigger SIGSEGV";
+      badStringPtr->append("crashing");
+   }
+
+
 } // example fatal
 
 
@@ -96,8 +105,13 @@ int main(int argc, char **argv)
    // OK --- on Ubunti this caused get a compiler warning with gcc4.6
    // from gcc 4.7.2 (at least) it causes a crash (as expected)
    // On windows itll probably crash
-   //example_fatal::tryToKillWithIllegalPrintout();
+   example_fatal::tryToKillWithIllegalPrintout();
 
+   // try 2
+   std::unique_ptr<std::string> badStringPtr;
+   example_fatal::tryToKillWithAccessingIllegalPointer(std::move(badStringPtr));
+
+    // what happened? OK. let us just exit with SIGFPE
    int value = 1;    // system dependent but it SHOULD never reach this line
    example_fatal::killByZeroDivision(value);
    return 0;

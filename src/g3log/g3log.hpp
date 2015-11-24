@@ -209,8 +209,13 @@ And here is possible output
 
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Throws std::runtime_eror if contract breaks
-#define CHECK_F(boolean_expression, printf_like_message, ...)    \
+#define CHECKF(boolean_expression, printf_like_message, ...)    \
    if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
 
+// Backwards compatible. The same as CHECKF. 
+// Design By Contract, printf-like API syntax with variadic input parameters.
+// Throws std::runtime_eror if contract breaks
+#define CHECK_F(boolean_expression, printf_like_message, ...)    \
+   if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
 
 
