@@ -34,9 +34,9 @@
 #define __PRETTY_FUNCTION__   __FUNCTION__
 #endif
 
-// thread_local doesn't exist on VS2013 but it might soon? (who knows)
-// to work after Microsoft has updated to be C++11 compliant
-#if !(defined(thread_local)) && (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+// thread_local doesn't exist before VS2013
+// it exists on VS2015
+#if !(defined(thread_local)) && defined(_MSC_VER) && _MSC_VER < 1900
 #define thread_local __declspec(thread)
 #endif
 
