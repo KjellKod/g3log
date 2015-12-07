@@ -75,7 +75,12 @@ ENDIF()
 
    IF (MSVC OR MINGW) 
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
+	 list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_android.cpp)
+   ELSEIF(ANDROID)
+	 list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
+	 list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)	
    ELSE()
+ 	 list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_android.cpp)
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
    ENDIF (MSVC OR MINGW)
 
