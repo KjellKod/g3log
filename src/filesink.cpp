@@ -51,7 +51,7 @@ namespace g3 {
    // The actual log receiving function
    void FileSink::fileWrite(LogMessageMover message) {
       std::ofstream &out(filestream());
-      out << message.get().toString();
+      out << message.get().toString() << std::flush;
    }
 
    std::string FileSink::changeLogFile(const std::string &directory) {
