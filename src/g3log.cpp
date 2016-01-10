@@ -26,9 +26,7 @@
 #include "g3log/loglevels.hpp"
 
 
-#include <cstdio>    // vsnprintf
 #include <mutex>
-#include <csignal>
 #include <memory>
 #include <iostream>
 #include <thread>

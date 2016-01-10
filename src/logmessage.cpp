@@ -9,8 +9,6 @@
 #include "g3log/logmessage.hpp"
 #include "g3log/crashhandler.hpp"
 #include "g3log/time.hpp"
-#include "g3log/std2_make_unique.hpp"
-#include <algorithm>
 #include <mutex>
 
 namespace {

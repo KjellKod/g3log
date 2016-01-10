@@ -26,7 +26,6 @@
 
 
 #include <future>
-#include "g3log/active.hpp"
 #include "g3log/moveoncopy.hpp"
 #include "g3log/stlpatch_future.hpp"
 

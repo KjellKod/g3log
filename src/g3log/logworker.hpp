@@ -11,7 +11,6 @@
  *
  * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
  * ********************************************* */
-#include "g3log/g3log.hpp"
 #include "g3log/sinkwrapper.hpp"
 #include "g3log/sinkhandle.hpp"
 #include "g3log/filesink.hpp"
@@ -20,7 +19,6 @@
 
 #include <memory>
 #include <string>
-#include <utility>
 #include <vector>
 
 
