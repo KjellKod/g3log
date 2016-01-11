@@ -13,16 +13,13 @@
  * ============================================================================*/
 
 #include "g3log/stacktrace_windows.hpp"
-#include "g3log/g3log.hpp"
 
 #include <windows.h>
 #include <dbghelp.h>
 #include <map>
 #include <memory>
-#include <atomic>
 #include <cassert>
 #include <vector>
-#include <cstdlib>
 #include <mutex>
 
 
