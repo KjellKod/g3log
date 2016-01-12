@@ -10,13 +10,10 @@
 #include "g3log/logmessage.hpp"
 #include "g3log/active.hpp"
 #include "g3log/g3log.hpp"
-#include "g3log/time.hpp"
 #include "g3log/future.hpp"
 #include "g3log/crashhandler.hpp"
 
 #include <iostream>
-#include <cassert>
-#include <functional>
 
 
 namespace g3 {
