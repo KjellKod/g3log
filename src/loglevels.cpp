@@ -63,6 +63,11 @@ namespace g3 {
          internal::g_log_level_status.clear();
          internal::g_log_level_status = std::map<int, atomicbool>{{g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true }, {FATAL.value, true}};
       }
+
+     void disableAll() {
+         internal::g_log_level_status.clear();
+         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kDebugVaulue, false}, {INFO.value, false}, {WARNING.value, false}, {ERROR.value, false}, {FATAL.value, false}};
+     }
    } // only_change_at_initialization
 #endif
 

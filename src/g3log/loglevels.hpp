@@ -117,6 +117,7 @@ namespace g3 {
       void setLogLevel(LEVELS level, bool enabled_status);
       std::string printLevels();
       void reset();
+      void disableAll();
 
    } // only_change_at_initialization
 #endif
