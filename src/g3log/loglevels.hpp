@@ -65,6 +65,7 @@ namespace g3 {
    static const int kInfoValue = 100;
    static const int kWarningValue = 500;
    static const int kErrorValue = 600;
+   static const int kErrorFatalValue = 700;
    static const int kFatalValue = 1000;
    static const int kInternalFatalValue = 2000;
 }
@@ -77,6 +78,7 @@ const LEVELS DEBUG {g3::kDebugVaulue, {"DEBUG"}},
       INFO {g3::kInfoValue, {"INFO"}},
       WARNING {g3::kWarningValue, {"WARNING"}},
       ERROR {g3::kErrorValue, {"ERROR"}},
+      ERRORF {g3::kErrorFatalValue, {"ERROR_F"}},
 
 
 // Insert here *any* extra logging levels that is needed. You can do so in your own source file

@@ -40,7 +40,7 @@ namespace g3 {
       }
 
 #ifdef G3_DYNAMIC_LOGGING
-      std::map<int, atomicbool> g_log_level_status = {{g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true }, {FATAL.value, true}};
+      std::map<int, atomicbool> g_log_level_status = { {g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true}, {ERRORF.value, true}, {FATAL.value, true} };
 #endif
    } // internal
 
@@ -61,12 +61,12 @@ namespace g3 {
 
       void reset() {
          internal::g_log_level_status.clear();
-         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true }, {FATAL.value, true}};
+         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kDebugVaulue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true}, {ERRORF.value, true}, {FATAL.value, true}};
       }
 
      void disableAll() {
          internal::g_log_level_status.clear();
-         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kDebugVaulue, false}, {INFO.value, false}, {WARNING.value, false}, {ERROR.value, false}, {FATAL.value, false}};
+         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kDebugVaulue, false}, {INFO.value, false}, {WARNING.value, false}, {ERROR.value, false}, {ERRORF.value, false}, {FATAL.value, false}};
      }
    } // only_change_at_initialization
 #endif
