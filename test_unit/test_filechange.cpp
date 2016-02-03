@@ -30,14 +30,14 @@ namespace { // anonymous
   g3::SinkHandle<g3::FileSink>* g_filesink_handler = nullptr;
   LogFileCleaner* g_cleaner_ptr = nullptr;
 
-  std::string setLogNameAndAddCount(std::string new_file_to_create) {
+  std::string setLogNameAndAddCount(std::string new_file_to_create, std::string logger_id = "g3log") {
     static std::mutex m;
     static int count;
     std::string add_count;
     std::lock_guard<std::mutex> lock(m);
     {
       add_count = std::to_string(++count) + "_";
-      auto future_new_log = g_filesink_handler->call(&g3::FileSink::changeLogFile, new_file_to_create + add_count);
+      auto future_new_log = g_filesink_handler->call(&g3::FileSink::changeLogFile, new_file_to_create + add_count, logger_id);
       auto new_log = future_new_log.get();
       if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
       return new_log;
@@ -45,8 +45,8 @@ namespace { // anonymous
     return add_count;
   }
 
-  std::string setLogName(std::string new_file_to_create) {
-    auto future_new_log = g_filesink_handler->call(&g3::FileSink::changeLogFile, new_file_to_create);
+  std::string setLogName(std::string new_file_to_create, std::string logger_id = "g3log") {
+    auto future_new_log = g_filesink_handler->call(&g3::FileSink::changeLogFile, new_file_to_create, logger_id);
     auto new_log = future_new_log.get();
     if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
     return new_log;
@@ -72,6 +72,24 @@ TEST(TestOf_ChangingLogFile, Expecting_NewLogFileUsed) {
   ASSERT_NE(old_log, new_log);
 }
 
+TEST(TestOf_ChangingLogFile_Id, Expecting_NewLogFileUsed) {
+  auto old_log = getLogName();
+  std::string name = setLogNameAndAddCount(name_path_1);
+  auto new_log = setLogName("foo","new_logger_id");
+  ASSERT_NE(old_log, new_log);
+  std::string new_name = getLogName();
+  ASSERT_STREQ(new_name.substr(0,31).c_str(),"fooReplaceLogFile.new_logger_id");
+}
+
+TEST(TestOf_ChangingLogFile_NoId, Expecting_NewLogFileUsed) {
+  auto old_log = getLogName();
+  std::string name = setLogNameAndAddCount(name_path_1);
+  auto new_log = setLogName("foo","");
+  ASSERT_NE(old_log, new_log);
+  std::string new_name = getLogName();
+  ASSERT_STREQ(new_name.substr(0,17).c_str(),"fooReplaceLogFile");
+}
+
 TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
   auto old_log = g_filesink_handler->call(&g3::FileSink::fileName).get();
   if (!old_log.empty()) g_cleaner_ptr->addLogToClean(old_log);
@@ -82,7 +100,8 @@ TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
   auto size = g_cleaner_ptr->size();
   for (auto count = 0; count < max; ++count) {
     std::string drive = ((count % 2) == 0) ? "./_threadEven_" : "./_threaOdd_";
-    threads.push_back(std::thread(setLogNameAndAddCount, drive));
+    std::string logger_id = std::to_string(count);
+    threads.push_back(std::thread(setLogNameAndAddCount, drive, logger_id));
   }
   for (auto& thread : threads)
     thread.join();
@@ -99,6 +118,13 @@ TEST(TestOf_IllegalLogFileName, Expecting_NoChangeToOriginalFileName) {
   ASSERT_STREQ(original.c_str(), post_illegal.c_str());
 }
 
+TEST(TestOf_SinkHandleDifferentId, Expecting_DifferentId)
+{
+  auto sink = std2::make_unique<g3::FileSink>("AnotherLogFile", name_path_1, "logger_id");
+  auto name = sink->fileName();
+  ASSERT_STREQ( name.substr(0,26).c_str(), "./AnotherLogFile.logger_id");
+  g_cleaner_ptr->addLogToClean(name);
+}
 
 int main(int argc, char *argv[]) {
   LogFileCleaner cleaner;

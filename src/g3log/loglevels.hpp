@@ -24,7 +24,6 @@
 
 #include <string>
 
-
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod
 struct LEVELS {
    // force internal copy of the const char*. This is a simple safeguard for when g3log is used in a
