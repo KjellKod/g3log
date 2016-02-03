@@ -19,7 +19,7 @@ namespace g3 {
       virtual ~FileSink();
 
       void fileWrite(LogMessageMover message);
-      std::string changeLogFile(const std::string &directory, const std::string &logger_id="g3log");
+      std::string changeLogFile(const std::string &directory, const std::string &logger_id);
       std::string fileName();
 
 

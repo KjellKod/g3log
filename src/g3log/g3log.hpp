@@ -26,6 +26,7 @@
 #include "g3log/logmessage.hpp"
 
 #include <string>
+#include <cstdarg>
 #include <functional>
 
 

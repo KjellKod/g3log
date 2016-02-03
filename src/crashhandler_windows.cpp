@@ -11,6 +11,7 @@
 #endif
 
 #include <windows.h>
+#include <intrin.h>
 #include <csignal>
 #include <sstream>
 #include <atomic>
