@@ -23,6 +23,7 @@
 #endif
 
 #include <string>
+#include <cstdarg>
 #include <algorithm>
 
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod

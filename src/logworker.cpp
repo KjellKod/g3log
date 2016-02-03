@@ -14,7 +14,8 @@
 #include "g3log/crashhandler.hpp"
 
 #include <iostream>
-
+#include <cassert>
+#include <functional>
 
 namespace g3 {
 
