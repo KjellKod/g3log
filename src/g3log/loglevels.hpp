@@ -115,8 +115,10 @@ namespace g3 {
 #ifdef G3_DYNAMIC_LOGGING
    // Only safe if done at initialization in a single-thread context
    namespace only_change_at_initialization {
-      // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
+      // Enable/Disable a log level {DEBUG,INFO,WARNING,ERROR,ERROR_F,FATAL}
       void setLogLevel(LEVELS level, bool enabled_status);
+      // Enable log level >= log_level
+      void setLogLevel(const std::string &log_level);
       std::string printLevels();
       void reset();
       void disableAll();
