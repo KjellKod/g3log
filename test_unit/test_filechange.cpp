@@ -139,7 +139,7 @@ int main(int argc, char* argv[]) {
 
       last_log_file = g_filesink_handler->call(&g3::FileSink::fileName).get();
       std::cout << "log file at: " << last_log_file << std::endl;
-      g3::internal::shutDownLogging();
+      //g3::internal::shutDownLogging();
    }
    std::cout << "FINISHED WITH THE TESTING" << std::endl;
    // cleaning up
