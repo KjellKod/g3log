@@ -15,7 +15,6 @@
 
 #include <iostream>
 
-
 namespace g3 {
 
    LogWorkerImpl::LogWorkerImpl() : _bg(kjellkod::Active::createActive()) { }
