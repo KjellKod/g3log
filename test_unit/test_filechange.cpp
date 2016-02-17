@@ -143,6 +143,6 @@ int main(int argc, char* argv[]) {
    }
    std::cout << "FINISHED WITH THE TESTING" << std::endl;
    // cleaning up
-   //cleaner.addLogToClean(last_log_file);
+   cleaner.addLogToClean(last_log_file);
    return return_value;
 }
