@@ -14,7 +14,7 @@ namespace g3 {
    using namespace internal;
 
 
-   FileSink::FileSink(const std::string &log_prefix, const std::string &log_directory)
+   FileSink::FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string& logger_id)
       : _log_file_with_path(log_directory)
       , _log_prefix_backup(log_prefix)
       , _outptr(new std::ofstream)
@@ -25,7 +25,7 @@ namespace g3 {
          abort();
       }
 
-      std::string file_name = createLogFileName(_log_prefix_backup);
+      std::string file_name = createLogFileName(_log_prefix_backup, logger_id);
       _log_file_with_path = pathSanityFix(_log_file_with_path, file_name);
       _outptr = createLogFile(_log_file_with_path);
 
@@ -54,18 +54,16 @@ namespace g3 {
       out << message.get().toString() << std::flush;
    }
 
-   std::string FileSink::changeLogFile(const std::string &directory) {
+   std::string FileSink::changeLogFile(const std::string &directory, const std::string &logger_id) {
 
       auto now = g3::systemtime_now();
       auto now_formatted = g3::localtime_formatted(now, {internal::date_formatted + " " + internal::time_formatted});
 
-      std::string file_name = createLogFileName(_log_prefix_backup);
-      std::string prospect_log = directory + file_name;     
-
+      std::string file_name = createLogFileName(_log_prefix_backup, logger_id);
+      std::string prospect_log = directory + file_name;
       std::unique_ptr<std::ofstream> log_stream = createLogFile(prospect_log);
       if (nullptr == log_stream) {
-         filestream() << "\n" << now_formatted << " Unable to change log file."
-            << " Illegal filename or busy? Unsuccessful log name was: " << prospect_log;
+         filestream() << "\n" << now_formatted << " Unable to change log file. Illegal filename or busy? Unsuccessful log name was: " << prospect_log;
          return {}; // no success
       }
 

@@ -84,7 +84,7 @@ namespace g3 {
        std::cout << "The filename is: " << log_file_name.get() << std::endl;
        //   something like: /tmp/my_test_log.g3log.20150819-100300.log
        */
-       std::unique_ptr<FileSinkHandle> addDefaultLogger(const std::string& log_prefix, const std::string& log_directory);
+       std::unique_ptr<FileSinkHandle> addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id = "g3log");
 
 
 
