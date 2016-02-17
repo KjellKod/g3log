@@ -24,7 +24,7 @@ namespace g3 {
 
       // check for filename validity -  filename should not be part of PATH
       bool isValidFilename(const std::string &prefix_filename) {
-         std::string illegal_characters("/,|<>:#$%{}()[]\'\"^!?+* ");
+         std::string illegal_characters("/,|<>:#$%{}[]\'\"^!?+* ");
          size_t pos = prefix_filename.find_first_of(illegal_characters, 0);
          if (pos != std::string::npos) {
             std::cerr << "Illegal character [" << prefix_filename.at(pos) << "] in logname prefix: " << "[" << prefix_filename << "]" << std::endl;
