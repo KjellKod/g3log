@@ -154,11 +154,12 @@ int main(int argc, char* argv[]) {
       testing_helpers::ScopedOut scopedCerr(std::cerr, &cerrDump);
 
       auto worker = g3::LogWorker::createLogWorker();
-      auto handle = worker->addDefaultLogger(kReplaceFileName, name_path_1, "kjell");
+      auto handle = worker->addDefaultLogger(kReplaceFileName, name_path_1);
       g_logger_ptr = worker.get();
       g_filesink_handler = handle.get();
       last_log_file = g_filesink_handler->call(&g3::FileSink::fileName).get();
-      //cleaner.addLogToClean(last_log_file);
+      std::cout << "log file at: " << last_log_file << std::endl;
+      cleaner.addLogToClean(last_log_file);
 
 
       g3::initializeLogging(g_logger_ptr);
@@ -173,6 +174,6 @@ int main(int argc, char* argv[]) {
    }
    std::cout << "FINISHED WITH THE TESTING" << std::endl;
    // cleaning up
-   //cleaner.addLogToClean(last_log_file);
+   cleaner.addLogToClean(last_log_file);
    return return_value;
 }
