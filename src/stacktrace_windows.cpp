@@ -21,6 +21,7 @@
 #include <cassert>
 #include <vector>
 #include <mutex>
+#include <g3log/g3log.hpp>
 
 
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))

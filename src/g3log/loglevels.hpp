@@ -22,7 +22,8 @@
 #endif
 #endif
 
-#include <string>
+#include <string> 
+#include <algorithm>
 
 
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod

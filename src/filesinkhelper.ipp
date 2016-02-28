@@ -24,7 +24,7 @@ namespace g3 {
 
       // check for filename validity -  filename should not be part of PATH
       bool isValidFilename(const std::string &prefix_filename) {
-         std::string illegal_characters("/,|<>:#$%{}()[]\'\"^!?+* ");
+         std::string illegal_characters("/,|<>:#$%{}[]\'\"^!?+* ");
          size_t pos = prefix_filename.find_first_of(illegal_characters, 0);
          if (pos != std::string::npos) {
             std::cerr << "Illegal character [" << prefix_filename.at(pos) << "] in logname prefix: " << "[" << prefix_filename << "]" << std::endl;
@@ -85,9 +85,10 @@ namespace g3 {
          return ss_entry.str();
       }
 
-      std::string createLogFileName(const std::string &verified_prefix) {
+      std::string createLogFileName(const std::string &verified_prefix, const std::string &logger_id) {
          std::stringstream oss_name;
-         oss_name << verified_prefix << ".g3log.";
+         oss_name << verified_prefix << ".";
+         if( logger_id != "" ) oss_name << logger_id << ".";
          oss_name << g3::localtime_formatted(g3::systemtime_now(), file_name_time_formatted);
          oss_name << ".log";
          return oss_name.str();

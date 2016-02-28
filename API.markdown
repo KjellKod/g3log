@@ -89,6 +89,24 @@ A logging sink is not required to be a subclass of a specific type. The only req
 
 ### Using the default sink
 Sink creation is defined in [logworker.hpp](src/g3log/logworker.hpp) and used in [logworker.cpp](src/logworker.cpp). For in-depth knowlege regarding sink implementation details you can look at [sinkhandle.hpp](src/g3log/sinkhandle.hpp) and [sinkwrapper.hpp](src/g3log/sinkwrapper.hpp)
+```
+  std::unique_ptr<FileSinkHandle> addDefaultLogger(
+            const std::string& log_prefix
+            , const std::string& log_directory
+            , const std::string& default_id = "g3log");
+```
+
+With the default id left as is (i.e. "g3log") a creation of the logger in the unit test "test_filechange" would look like this
+```
+  const std::string directory = "./";
+  const std::string name = "(ReplaceLogFile)";
+  auto worker = g3::LogWorker::createLogWorker();
+  auto handle = worker->addDefaultLogger(name, directory);
+```
+The resulting filename would be something like: 
+```
+./(ReplaceLogFile).g3log.20160217-001406.log
+```
 
 
 ## LOG <a name="log_flushing">flushing</a> 
