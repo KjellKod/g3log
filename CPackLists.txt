@@ -2,7 +2,7 @@
 # 2015 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 # with no warranties. This code is yours to share, use and modify with no
 # strings attached and no restrictions or obligations.
-# 
+#
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
@@ -18,16 +18,18 @@
  #           COMPONENT headers)
 
 
+   SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output dir for libraries")
+   SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output dir for headers")
 
-   INSTALL( TARGETS g3logger_shared
-            ARCHIVE
-            LIBRARY DESTINATION /usr/local/lib
+   INSTALL( TARGETS g3logger g3logger_shared
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT libraries)
 
    INSTALL( FILES ${HEADER_FILES}
-            DESTINATION /usr/local/include/g3log
+            DESTINATION ${CMAKE_INSTALL_HEADERDIR}/g3log
             COMPONENT headers)
-                      
+
 
   SET(CPACK_COMPONENTS_ALL libraries headers)
   SET(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "G3Log libraries")
@@ -55,5 +57,5 @@ INCLUDE(CPack)
 
 
 #  2094  sudo dpkg -r g3log
-# 2100  sudo dpkg -i g3log-1.1.0-Linux.deb 
+# 2100  sudo dpkg -i g3log-1.1.0-Linux.deb
 # 2101  sudo dpkg -L g3log
