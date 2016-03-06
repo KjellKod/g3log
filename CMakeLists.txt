@@ -112,17 +112,21 @@ endif()
 
 
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+   # ==========================================================================
+   # BETA : package manager for G3Log,. not yet reliable. Use at your own risk
+   #        only tested on Ubuntu and CentOS
+   #
+   #        For OSX you can install an older version using 'brew install'
+   #
+   # ==========================================================================
+   #   Package handling is done AFTER all other CMake setup
+   #   usage:   make package
+   #   Check the output result and install accordingly.
+   # ==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+ENDIF()
 
-# ==========================================================================
-# BETA : package manager for G3Log,. not yet reliable. Use at your own risk
-# ==========================================================================
-#   Package handling is done AFTER all other CMake setup
-#
-#   usage:   make package
-#
-#   Check the output result and install accordingly.
-# ==========================================================================
-INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 
 IF (NOT MSVC)
    MESSAGE("\n\n
