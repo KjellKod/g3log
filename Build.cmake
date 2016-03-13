@@ -65,6 +65,11 @@ ELSEIF(MSVC)
 
    # ERROR level conflicts with windows.h
    ADD_DEFINITIONS (-DNOGDI)
+   # support AMD proc on vc2015
+   if(${CMAKE_CL_64} STREQUAL "0")
+       set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /arch:IA32")
+   endif()
+
 ENDIF()
 
    # GENERIC STEPS
