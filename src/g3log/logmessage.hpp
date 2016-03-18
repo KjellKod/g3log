@@ -100,17 +100,15 @@ namespace g3 {
 
 
       friend void swap(LogMessage& first, LogMessage& second) {
-         // enable ADL (not necessary in our case, but good practice)
-         using std::swap;
-         swap(first._timestamp, second._timestamp);
-         swap(first._call_thread_id, second._call_thread_id);
-         swap(first._microseconds, second._microseconds);
-         swap(first._file, second._file);
-         swap(first._line, second._line);
-         swap(first._function, second._function);
-         swap(first._level, second._level);
-         swap(first._expression, second._expression);
-         swap(first._message, second._message);
+         std::swap(first._timestamp, second._timestamp);
+         std::swap(first._call_thread_id, second._call_thread_id);
+         std::swap(first._microseconds, second._microseconds);
+         std::swap(first._file, second._file);
+         std::swap(first._line, second._line);
+         std::swap(first._function, second._function);
+         std::swap(first._level, second._level);
+         std::swap(first._expression, second._expression);
+         std::swap(first._message, second._message);
       }
 
    };

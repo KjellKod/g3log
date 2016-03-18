@@ -43,9 +43,8 @@ struct LEVELS {
    }
 
    friend void swap(LEVELS& first, LEVELS& second) {
-      using std::swap;
-      swap(first.value, second.value);
-      swap(first.text, second.text);
+      std::swap(first.value, second.value);
+      std::swap(first.text, second.text);
    }
 
 
