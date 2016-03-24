@@ -56,6 +56,8 @@ std::future<std::string> sillyFutureReturn()
   result.wait();
   return result; // already wasted
 }
+
+
 TEST(Configuration, FutureSilly)
 {
   std::string hello = sillyFutureReturn().get();
@@ -182,10 +184,10 @@ TEST(Yalla, Testar)
 {
   using namespace WORKING;
   auto f = spawn_task(get_res);
-  std::cout << "Res = " << f.get() << std::endl;
+  ASSERT_EQ(42.2, f.get());
 
   auto f2 = spawn_task(msg3);
-  std::cout << "Res2 = " << f2.get() << std::endl;
+  ASSERT_EQ("msg3", f2.get());
 
 
   ASSERT_TRUE(true);
