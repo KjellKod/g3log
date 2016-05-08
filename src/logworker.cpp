@@ -116,6 +116,20 @@ namespace g3 {
       token_done.wait();
    }
 
+   void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
+      auto bg_removesink_call = [this, sink] {
+         for (auto it = _impl._sinks.begin(); it != _impl._sinks.end(); ) {
+            if ((*it).get() == sink.get()) {
+               it = _impl._sinks.erase(it);
+            } else {
+               ++it;
+            }
+         }
+      };
+      auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
+      token_done.wait();
+   }
+
    std::unique_ptr<LogWorker> LogWorker::createLogWorker() {
       return std::unique_ptr<LogWorker>(new LogWorker);
    }
