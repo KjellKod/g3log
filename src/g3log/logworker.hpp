@@ -53,7 +53,6 @@ namespace g3 {
    class LogWorker final {
       LogWorker() = default;
       void addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> wrapper);
-      void removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> wrapper);
 
       LogWorkerImpl _impl;
       LogWorker(const LogWorker&) = delete;
@@ -100,15 +99,6 @@ namespace g3 {
          auto sink = std::make_shared<Sink<T>> (std::move(real_sink), call);
          addWrappedSink(sink);
          return std2::make_unique<SinkHandle<T>> (sink);
-      }
-
-
-
-      /// Removes a sink
-      /// @param
-      template<typename T>
-      void removeSink(std::unique_ptr<SinkHandle<T>> sink_handle) {
-         removeWrappedSink(sink_handle.get()->sink());
       }
 
 
