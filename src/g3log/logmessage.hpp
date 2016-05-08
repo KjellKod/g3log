@@ -14,6 +14,7 @@
 #include "g3log/time.hpp"
 #include "g3log/moveoncopy.hpp"
 #include "g3log/crashhandler.hpp"
+#include "g3log/timestamp.hpp"
 
 #include <string>
 #include <sstream>
@@ -45,8 +46,8 @@ namespace g3 {
       }
 
       /// use a different format string to get a different look on the time.
-      //  default look is Y/M/D H:M:S
-      std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
+      //  default look (Y/M/D H:M:S) is defined by default timestamp generator
+      std::string timestamp(const std::string& time_format = "") const;
       std::string microseconds() const {
          return std::to_string(_microseconds);
       }
@@ -87,7 +88,8 @@ namespace g3 {
       // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
-      std::time_t _timestamp;
+      // TODO: unique_ptr should be considered instead of shared_ptr
+      std::shared_ptr<Timestamp> _timestamp;
       std::thread::id _call_thread_id;
       int64_t _microseconds;
       std::string _file;
