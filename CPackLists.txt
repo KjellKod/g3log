@@ -2,7 +2,7 @@
 # 2015 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 # with no warranties. This code is yours to share, use and modify with no
 # strings attached and no restrictions or obligations.
-# 
+#
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
@@ -18,16 +18,18 @@
  #           COMPONENT headers)
 
 
+   SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output dir for libraries")
+   SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output dir for headers")
 
-   INSTALL( TARGETS g3logger_shared
-            ARCHIVE
-            LIBRARY DESTINATION /usr/local/lib
+   INSTALL( TARGETS g3logger g3logger_shared
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT libraries)
 
    INSTALL( FILES ${HEADER_FILES}
-            DESTINATION /usr/local/include/g3log
+            DESTINATION ${CMAKE_INSTALL_HEADERDIR}/g3log
             COMPONENT headers)
-                      
+
 
   SET(CPACK_COMPONENTS_ALL libraries headers)
   SET(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "G3Log libraries")
@@ -46,14 +48,22 @@ set(CPACK_PACKAGE_CONTACT "Kjell Hedstrom hedstrom@kjellkod.cc")
 
 MESSAGE("\n\nTo install on Ubuntu\t\t(after cmake with options && make)")
 MESSAGE("make package")
-MESSAGE("sudo dpkg -i g3log-***Linux.deb\n\n")
 
-#SET(CPACK_INSTALL_PREFIX "/usr/local/")
-#CPACK_PACKAGE_INSTALL_DIRECTORY("/usr/local/g3log")
+MESSAGE("Headers installation directory: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}")
+MESSAGE("Library installation directory: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+MESSAGE("For more information please see g3log/CpackLists.txt")
+MESSAGE("To install: sudo dpkg -i g3log-***Linux.deb\n\n")
+MESSAGE("To list installed files: sudo dpkg -L g3log\n\n")
+MESSAGE("To remove: sudo dpkg -r g3log\n\n")
+MESSAGE("To remove: sudo dpkg -r g3log\n\n")
+
+#  NOTE: to change installation locations you can use the settings below
+#  examples:
+#  CPACK_INSTALL_PREFIX
+#  CPACK_PACKAGE_INSTALL_DIRECTORY
+#  CMAKE_INSTALL_HEADERDIR
+#  CMAKE_INSTALL_LIBDIR
+
+
 INCLUDE(CPack)
 
-
-
-#  2094  sudo dpkg -r g3log
-# 2100  sudo dpkg -i g3log-1.1.0-Linux.deb 
-# 2101  sudo dpkg -L g3log
