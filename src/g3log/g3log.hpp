@@ -12,7 +12,7 @@
  * PUBLIC DOMAIN and Not copywrited since it was built on public-domain software and influenced
  * at least in "spirit" from the following sources
  * 1. kjellkod.cc ;)
- * 2. Dr.Dobbs, Petru Marginean:  http://drdobbs.com/article/printableArticle.jhtml?articleId=201804215&dept_url=/cpp/
+ * 2. Dr.Dobbs, Petru Marginean:  http://drdobbs.com/article/printableArticle.jhtml?articleId=201804215&dept_url=/caddpp/
  * 3. Dr.Dobbs, Michael Schulze: http://drdobbs.com/article/printableArticle.jhtml?articleId=225700666&dept_url=/cpp/
  * 4. Google 'glog': http://google-glog.googlecode.com/svn/trunk/doc/glog.html
  * 5. Various Q&A at StackOverflow

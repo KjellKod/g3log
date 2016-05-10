@@ -463,7 +463,6 @@ TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg) {
 TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This message is added to throw %s and %s";
-   std::string msg3 = "This message is added to throw message and log";
    std::string arg1 = "message";
    std::string arg3 = "log";
 
@@ -477,25 +476,19 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
 
 TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg) {
    RestoreFileLogger logger(log_directory);
-   std::string msg = "This message is added to throw %s and %s";
-   std::string msg3 = "This message is added to throw message and log";
-   std::string arg1 = "message";
-   std::string arg3 = "log";
-   CHECK(1 >= 2) << msg3;
+   std::string msg = "This message is added to throw message and log";
+   CHECK(1 >= 2) << msg;
 
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
    EXPECT_TRUE(verifyContent(file_content, "CONTRACT"));
-   EXPECT_TRUE(verifyContent(file_content, msg3));
+   EXPECT_TRUE(verifyContent(file_content, msg));
 }
 TEST(CHECK, CHECK_ThatWontThrow) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This %s should never appear in the %s";
    std::string msg3 = "This message should never appear in the log";
-   std::string arg1 = "message";
-   std::string arg3 = "log";
-
    CHECK(1 == 1);
    CHECK_F(1 == 1, msg.c_str(), "message", "log");
    logger.reset();
@@ -662,7 +655,6 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
 
    std::string msg_debugOn = "This %s SHOULD  appear in the %s";
    std::string msg_debugOff = "This message should never appear in the log";
-   std::string msg_info1 = "This info msg log";
    try {
       {
          RestoreFileLogger logger(log_directory);
@@ -681,8 +673,7 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
       }
 
    } catch (std::exception const& e) {
-      std::cerr << e.what() << std::endl;
-      ADD_FAILURE() << "Should never have thrown";
+      ADD_FAILURE() << "Should never have thrown: " << e.what();
    }
 }
 TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {

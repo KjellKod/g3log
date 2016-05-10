@@ -7,6 +7,7 @@
  *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
+#include <cstdio>
 #include <string>
 #include <map>
 #include "g3log/loglevels.hpp"
