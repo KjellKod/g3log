@@ -88,8 +88,7 @@ namespace g3 {
       // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
-      // TODO: unique_ptr should be considered instead of shared_ptr
-      std::shared_ptr<Timestamp> _timestamp;
+      Timestamp _timestamp;
       std::thread::id _call_thread_id;
       int64_t _microseconds;
       std::string _file;
@@ -117,6 +116,9 @@ namespace g3 {
    };
 
 
+   // prototypes for timestamp generator's functionality
+   std::function<Timestamp()>& getTimestampGenerator();
+   void                        setTimestampGenerator(std::function<Timestamp()>);
 
 
    /** Trigger for flushing the message queue and exiting the application

@@ -46,8 +46,6 @@ namespace {
 
 
    std::atomic<size_t> g_fatal_hook_recursive_counter = {0};
-
-   g3::TimestampProvider timestampProvider;
 }
 
 
@@ -109,13 +107,6 @@ namespace g3 {
    void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
       g_fatal_to_g3logworker_function_ptr = fatal_call;
    }
-
-
-   // returns reference to the global timestamp provider
-   TimestampProvider& timestamp_provider() {
-      return timestampProvider;
-   }
-
 
 
    namespace internal {

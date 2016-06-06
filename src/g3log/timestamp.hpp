@@ -1,47 +1,22 @@
 #pragma once
 #include <ctime>
-#include <functional>
-#include <memory>
 #include <string>
-
-#include "g3log/time.hpp"
 
 
 namespace g3 {
 
 
 	struct Timestamp {
-		virtual std::string getLocalTimestamp(const std::string& format = "") = 0;
+			    Timestamp(std::string&);
+			    Timestamp(std::time_t, int64_t, std::string&);
+			    Timestamp(const Timestamp*);
+			   ~Timestamp();
+		std::string getLocalTimestamp(const std::string& = "") const;
+		Timestamp&  operator=(Timestamp other);
+		friend void swap(Timestamp& first, Timestamp& second);
+
+		std::time_t  _time;           /* time as std::time_t which is #sec since enoch */
+		uint64_t     _microsec;       /* microsecond part of the timestamp [0-1000000] */
+		std::string& _defaultFormat;  /* default format used by getLocalTimestamp      */
 	};
-
-
-	struct DefaultTimestamp : public Timestamp {
-							DefaultTimestamp(const std::string&);
-							DefaultTimestamp(const DefaultTimestamp*);
-		virtual            ~DefaultTimestamp();
-		virtual std::string getLocalTimestamp(const std::string&);
-
-		const std::time_t  _timestamp;
-		const std::string& _defaultFormat;
-	};
-
-
-	class TimestampProvider {
-		public:
-									   TimestampProvider(const std::string = {g3::internal::date_formatted  + " " + g3::internal::time_formatted});
-									  ~TimestampProvider();
-			std::shared_ptr<Timestamp> generate();
-			void                       setGenerator(std::function<std::shared_ptr<Timestamp> ()> = NULL);
-			void                       setDefaultFormat(std::string format);
-
-		protected:
-			std::shared_ptr<Timestamp> defaultGenerator();
-
-		private:
-			std::function<std::shared_ptr<Timestamp> ()> _generator;
-			std::string                                  _defaultFormat;
-	};
-
-
-	TimestampProvider& timestamp_provider();
 }
