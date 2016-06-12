@@ -321,26 +321,47 @@ TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {
    EXPECT_EQ(g_fatal_counter.load(), size_t{1});
 }
 
+#if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))   
 namespace {
    std::atomic<size_t> customFatalCounter = {0};
    std::atomic<int> lastEncounteredSignal = {0};
    void customSignalHandler(int signal_number, siginfo_t* info, void* unused_context) {
       lastEncounteredSignal.store(signal_number);
-      ++customFatalCounter;
+	  ++customFatalCounter;
    }
-
-
-
-   void installCustomSIGTERM () {
+   void installCustomSIGTERM() {
       struct sigaction action;
-      memset(&action, 0, sizeof (action));
-      sigemptyset(&action.sa_mask);
-      action.sa_sigaction = &customSignalHandler;
-      action.sa_flags = SA_SIGINFO;
-      sigaction(SIGTERM, &action, nullptr);
+	  memset(&action, 0, sizeof(action));
+	  sigemptyset(&action.sa_mask);
+	  action.sa_sigaction = &customSignalHandler;
+	  action.sa_flags = SA_SIGINFO;
+	  sigaction(SIGTERM, &action, nullptr);
    }
-
 } // anonymous
+
+// Override of signal handling and testing of it should be fairly easy to port to windows
+// ref: https://github.com/KjellKod/g3log/blob/master/src/crashhandler_windows.cpp
+// what is missing is the override of signals and custom installation of signals
+// ref: https://github.com/KjellKod/g3log/blob/master/src/crashhandler_unix.cpp
+//      functions: void restoreSignalHandlerToDefault()
+//                 void overrideSetupSignals(const std::map<int, std::string> overrideSignals)
+//                 void restoreSignalHandler(int signal_number)
+//
+// It would require some adding of unit test (see the test below)
+// and good Windows experience. Since I am not currently working much on the Windows
+// side I am reaching out to the community for this one:
+//
+//
+// For the test to work the following code should be added in this test
+//void customSignalHandler(int signal_number) {
+//	lastEncounteredSignal.store(signal_number);
+//	++customFatalCounter;
+//}
+//
+//void installCustomSIGTERM() {
+//	ASSERT_TRUE(SIG_ERR != signal(SIGTERM, customSignalHandler));
+//} 
+
 
 TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
    RestoreFileLogger logger(log_directory);
@@ -360,6 +381,7 @@ TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
    EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
    EXPECT_EQ(customFatalCounter.load(), size_t{1});
 }
+#endif
 
 
 
