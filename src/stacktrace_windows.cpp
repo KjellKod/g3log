@@ -23,6 +23,8 @@
 #include <mutex>
 #include <g3log/g3log.hpp>
 
+#pragma comment(lib, "dbghelp.lib")
+
 
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "stacktrace_win.cpp used but not on a windows system"
