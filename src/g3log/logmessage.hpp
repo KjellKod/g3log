@@ -14,7 +14,6 @@
 #include "g3log/time.hpp"
 #include "g3log/moveoncopy.hpp"
 #include "g3log/crashhandler.hpp"
-#include "g3log/timestamp.hpp"
 
 #include <string>
 #include <sstream>
@@ -88,7 +87,7 @@ namespace g3 {
       // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
-      Timestamp _timestamp;
+      timespec _timestamp;
       std::thread::id _call_thread_id;
       int64_t _microseconds;
       std::string _file;
@@ -115,10 +114,6 @@ namespace g3 {
 
    };
 
-
-   // prototypes for timestamp generator's functionality
-   std::function<Timestamp()>& getTimestampGenerator();
-   void                        setTimestampGenerator(std::function<Timestamp()>);
 
 
    /** Trigger for flushing the message queue and exiting the application

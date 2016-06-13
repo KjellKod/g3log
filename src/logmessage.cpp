@@ -122,7 +122,11 @@ namespace g3 {
 
 
    std::string LogMessage::timestamp(const std::string& time_look) const {
-      return  _timestamp.getLocalTimestamp();
+      std::ostringstream stringStream;
+
+      stringStream << _timestamp.tv_nsec;
+
+      return g3::localtime_formatted(_timestamp.tv_sec, (time_look.empty() ? g3::internal::date_formatted + " " + g3::internal::time_formatted : time_look)) + "|" + stringStream.str() + "|";
    }
 
 
@@ -136,14 +140,15 @@ namespace g3 {
 
    LogMessage::LogMessage(const std::string& file, const int line,
                           const std::string& function, const LEVELS& level)
-      : _timestamp(g3::getTimestampGenerator()())
-      , _call_thread_id(std::this_thread::get_id())
+      : _call_thread_id(std::this_thread::get_id())
       , _microseconds(microsecondsCounter())
       , _file(splitFileName(file))
       , _line(line)
       , _function(function)
       , _level(level)
-   {}
+   {
+      clock_gettime(CLOCK_REALTIME, &_timestamp);
+   }
 
 
    LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
@@ -183,28 +188,6 @@ namespace g3 {
       return oss.str();
    }
 
-
-   // the default timestamp generator implementation
-   std::function<Timestamp()> timestamp_generator = []() -> Timestamp {
-
-      // making it static because Timestamp object accepts reference, not a copy
-      static std::string format = {g3::internal::date_formatted + " " + g3::internal::time_formatted};
-
-      // creating a new timestamp
-      return Timestamp(format);
-   };
-
-
-   // returns reference to the global timestamp generator
-   std::function<Timestamp()>& getTimestampGenerator() {
-      return timestamp_generator;
-   }
-
-
-   // registering a new timestamp generator
-   void setTimestampGenerator(std::function<Timestamp()> timestampGenerator) {
-      timestamp_generator = timestampGenerator;
-   }
 
 
    FatalMessage::FatalMessage(const LogMessage& details, g3::SignalType signal_id)
