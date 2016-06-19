@@ -122,11 +122,7 @@ namespace g3 {
 
 
    std::string LogMessage::timestamp(const std::string& time_look) const {
-      std::ostringstream stringStream;
-
-      stringStream << _timestamp.tv_nsec;
-
-      return g3::localtime_formatted(_timestamp.tv_sec, (time_look.empty() ? g3::internal::date_formatted + " " + g3::internal::time_formatted : time_look)) + "|" + stringStream.str() + "|";
+      return g3::localtime_formatted(_timestamp, time_look);
    }
 
 
@@ -147,7 +143,7 @@ namespace g3 {
       , _function(function)
       , _level(level)
    {
-      clock_gettime(CLOCK_REALTIME, &_timestamp);
+      timespec_get(&_timestamp, TIME_UTC);
    }
 
 

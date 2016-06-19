@@ -21,7 +21,7 @@ namespace g3 {
       // This is needed since latest version (at time of writing) of gcc4.7 does not implement this library function yet.
       // return value is SIMPLIFIED to only return a std::string
 
-      std::string put_time(const struct tm *tmb, const char *c_time_format) {
+      std::string put_time(const struct tm *tmb, const long nsec, const char *c_time_format) {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
          std::ostringstream oss;
          oss.fill('0');
@@ -34,6 +34,7 @@ namespace g3 {
          //                    ... also ... This is way more buffer space then we need
 
          auto success = std::strftime(buffer, size, c_time_format, tmb);
+         // TODO: incorrect code
          if (0 == success)
          {
             assert((0 != success) && "strftime fails with illegal formatting");
@@ -69,8 +70,13 @@ namespace g3 {
    /// * format string must conform to std::put_time
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
 
+   std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
+      std::tm t = localtime(time_snapshot.tv_sec); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)
+      return g3::internal::put_time(&t, time_snapshot.tv_nsec, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
+   }
+
+   // this version of localtime_formatted used by FileSink::~FileSink because systemtime_now returns time_t
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) {
-      std::tm t = localtime(time_snapshot); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)
-      return g3::internal::put_time(&t, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
+      return localtime_formatted(timespec{time_snapshot, 0}, time_format);
    }
 } // g3

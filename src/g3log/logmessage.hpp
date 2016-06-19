@@ -45,8 +45,8 @@ namespace g3 {
       }
 
       /// use a different format string to get a different look on the time.
-      //  default look (Y/M/D H:M:S) is defined by default timestamp generator
-      std::string timestamp(const std::string& time_format = "") const;
+      //  default look is Y/M/D H:M:S
+      std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
       std::string microseconds() const {
          return std::to_string(_microseconds);
       }
