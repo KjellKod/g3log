@@ -143,7 +143,9 @@ namespace g3 {
       , _function(function)
       , _level(level)
    {
-      timespec_get(&_timestamp, TIME_UTC);
+      // Falling back to clock_gettime as TIME_UTC is not recognized by travis CI
+      // timespec_get(&_timestamp, TIME_UTC);
+      clock_gettime(CLOCK_REALTIME, &_timestamp);
    }
 
 
