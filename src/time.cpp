@@ -10,6 +10,7 @@
 
 #include <sstream>
 #include <string>
+#include <cstring>
 #include <chrono>
 #include <cassert>
 #include <iomanip>
@@ -21,7 +22,7 @@ namespace g3 {
       // This is needed since latest version (at time of writing) of gcc4.7 does not implement this library function yet.
       // return value is SIMPLIFIED to only return a std::string
 
-      std::string put_time(const struct tm *tmb, const long nsec, const char *c_time_format) {
+      std::string put_time(const struct tm *tmb, const char *c_time_format) {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
          std::ostringstream oss;
          oss.fill('0');
@@ -71,12 +72,28 @@ namespace g3 {
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
 
    std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
-      std::tm t = localtime(time_snapshot.tv_sec); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)
-      return g3::internal::put_time(&t, time_snapshot.tv_nsec, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
+      ushort fcount = 0;
+      for(auto found_ptr = time_format.c_str(); (found_ptr = strstr(found_ptr, "%f")) != nullptr; found_ptr++, fcount++);
+      const size_t format_size = time_format.length() + fcount * 7 + 1;  // len(format) + num(nanosec size - len("%f")) + zero
+
+      // creating a new buffer on the stack conaining format string
+      char format_buffer[format_size];
+      strcpy(format_buffer, time_format.c_str());
+
+      for(auto found_ptr = format_buffer; (found_ptr = strstr(found_ptr, "%f")) != nullptr; found_ptr++) {
+         strcpy(found_ptr + 9, found_ptr + 2);
+         memcpy(found_ptr, "000000000", 9);
+         auto nsec_str = std::to_string(time_snapshot.tv_nsec);
+         auto nsec_len = strlen(nsec_str.c_str());
+         memcpy(found_ptr, nsec_str.c_str() + nsec_len - 9, nsec_len);
+      }
+
+      std::tm t = localtime(time_snapshot.tv_sec);
+      return g3::internal::put_time(&t, format_buffer);
    }
 
-   // this version of localtime_formatted used by FileSink::~FileSink because systemtime_now returns time_t
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) {
-      return localtime_formatted(timespec{time_snapshot, 0}, time_format);
+      std::tm t = localtime(time_snapshot); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)
+      return g3::internal::put_time(&t, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
    }
 } // g3
