@@ -71,25 +71,26 @@ namespace g3 {
    /// * format string must conform to std::put_time
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
 
+   namespace {
+      std::string kNanoSecondIdentifier = "%f";
+   }
+
    std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
-      ushort fcount = 0;
-      for(auto found_ptr = time_format.c_str(); (found_ptr = strstr(found_ptr, "%f")) != nullptr; found_ptr++, fcount++);
-      const size_t format_size = time_format.length() + fcount * 7 + 1;  // len(format) + num(nanosec size - len("%f")) + zero
+      auto format_buffer = time_format;
+      auto value_str = std::to_string(time_snapshot.tv_nsec);
 
-      // creating a new buffer on the stack conaining format string
-      char format_buffer[format_size];
-      strcpy(format_buffer, time_format.c_str());
+      // creating nsec string with leading zeros
+      auto nsec_str = std::string("000000000");
+      nsec_str.replace(nsec_str.length() - value_str.length(), value_str.length(), value_str);
 
-      for(auto found_ptr = format_buffer; (found_ptr = strstr(found_ptr, "%f")) != nullptr; found_ptr++) {
-         strcpy(found_ptr + 9, found_ptr + 2);
-         memcpy(found_ptr, "000000000", 9);
-         auto nsec_str = std::to_string(time_snapshot.tv_nsec);
-         auto nsec_len = strlen(nsec_str.c_str());
-         memcpy(found_ptr, nsec_str.c_str() + nsec_len - 9, nsec_len);
+      // replacing %f with actual nsec value
+      for(size_t pos = 0; (pos = format_buffer.find(kNanoSecondIdentifier, pos)) != std::string::npos; pos += nsec_str.size()) {
+         format_buffer.replace(pos, kNanoSecondIdentifier.size(), nsec_str);
       }
 
+      // using new format string that might contain sec fractional part
       std::tm t = localtime(time_snapshot.tv_sec);
-      return g3::internal::put_time(&t, format_buffer);
+      return g3::internal::put_time(&t, format_buffer.c_str());
    }
 
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) {
