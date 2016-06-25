@@ -122,7 +122,7 @@ namespace g3 {
 
 
    std::string LogMessage::timestamp(const std::string& time_look) const {
-      return  localtime_formatted(_timestamp, time_look);
+      return g3::localtime_formatted(_timestamp, time_look);
    }
 
 
@@ -136,14 +136,17 @@ namespace g3 {
 
    LogMessage::LogMessage(const std::string& file, const int line,
                           const std::string& function, const LEVELS& level)
-      : _timestamp(g3::systemtime_now())
-      , _call_thread_id(std::this_thread::get_id())
+      : _call_thread_id(std::this_thread::get_id())
       , _microseconds(microsecondsCounter())
       , _file(splitFileName(file))
       , _line(line)
       , _function(function)
       , _level(level)
-   {}
+   {
+      // Falling back to clock_gettime as TIME_UTC is not recognized by travis CI
+      // timespec_get(&_timestamp, TIME_UTC);
+      clock_gettime(CLOCK_REALTIME, &_timestamp);
+   }
 
 
    LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
@@ -182,6 +185,8 @@ namespace g3 {
       oss << _call_thread_id;
       return oss.str();
    }
+
+
 
    FatalMessage::FatalMessage(const LogMessage& details, g3::SignalType signal_id)
       : LogMessage(details), _signal_id(signal_id) { }

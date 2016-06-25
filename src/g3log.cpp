@@ -117,9 +117,6 @@ namespace g3 {
    }
 
 
-
-
-
    namespace internal {
 
       bool isLoggingInitialized() {

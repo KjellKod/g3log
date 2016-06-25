@@ -10,6 +10,7 @@
 
 #include <sstream>
 #include <string>
+#include <cstring>
 #include <chrono>
 #include <cassert>
 #include <iomanip>
@@ -34,6 +35,7 @@ namespace g3 {
          //                    ... also ... This is way more buffer space then we need
 
          auto success = std::strftime(buffer, size, c_time_format, tmb);
+         // TODO: incorrect code
          if (0 == success)
          {
             assert((0 != success) && "strftime fails with illegal formatting");
@@ -68,6 +70,28 @@ namespace g3 {
    /// returns a std::string with content of time_t as localtime formatted by input format string
    /// * format string must conform to std::put_time
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
+
+   namespace {
+      std::string kNanoSecondIdentifier = "%f";
+   }
+
+   std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
+      auto format_buffer = time_format;
+      auto value_str = std::to_string(time_snapshot.tv_nsec);
+
+      // creating nsec string with leading zeros
+      auto nsec_str = std::string("000000000");
+      nsec_str.replace(nsec_str.length() - value_str.length(), value_str.length(), value_str);
+
+      // replacing %f with actual nsec value
+      for(size_t pos = 0; (pos = format_buffer.find(kNanoSecondIdentifier, pos)) != std::string::npos; pos += nsec_str.size()) {
+         format_buffer.replace(pos, kNanoSecondIdentifier.size(), nsec_str);
+      }
+
+      // using new format string that might contain sec fractional part
+      std::tm t = localtime(time_snapshot.tv_sec);
+      return g3::internal::put_time(&t, format_buffer.c_str());
+   }
 
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) {
       std::tm t = localtime(time_snapshot); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)

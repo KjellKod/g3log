@@ -45,6 +45,7 @@ namespace g3
    * WARNING: At time of writing there is only so-so compiler support for
    * std::put_time. A possible fix if your c++11 library is not updated is to
    * modify this to use std::strftime instead */
+   std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) ;
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) ;
 }
 
