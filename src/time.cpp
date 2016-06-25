@@ -73,6 +73,7 @@ namespace g3 {
 
    namespace {
       std::string kNanoSecondIdentifier = "%f";
+      ushort      kNanoSecondZeroes     = 9;
    }
 
    std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
@@ -80,8 +81,7 @@ namespace g3 {
       auto value_str = std::to_string(time_snapshot.tv_nsec);
 
       // creating nsec string with leading zeros
-      auto nsec_str = std::string("000000000");
-      nsec_str.replace(nsec_str.length() - value_str.length(), value_str.length(), value_str);
+      auto nsec_str = std::string(kNanoSecondZeroes - value_str.length(), '0') + value_str;
 
       // replacing %f with actual nsec value
       for(size_t pos = 0; (pos = format_buffer.find(kNanoSecondIdentifier, pos)) != std::string::npos; pos += nsec_str.size()) {
