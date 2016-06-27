@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <cmath>
 #include <chrono>
 #include <cassert>
 #include <iomanip>
@@ -72,20 +73,43 @@ namespace g3 {
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
 
    namespace {
-      std::string kNanoSecondIdentifier = "%f";
-      ushort      kNanoSecondZeroes     = 9;
+      std::string kIdentifier = "%f";
+      ushort      kZeroes[]   = {3, 6, 9};
    }
 
    std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
+
+      // copying format string to a separate buffer
       auto format_buffer = time_format;
-      auto value_str = std::to_string(time_snapshot.tv_nsec);
 
-      // creating nsec string with leading zeros
-      auto nsec_str = std::string(kNanoSecondZeroes - value_str.length(), '0') + value_str;
+      // creating an array of sec fractional parts
+      std::string value_str[] = {
+         // TODO: there should be a way computing pow(kZeroes[2] - kZeroes[0], 10) using integers
+         std::to_string((long)std::round((long double)time_snapshot.tv_nsec / 1000000)),
+         std::to_string((long)std::round((long double)time_snapshot.tv_nsec / 1000)),
+         std::to_string(time_snapshot.tv_nsec)
+      };
 
-      // replacing %f with actual nsec value
-      for(size_t pos = 0; (pos = format_buffer.find(kNanoSecondIdentifier, pos)) != std::string::npos; pos += nsec_str.size()) {
-         format_buffer.replace(pos, kNanoSecondIdentifier.size(), nsec_str);
+      // adding leading zeros to sec fractional parts
+      for (ushort i = 0; i < sizeof(kZeroes)/sizeof(*kZeroes); i++) {
+         value_str[i] = std::string(kZeroes[i] - value_str[i].length(), '0') + value_str[i];
+      }
+
+      // replacing %f[3|6|9] with actual sec fractional value
+      for(size_t pos = 0; (pos = format_buffer.find(kIdentifier, pos)) != std::string::npos; pos += kIdentifier.size()) {
+
+         // figuring out whether this is nano, micro or milli identifier
+         ushort index = 2;
+         char ch = (format_buffer.size() > pos + kIdentifier.size() ? format_buffer.at(pos + kIdentifier.size()) : '\0');
+         switch (ch) {
+            case '3': index = 0;    break;
+            case '6': index = 1;    break;
+            case '9': index = 2;    break;
+	    default : ch    = '\0'; break;
+         }
+
+         // replacing %f with sec fractional part value
+         format_buffer.replace(pos, kIdentifier.size() + (ch == '\0' ? 0 : 1), value_str[index]);
       }
 
       // using new format string that might contain sec fractional part
