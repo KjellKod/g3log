@@ -81,7 +81,7 @@ namespace g3 {
       auto        format_buffer = time_format;  // copying format string to a separate buffer
       std::string value_str[3];                 // creating an array of sec fractional parts
 
-      // replacing %f[3|6|9] with actual sec fractional value
+      // iterating through every "%f" instance in the format string
       for(size_t pos = 0; (pos = format_buffer.find(kIdentifier, pos)) != std::string::npos; pos += kIdentifier.size()) {
 
          // figuring out whether this is nano, micro or milli identifier
@@ -100,7 +100,7 @@ namespace g3 {
             value_str[index] = std::string(kZeroes[index][0] - value_str[index].length(), '0') + value_str[index];
          }
 
-         // replacing %f with sec fractional part value
+         // replacing "%f[3|6|9]" with sec fractional part value
          format_buffer.replace(pos, kIdentifier.size() + (ch == '\0' ? 0 : 1), value_str[index]);
       }
 
