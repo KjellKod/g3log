@@ -73,39 +73,31 @@ namespace g3 {
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
 
    namespace {
-      std::string kIdentifier = "%f";
-      ushort      kZeroes[]   = {3, 6, 9};
+      const std::string kIdentifier   = "%f";
+      const ulong       kZeroes[3][2] = {{3, 1000000}, {6, 1000}, {9, 1}};
    }
 
    std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
-
-      // copying format string to a separate buffer
-      auto format_buffer = time_format;
-
-      // creating an array of sec fractional parts
-      std::string value_str[] = {
-         // TODO: there should be a way computing pow(kZeroes[2] - kZeroes[0], 10) using integers
-         std::to_string((long)std::round((long double)time_snapshot.tv_nsec / 1000000)),
-         std::to_string((long)std::round((long double)time_snapshot.tv_nsec / 1000)),
-         std::to_string(time_snapshot.tv_nsec)
-      };
-
-      // adding leading zeros to sec fractional parts
-      for (ushort i = 0; i < sizeof(kZeroes)/sizeof(*kZeroes); i++) {
-         value_str[i] = std::string(kZeroes[i] - value_str[i].length(), '0') + value_str[i];
-      }
+      auto        format_buffer = time_format;  // copying format string to a separate buffer
+      std::string value_str[3];                 // creating an array of sec fractional parts
 
       // replacing %f[3|6|9] with actual sec fractional value
       for(size_t pos = 0; (pos = format_buffer.find(kIdentifier, pos)) != std::string::npos; pos += kIdentifier.size()) {
 
          // figuring out whether this is nano, micro or milli identifier
          ushort index = 2;
-         char ch = (format_buffer.size() > pos + kIdentifier.size() ? format_buffer.at(pos + kIdentifier.size()) : '\0');
+         char   ch    = (format_buffer.size() > pos + kIdentifier.size() ? format_buffer.at(pos + kIdentifier.size()) : '\0');
          switch (ch) {
             case '3': index = 0;    break;
             case '6': index = 1;    break;
             case '9': index = 2;    break;
-	    default : ch    = '\0'; break;
+            default : ch    = '\0'; break;
+         }
+
+         // creating sec fractional value string if required
+         if (value_str[index].empty()) {
+            value_str[index] = std::to_string((long)std::round((long double)time_snapshot.tv_nsec / kZeroes[index][1]));
+            value_str[index] = std::string(kZeroes[index][0] - value_str[index].length(), '0') + value_str[index];
          }
 
          // replacing %f with sec fractional part value
