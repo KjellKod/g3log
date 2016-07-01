@@ -72,10 +72,22 @@ namespace g3 {
    /// * format string must conform to std::put_time
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
 
+   inline ulong round_fractional(ulong fractional, ulong zeroes) {
+      return std::round((long double)fractional / zeroes);
+   }
+
+
+   inline std::string fractional_to_string(ulong fractional, ulong zeroes) {
+      auto str = std::to_string(fractional);
+      return std::string(zeroes - str.length(), '0') + str;
+   }
+
+
    namespace {
       const std::string kIdentifier   = "%f";
       const ulong       kZeroes[3][2] = {{3, 1000000}, {6, 1000}, {9, 1}};
    }
+
 
    std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
       auto        format_buffer = time_format;  // copying format string to a separate buffer
@@ -96,17 +108,14 @@ namespace g3 {
 
          // creating sec fractional value string if required
          if (value_str[index].empty()) {
-            value_str[index] = std::to_string((long)std::round((long double)time_snapshot.tv_nsec / kZeroes[index][1]));
-            value_str[index] = std::string(kZeroes[index][0] - value_str[index].length(), '0') + value_str[index];
+            value_str[index] = fractional_to_string(round_fractional(time_snapshot.tv_nsec, kZeroes[index][1]), kZeroes[index][0]);
          }
 
          // replacing "%f[3|6|9]" with sec fractional part value
          format_buffer.replace(pos, kIdentifier.size() + (ch == '\0' ? 0 : 1), value_str[index]);
       }
 
-      // using new format string that might contain sec fractional part
-      std::tm t = localtime(time_snapshot.tv_sec);
-      return g3::internal::put_time(&t, format_buffer.c_str());
+      return localtime_formatted(time_snapshot.tv_sec, format_buffer);
    }
 
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) {
