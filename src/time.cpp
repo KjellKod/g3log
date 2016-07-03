@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 #include <cstring>
+#include <cmath>
 #include <chrono>
 #include <cassert>
 #include <iomanip>
@@ -71,26 +72,50 @@ namespace g3 {
    /// * format string must conform to std::put_time
    /// This is similar to std::put_time(std::localtime(std::time_t*), time_format.c_str());
 
-   namespace {
-      std::string kNanoSecondIdentifier = "%f";
+   inline ulong round_fractional(ulong fractional, ulong zeroes) {
+      return std::round((long double)fractional / zeroes);
    }
 
+
+   inline std::string fractional_to_string(ulong fractional, ulong zeroes) {
+      auto str = std::to_string(fractional);
+      return std::string(zeroes - str.length(), '0') + str;
+   }
+
+
+   namespace {
+      const std::string kIdentifier   = "%f";
+      const ulong       kZeroes[3][2] = {{3, 1000000}, {6, 1000}, {9, 1}};
+   }
+
+
    std::string localtime_formatted(const timespec &time_snapshot, const std::string &time_format) {
-      auto format_buffer = time_format;
-      auto value_str = std::to_string(time_snapshot.tv_nsec);
+      auto        format_buffer = time_format;  // copying format string to a separate buffer
+      std::string value_str[3];                 // creating an array of sec fractional parts
 
-      // creating nsec string with leading zeros
-      auto nsec_str = std::string("000000000");
-      nsec_str.replace(nsec_str.length() - value_str.length(), value_str.length(), value_str);
+      // iterating through every "%f" instance in the format string
+      for(size_t pos = 0; (pos = format_buffer.find(kIdentifier, pos)) != std::string::npos; pos += kIdentifier.size()) {
 
-      // replacing %f with actual nsec value
-      for(size_t pos = 0; (pos = format_buffer.find(kNanoSecondIdentifier, pos)) != std::string::npos; pos += nsec_str.size()) {
-         format_buffer.replace(pos, kNanoSecondIdentifier.size(), nsec_str);
+         // figuring out whether this is nano, micro or milli identifier
+         ushort index = 2;
+         char   ch    = (format_buffer.size() > pos + kIdentifier.size() ? format_buffer.at(pos + kIdentifier.size()) : '\0');
+         switch (ch) {
+            case '3': index = 0;    break;
+            case '6': index = 1;    break;
+            case '9': index = 2;    break;
+            default : ch    = '\0'; break;
+         }
+
+         // creating sec fractional value string if required
+         if (value_str[index].empty()) {
+            value_str[index] = fractional_to_string(round_fractional(time_snapshot.tv_nsec, kZeroes[index][1]), kZeroes[index][0]);
+         }
+
+         // replacing "%f[3|6|9]" with sec fractional part value
+         format_buffer.replace(pos, kIdentifier.size() + (ch == '\0' ? 0 : 1), value_str[index]);
       }
 
-      // using new format string that might contain sec fractional part
-      std::tm t = localtime(time_snapshot.tv_sec);
-      return g3::internal::put_time(&t, format_buffer.c_str());
+      return localtime_formatted(time_snapshot.tv_sec, format_buffer);
    }
 
    std::string localtime_formatted(const std::time_t &time_snapshot, const std::string &time_format) {
