@@ -26,15 +26,26 @@ namespace g3
    namespace internal
    {
       static const std::string date_formatted = "%Y/%m/%d";
-      static const std::string time_formatted = "%H:%M:%S";
+      // %f: fractions of seconds (%f is nanoseconds)
+      // %f3: milliseconds, 3 digits: 001
+      // %6: microseconds: 6 digits: 000001  --- default for the time_format
+      // %f9, %f: nanoseconds, 9 digits: 000000001
+      static const std::string time_formatted = "%H:%M:%S %f6";
    }
 
    typedef std::chrono::time_point<std::chrono::system_clock>  system_time_point;
    typedef std::chrono::milliseconds milliseconds;
    typedef std::chrono::microseconds microseconds;
 
+   size_t time_fraction(const std::string& format_buffer, size_t pos);
+
    //  wrap for std::chrono::system_clock::now()
    std::time_t systemtime_now();
+   
+   // OSX, Windows needed wrapper for std::timespec_get(struct timespec *ts, int base)
+   //   OSX and Windows also lacks the POSIX clock_gettime(int base, struct timespec *ts)
+   //   so for that reason we go with the std::timespec_get(...) but wrap it
+   int timespec_get(struct timespec *ts/*, int base*/);
 
    /** return time representing POD struct (ref ctime + wchar) that is normally
    * retrieved with std::localtime. g3::localtime is threadsafe which std::localtime is not.
