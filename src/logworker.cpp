@@ -120,6 +120,20 @@ namespace g3 {
       return std::unique_ptr<LogWorker>(new LogWorker);
    }
 
+   void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
+      auto bg_removesink_call = [this, sink] {
+         for (auto it = _impl._sinks.begin(); it != _impl._sinks.end(); ) {
+            if ((*it).get() == sink.get()) {
+               it = _impl._sinks.erase(it);
+            } else {
+               ++it;
+            }
+         }
+      };
+      auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
+      token_done.wait();
+   }
+
    std::unique_ptr<FileSinkHandle>LogWorker::addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id) {
       return addSink(std2::make_unique<g3::FileSink>(log_prefix, log_directory, default_id), &FileSink::fileWrite);
    }
