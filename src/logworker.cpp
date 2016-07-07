@@ -123,7 +123,7 @@ namespace g3 {
    void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
       auto bg_removesink_call = [this, sink] {
          for (auto it = _impl._sinks.begin(); it != _impl._sinks.end(); ) {
-            if ((*it).get() == sink.get()) {
+            if ((*it) == sink) {
                it = _impl._sinks.erase(it);
             } else {
                ++it;

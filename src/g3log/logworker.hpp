@@ -106,7 +106,7 @@ namespace g3 {
       /// @param
       template<typename T>
       void removeSink(std::unique_ptr<SinkHandle<T>> sink_handle) {
-         removeWrappedSink(sink_handle.get()->sink());
+         removeWrappedSink(sink_handle->sink());
       }
 
 
