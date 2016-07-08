@@ -24,7 +24,6 @@ namespace g3 {
    // in the resulting future. Ref: SinkHandle::call
    template<class T>
    class SinkHandle {
-      friend class LogWorker;
       std::weak_ptr<internal::Sink<T>> _sink;
 
    public:
@@ -50,7 +49,6 @@ namespace g3 {
          }
       }
 
-   protected:
       std::shared_ptr<internal::Sink<T>> sink() {
          return _sink.lock();
       }
