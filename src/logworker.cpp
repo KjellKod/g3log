@@ -110,8 +110,13 @@ namespace g3 {
       _impl._bg->send([this, fatal_message] {_impl.bgFatal(fatal_message); });
    }
 
-   void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_addsink_call = [this, sink] {_impl._sinks.push_back(sink);};
+   void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sinkPtr) {
+      std::weak_ptr<g3::internal::SinkWrapper> sinkWeakPtr = sinkPtr;
+      auto bg_addsink_call = [this, sinkWeakPtr] {
+         if (auto sinkPtr = sinkWeakPtr.lock()) {
+            _impl._sinks.push_back(sinkPtr);
+         }
+      };
       auto token_done = g3::spawn_task(bg_addsink_call, _impl._bg.get());
       token_done.wait();
    }
@@ -120,14 +125,18 @@ namespace g3 {
       return std::unique_ptr<LogWorker>(new LogWorker);
    }
 
-   void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_removesink_call = [this, sink] {
-         for (auto it = _impl._sinks.begin(); it != _impl._sinks.end(); ) {
-            if ((*it) == sink) {
-               it = _impl._sinks.erase(it);
-            } else {
-               ++it;
-            }
+   void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sinkPtr) {
+      std::weak_ptr<g3::internal::SinkWrapper> sinkWeakPtr = sinkPtr;
+      auto bg_removesink_call = [this, sinkWeakPtr] {
+         if (auto sinkPtr = sinkWeakPtr.lock()) {
+            _impl._sinks.erase(
+               std::remove(
+                  _impl._sinks.begin(),
+                  _impl._sinks.end(),
+                  sinkPtr
+               ),
+               _impl._sinks.end()
+            );
          }
       };
       auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
