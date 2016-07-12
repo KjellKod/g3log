@@ -40,6 +40,28 @@ using namespace g3;
    EXPECT_TRUE(1 == count->load());
 }
 
+TEST(Sink, OneSinkRemove) {
+using namespace g3;
+   AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
+   AtomicIntPtr count = make_shared < atomic<int >> (0);
+   {
+      auto worker = g3::LogWorker::createLogWorker();
+      auto handle = worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+      EXPECT_FALSE(flag->load());
+      EXPECT_TRUE(0 == count->load());
+
+      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      message.get()->write().append("this message should trigger an atomic increment at the sink");
+      worker->save(message);
+      worker->removeSink(std::move(handle));
+      EXPECT_TRUE(flag->load());
+      EXPECT_TRUE(1 == count->load());
+
+      worker->save(message);
+   }
+   EXPECT_TRUE(1 == count->load());
+}
+
 namespace {
    typedef std::shared_ptr<std::atomic<bool >> AtomicBoolPtr;
    typedef std::shared_ptr<std::atomic<int >> AtomicIntPtr;
