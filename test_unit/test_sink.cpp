@@ -30,7 +30,6 @@ using namespace g3;
    {
       auto worker = g3::LogWorker::createLogWorker();
       auto handle = worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
-      std::cout << "handle->sink().use_count()=" << handle->sink().use_count() << std::endl;
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
       LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
