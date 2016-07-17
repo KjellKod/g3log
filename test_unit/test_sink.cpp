@@ -50,17 +50,19 @@ using namespace g3;
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
 
-      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
-      message.get()->write().append("this message should trigger an atomic increment at the sink");
-      worker->save(message);
+      LogMessagePtr message1{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      message1.get()->write().append("this message should trigger an atomic increment at the sink");
+      worker->save(message1);
+
       worker->removeSink(std::move(handle));
       EXPECT_TRUE(flag->load());
       EXPECT_TRUE(1 == count->load());
 
-      // TODO: saving message after sink was removed will cause seg fault in worker destructor
-      //worker->save(message);
+      LogMessagePtr message2{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      message2.get()->write().append("this message is issued after all sinks are removed");
+      worker->save(message2);
    }
-   //EXPECT_TRUE(1 == count->load());
+   EXPECT_TRUE(1 == count->load());
 }
 
 namespace {

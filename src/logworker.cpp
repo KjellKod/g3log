@@ -29,6 +29,8 @@ namespace g3 {
 
       if (_sinks.empty()) {
          std::string err_msg {"g3logworker has no sinks. Message: ["};
+
+         // TODO: following line will cause seg fault if empty msgPtr is provided
          err_msg.append(uniqueMsg.get()->toString()).append({"]\n"});
          std::cerr << err_msg;
       }
