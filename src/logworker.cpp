@@ -124,14 +124,7 @@ namespace g3 {
 
    void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
       auto bg_removesink_call = [this, sink] {
-         _impl._sinks.erase(
-            std::remove(
-               _impl._sinks.begin(),
-               _impl._sinks.end(),
-               sink
-            ),
-            _impl._sinks.end()
-         );
+         _impl._sinks.erase(std::remove(_impl._sinks.begin(), _impl._sinks.end(), sink), _impl._sinks.end());
       };
       auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
       token_done.wait();
