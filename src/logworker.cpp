@@ -113,7 +113,7 @@ namespace g3 {
    }
 
    void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_addsink_call = [this, sink] {_impl._sinks.push_back(sink);};
+      auto bg_addsink_call = [this, &sink] {_impl._sinks.push_back(sink);};
       auto token_done = g3::spawn_task(bg_addsink_call, _impl._bg.get());
       token_done.wait();
    }
@@ -123,15 +123,10 @@ namespace g3 {
    }
 
    void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_removesink_call = [this, sink] {
+      auto bg_removesink_call = [this, &sink] {
          _impl._sinks.erase(std::remove(_impl._sinks.begin(), _impl._sinks.end(), sink), _impl._sinks.end());
       };
       auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
-      token_done.wait();
-
-      // this will ensure captured sink pointer value will be released
-      auto bg_empty_call = [] {};
-      token_done = g3::spawn_task(bg_empty_call, _impl._bg.get());
       token_done.wait();
    }
 
