@@ -20,7 +20,8 @@ make -j
 ./test_dynamic_loaded_shared_lib | true && \
 ./test_filechange && \
 ./test_io && \
-./test_sink
+./test_sink && \
+./test_message
  
 
 

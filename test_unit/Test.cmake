@@ -46,7 +46,7 @@
         SET(OS_SPECIFIC_TEST test_crashhandler_windows)
      ENDIF(MSVC OR MINGW)
 
-      SET(tests_to_run test_filechange test_io test_cpp_future_concepts test_concept_sink test_sink ${OS_SPECIFIC_TEST})
+      SET(tests_to_run test_message test_filechange test_io test_cpp_future_concepts test_concept_sink test_sink ${OS_SPECIFIC_TEST})
       SET(helper ${DIR_UNIT_TEST}/testing_helpers.h ${DIR_UNIT_TEST}/testing_helpers.cpp)
       include_directories(${DIR_UNIT_TEST})
 
