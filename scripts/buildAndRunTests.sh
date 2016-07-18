@@ -14,7 +14,7 @@ unzip -o 3rdParty/gtest/gtest-1.7.0.zip -d 3rdParty/gtest
 mkdir -p  build_travis
 cd build_travis
 # OSX: cmake  -DCMAKE_CXX_FLAGS=-std=gnu++11 -DADD_G3LOG_UNIT_TEST=ON ..
-cmake  -DCMAKE_CXX_FLAGS=-std=C++14 -DADD_G3LOG_UNIT_TEST=ON ..
+cmake  -DCMAKE_CXX_FLAGS=-std=c++14 -DADD_G3LOG_UNIT_TEST=ON ..
 make -j
 ./test_concept_sink && \
 ./test_cpp_future_concepts && \
