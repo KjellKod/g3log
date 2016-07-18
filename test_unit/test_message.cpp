@@ -39,3 +39,17 @@ catch(...)
 }
 ASSERT_TRUE(true); // no exception. all good
 }
+
+// testing is missing for
+// time.cpp 
+//      fractional_to_string
+//      size_t fractional_cutoff
+//      localtime_formatted
+//
+// -- change
+// time.cpp naming
+// confusing comment + assert
+// fractional_to_string, take the whole timespec value?
+//
+// -- to find out
+// -lrt?
