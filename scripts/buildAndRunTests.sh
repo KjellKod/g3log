@@ -5,7 +5,7 @@ set -ev
 unzip -o 3rdParty/gtest/gtest-1.7.0.zip -d 3rdParty/gtest
 
 
-#if [ "$CXX" = "g++" ]; then export CXX=g++-4.8; fi
+#if [ "$CXX" = "g++" ]; then export CXX=g++-5; fi
 #if [ "$CXX" = "clang++" ]; then export CXX=clang++-3.4; fi
 #echo $TRAVIS_OS_NAME
 #echo $CXX
