@@ -107,8 +107,8 @@ namespace g3 {
       ts->tv_nsec = now.tv_usec * 1000;
       return 0;
 #else
-      // Linux
-      return std::timespec_get(ts, TIME_UTC));
+      // ubuntu/gcc5 has no support for std::timespec_get(...) as of yet
+      return clock_gettime(CLOCK_REALTIME, ts);
 #endif
    }
 
