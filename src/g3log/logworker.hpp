@@ -109,6 +109,13 @@ namespace g3 {
          removeWrappedSink(sink_handle->sink());
       }
 
+      void flush(bool propogate_to_sinks = true) {
+         g3::spawn_task([propogate_to_sinks] {
+            if (propogate_to_sinks) {
+               // TODO: ...
+            }
+         }, _impl._bg.get()).wait();
+      }
 
       /// internal:
       /// pushes in background thread (asynchronously) input messages to log file

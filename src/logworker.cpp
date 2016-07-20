@@ -113,9 +113,8 @@ namespace g3 {
    }
 
    void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_addsink_call = [this, &sink] {_impl._sinks.push_back(sink);};
-      auto token_done = g3::spawn_task(bg_addsink_call, _impl._bg.get());
-      token_done.wait();
+      auto bg_addsink_call = [this, sink] {_impl._sinks.push_back(sink);};
+      g3::spawn_task(bg_addsink_call, _impl._bg.get());
    }
 
    std::unique_ptr<LogWorker> LogWorker::createLogWorker() {
@@ -123,11 +122,13 @@ namespace g3 {
    }
 
    void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_removesink_call = [this, &sink] {
+      auto bg_removesink_call = [this, sink] {
          _impl._sinks.erase(std::remove(_impl._sinks.begin(), _impl._sinks.end(), sink), _impl._sinks.end());
+
+         // TODO: to be added to the sink API
+         //sink->flush();
       };
-      auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
-      token_done.wait();
+      g3::spawn_task(bg_removesink_call, _impl._bg.get());
    }
 
    std::unique_ptr<FileSinkHandle>LogWorker::addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id) {
