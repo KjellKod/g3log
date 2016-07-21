@@ -113,8 +113,16 @@ namespace g3 {
    }
 
    void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_addsink_call = [this, sink] {_impl._sinks.push_back(sink);};
-      g3::spawn_task(bg_addsink_call, _impl._bg.get());
+
+      // capturing sink by reference is safe because this method waits for the completion of this task
+      // passing sink by value may lead to keeping it in other thread's context even after this method returns
+      auto bg_addsink_call = [this, &sink] {
+         _impl._sinks.push_back(sink);
+      };
+      auto token_done = g3::spawn_task(bg_addsink_call, _impl._bg.get());
+
+      // even though add sink can use async semantic, making it sync improves overall performance
+      token_done.wait();
    }
 
    std::unique_ptr<LogWorker> LogWorker::createLogWorker() {
@@ -122,13 +130,19 @@ namespace g3 {
    }
 
    void LogWorker::removeWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
-      auto bg_removesink_call = [this, sink] {
-         _impl._sinks.erase(std::remove(_impl._sinks.begin(), _impl._sinks.end(), sink), _impl._sinks.end());
 
-         // TODO: to be added to the sink API
-         //sink->flush();
+      // capturing sink by reference is safe because this method waits for this task to complete
+      // passing sink by value may lead to keeping it in other thread's context even after this method returns
+      auto bg_removesink_call = [this, &sink] {
+
+         // once sink is removed from worker, it will not receive new log entries so its destructor can flush sink's content safely
+         // sink flush is done implicitly dy destroying as capturing sink by reference and waiting for task to complete guarantees sink is destroyed
+         _impl._sinks.erase(std::remove(_impl._sinks.begin(), _impl._sinks.end(), sink), _impl._sinks.end());
       };
-      g3::spawn_task(bg_removesink_call, _impl._bg.get());
+      auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
+
+      // even though remove sink can use async semantic, making it sync improves overall performance
+      token_done.wait();
    }
 
    std::unique_ptr<FileSinkHandle>LogWorker::addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id) {
