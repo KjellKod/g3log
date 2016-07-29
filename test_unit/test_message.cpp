@@ -40,16 +40,36 @@ catch(...)
 ASSERT_TRUE(true); // no exception. all good
 }
 
-// testing is missing for
-// time.cpp 
-//      fractional_to_string
-//      size_t fractional_cutoff
-//      localtime_formatted
-//
-// -- change
-// time.cpp naming
-// confusing comment + assert
-// fractional_to_string, take the whole timespec value?
-//
-// -- to find out
-// -lrt?
+
+
+TEST(Message, GetFractional_Empty_buffer_ExpectDefaults) {
+  auto fractional = g3::internal::time::getFractional("", 0);
+  const auto expected = g3::internal::time::Fractional::NanosecondDefault;
+  EXPECT_EQ(fractional, expected);
+  fractional = g3::internal::time::getFractional("", 100);
+  EXPECT_EQ(fractional, expected);
+}
+
+TEST(Message, GetFractional_MilliSeconds) {
+  auto fractional = g3::internal::time::getFractional("%f3", 0);
+  const auto expected = g3::internal::time::Fractional::Millisecond;
+  EXPECT_EQ(fractional, expected);
+}
+
+TEST(Message, GetFractional_Microsecond) {
+  auto fractional = g3::internal::time::getFractional("%f6", 0);
+  const auto expected = g3::internal::time::Fractional::Microsecond;
+  EXPECT_EQ(fractional, expected);
+}
+
+TEST(Message, GetFractional_Nanosecond) {
+  auto fractional = g3::internal::time::getFractional("%f9", 0);
+  const auto expected = g3::internal::time::Fractional::Nanosecond;
+  EXPECT_EQ(fractional, expected);
+}
+
+TEST(Message, GetFractional_NanosecondDefault) {
+  auto fractional = g3::internal::time::getFractional("%f", 0);
+  const auto expected = g3::internal::time::Fractional::NanosecondDefault;
+  EXPECT_EQ(fractional, expected);
+}
