@@ -73,3 +73,28 @@ TEST(Message, GetFractional_NanosecondDefault) {
   const auto expected = g3::internal::time::Fractional::NanosecondDefault;
   EXPECT_EQ(fractional, expected);
 }
+
+TEST(Message, GetFractional_All) {
+  std::string formatted = "%f, %f9, %f6, %f3";
+  auto fractional = g3::internal::time::getFractional(formatted, 0);
+  auto expected = g3::internal::time::Fractional::NanosecondDefault;
+  EXPECT_EQ(fractional, expected);
+
+  // ns
+  fractional = g3::internal::time::getFractional(formatted, 4);
+  expected = g3::internal::time::Fractional::Nanosecond;
+  EXPECT_EQ(fractional, expected);
+
+  // us 
+  fractional = g3::internal::time::getFractional(formatted, 9);
+  expected = g3::internal::time::Fractional::Microsecond;
+  EXPECT_EQ(fractional, expected);
+
+  // ms
+  fractional = g3::internal::time::getFractional(formatted, 14);
+  expected = g3::internal::time::Fractional::Millisecond;
+  EXPECT_EQ(fractional, expected);
+}
+
+
+

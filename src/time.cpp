@@ -27,8 +27,7 @@ namespace g3 {
 
 
 
-Fractional getFractional(const std::string& format_buffer, size_t pos)
-          {
+         Fractional getFractional(const std::string& format_buffer, size_t pos) {
             char  ch  = (format_buffer.size() > pos + kFractionalIdentierSize ? format_buffer.at(pos + kFractionalIdentierSize) : '\0');
             Fractional type = Fractional::NanosecondDefault;
             switch (ch) {
