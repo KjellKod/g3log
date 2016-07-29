@@ -70,7 +70,11 @@ namespace g3 {
          //                    ... also ... This is way more buffer space then we need
 
          auto success = std::strftime(buffer, size, c_time_format, tmb);
-         // TODO: incorrect code
+         // In DEBUG the assert will trigger a process exit. Once inside the if-statement 
+         // the 'always true' expression will be displayed as reason for the exit
+         //
+         // In Production mode
+         // the assert will do nothing but the format string will instead be returned
          if (0 == success) {
             assert((0 != success) && "strftime fails with illegal formatting");
             return c_time_format;
