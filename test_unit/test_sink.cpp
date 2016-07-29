@@ -23,13 +23,16 @@
 
 using namespace testing_helpers;
 using namespace std;
-TEST(Sink, OneSink) {
+TEST(Sink, KJELL_OneSink) {
 using namespace g3;
    AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
    AtomicIntPtr count = make_shared < atomic<int >> (0);
    {
       auto worker = g3::LogWorker::createLogWorker();
       auto handle = worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+      auto realSink = handle->sink();
+      std::cout << "instances: " << realSink.use_count() << std::endl;
+
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
       LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
@@ -38,9 +41,10 @@ using namespace g3;
    }
    EXPECT_TRUE(flag->load());
    EXPECT_TRUE(1 == count->load());
+   std::cout << "\n\n\n" << std::endl;
 }
 
-TEST(Sink, OneSinkRemove) {
+TEST(Sink, KJELL_OneSinkRemove) {
 using namespace g3;
    AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
    AtomicIntPtr count = make_shared < atomic<int >> (0);
@@ -53,7 +57,10 @@ using namespace g3;
       LogMessagePtr message1{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       message1.get()->write().append("this message should trigger an atomic increment at the sink");
       worker->save(message1);
-
+      {
+         auto realSink = handle->sink();
+         std::cout << "instances: " << realSink.use_count() << std::endl;
+      }
       worker->removeSink(std::move(handle));
       EXPECT_TRUE(flag->load());
       EXPECT_TRUE(1 == count->load());
