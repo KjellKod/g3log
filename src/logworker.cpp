@@ -52,9 +52,9 @@ namespace g3 {
       std::string exiting = {"Fatal type: "};
 
       uniqueMsg->write().append("). ").append(exiting).append(" ").append(reason)
-      .append("\nLog content flushed flushed sucessfully to sink\n\n");
+      .append("\nLog content flushed sucessfully to sink\n\n");
 
-      std::cerr << uniqueMsg->message() << std::flush;
+      std::cerr << uniqueMsg->toString() << std::flush;
       for (auto& sink : _sinks) {
          LogMessage msg(*(uniqueMsg));
          sink->send(LogMessageMover(std::move(msg)));
