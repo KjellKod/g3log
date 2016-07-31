@@ -70,12 +70,12 @@ namespace g3 {
 }
 
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-const LEVELS DBUG {g3::kDebugVaulue, "DEBUG"},
+const LEVELS DBUG {g3::kDebugVaulue, {"DEBUG"}},
 #else
-const LEVELS DEBUG {g3::kDebugVaulue, "DEBUG"},
+const LEVELS DEBUG {g3::kDebugVaulue, {"DEBUG"}},
 #endif
-      INFO {g3::kInfoValue, "INFO"},
-      WARNING {g3::kWarningValue, "WARNING"},
+      INFO {g3::kInfoValue, {"INFO"}},
+      WARNING {g3::kWarningValue, {"WARNING"}},
 
 
 
@@ -97,13 +97,13 @@ const LEVELS DEBUG {g3::kDebugVaulue, "DEBUG"},
 
 // 1) Remember to update the FATAL initialization below
 // 2) Remember to update the initialization of "g3loglevels.cpp/g_log_level_status"
-      FATAL {g3::kFatalValue, "FATAL"};
+      FATAL {g3::kFatalValue, {"FATAL"}};
 
 namespace g3 {
    namespace internal {
-      const LEVELS CONTRACT {g3::kInternalFatalValue, "CONTRACT"},
-            FATAL_SIGNAL {g3::kInternalFatalValue +1, "FATAL_SIGNAL"},
-            FATAL_EXCEPTION {kInternalFatalValue +2, "FATAL_EXCEPTION"};
+      const LEVELS CONTRACT {g3::kInternalFatalValue, {"CONTRACT"}},
+            FATAL_SIGNAL {g3::kInternalFatalValue +1, {"FATAL_SIGNAL"}},
+            FATAL_EXCEPTION {kInternalFatalValue +2, {"FATAL_EXCEPTION"}};
 
       /// helper function to tell the logger if a log message was fatal. If it is it will force
       /// a shutdown after all log entries are saved to the sinks
