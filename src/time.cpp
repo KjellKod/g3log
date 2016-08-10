@@ -19,61 +19,62 @@
 #include <sys/time.h>
 #endif
 
+#include <iostream>
+
 namespace g3 {
    namespace internal {
-      namespace time {
-         const std::string kFractionalIdentier   = "%f";
-         const size_t kFractionalIdentierSize = 2;
+      const std::string kFractionalIdentier   = "%f";
+      const size_t kFractionalIdentierSize = 2;
 
 
 
-         Fractional getFractional(const std::string& format_buffer, size_t pos) {
-            char  ch  = (format_buffer.size() > pos + kFractionalIdentierSize ? format_buffer.at(pos + kFractionalIdentierSize) : '\0');
-            Fractional type = Fractional::NanosecondDefault;
-            switch (ch) {
-               case '3': type = Fractional::Millisecond; break;
-               case '6': type = Fractional::Microsecond; break;
-               case '9': type = Fractional::Nanosecond; break;
-               default: type = Fractional::NanosecondDefault; break;
+      Fractional getFractional(const std::string& format_buffer, size_t pos) {
+         char  ch  = (format_buffer.size() > pos + kFractionalIdentierSize ? format_buffer.at(pos + kFractionalIdentierSize) : '\0');
+         Fractional type = Fractional::NanosecondDefault;
+         switch (ch) {
+            case '3': type = Fractional::Millisecond; break;
+            case '6': type = Fractional::Microsecond; break;
+            case '9': type = Fractional::Nanosecond; break;
+            default: type = Fractional::NanosecondDefault; break;
+         }
+         return type;
+      }
+
+
+      // Returns the fractional as a string with padded zeroes
+      // 1 ms --> 001
+      // 1 us --> 000001
+      // 1 ns --> 000000001
+      std::string to_string(const timespec& time_snapshot, Fractional fractional) {
+         auto ns = time_snapshot.tv_nsec;
+         auto zeroes = 9; // default ns
+         auto digitsToCut = 1; // default ns, divide by 1 makes no change
+         switch (fractional) {
+            case Fractional::Millisecond : {
+               zeroes = 3;
+               digitsToCut = 1000000;
+               break;
             }
-            return type;
+            case Fractional::Microsecond : {
+               zeroes = 6;
+               digitsToCut = 1000;
+               break;
+            }
+            case Fractional::Nanosecond :
+            case Fractional::NanosecondDefault:
+            default:
+               zeroes = 9;
+               digitsToCut = 1;
+
          }
 
-
-         // Returns the fractional as a string with padded zeroes
-         // 1 ms --> 001
-         // 1 us --> 000001
-         // 1 ns --> 000000001
-         std::string to_string(const timespec& time_snapshot, Fractional fractional) {
-            auto ns = time_snapshot.tv_nsec;
-            auto zeroes = 9; // default ns
-            auto digitsToCut = 1; // default ns, divide by 1 makes no change
-            switch (fractional) {
-               case Fractional::Millisecond : {
-                  zeroes = 3;
-                  digitsToCut = 1000000;
-                  break;
-               }
-               case Fractional::Microsecond : {
-                  zeroes = 6;
-                  digitsToCut = 1000;
-                  break;
-               }
-               case Fractional::Nanosecond :
-               case Fractional::NanosecondDefault:
-               default:
-                  zeroes = 9;
-                  digitsToCut = 1;
-
-            }
-
-            ns /= digitsToCut;
-            // auto value = std::to_string(typeAdjustedValue);
-            // return value; // std::string(fractional_digit, '0') + value;
-            auto value = std::string(std::to_string(ns));
-            return std::string(zeroes - value.size(), '0') + value;
-         }
-      } // time
+         ns /= digitsToCut;
+         // auto value = std::to_string(typeAdjustedValue);
+         // return value; // std::string(fractional_digit, '0') + value;
+         auto value = std::string(std::to_string(ns));
+         std::cout << "zeroes: " << zeroes << ", value.size(): " << value.size() << std::endl;
+         return std::string(zeroes - value.size(), '0') + value;
+      }
    } // internal
 } // g3
 
@@ -161,17 +162,17 @@ namespace g3 {
 
       // iterating through every "%f" instance in the format string
       auto identifierExtraSize = 0;
-      for (size_t pos = 0; (pos = format_buffer.find(g3::internal::time::kFractionalIdentier, pos)) != std::string::npos; pos += g3::internal::time::kFractionalIdentierSize + identifierExtraSize) {
+      for (size_t pos = 0; (pos = format_buffer.find(g3::internal::kFractionalIdentier, pos)) != std::string::npos; pos += g3::internal::kFractionalIdentierSize + identifierExtraSize) {
          // figuring out whether this is nano, micro or milli identifier
-         auto type = g3::internal::time::getFractional(format_buffer, pos);
-         auto value = g3::internal::time::to_string(time_snapshot, type);
+         auto type = g3::internal::getFractional(format_buffer, pos);
+         auto value = g3::internal::to_string(time_snapshot, type);
          auto padding = 0;
-         if (type != g3::internal::time::Fractional::NanosecondDefault) {
+         if (type != g3::internal::Fractional::NanosecondDefault) {
             padding = 1;
          }
 
          // replacing "%f[3|6|9]" with sec fractional part value
-         format_buffer.replace(pos, g3::internal::time::kFractionalIdentier.size() + padding, value);
+         format_buffer.replace(pos, g3::internal::kFractionalIdentier.size() + padding, value);
       }
 
       return localtime_formatted(time_snapshot.tv_sec, format_buffer);

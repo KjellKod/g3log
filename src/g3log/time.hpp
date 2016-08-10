@@ -23,22 +23,16 @@
 
 namespace g3 {
    namespace internal {
-      namespace time {
-         enum class Fractional {Millisecond, Microsecond, Nanosecond, NanosecondDefault};
-         Fractional getFractional(const std::string& format_buffer, size_t pos);
-         std::string to_string(const timespec& time_snapshot, Fractional fractional);
-      }
-   }
-}
-namespace g3 {
-   namespace internal {
+      enum class Fractional {Millisecond, Microsecond, Nanosecond, NanosecondDefault};
+      Fractional getFractional(const std::string& format_buffer, size_t pos);
+      std::string to_string(const timespec& time_snapshot, Fractional fractional);
       static const std::string date_formatted = "%Y/%m/%d";
       // %f: fractions of seconds (%f is nanoseconds)
       // %f3: milliseconds, 3 digits: 001
       // %6: microseconds: 6 digits: 000001  --- default for the time_format
       // %f9, %f: nanoseconds, 9 digits: 000000001
       static const std::string time_formatted = "%H:%M:%S %f6";
-   }
+   } // internal
 
    typedef std::chrono::time_point<std::chrono::system_clock>  system_time_point;
    typedef std::chrono::milliseconds milliseconds;
@@ -71,5 +65,6 @@ namespace g3 {
    std::string localtime_formatted(const timespec& time_snapshot, const std::string& time_format) ;
    std::string localtime_formatted(const std::time_t& time_snapshot, const std::string& time_format) ;
 }
+
 
 
