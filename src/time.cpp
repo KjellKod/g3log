@@ -19,8 +19,6 @@
 #include <sys/time.h>
 #endif
 
-#include <iostream>
-
 namespace g3 {
    namespace internal {
       const std::string kFractionalIdentier   = "%f";
@@ -72,7 +70,6 @@ namespace g3 {
          // auto value = std::to_string(typeAdjustedValue);
          // return value; // std::string(fractional_digit, '0') + value;
          auto value = std::string(std::to_string(ns));
-         std::cout << "zeroes: " << zeroes << ", value.size(): " << value.size() << std::endl;
          return std::string(zeroes - value.size(), '0') + value;
       }
    } // internal

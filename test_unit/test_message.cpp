@@ -10,6 +10,7 @@
 #include <g3log/g3log.hpp>
 #include <g3log/time.hpp>
 #include <iostream>
+#include <ctime>
 
 TEST(Message, CppSupport) {
    // ref: http://www.cplusplus.com/reference/clibrary/ctime/strftime/
@@ -115,7 +116,7 @@ TEST(Message, FractionalToStringNanoPadded) {
    ts.tv_nsec = 1;
    auto value = g3::internal::to_string(ts, g3::internal::Fractional::Nanosecond);
    EXPECT_EQ("000000001", value);
-          // 0000000012
+   // 0000000012
    value = g3::internal::to_string(ts, g3::internal::Fractional::NanosecondDefault);
    EXPECT_EQ("000000001", value);
 }
@@ -125,7 +126,7 @@ TEST(Message, FractionalToString12NanoPadded) {
    ts.tv_nsec = 12;
    auto value = g3::internal::to_string(ts, g3::internal::Fractional::Nanosecond);
    EXPECT_EQ("000000012", value);
-          // 0000000012
+   // 0000000012
    value = g3::internal::to_string(ts, g3::internal::Fractional::NanosecondDefault);
    EXPECT_EQ("000000012", value);
 }
@@ -140,10 +141,10 @@ TEST(Message, FractionalToStringMicroPadded) {
    value = g3::internal::to_string(ts, g3::internal::Fractional::Microsecond);
    EXPECT_EQ("000011", value);
 
- }
+}
 
 
- TEST(Message, FractionalToStringMilliPadded) {
+TEST(Message, FractionalToStringMilliPadded) {
    timespec ts = {};
    ts.tv_nsec = 1000000;
    auto value = g3::internal::to_string(ts, g3::internal::Fractional::Millisecond);
@@ -153,5 +154,31 @@ TEST(Message, FractionalToStringMicroPadded) {
    EXPECT_EQ("021", value);
 }
 
+
+
+#if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+TEST(Message, localtime_formatted) {
+   struct tm tm;
+   time_t t;
+
+   ASSERT_TRUE(nullptr != strptime("2016-08-09 22:58:45", "%Y-%m-%d %H:%M:%S", &tm));
+   t = mktime(&tm);
+   timespec ts = {};
+   ts.tv_sec = t;
+   ts.tv_nsec = 123;
+   auto format = g3::localtime_formatted(ts, g3::internal::date_formatted); // %Y/%m/%d
+   EXPECT_EQ("2016/08/09", format);
+   
+   auto us_format = g3::localtime_formatted(ts, g3::internal::time_formatted); // "%H:%M:%S %f6";
+   EXPECT_EQ("22:58:45 000000", us_format);
+   
+   auto ns_format = g3::localtime_formatted(ts, "%H:%M:%S %f"); 
+   EXPECT_EQ("22:58:45 000000123", ns_format);
+   
+   ts.tv_nsec = 1234000;
+   auto ms_format = g3::localtime_formatted(ts, "%H:%M:%S %f3"); 
+   EXPECT_EQ("22:58:45 001", ms_format);
+}
+#endif
 
 
