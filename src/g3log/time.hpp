@@ -38,7 +38,7 @@ namespace g3 {
    typedef std::chrono::milliseconds milliseconds;
    typedef std::chrono::microseconds microseconds;
 
-
+      
 
    //  wrap for std::chrono::system_clock::now()
    std::time_t systemtime_now();
