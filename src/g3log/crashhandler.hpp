@@ -20,7 +20,7 @@ namespace g3 {
    // PUBLIC API:
    /** Install signal handler that catches FATAL C-runtime or OS signals
      See the wikipedia site for details http://en.wikipedia.org/wiki/SIGFPE
-     See the this site for example usage: http://www.tutorialspoint.com/cplusplus/cpp_signal_handling.hpptm
+     See the this site for example usage: http://www.tutorialspoint.com/cplusplus/cpp_signal_handling
      SIGABRT  ABORT (ANSI), abnormal termination
      SIGFPE   Floating point exception (ANSI)
      SIGILL   ILlegal instruction (ANSI)
