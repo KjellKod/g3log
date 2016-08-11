@@ -22,6 +22,9 @@
    #
    # ==============================================================
 
+  IF (MSVC OR MINGW)
+     set(EXAMPLE_PLATFORM_LINK_LIBRIES dbghelp)
+  ENDIF()
 
    set(DIR_EXAMPLE ${g3log_SOURCE_DIR}/example)
    option (ADD_FATAL_EXAMPLE  "Fatal (fatal-crashes/contract) examples " ON)
@@ -34,9 +37,9 @@
       add_executable(g3log-FATAL-sigsegv ${DIR_EXAMPLE}/main_sigsegv.cpp)
       add_executable(g3log-FATAL-choice ${DIR_EXAMPLE}/main_fatal_choice.cpp)
       
-      target_link_libraries(g3log-FATAL-contract ${G3LOG_LIBRARY})
-      target_link_libraries(g3log-FATAL-sigsegv ${G3LOG_LIBRARY})
-      target_link_libraries(g3log-FATAL-choice ${G3LOG_LIBRARY})
+      target_link_libraries(g3log-FATAL-contract ${G3LOG_LIBRARY} ${EXAMPLE_PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g3log-FATAL-sigsegv ${G3LOG_LIBRARY} ${EXAMPLE_PLATFORM_LINK_LIBRIES})
+      target_link_libraries(g3log-FATAL-choice ${G3LOG_LIBRARY} ${EXAMPLE_PLATFORM_LINK_LIBRIES})
    ELSE()
        MESSAGE("-DADD_SIMPLE_EXAMPLE=OFF")
    ENDIF (ADD_FATAL_EXAMPLE)
