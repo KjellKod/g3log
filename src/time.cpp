@@ -99,9 +99,12 @@ namespace g3 {
       ts->tv_sec  = now.tv_sec;
       ts->tv_nsec = now.tv_usec * 1000;
       return 0;
+#elif(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+	   return timespec_get(ts, TIME_UTC);
 #else
-      // ubuntu/gcc5 has no support for std::timespec_get(...) as of yet
-      return clock_gettime(CLOCK_REALTIME, ts);
+	   // ubuntu/gcc5 has no support for std::timespec_get(...) as of yet
+	   return clock_gettime(CLOCK_REALTIME, ts);
+
 #endif
    }
 

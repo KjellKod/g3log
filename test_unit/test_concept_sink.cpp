@@ -150,10 +150,10 @@ TEST(ConceptSink, DeletedSink__Exptect_badweak_ptr___exception) {
 }
 
 namespace {
-   typedef std::shared_ptr<std::atomic<bool >> AtomicBoolPtr;
-   typedef std::shared_ptr<std::atomic<int >> AtomicIntPtr;
-   typedef vector<AtomicBoolPtr> BoolList;
-   typedef vector<AtomicIntPtr> IntVector;
+   using AtomicBooleanPtr = std::shared_ptr<std::atomic<bool>>;
+   using AtomicIntegerPtr =  std::shared_ptr<std::atomic<int>> ;
+   using BoolList = std::vector<AtomicBooleanPtr> ;
+   using IntVector = std::vector<AtomicIntegerPtr>;
 }
 
 TEST(ConceptSink, OneHundredSinks_part1) {
@@ -192,8 +192,8 @@ TEST(ConceptSink, OneHundredSinks_part1) {
 
 
 TEST(ConceptSink, OneHundredSinks_part2) {
-   using BoolPtrVector = std::vector<AtomicBoolPtr> ;
-   using IntPtrVector = vector<AtomicIntPtr> ;
+   using BoolPtrVector = std::vector<AtomicBooleanPtr> ;
+   using IntPtrVector = vector<AtomicIntegerPtr> ;
    BoolPtrVector flags;
    IntPtrVector counts;
 
@@ -235,8 +235,8 @@ TEST(ConceptSink, OneHundredSinks_part2) {
 
 
 TEST(ConceptSink, OneSinkWithHandleOutOfScope) {
-   AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
-   AtomicIntPtr count = make_shared<atomic<int>>(0);
+   AtomicBooleanPtr flag = make_shared<atomic<bool>>(false);
+   AtomicIntegerPtr count = make_shared<atomic<int>>(0);
    {
       auto worker = g3::LogWorker::createLogWorker();
       {
