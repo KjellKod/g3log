@@ -258,7 +258,7 @@ http://kjellkod.wordpress.com/2011/11/17/kjellkods-g2log-vs-googles-glog-are-asy
 or at ```Hedstrom at KjellKod dot cc```
 
 # Say Thanks
-This logger is done for free and all of its source code is public domain.  A great way of saying thanks is to send a donation. It would go a long way not only to show your support but also to boost continued development.
+This logger is available for free and all of its source code is public domain.  A great way of saying thanks is to send a donation. It would go a long way not only to show your support but also to boost continued development.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/g3log/25)
 
