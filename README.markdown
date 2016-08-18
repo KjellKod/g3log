@@ -267,7 +267,6 @@ This logger is done for free and all of its source code is public domain.  A gre
 * $25 for a lunch or two
 * $100 for a date night with my wife (which buys family credit for evening coding)
 * $$$ for upgrading my development environment
-
 * $$$$ :)
 
 Cheers
