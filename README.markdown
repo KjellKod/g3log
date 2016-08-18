@@ -261,11 +261,17 @@ or at ```Hedstrom at KjellKod dot cc```
 This logger is done for free and all of its source code is public domain.  A great way of saying thanks is to send a donation. It would go a long way not only to show your support but also to boost continued development.
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/g3log/25)
+
 $5 for a cup of coffee
+
 $10 for pizza 
+
 $25 for a lunch or two
+
 $100 for a date night with my wife (which buys family credit for evening coding)
+
 $$$ for upgrading my development environment
+
 $$$$ :)
 
 Cheers
