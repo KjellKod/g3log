@@ -13,7 +13,7 @@
 #include "g3log/logmessage.hpp"
 namespace g3 {
 
-   class FileSink {
+   class g3log_API FileSink {
    public:
       FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string &logger_id="g3log");
       virtual ~FileSink();

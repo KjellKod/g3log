@@ -58,7 +58,7 @@ namespace g3 {
 
    /** Should be called at very first startup of the software with \ref g3LogWorker
     *  pointer. Ownership of the \ref g3LogWorker is the responsibilkity of the caller */
-   void initializeLogging(LogWorker *logger);
+   g3log_API void initializeLogging(LogWorker *logger);
 
 
    /** setFatalPreLoggingHook() provides an optional extra step before the fatalExitHandler is called
@@ -76,13 +76,13 @@ namespace g3 {
     *
     * Linux:   g3::setFatalPreLoggingHook([]{ raise(SIGTRAP); });
     */
-   void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
+   g3log_API void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
 
    /** If the @ref setFatalPreLoggingHook is not enough and full fatal exit handling is needed then
     * use "setFatalExithandler".  Please see g3log.cpp and crashhandler_windows.cpp or crashhandler_unix for
     * example of restoring signal and exception handlers, flushing the log and shutting down.
     */
-   void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
+   g3log_API void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
 
 
 

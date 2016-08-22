@@ -22,6 +22,15 @@
 #endif
 #endif
 
+#if (defined _MSC_VER || defined __GCC__)
+  #ifdef g3log_EXPORTS
+    #define g3log_API __declspec(dllexport)
+  #else
+    #define g3log_API __declspec(dllimport)
+  #endif
+#endif
+
+
 #include <string> 
 #include <algorithm>
 
@@ -120,6 +129,6 @@ namespace g3 {
 
    } // only_change_at_initialization
 #endif
-   bool logLevel(LEVELS level);
+   g3log_API bool logLevel(LEVELS level);
 } // g3
 
