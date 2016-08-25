@@ -78,12 +78,6 @@ namespace g3 {
 
 
 namespace g3 {
-
-   // timespec_get systemtime_now() {
-   //    system_time_point system_now = std::chrono::system_clock::now();
-   //    return std::chrono::system_clock::to_time_t(system_now);
-   // }
-
    struct timespec systemtime_now() {
       struct timespec ts;
       timespec_get(&ts);
