@@ -40,8 +40,9 @@ namespace g3 {
 
       
 
-   //  wrap for std::chrono::system_clock::now()
-   std::time_t systemtime_now();
+   //  custom wrap for std::chrono::system_clock::now()but this one 
+   // returns timespec struct instead which is what we use in g3log
+   struct timespec systemtime_now();
 
    // OSX, Windows needed wrapper for std::timespec_get(struct timespec *ts, int base)
    //   OSX and Windows also lacks the POSIX clock_gettime(int base, struct timespec *ts)
@@ -63,7 +64,6 @@ namespace g3 {
    * std::put_time. A possible fix if your c++11 library is not updated is to
    * modify this to use std::strftime instead */
    std::string localtime_formatted(const timespec& time_snapshot, const std::string& time_format) ;
-   std::string localtime_formatted(const std::time_t& time_snapshot, const std::string& time_format) ;
 }
 
 
