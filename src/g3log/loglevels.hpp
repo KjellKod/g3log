@@ -62,7 +62,7 @@ struct LEVELS {
 
 
 namespace g3 {
-   static const int kDebugVaulue = 0;
+   static const int kDebugValue = 0;
    static const int kInfoValue = 100;
    static const int kWarningValue = 500;
    static const int kFatalValue = 1000;
@@ -70,9 +70,9 @@ namespace g3 {
 }
 
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-const LEVELS DBUG {g3::kDebugVaulue, {"DEBUG"}},
+const LEVELS DBUG {g3::kDebugValue, {"DEBUG"}},
 #else
-const LEVELS DEBUG {g3::kDebugVaulue, {"DEBUG"}},
+const LEVELS DEBUG {g3::kDebugValue, {"DEBUG"}},
 #endif
       INFO {g3::kInfoValue, {"INFO"}},
       WARNING {g3::kWarningValue, {"WARNING"}},
