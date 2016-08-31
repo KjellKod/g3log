@@ -78,10 +78,10 @@ namespace g3 {
 
 
 namespace g3 {
-
-   std::time_t systemtime_now() {
-      system_time_point system_now = std::chrono::system_clock::now();
-      return std::chrono::system_clock::to_time_t(system_now);
+   struct timespec systemtime_now() {
+      struct timespec ts;
+      timespec_get(&ts);
+      return ts;
    }
 
 
@@ -155,8 +155,6 @@ namespace g3 {
 
 
 
-
-
    std::string localtime_formatted(const timespec& time_snapshot, const std::string& time_format) {
       auto format_buffer = time_format;  // copying format string to a separate buffer
 
@@ -174,12 +172,7 @@ namespace g3 {
          // replacing "%f[3|6|9]" with sec fractional part value
          format_buffer.replace(pos, g3::internal::kFractionalIdentier.size() + padding, value);
       }
-
-      return localtime_formatted(time_snapshot.tv_sec, format_buffer);
-   }
-
-   std::string localtime_formatted(const std::time_t& time_snapshot, const std::string& time_format) {
-      std::tm t = localtime(time_snapshot); // could be const, but cannot due to VS2012 is non conformant for C++11's std::put_time (see above)
-      return g3::put_time(&t, time_format.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
+      std::tm t = localtime(time_snapshot.tv_sec);   
+      return g3::put_time(&t, format_buffer.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
    }
 } // g3
