@@ -48,13 +48,19 @@ namespace g3 {
       //  default look is Y/M/D H:M:S
       std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
 
-      std::string message() const  {
-         return _message;
-      }
-      std::string& write() const {
-         return _message;
-      }
-
+#ifdef ENABLE_WIN_WSTRING_SUPPPORT
+	  std::wstring& wwrite() const {
+		  return _wmessage;
+	  }
+	  std::string message() const;
+#else
+	  std::string message() const {
+		  return _message;
+	  }
+#endif
+	  std::string& write() const {
+		  return _message;
+	  }
       std::string expression() const  {
          return _expression;
       }
@@ -92,9 +98,9 @@ namespace g3 {
       LEVELS _level;
       std::string _expression; // only with content for CHECK(...) calls
       mutable std::string _message;
-
-
-
+#ifdef ENABLE_WIN_WSTRING_SUPPPORT
+	  mutable std::wstring _wmessage;
+#endif
       friend void swap(LogMessage& first, LogMessage& second) {
          using std::swap;
          swap(first._timestamp, second._timestamp);
@@ -105,6 +111,10 @@ namespace g3 {
          swap(first._level, second._level);
          swap(first._expression, second._expression);
          swap(first._message, second._message);
+#ifdef ENABLE_WIN_WSTRING_SUPPPORT
+		 swap(first._wmessage, second._wmessage);
+#endif
+
       }
 
    };

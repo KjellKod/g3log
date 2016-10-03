@@ -94,8 +94,13 @@ namespace g3 {
       bool isLoggingInitialized();
 
       // Save the created LogMessage to any existing sinks
+#ifdef ENABLE_WIN_WSTRING_SUPPPORT
+	  void saveMessage(const char *message, const wchar_t *wmessage, const char *file, int line, const char *function, const LEVELS &level,
+		  const char *boolean_expression, int fatal_signal, const char *stack_trace);
+#else
       void saveMessage(const char *message, const char *file, int line, const char *function, const LEVELS &level,
                        const char *boolean_expression, int fatal_signal, const char *stack_trace);
+#endif
 
       // forwards the message to all sinks
       void pushMessageToLogger(LogMessagePtr log_entry);
@@ -149,6 +154,14 @@ namespace g3 {
 #define CHECK(boolean_expression)        \
    if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
 
+#ifdef ENABLE_WIN_WSTRING_SUPPPORT
+#	define LOGW(level) if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).wstream()
+#	define LOG_IFW(level, boolean_expression)  \
+		if(true == boolean_expression)  \
+			if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).wstream()
+#define CHECKW(boolean_expression)        \
+   if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).wstream()
+#endif
 
 /** For details please see this
  * REFERENCE: http://www.cppreference.com/wiki/io/c/printf_format
