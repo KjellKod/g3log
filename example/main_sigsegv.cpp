@@ -22,6 +22,11 @@ namespace
 #endif
 }
 
+#ifdef CHANGE_G3LOG_DEBUG_TO_DBUG
+#undef DEBUG
+#define DEBUG DBUG
+#endif
+
 namespace example_fatal
 {
    // on Ubunti this caused get a compiler warning with gcc4.6
