@@ -31,6 +31,9 @@ namespace g3 {
    * desired way.
    */
    struct LogMessage {
+	   std::string file_path() const {
+		   return _file_path;
+	   }
       std::string file() const {
          return _file;
       }
@@ -73,7 +76,7 @@ namespace g3 {
       LogMessage& operator=(LogMessage other);
 
 
-      LogMessage(const std::string& file, const int line, const std::string& function, const LEVELS& level);
+      LogMessage(const char * file, const int line, const std::string& function, const LEVELS& level);
 
       explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
       LogMessage(const LogMessage& other);
@@ -87,6 +90,7 @@ namespace g3 {
       timespec _timestamp;
       std::thread::id _call_thread_id;
       std::string _file;
+	  const char * _file_path;
       int _line;
       std::string _function;
       LEVELS _level;

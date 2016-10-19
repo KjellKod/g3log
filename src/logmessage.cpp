@@ -123,10 +123,11 @@ namespace g3 {
    }
 
 
-   LogMessage::LogMessage(const std::string& file, const int line,
+   LogMessage::LogMessage(const char * file, const int line,
                           const std::string& function, const LEVELS& level)
       : _call_thread_id(std::this_thread::get_id())
       , _file(splitFileName(file))
+      , _file_path(file)
       , _line(line)
       , _function(function)
       , _level(level)
@@ -147,6 +148,7 @@ namespace g3 {
       : _timestamp(other._timestamp)
       , _call_thread_id(other._call_thread_id)
       , _file(other._file)
+      , _file_path(other._file_path)
       , _line(other._line)
       , _function(other._function)
       , _level(other._level)
@@ -158,6 +160,7 @@ namespace g3 {
       : _timestamp(other._timestamp)
       , _call_thread_id(other._call_thread_id)
       , _file(std::move(other._file))
+      , _file_path(other._file_path)
       , _line(other._line)
       , _function(std::move(other._function))
       , _level(other._level)
