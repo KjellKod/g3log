@@ -24,6 +24,11 @@
 #define NOEXCEPT throw()
 #endif
 
+#ifdef CHANGE_G3LOG_DEBUG_TO_DBUG
+#undef DEBUG
+#define DEBUG DBUG
+#endif
+
 namespace
 {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
