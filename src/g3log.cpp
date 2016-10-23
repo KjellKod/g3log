@@ -59,7 +59,7 @@ namespace g3 {
    // several times...
    //                    for all other practical use, it shouldn't!
 
-   void initializeLogging(LogWorker *bgworker) {
+	g3log_API void initializeLogging(LogWorker *bgworker) {
       std::call_once(g_initialize_flag, [] {
          installCrashHandler();
       });
@@ -96,7 +96,7 @@ namespace g3 {
    *  It will be reset to do nothing in ::initializeLogging(...)
    *     so please call this function, if you ever need to, after initializeLogging(...)
    */
-   void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook) {
+   g3log_API void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook) {
       static std::mutex m;
       std::lock_guard<std::mutex> lock(m);
       g_fatal_pre_logging_hook = pre_fatal_hook;
@@ -112,7 +112,7 @@ namespace g3 {
     * This function switches the function pointer so that only
     * 'unitTest' mock-fatal calls are made.
     * */
-   void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
+   g3log_API void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
       g_fatal_to_g3logworker_function_ptr = fatal_call;
    }
 

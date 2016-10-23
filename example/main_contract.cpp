@@ -51,14 +51,14 @@ int main(int argc, char **argv)
 
    LOGF(INFO, "Hi log %d", 123);
    LOG(INFO) << "Test SLOG INFO";
-   LOG(DEBUG) << "Test SLOG DEBUG";
+   LOG(DBUG) << "Test SLOG DBUG";
    LOG(INFO) << "one: " << 1;
    LOG(INFO) << "two: " << 2;
    LOG(INFO) << "one and two: " << 1 << " and " << 2;
-   LOG(DEBUG) << "float 2.14: " << 1000 / 2.14f;
-   LOG(DEBUG) << "pi double: " << pi_d;
-   LOG(DEBUG) << "pi float: " << pi_f;
-   LOG(DEBUG) << "pi float (width 10): " << std::setprecision(10) << pi_f;
+   LOG(DBUG) << "float 2.14: " << 1000 / 2.14f;
+   LOG(DBUG) << "pi double: " << pi_d;
+   LOG(DBUG) << "pi float: " << pi_f;
+   LOG(DBUG) << "pi float (width 10): " << std::setprecision(10) << pi_f;
    LOGF(INFO, "pi float printf:%f", pi_f);
 
    // FATAL SECTION

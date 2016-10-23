@@ -26,7 +26,7 @@
  * As a safety precaution: No memory allocated here will be moved into the background
  * worker in case of dynamic loaded library reasons
 */
-struct LogCapture {
+struct g3log_API LogCapture {
    /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
    LogCapture(const LEVELS &level, g3::SignalType fatal_signal, const char *dump = nullptr);
 

@@ -30,7 +30,7 @@ namespace g3 {
    * the helper functions or even the public raw data to format the saved log message any
    * desired way.
    */
-   struct LogMessage {
+   struct g3log_API LogMessage {
       std::string file() const {
          return _file;
       }

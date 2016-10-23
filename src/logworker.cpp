@@ -70,7 +70,7 @@ namespace g3 {
       perror("g3log exited after receiving FATAL trigger. Flush message status: ");
    }
 
-   LogWorker::~LogWorker() {
+   g3log_API LogWorker::~LogWorker() {
       g3::internal::shutDownLoggingForActiveOnly(this);
 
       // The sinks WILL automatically be cleared at exit of this destructor
@@ -102,25 +102,25 @@ namespace g3 {
       _impl._bg.reset(nullptr);
    }
 
-   void LogWorker::save(LogMessagePtr msg) {
+   g3log_API void LogWorker::save(LogMessagePtr msg) {
       _impl._bg->send([this, msg] {_impl.bgSave(msg); });
    }
 
-   void LogWorker::fatal(FatalMessagePtr fatal_message) {
+   g3log_API void LogWorker::fatal(FatalMessagePtr fatal_message) {
       _impl._bg->send([this, fatal_message] {_impl.bgFatal(fatal_message); });
    }
 
-   void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
+   g3log_API void LogWorker::addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> sink) {
       auto bg_addsink_call = [this, sink] {_impl._sinks.push_back(sink);};
       auto token_done = g3::spawn_task(bg_addsink_call, _impl._bg.get());
       token_done.wait();
    }
 
-   std::unique_ptr<LogWorker> LogWorker::createLogWorker() {
+   g3log_API std::unique_ptr<LogWorker> LogWorker::createLogWorker() {
       return std::unique_ptr<LogWorker>(new LogWorker);
    }
 
-   std::unique_ptr<FileSinkHandle>LogWorker::addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id) {
+   g3log_API std::unique_ptr<FileSinkHandle>LogWorker::addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id) {
       return addSink(std2::make_unique<g3::FileSink>(log_prefix, log_directory, default_id), &FileSink::fileWrite);
    }
 

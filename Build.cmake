@@ -91,30 +91,21 @@ ENDIF()
    # Create the g3log library
    include_directories(${LOG_SRC})
    #MESSAGE("  g3logger files: [${SRC_FILES}]")
-   add_library(g3logger ${SRC_FILES})
+
+   add_library(g3logger SHARED ${SRC_FILES})
    set_target_properties(g3logger PROPERTIES
       LINKER_LANGUAGE CXX
       OUTPUT_NAME g3logger
       CLEAN_DIRECT_OUTPUT 1)
-   target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
-   SET(G3LOG_LIBRARY g3logger)
-
-if(ADD_BUILD_WIN_SHARED OR NOT(MSVC OR MINGW))
-   IF(NOT(CMAKE_VERSION LESS 3.4) AND MSVC)
-      set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+   IF(NOT(CMAKE_VERSION LESS 3.4) AND (MSVC OR MINGW))
+     target_compile_definitions(g3logger PRIVATE g3log_EXPORTS)
    ENDIF()
-   add_library(g3logger_shared SHARED ${SRC_FILES})
-   set_target_properties(g3logger_shared PROPERTIES
-      LINKER_LANGUAGE CXX
-      OUTPUT_NAME g3logger
-      CLEAN_DIRECT_OUTPUT 1)
    IF(APPLE)
-      set_target_properties(g3logger_shared PROPERTIES MACOSX_RPATH TRUE)
+      set_target_properties(g3logger PROPERTIES MACOSX_RPATH TRUE)
    ENDIF(APPLE)
-   target_link_libraries(g3logger_shared ${PLATFORM_LINK_LIBRIES})
+   target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
 
-   SET(G3LOG_SHARED_LIBRARY g3logger_shared)
-endif()
+   SET(G3LOG_SHARED_LIBRARY g3logger)
 
 
 

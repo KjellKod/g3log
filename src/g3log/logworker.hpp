@@ -46,11 +46,11 @@ namespace g3 {
 
 
 
-   /// Front end of the LogWorker.  API that is usefule is
+   /// Front end of the LogWorker.  API that is useful is
    /// addSink( sink, default_call ) which returns a handle to the sink. See below and REAME for usage example
    /// save( msg ) : internal use
    /// fatal ( fatal_msg ) : internal use
-   class LogWorker final {
+   class g3log_API LogWorker final {
       LogWorker() = default;
       void addWrappedSink(std::shared_ptr<g3::internal::SinkWrapper> wrapper);
 
