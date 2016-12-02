@@ -92,10 +92,17 @@ ENDIF()
    include_directories(${LOG_SRC})
    #MESSAGE("  g3logger files: [${SRC_FILES}]")
    add_library(g3logger ${SRC_FILES})
-   set_target_properties(g3logger PROPERTIES
-      LINKER_LANGUAGE CXX
-      OUTPUT_NAME g3logger
-      CLEAN_DIRECT_OUTPUT 1)
+   if (WIN32 AND ADD_BUILD_WIN_SHARED)
+		set_target_properties(g3logger PROPERTIES
+		  LINKER_LANGUAGE CXX
+		  OUTPUT_NAME g3logger_static
+		  CLEAN_DIRECT_OUTPUT 1)
+	else()
+		set_target_properties(g3logger PROPERTIES
+		  LINKER_LANGUAGE CXX
+		  OUTPUT_NAME g3logger
+		  CLEAN_DIRECT_OUTPUT 1)
+   endif()
    target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
    SET(G3LOG_LIBRARY g3logger)
 
