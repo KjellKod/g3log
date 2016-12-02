@@ -19,8 +19,8 @@
 
 
 
-MESSAGE("COMPILE_DEFINITIONS:  ${G3_DEFINITIONS}")
-MESSAGE("End of COMPILE_DEFINITIONS")
+MESSAGE(STATUS "COMPILE_DEFINITIONS:  ${G3_DEFINITIONS}")
+MESSAGE(STATUS "End of COMPILE_DEFINITIONS")
 SET(GENERATED_G3_DEFINITIONS src/g3log/generated_definitions.hpp)
 file(REMOVE ${GENERATED_G3_DEFINITIONS} )
 FILE(WRITE ${GENERATED_G3_DEFINITIONS} "// AUTO GENERATED MACRO DEFINITIONS FOR G3LOG\n\n")
@@ -32,9 +32,9 @@ FOREACH(definition ${G3_DEFINITIONS} )
    FILE(APPEND ${GENERATED_G3_DEFINITIONS} "#define ${definition}\n")
 ENDFOREACH(definition)
 
-MESSAGE("Generated ${GENERATED_G3_DEFINITIONS}")
+MESSAGE(STATUS "Generated ${GENERATED_G3_DEFINITIONS}")
 file(READ ${GENERATED_G3_DEFINITIONS} generated_content)
 
-MESSAGE("******************** START *************************")
-MESSAGE(${generated_content})
-MESSAGE("******************** END *************************")
+MESSAGE(STATUS "******************** START *************************")
+MESSAGE(STATUS ${generated_content})
+MESSAGE(STATUS "******************** END *************************")

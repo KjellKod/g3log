@@ -31,11 +31,11 @@ option (USE_DYNAMIC_LOGGING_LEVELS
        "Turn ON/OFF log levels. An disabled level will not push logs of that level to the sink. By default dynamic logging is disabled" OFF)
 IF(USE_DYNAMIC_LOGGING_LEVELS)
    LIST(APPEND G3_DEFINITIONS G3_DYNAMIC_LOGGING)
-   MESSAGE("-DUSE_DYNAMIC_LOGGING_LEVELS=ON")
-   MESSAGE("\tDynamic logging levels is used")
-   MESSAGE("\tUse  [g3::setLogLevel(LEVEL boolean)] to enable/disable logging on specified levels\n\n")
+   MESSAGE(STATUS "-DUSE_DYNAMIC_LOGGING_LEVELS=ON")
+   MESSAGE(STATUS "\tDynamic logging levels is used")
+   MESSAGE(STATUS "\tUse  [g3::setLogLevel(LEVEL boolean)] to enable/disable logging on specified levels\n\n")
 ELSE() 
-  MESSAGE("-DUSE_DYNAMIC_LOGGING_LEVELS=OFF") 
+  MESSAGE(STATUS "-DUSE_DYNAMIC_LOGGING_LEVELS=OFF") 
 ENDIF(USE_DYNAMIC_LOGGING_LEVELS)
 
 
@@ -47,9 +47,9 @@ option (CHANGE_G3LOG_DEBUG_TO_DBUG
        "Use DBUG logging level instead of DEBUG. By default DEBUG is the debugging level" OFF)
 IF(CHANGE_G3LOG_DEBUG_TO_DBUG)
    LIST(APPEND G3_DEFINITIONS CHANGE_G3LOG_DEBUG_TO_DBUG)
-   MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=ON                 DBUG instead of DEBUG logging level is used")
+   MESSAGE(STATUS "-DCHANGE_G3LOG_DEBUG_TO_DBUG=ON                 DBUG instead of DEBUG logging level is used")
    ELSE() 
-  MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')") 
+  MESSAGE(STATUS "-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')") 
 ENDIF(CHANGE_G3LOG_DEBUG_TO_DBUG)
 
 
@@ -63,9 +63,9 @@ option (ENABLE_FATAL_SIGNALHANDLING
 IF(NOT ENABLE_FATAL_SIGNALHANDLING)
   LIST(APPEND G3_DEFINITIONS DISABLE_FATAL_SIGNALHANDLING)
 
-    MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=OFF               Fatal signal handler is disabled")
+    MESSAGE(STATUS "-DENABLE_FATAL_SIGNALHANDLING=OFF               Fatal signal handler is disabled")
   ELSE() 
-  MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=ON\tFatal signal handler is enabled")
+  MESSAGE(STATUS "-DENABLE_FATAL_SIGNALHANDLING=ON\tFatal signal handler is enabled")
 ENDIF(NOT ENABLE_FATAL_SIGNALHANDLING)
 
 # WINDOWS OPTIONS
@@ -79,9 +79,9 @@ IF (MSVC OR MINGW)
 
     IF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
       LIST(APPEND G3_DEFINITIONS DISABLE_VECTORED_EXCEPTIONHANDLING)
-      MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled") 
+      MESSAGE(STATUS "-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled") 
     ELSE() 
-       MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=ON\t\t\tVectored exception handling is enabled") 
+       MESSAGE(STATUS "-DENABLE_VECTORED_EXCEPTIONHANDLING=ON\t\t\tVectored exception handling is enabled") 
     ENDIF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
 
 
@@ -94,13 +94,13 @@ IF (MSVC OR MINGW)
        "Enable Visual Studio break point when receiving a fatal exception. In __DEBUG mode only" OFF)
     IF(DEBUG_BREAK_AT_FATAL_SIGNAL)
       LIST(APPEND G3_DEFINITIONS DEBUG_BREAK_AT_FATAL_SIGNAL)
-      MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=ON                  Break point for fatal signal is enabled for __DEBUG.") 
+      MESSAGE(STATUS "-DDEBUG_BREAK_AT_FATAL_SIGNAL=ON                  Break point for fatal signal is enabled for __DEBUG.") 
     ELSE() 
-       MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled") 
+       MESSAGE(STATUS "-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled") 
     ENDIF(DEBUG_BREAK_AT_FATAL_SIGNAL)
 
 ENDIF (MSVC OR MINGW)
-MESSAGE("\n\n\n")
+MESSAGE(STATUS "\n\n\n")
 
 
 
