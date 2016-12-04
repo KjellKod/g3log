@@ -31,7 +31,8 @@
 
 
    IF (ADD_FATAL_EXAMPLE)
-      MESSAGE(STATUS "-DADD_FATAL_EXAMPLE=ON\t\t[contract][sigsegv][fatal choice] are examples of when g3log comes in handy")
+      MESSAGE(STATUS "-DADD_FATAL_EXAMPLE=ON")
+      MESSAGE(STATUS "\t[contract][sigsegv][fatal choice] are examples of when g3log comes in handy")
       include_directories (${DIR_EXAMPLE})
       add_executable(g3log-FATAL-contract ${DIR_EXAMPLE}/main_contract.cpp)
       add_executable(g3log-FATAL-sigsegv ${DIR_EXAMPLE}/main_sigsegv.cpp)
