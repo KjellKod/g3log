@@ -153,23 +153,15 @@ namespace g3 {
 
 
 
-#ifndef ENABLE_WIN_WSTRING_SUPPPORT
-	  /** explicits copy of all input. This is makes it possibly to use g3log across dynamically loaded libraries
-	  * i.e. (dlopen + dlsym)  */
-	  void saveMessage(const char *entry, const char *file, int line, const char *function, const LEVELS &level,
-                       const char *boolean_expression, int fatal_signal, const char *stack_trace) {
-#else
 	  void saveMessage(const char *entry, const wchar_t *wentry, const char *file, int line, const char *function, const LEVELS &level,
 		 const char *boolean_expression, int fatal_signal, const char *stack_trace) {
-#endif
+
          LEVELS msgLevel {level};
          LogMessagePtr message {std2::make_unique<LogMessage>(file, line, function, msgLevel)};
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
+
 		 message.get()->wwrite().append(wentry);
-#endif
          message.get()->write().append(entry);
          message.get()->setExpression(boolean_expression);
-
 
          if (internal::wasFatal(level)) {
             auto fatalhook = g_fatal_pre_logging_hook;

@@ -29,11 +29,7 @@
 LogCapture::~LogCapture() {
    using namespace g3::internal;
    SIGNAL_HANDLER_VERIFY();
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
    saveMessage(_stream.str().c_str(), _wstream.str().c_str(), _file, _line, _function, _level, _expression, _fatal_signal, _stack_trace.c_str());
-#else
-   saveMessage(_stream.str().c_str(), _file, _line, _function, _level, _expression, _fatal_signal, _stack_trace.c_str());
-#endif
 }
 
 
@@ -57,7 +53,6 @@ LogCapture::LogCapture(const char *file, const int line, const char *function, c
    }
 }
 
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
 void LogCapture::capturef(const wchar_t *printf_like_message, ...) {
 	static const int kMaxMessageSize = 2048;
 	static const std::wstring kTruncatedWarningText = L"[...truncated...]";
@@ -83,7 +78,6 @@ void LogCapture::capturef(const wchar_t *printf_like_message, ...) {
 		wstream() << finished_message;
 	}
 }
-#endif
 
 /**
 * capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF

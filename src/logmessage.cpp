@@ -10,10 +10,8 @@
 #include "g3log/crashhandler.hpp"
 #include "g3log/time.hpp"
 #include <mutex>
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
 #include <locale>
 #include <codecvt>
-#endif 
 
 namespace {
    std::string splitFileName(const std::string& str) {
@@ -112,7 +110,6 @@ namespace g3 {
       return out;
    }
 
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
    std::string LogMessage::message() const {
 	   std::string msg;
 	   if (!_wmessage.empty())
@@ -124,7 +121,6 @@ namespace g3 {
 	   }
 	   return msg.append(_message);
    }
-#endif
 
    std::string LogMessage::timestamp(const std::string& time_look) const {
       return g3::localtime_formatted(_timestamp, time_look);
@@ -167,9 +163,7 @@ namespace g3 {
       , _function(other._function)
       , _level(other._level)
       , _expression(other._expression)
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
 	  , _wmessage(other._wmessage)
-#endif
       , _message(other._message) {
    }
 
@@ -181,13 +175,9 @@ namespace g3 {
       , _function(std::move(other._function))
       , _level(other._level)
       , _expression(std::move(other._expression))
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
 	  , _wmessage(std::move(other._wmessage))
-#endif
       , _message(std::move(other._message)) {
    }
-
-
 
    std::string LogMessage::threadID() const {
       std::ostringstream oss;
