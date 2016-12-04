@@ -87,20 +87,27 @@ namespace g3 {
 
    int timespec_get(struct timespec* ts/*, int base*/) {
 #ifdef __MACH__
-      // std::timespec_get or posix clock_gettime)(...) are not
-      // implemented on OSX
-      // @return value of base if successful, else zero
-      struct timeval now = {};
-      int rv = gettimeofday(&now, nullptr);
-      if (-1 == rv) {
-         return rv;
-      }
-      // error mode. just return sec, microsecond
-      ts->tv_sec  = now.tv_sec;
-      ts->tv_nsec = now.tv_usec * 1000;
-      return 0;
+	   // std::timespec_get or posix clock_gettime)(...) are not
+	   // implemented on OSX
+	   // @return value of base if successful, else zero
+	   struct timeval now = {};
+	   int rv = gettimeofday(&now, nullptr);
+	   if (-1 == rv) {
+		   return rv;
+	   }
+	   // error mode. just return sec, microsecond
+	   ts->tv_sec = now.tv_sec;
+	   ts->tv_nsec = now.tv_usec * 1000;
+	   return 0;
 #elif(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-	   return timespec_get(ts, TIME_UTC);
+	   static auto os =
+		   std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch() -
+		   std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch();
+
+	   auto now_ns = (std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch() + os).count();
+	   ts ->tv_sec = now_ns / 1000000000;
+	   ts ->tv_nsec = now_ns % 1000000000;
+	   return TIME_UTC;
 #else
 	   // ubuntu/gcc5 has no support for std::timespec_get(...) as of yet
 	   return clock_gettime(CLOCK_REALTIME, ts);
