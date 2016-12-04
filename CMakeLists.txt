@@ -79,7 +79,7 @@ else()
 		set( CXXVER "MSVC-${MSVC_VERSION}" )
 	endif()
 	
-   SET(CMAKE_INSTALL_LIBDIR "${g3log_SOURCE_DIR}-install/${CXXVER}/bin/${CMAKE_CFG_INTDIR}" CACHE PATH "Output dir for libraries")
+   SET(CMAKE_INSTALL_LIBDIR "${g3log_SOURCE_DIR}-install/${CXXVER}/bin/$<CONFIG>" CACHE PATH "Output dir for libraries")
    SET(CMAKE_INSTALL_HEADERDIR "${g3log_SOURCE_DIR}-install/${CXXVER}/include" CACHE PATH "Output dir for headers")
 endif()
 
