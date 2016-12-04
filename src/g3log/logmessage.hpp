@@ -94,6 +94,7 @@ namespace g3 {
       std::string _expression; // only with content for CHECK(...) calls
       mutable std::string _message;
 	  mutable std::wstring _wmessage;
+
       friend void swap(LogMessage& first, LogMessage& second) {
          using std::swap;
          swap(first._timestamp, second._timestamp);
@@ -103,7 +104,7 @@ namespace g3 {
          swap(first._function, second._function);
          swap(first._level, second._level);
          swap(first._expression, second._expression);
-         swap(first._message, second._message);
+		 swap(first._message, second._message);
 		 swap(first._wmessage, second._wmessage);
       }
 

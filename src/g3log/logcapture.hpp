@@ -53,6 +53,7 @@ struct LogCapture {
 #ifndef __GNUC__
 #define  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
 #endif 
+
 #ifdef _MSC_VER 
 #	if _MSC_VER >= 1400
 #		define G3LOG_FORMAT_STRING _Printf_format_string_
@@ -70,7 +71,7 @@ struct LogCapture {
       return _stream;
    }
 
-   void capturef(const wchar_t *printf_like_message, ...) __attribute__((format(wprintf, 2, 3))); // 2,3 ref:  http://www.codemaestro.com/reviews/18
+   void capturef(const wchar_t *printf_like_message, ...);
 
    std::wostringstream &wstream() {
 	   return _wstream;
