@@ -30,6 +30,11 @@ namespace example_fatal
    }
 } // example fatal
 
+#ifdef CHANGE_G3LOG_DEBUG_TO_DBUG
+#undef DEBUG
+#define DEBUG DBUG
+#endif
+
 int main(int argc, char **argv)
 {
    double pi_d = 3.1415926535897932384626433832795;

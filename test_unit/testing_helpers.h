@@ -135,6 +135,9 @@ private:
   };
 } // testing_helpers
 
-
+#ifdef CHANGE_G3LOG_DEBUG_TO_DBUG
+#undef DEBUG
+#define DEBUG DBUG
+#endif
 
 
