@@ -57,20 +57,16 @@ struct LogCapture {
    std::ostringstream &stream() {
       return _stream;
    }
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
+
    void capturef(const wchar_t *printf_like_message, ...) __attribute__((format(wprintf, 2, 3))); // 2,3 ref:  http://www.codemaestro.com/reviews/18
 
-
-																							  /// prettifying API for this completely open struct
    std::wostringstream &wstream() {
 	   return _wstream;
    }
-#endif
 
    std::ostringstream _stream;
-#ifdef ENABLE_WIN_WSTRING_SUPPPORT
    std::wostringstream _wstream;
-#endif
+
    std::string _stack_trace;
    const char *_file;
    const int _line;

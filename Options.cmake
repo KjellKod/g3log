@@ -101,18 +101,6 @@ IF (MSVC OR MINGW)
 
 ENDIF (MSVC OR MINGW)
 
-IF (MSVC)
-	option (ENABLE_WIN_WSTRING_SUPPPORT
-       "Allow windows UTF-16 strings as log messages" OFF)
-
-    IF(NOT ENABLE_WIN_WSTRING_SUPPPORT)
-      MESSAGE("-DENABLE_WIN_WSTRING_SUPPPORT=OFF                  Wide string support is disabled") 
-    ELSE() 
-	   LIST(APPEND G3_DEFINITIONS ENABLE_WIN_WSTRING_SUPPPORT)
-       MESSAGE("-DENABLE_WIN_WSTRING_SUPPPORT=ON\t\t\tWide string support is enabled") 
-    ENDIF(NOT ENABLE_WIN_WSTRING_SUPPPORT)
-ENDIF (MSVC)
-
 MESSAGE("\n\n\n")
 
 
