@@ -47,14 +47,15 @@ namespace g3 {
 
 #ifdef G3_DYNAMIC_LOGGING
    namespace only_change_at_initialization {
-      void setLogLevel(LEVELS log_level, bool enabled) {
+      void setLogLevel(LEVELS log_level, bool enabled_status) {
          int level = log_level.value;
-         internal::g_log_level_status[level].get().store(enabled, std::memory_order_release);
+         internal::g_log_level_status[level].get().store(enabled_status, std::memory_order_release);
       }
 
-	  void addLogLevel(LEVELS log_level) {
-		  internal::g_default_log_level_status[log_level.value].get().store(true, std::memory_order_release);
-		  internal::g_log_level_status[log_level.value].get().store(true, std::memory_order_release);
+	  void addLogLevel(LEVELS log_level, bool default_enabled_status) {
+         internal::g_default_log_level_status[log_level.value].get().store(default_enabled_status, std::memory_order_release);
+         if (! internal::g_log_level_status.count(log_level.value))
+            setLogLevel(log_level, default_enabled_status);
 	  }
 
       std::string printLevels() {
