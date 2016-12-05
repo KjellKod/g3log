@@ -572,7 +572,7 @@ namespace {
       RestoreDynamicLoggingLevels() {
       };
       ~RestoreDynamicLoggingLevels() {
-         g3::only_change_at_initialization::reset();
+         g3::only_change_at_initialization::reset(true);
          g3::only_change_at_initialization::setLogLevel(DEBUG, false);
          g3::only_change_at_initialization::setLogLevel(INFO, false);
          g3::only_change_at_initialization::setLogLevel(WARNING, false);
@@ -592,6 +592,16 @@ TEST(CustomLogLevels, AddANonFatal__ThenReset) {
    EXPECT_FALSE(g3::logLevel(MYINFO));
 }
 
+TEST(CustomLogLevels, AddANonFatalWithDefault__ThenReset) {
+	RestoreFileLogger logger(log_directory);
+	RestoreDynamicLoggingLevels raiiLevelRestore;
+	const LEVELS MYINFO{ WARNING.value + 2,{ "MY_INFO_LEVEL" } };
+	EXPECT_FALSE(g3::logLevel(MYINFO));
+	g3::only_change_at_initialization::addLogLevel(MYINFO, true);
+	EXPECT_TRUE(g3::logLevel(MYINFO));
+	g3::only_change_at_initialization::reset();
+	EXPECT_TRUE(g3::logLevel(MYINFO));
+}
 
 TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue1) {
    RestoreFileLogger logger(log_directory);

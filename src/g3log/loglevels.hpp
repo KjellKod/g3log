@@ -115,9 +115,9 @@ namespace g3 {
    namespace only_change_at_initialization {
       // Enable/Disable a log level {DEBUG,INFO,WARNING,FATAL}
       void setLogLevel(LEVELS level, bool enabled_status);
-	  void addLogLevel(LEVELS level, bool default_enabled_status = true);
+	  void addLogLevel(LEVELS level, bool enabled_status = true);
       std::string printLevels();
-      void reset();
+      void reset(bool remove_custom_levels = false);
 
    } // only_change_at_initialization
 #endif
