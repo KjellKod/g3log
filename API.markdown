@@ -76,8 +76,9 @@ If the ```<boolean-expression>``` evaluates to false then the the message for th
   const LEVELS DEADLY {FATAL.value + 1, {"DEADLY"}}; 
   ```
 
+Both custom and built-in log levels can be turned on and off using the function ```g3::only_change_at_initialization::setLogLevel```. Calling ```g3::only_change_at_initialization::reset``` will reset all built-in levels to their defaults and remove custom levels. If the latter is not the desired behavior the function ```g3::only_change_at_initialization::addLogLevel``` can be used to turn a custom log level on or off and save this state as the default which is restored when ```reset()``` is called. 
 
-
+Calling ```g3::only_change_at_initialization::reset(true)``` will remove all custom levels regardless of whether ```addLevel``` was used with them.
   
 ## Sink <a name="sink_creation">creation</a> and utilization 
 The default sink for g3log is the one as used in g2log. It is a simple file sink with a limited API. The details for the default file sink can be found in [filesink.hpp](src/g3log/filesink.hpp), [filesink.cpp](src/filesink.cpp), [filesinkhelper.ipp](src/filesinkhelper.ipp)
