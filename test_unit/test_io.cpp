@@ -311,6 +311,7 @@ TEST(LogTest, LOGF__FATAL) {
    EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
 
+#ifndef DISABLE_FATAL_SIGNALHANDLING
 
 TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {
    RestoreFileLogger logger(log_directory);
@@ -383,7 +384,7 @@ TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
 }
 #endif
 
-
+#endif
 
 TEST(LogTest, LOG_preFatalLogging_hook) {
    {
