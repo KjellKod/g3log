@@ -3,6 +3,8 @@ language: cpp
 os:
   - linux
 
+dist: trusty
+
 compiler: 
      - gcc
     #- clang
@@ -14,26 +16,30 @@ branches:
 
 
 before_install: 
-   # use http://lint.travis-ci.org/ to validate changes
-       # sudo add-apt-repository -y ppa:h-rayflood/llvm; 
-       # sudo apt-get install --allow-unauthenticated -qq clang-3.4
 
    if [ ${TRAVIS_OS_NAME} = 'linux' ]; 
    then 
+
+
      sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test; 
+
+     sudo add-apt-repository -y ppa:george-edison55/precise-backports;
+
+     sudo apt-get remove -qq cmake cmake-data
+     sudo apt-get autoremove -qq
+
      sudo apt-get update -qq;
      sudo apt-get install python-software-properties;
      sudo apt-get update;
      sudo apt-get install gcc-5 g++-5;
-     sudo  apt-get install software-properties-common;
-     # sudo add-apt-repository -y ppa:george-edison55-precise-backports;
+     sudo apt-get install software-properties-common;
      sudo apt-get update;
      sudo apt-get update -qq;
-     # sudo apt-get install cmake cmake-data;
+     sudo apt-get install cmake cmake-data;
    fi
  
 install:
-  #  gcc 5 .
+  #  gcc 5
   - if [ "$CXX" == "g++" ]; then sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 10; fi
   - if [ "$CXX" == "g++" ]; then  sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 10; fi
 
@@ -58,12 +64,5 @@ install:
  
 script: "./scripts/buildAndRunTests.sh"
 
-addons:
-  apt:
-    sources:
-    - kalakris-cmake
-    - george-edison55-precise-backports
-    packages:
-    - cmake
-    - cmake-data
 
+ 
