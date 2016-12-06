@@ -54,28 +54,28 @@ LogCapture::LogCapture(const char *file, const int line, const char *function, c
 }
 
 void LogCapture::capturef(const wchar_t *printf_like_message, ...) {
-	static const int kMaxMessageSize = 2048;
-	static const std::wstring kTruncatedWarningText = L"[...truncated...]";
-	wchar_t finished_message[kMaxMessageSize];
-	va_list arglist;
-	va_start(arglist, printf_like_message);
+   static const int kMaxMessageSize = 2048;
+   static const std::wstring kTruncatedWarningText = L"[...truncated...]";
+   wchar_t finished_message[kMaxMessageSize];
+   va_list arglist;
+   va_start(arglist, printf_like_message);
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
-	const int nbrcharacters = _vsnwprintf_s(finished_message, _countof(finished_message), _TRUNCATE, printf_like_message, arglist);
+   const int nbrcharacters = _vsnwprintf_s(finished_message, _countof(finished_message), _TRUNCATE, printf_like_message, arglist);
 #else
-	const int nbrcharacters = vswprintf(finished_message, sizeof(finished_message), printf_like_message, arglist);
+   const int nbrcharacters = vswprintf(finished_message, sizeof(finished_message), printf_like_message, arglist);
 #endif
-	va_end(arglist);
+   va_end(arglist);
 
-	if (nbrcharacters <= 0) {
-		wstream() << L"\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully the message";
-		wstream() << L'"' << printf_like_message << L'"' << std::endl;
-	} else if (nbrcharacters > kMaxMessageSize) {
-		wstream() << finished_message << kTruncatedWarningText;
-	}
-	else {
-		wstream() << finished_message;
-	}
+   if (nbrcharacters <= 0) {
+      wstream() << L"\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully the message";
+      wstream() << L'"' << printf_like_message << L'"' << std::endl;
+   } else if (nbrcharacters > kMaxMessageSize) {
+      wstream() << finished_message << kTruncatedWarningText;
+   }
+   else {
+      wstream() << finished_message;
+   }
 }
 
 /**

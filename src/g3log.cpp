@@ -153,13 +153,13 @@ namespace g3 {
 
 
 
-	  void saveMessage(const char *entry, const wchar_t *wentry, const char *file, int line, const char *function, const LEVELS &level,
-		 const char *boolean_expression, int fatal_signal, const char *stack_trace) {
+      void saveMessage(const char *entry, const wchar_t *wentry, const char *file, int line, const char *function, const LEVELS &level,
+         const char *boolean_expression, int fatal_signal, const char *stack_trace) {
 
          LEVELS msgLevel {level};
          LogMessagePtr message {std2::make_unique<LogMessage>(file, line, function, msgLevel)};
 
-		 message.get()->wwrite().append(wentry);
+         message.get()->wwrite().append(wentry);
          message.get()->write().append(entry);
          message.get()->setExpression(boolean_expression);
 

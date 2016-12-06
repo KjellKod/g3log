@@ -123,10 +123,10 @@ namespace g3 {
          std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
          msg.append(_message.append(convert.to_bytes(_wmessage)));
 #else
-		 msg.append("[unconverted wstring]");
+         msg.append("[unconverted wstring]");
 #endif
-	   }
-	   return msg.append(_message);
+      }
+      return msg.append(_message);
    }
 
    std::string LogMessage::timestamp(const std::string& time_look) const {
