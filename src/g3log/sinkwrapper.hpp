@@ -15,7 +15,7 @@ namespace g3 {
 
       struct SinkWrapper {
          virtual ~SinkWrapper() { }
-         virtual void send(LogMessageMover msg) { }
+		 virtual void send(LogMessageMover msg) = 0;
       };
    }
 }
