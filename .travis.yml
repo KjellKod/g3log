@@ -12,13 +12,7 @@ branches:
   only:
     - master
 
-addons:
-  apt:
-    sources:
-      - george-edison55-precise-backports # cmake 3.2.3 / doxygen 1.8.3
-    packages:
-      - cmake
-      - cmake-data
+
       
 before_install: 
    # use http://lint.travis-ci.org/ to validate changes
@@ -65,3 +59,11 @@ install:
  
 script: "./scripts/buildAndRunTests.sh"
  
+addons:
+  apt:
+    packages:
+    - cmake
+    - cmake-data
+    sources:
+    - kalakris-cmake
+    - george-edison55-precise-backports
