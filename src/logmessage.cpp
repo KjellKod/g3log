@@ -160,7 +160,7 @@ namespace g3 {
       : _timestamp(other._timestamp)
       , _call_thread_id(other._call_thread_id)
       , _file(std::move(other._file))
-      , _file_path(other._file_path)
+      , _file_path(std::move(other._file_path))
       , _line(other._line)
       , _function(std::move(other._function))
       , _level(other._level)
