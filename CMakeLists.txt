@@ -48,6 +48,10 @@
 
 cmake_minimum_required (VERSION 3.1)
 ENABLE_LANGUAGE(CXX)
+if( POLICY CMP0054 )
+	cmake_policy(SET CMP0054 NEW)
+endif()
+
 set(CMAKE_BUILD_TYPE Release)
 
 project (g3log)

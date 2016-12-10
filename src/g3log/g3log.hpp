@@ -94,8 +94,8 @@ namespace g3 {
       bool isLoggingInitialized();
 
       // Save the created LogMessage to any existing sinks
-      void saveMessage(const char *message, const char *file, int line, const char *function, const LEVELS &level,
-                       const char *boolean_expression, int fatal_signal, const char *stack_trace);
+      void saveMessage(const char *message, const wchar_t *wmessage, const char *file, int line, const char *function, const LEVELS &level,
+         const char *boolean_expression, int fatal_signal, const char *stack_trace);
 
       // forwards the message to all sinks
       void pushMessageToLogger(LogMessagePtr log_entry);
@@ -136,18 +136,23 @@ namespace g3 {
 
 // LOG(level) is the API for the stream log
 #define LOG(level) if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).stream()
-
+#define LOGW(level) if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).wstream()
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
    if(true == boolean_expression)  \
       if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).stream()
+#define LOG_IFW(level, boolean_expression)  \
+   if(true == boolean_expression)  \
+      if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).wstream()
 
 // 'Design By Contract' stream API. For Broken Contracts:
 //         unit testing: it will throw std::runtime_error when a contract breaks
 //         I.R.L : it will exit the application by using fatal signal SIGABRT
-#define CHECK(boolean_expression)        \
+#define CHECK(boolean_expression)    \
    if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
+#define CHECKW(boolean_expression)   \
+   if (false == (boolean_expression)) INTERNAL_CONTRACT_MESSAGE(#boolean_expression).wstream()
 
 
 /** For details please see this

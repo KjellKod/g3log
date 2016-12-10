@@ -328,15 +328,15 @@ namespace {
    std::atomic<int> lastEncounteredSignal = {0};
    void customSignalHandler(int signal_number, siginfo_t* info, void* unused_context) {
       lastEncounteredSignal.store(signal_number);
-	  ++customFatalCounter;
+      ++customFatalCounter;
    }
    void installCustomSIGTERM() {
       struct sigaction action;
-	  memset(&action, 0, sizeof(action));
-	  sigemptyset(&action.sa_mask);
-	  action.sa_sigaction = &customSignalHandler;
-	  action.sa_flags = SA_SIGINFO;
-	  sigaction(SIGTERM, &action, nullptr);
+      memset(&action, 0, sizeof(action));
+      sigemptyset(&action.sa_mask);
+      action.sa_sigaction = &customSignalHandler;
+      action.sa_flags = SA_SIGINFO;
+      sigaction(SIGTERM, &action, nullptr);
    }
 } // anonymous
 
@@ -354,13 +354,13 @@ namespace {
 //
 //
 // For the test to work the following code should be added in this test
-//void customSignalHandler(int signal_number) {
-//	lastEncounteredSignal.store(signal_number);
-//	++customFatalCounter;
+// void customSignalHandler(int signal_number) {
+//    lastEncounteredSignal.store(signal_number);
+//    ++customFatalCounter;
 //}
 //
-//void installCustomSIGTERM() {
-//	ASSERT_TRUE(SIG_ERR != signal(SIGTERM, customSignalHandler));
+// void installCustomSIGTERM() {
+//    ASSERT_TRUE(SIG_ERR != signal(SIGTERM, customSignalHandler));
 //} 
 
 

@@ -53,14 +53,15 @@ struct LogCapture {
 #ifndef __GNUC__
 #define  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
 #endif 
+
 #ifdef _MSC_VER 
-#	if _MSC_VER >= 1400
-#		define G3LOG_FORMAT_STRING _Printf_format_string_
-#	else
-#		define G3LOG_FORMAT_STRING __format_string
-#	endif
+#   if _MSC_VER >= 1400
+#      define G3LOG_FORMAT_STRING _Printf_format_string_
+#   else
+#      define G3LOG_FORMAT_STRING __format_string
+#   endif
 #else
-#	define G3LOG_FORMAT_STRING
+#   define G3LOG_FORMAT_STRING
 #endif
    void capturef(G3LOG_FORMAT_STRING const char *printf_like_message, ...) __attribute__((format(printf, 2, 3))); // 2,3 ref:  http://www.codemaestro.com/reviews/18
 
@@ -70,9 +71,15 @@ struct LogCapture {
       return _stream;
    }
 
+   void capturef(const wchar_t *printf_like_message, ...);
 
+   std::wostringstream &wstream() {
+      return _wstream;
+   }
 
    std::ostringstream _stream;
+   std::wostringstream _wstream;
+
    std::string _stack_trace;
    const char *_file;
    const int _line;

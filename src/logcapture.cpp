@@ -10,7 +10,7 @@
 #include "g3log/crashhandler.hpp"
 
 // For Windows we need force a thread_local install per thread of three
-// signals that must have a signal handler instealled per thread-basis
+// signals that must have a signal handler installed per thread-basis
 // It is really a royal pain. Seriously Microsoft? Seriously?
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #define SIGNAL_HANDLER_VERIFY() g3::installSignalHandlerForThread()
@@ -29,7 +29,7 @@
 LogCapture::~LogCapture() {
    using namespace g3::internal;
    SIGNAL_HANDLER_VERIFY();
-   saveMessage(_stream.str().c_str(), _file, _line, _function, _level, _expression, _fatal_signal, _stack_trace.c_str());
+   saveMessage(_stream.str().c_str(), _wstream.str().c_str(), _file, _line, _function, _level, _expression, _fatal_signal, _stack_trace.c_str());
 }
 
 
@@ -53,7 +53,30 @@ LogCapture::LogCapture(const char *file, const int line, const char *function, c
    }
 }
 
+void LogCapture::capturef(const wchar_t *printf_like_message, ...) {
+   static const int kMaxMessageSize = 2048;
+   static const std::wstring kTruncatedWarningText = L"[...truncated...]";
+   wchar_t finished_message[kMaxMessageSize];
+   va_list arglist;
+   va_start(arglist, printf_like_message);
 
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
+   const int nbrcharacters = _vsnwprintf_s(finished_message, _countof(finished_message), _TRUNCATE, printf_like_message, arglist);
+#else
+   const int nbrcharacters = vswprintf(finished_message, sizeof(finished_message), printf_like_message, arglist);
+#endif
+   va_end(arglist);
+
+   if (nbrcharacters <= 0) {
+      wstream() << L"\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully the message";
+      wstream() << L'"' << printf_like_message << L'"' << std::endl;
+   } else if (nbrcharacters > kMaxMessageSize) {
+      wstream() << finished_message << kTruncatedWarningText;
+   }
+   else {
+      wstream() << finished_message;
+   }
+}
 
 /**
 * capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF
