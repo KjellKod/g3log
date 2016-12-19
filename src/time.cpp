@@ -85,33 +85,29 @@ namespace g3 {
    }
 
 
+   // std::timespec_get or posix clock_gettime)(...) are not
+   // implemented on OSX and ubuntu gcc5 has no support for std::timespec_get(...) as of yet
+   // so instead we roll our own.
    int timespec_get(struct timespec* ts/*, int base*/) {
-#ifdef __MACH__
-      // std::timespec_get or posix clock_gettime)(...) are not
-      // implemented on OSX
-      // @return value of base if successful, else zero
-      struct timeval now = {};
-      int rv = gettimeofday(&now, nullptr);
-      if (-1 == rv) {
-         return rv;
-      }
-      // error mode. just return sec, microsecond
-      ts->tv_sec = now.tv_sec;
-      ts->tv_nsec = now.tv_usec * 1000;
-      return 0;
-#elif(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-      static auto os =
-         std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now()).time_since_epoch() -
-         std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch();
-
-      auto now_ns = (std::chrono::time_point_cast<std::chrono::nanoseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch() + os).count();
-      ts ->tv_sec = now_ns / 1000000000;
-      ts ->tv_nsec = now_ns % 1000000000;
+      using namespace std::chrono;
+      
+      // thanks @AndreasSchoenle for the implementation and the explanation:
+      // The time since epoch for the steady_clock is not necessarily really the time since 1970.
+      // It usually is the time since program start. Thus, here is calculated the offset between 
+      // the starting point and the real start of the epoch as reported by the system clock 
+      // with the precision of the system clock. 
+      // 
+      // Time stamps will later have system clock accuracy but relative times will have the precision
+      // of the high resolution clock.   
+      thread_local const auto os =
+         time_point_cast<nanoseconds>(system_clock::now()).time_since_epoch() -
+         time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch();
+      
+      auto now_ns = (time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch() + os).count();
+      const auto kNanos = 1000000000;
+      ts ->tv_sec = now_ns / kNanos;
+      ts ->tv_nsec = now_ns % kNanos;
       return TIME_UTC;
-#else
-      // ubuntu/gcc5 has no support for std::timespec_get(...) as of yet
-      return clock_gettime(CLOCK_REALTIME, ts);
-#endif
    }
 
 
