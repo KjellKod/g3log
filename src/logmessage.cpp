@@ -27,8 +27,8 @@ namespace g3 {
    // helper for setting the normal log details in an entry
    std::string LogDetailsToString(const LogMessage& msg) {
       std::string out;
-      out.append("\n" + msg.timestamp() + "\t"
-                 + msg.level() + " [" + msg.file() + "->" + msg.function() + ":" + msg.line() + "]\t");
+      out.append(msg.timestamp() + "\t"
+                 + msg.level() + " [" + msg.file() + "->" + msg.function() + ":" + msg.line() + "]: ");
       return out;
    }
 
@@ -36,16 +36,16 @@ namespace g3 {
    // helper for normal
    std::string normalToString(const LogMessage& msg) {
       auto out = LogDetailsToString(msg);
-      out.append('"' + msg.message() + '"');
+      out.append(msg.message() + '\n');
       return out;
    }
 
    // helper for fatal signal
    std::string  fatalSignalToString(const LogMessage& msg) {
       std::string out; // clear any previous text and formatting
-      out.append("\n" + msg.timestamp()
+      out.append(msg.timestamp()
                  + "\n\n***** FATAL SIGNAL RECEIVED ******* \n"
-                 + '"' + msg.message() + '"');
+                 + msg.message() + '\n');
       return out;
    }
 
@@ -53,9 +53,9 @@ namespace g3 {
    // helper for fatal exception (windows only)
    std::string  fatalExceptionToString(const LogMessage& msg) {
       std::string out; // clear any previous text and formatting
-      out.append("\n" + msg.timestamp()
+      out.append(msg.timestamp()
                  + "\n\n***** FATAL EXCEPTION RECEIVED ******* \n"
-                 + '"' + msg.message() + '"');
+                 + msg.message() + '\n');
       return out;
    }
 
@@ -104,7 +104,7 @@ namespace g3 {
       // What? Did we hit a custom made level?
       auto out = LogDetailsToString(*this);
       static const std::string errorUnknown = {"UNKNOWN or Custom made Log Message Type"};
-      out.append("\n\t*******" + errorUnknown + "\t\n" + '"' + message() + '"');
+      out.append("\n\t*******" + errorUnknown + "\t\n" + message() + '\n');
       return out;
    }
 
