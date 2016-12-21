@@ -7,30 +7,6 @@
 # ============================================================================*/
 
 
-
- #  INSTALL( TARGETS g3logger_shared
- #           ARCHIVE
- #           LIBRARY DESTINATION lib/g3log
- #           COMPONENT libraries)
-
- #  INSTALL( FILES ${HEADER_FILES}
- #           DESTINATION include
- #           COMPONENT headers)
-
-
-   SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output dir for libraries")
-   SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output dir for headers")
-
-   INSTALL( TARGETS g3logger g3logger_shared
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            COMPONENT libraries)
-
-   INSTALL( FILES ${HEADER_FILES}
-            DESTINATION ${CMAKE_INSTALL_HEADERDIR}/g3log
-            COMPONENT headers)
-
-
   SET(CPACK_COMPONENTS_ALL libraries headers)
   SET(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "G3Log libraries")
   SET(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "G3Log C++ headers")

@@ -52,7 +52,7 @@ ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
    ELSE()
        set(PLATFORM_LINK_LIBRIES rt)
-       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -rdynamic -Wunused -std=c++11 -pthread -lrt -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
+       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TOOLCHAIN_COMPILER_FLAGS} -Wall -rdynamic -Wunused -std=c++11 -pthread -lrt -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
    ENDIF()
 ENDIF()
 
@@ -66,13 +66,13 @@ IF (MSVC OR MINGW)
       MESSAGE(STATUS "- MSVC: Set variadic max to 10 for MSVC compatibility")
       # Remember to set set target properties if using GTEST similar to done below on target "unit_test"
       # "set_target_properties(unit_test  PROPERTIES COMPILE_DEFINITIONS "GTEST_USE_OWN_TR1_TUPLE=0")
-   MESSAGE("")
-   MESSAGE("Windows: Run cmake with the appropriate Visual Studio generator")
-   MESSAGE("The generator is one number below the official version number. I.e. VS2013 -> Generator 'Visual Studio 12'")
-   MESSAGE("I.e. if VS2013: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 12\" ..]")
-   MESSAGE("if cmake finishes OK, do 'msbuild g3log.sln /p:Configuration=Release'")
-   MESSAGE("then run 'Release\\g3log-FATAL-*' examples")
-   MESSAGE("")
+   MESSAGE(STATUS "")
+   MESSAGE(STATUS "Windows: Run cmake with the appropriate Visual Studio generator")
+   MESSAGE(STATUS "The generator is one number below the official version number. I.e. VS2013 -> Generator 'Visual Studio 12'")
+   MESSAGE(STATUS "I.e. if VS2013: Please run the command [cmake -DCMAKE_BUILD_TYPE=Release -G \"Visual Studio 12\" ..]")
+   MESSAGE(STATUS "if cmake finishes OK, do 'msbuild g3log.sln /p:Configuration=Release'")
+   MESSAGE(STATUS "then run 'Release\\g3log-FATAL-*' examples")
+   MESSAGE(STATUS "")
 ENDIF()
 
    # GENERIC STEPS
@@ -92,10 +92,17 @@ ENDIF()
    include_directories(${LOG_SRC})
    #MESSAGE("  g3logger files: [${SRC_FILES}]")
    add_library(g3logger ${SRC_FILES})
-   set_target_properties(g3logger PROPERTIES
-      LINKER_LANGUAGE CXX
-      OUTPUT_NAME g3logger
-      CLEAN_DIRECT_OUTPUT 1)
+   if (WIN32 AND ADD_BUILD_WIN_SHARED)
+		set_target_properties(g3logger PROPERTIES
+		  LINKER_LANGUAGE CXX
+		  OUTPUT_NAME g3logger_static
+		  CLEAN_DIRECT_OUTPUT 1)
+	else()
+		set_target_properties(g3logger PROPERTIES
+		  LINKER_LANGUAGE CXX
+		  OUTPUT_NAME g3logger
+		  CLEAN_DIRECT_OUTPUT 1)
+   endif()
    target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
    SET(G3LOG_LIBRARY g3logger)
 
