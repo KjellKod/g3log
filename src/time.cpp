@@ -107,7 +107,10 @@ namespace g3 {
       const auto kNanos = 1000000000;
       ts ->tv_sec = now_ns / kNanos;
       ts ->tv_nsec = now_ns % kNanos;
-      return TIME_UTC;
+      #ifdef TIME_UTC
+         return TIME_UTC;
+      #endif
+      return 1;
    }
 
 
