@@ -58,6 +58,7 @@ ENDIF()
 
 
 IF (MSVC OR MINGW)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8") # source code already in utf-8, force it for compilers in non-utf8_windows_locale
   set(PLATFORM_LINK_LIBRIES dbghelp)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
