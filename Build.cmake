@@ -20,7 +20,7 @@ SET(ACTIVE_CPP0xx_DIR "Release")
   # description
   #  1) http://kjellkod.wordpress.com/2013/09/23/experimental-g3log-with-clang/
   #  2) https://github.com/maidsafe/MaidSafe/wiki/Hacking-with-Clang-llvm-abi-and-llvm-libc
-IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang")
+IF (${CMAKE_CXX_COMPILER_ID} MATCHES ".*Clang")
    MESSAGE("")
    MESSAGE("cmake for Clang ")
    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -Wunused -D_GLIBCXX_USE_NANOSLEEP")
@@ -44,7 +44,7 @@ IF ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang")
 
 
 
-ELSEIF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+ELSEIF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
    MESSAGE("cmake for GCC ")
    IF (APPLE)
        set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP")
