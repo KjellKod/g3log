@@ -63,6 +63,7 @@ ELSEIF(MSVC)
    set(CMAKE_CXX_FLAGS_RELEASE "/MT")
    set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
 
+   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8") # source code already in utf-8, force it for compilers in non-utf8_windows_locale
    # ERROR level conflicts with windows.h
    ADD_DEFINITIONS (-DNOGDI)
    # support AMD proc on vc2015
@@ -72,7 +73,6 @@ ELSEIF(MSVC)
 endif()
 
 IF (MSVC OR MINGW)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8") # source code already in utf-8, force it for compilers in non-utf8_windows_locale
   set(PLATFORM_LINK_LIBRIES dbghelp)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
