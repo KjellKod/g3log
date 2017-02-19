@@ -10,6 +10,7 @@
 #include "performance.h"
 #include <thread>
 #include <iostream>
+#include <algorithm>
 
 #if defined(G3LOG_PERFORMANCE)
 const std::string title = "G3LOG";

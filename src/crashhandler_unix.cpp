@@ -157,7 +157,7 @@ namespace g3 {
          const size_t max_dump_size = 50;
          void* dump[max_dump_size];
          size_t size = backtrace(dump, max_dump_size);
-         char** messages = backtrace_symbols(dump, size); // overwrite sigaction with caller's address
+         char** messages = backtrace_symbols(dump, static_cast<int>(size)); // overwrite sigaction with caller's address
 
          // dump stack: skip first frame, since that is here
          std::ostringstream oss;
