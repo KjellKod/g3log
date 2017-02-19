@@ -2,7 +2,7 @@
 * 2013 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
@@ -32,7 +32,7 @@ class CoutSink {
    unique_ptr<ScopedOut> scope_ptr;
 
    CoutSink() : scope_ptr(std2::make_unique<ScopedOut>(std::cout, &buffer)) {}
-public:
+ public:
    void clear() { buffer.str(""); }
    std::string string() { return buffer.str(); }
    void save(g3::LogMessageMover msg) { std::cout << msg.get().message(); }
@@ -67,24 +67,24 @@ namespace g3 {
          }
       }
 
-   public:
+    public:
 
       Worker() : _bg {
          kjellkod::Active::createActive()
-      }
-      {
+      } {
       }
 
       ~Worker() {
          _bg->send([this] {
-            _container.clear(); });
+            _container.clear();
+         });
       }
 
       void save(std::string msg) {
          _bg->send([this, msg] { bgSave(msg); });
       }
-      
-      
+
+
       template<typename T, typename DefaultLogCall>
       std::unique_ptr< SinkHandle<T> > addSink(std::unique_ptr<T> unique, DefaultLogCall call) {
          auto sink = std::make_shared < internal::Sink<T> > (std::move(unique), call);
@@ -150,13 +150,13 @@ TEST(ConceptSink, DeletedSink__Exptect_badweak_ptr___exception) {
 }
 
 namespace {
-   typedef std::shared_ptr<std::atomic<bool >> AtomicBoolPtr;
-   typedef std::shared_ptr<std::atomic<int >> AtomicIntPtr;
-   typedef vector<AtomicBoolPtr> BoolList;
-   typedef vector<AtomicIntPtr> IntVector;
+   using AtomicBooleanPtr = std::shared_ptr<std::atomic<bool>>;
+   using AtomicIntegerPtr =  std::shared_ptr<std::atomic<int>> ;
+   using BoolList = std::vector<AtomicBooleanPtr> ;
+   using IntVector = std::vector<AtomicIntegerPtr>;
 }
 
-TEST(ConceptSink, OneHundredSinks) {
+TEST(ConceptSink, OneHundredSinks_part1) {
    BoolList flags;
    IntVector counts;
 
@@ -177,7 +177,7 @@ TEST(ConceptSink, OneHundredSinks) {
       worker->save("Hello to 100 receivers :)");
       worker->save("Hello to 100 receivers :)");
    }
-   // at the curly brace above the ScopedLogger will go out of scope and all the 
+   // at the curly brace above the ScopedLogger will go out of scope and all the
    // 100 logging receivers will get their message to exit after all messages are
    // are processed
    size_t index = 0;
@@ -187,80 +187,68 @@ TEST(ConceptSink, OneHundredSinks) {
       ASSERT_TRUE(2 == count->load()) << ", count : " << (index - 1);
    }
 
-   cout << "test one hundred sinks is finished finished\n";
+   cout << "test one hundred sinks is finished\n";
 }
 
 
-/*
-TEST(Sink, OneSink) {
-  AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
-  AtomicIntPtr count = make_shared<atomic<int>>(0);
-    {
-    auto worker = std::make_shared<g3LogWorker>();
-    worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
-    worker->save("this message should trigger an atomic increment at the sink");
+TEST(ConceptSink, OneHundredSinks_part2) {
+   using BoolPtrVector = std::vector<AtomicBooleanPtr> ;
+   using IntPtrVector = vector<AtomicIntegerPtr> ;
+   BoolPtrVector flags;
+   IntPtrVector counts;
 
-    EXPECT_FALSE(flag->load());
-    EXPECT_TRUE(0 == count->load());
-  }
-  EXPECT_TRUE(flag->load());
-  EXPECT_TRUE(1 == count->load());
-}
+   size_t NumberOfItems = 100;
+   for (size_t index = 0; index < NumberOfItems; ++index) {
+      flags.push_back(make_shared<atomic<bool>>(false));
+      counts.push_back(make_shared<atomic<int>>(0));
+   }
 
-TEST(Sink, OneSinkWithHandleOutOfScope) {
-  AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
-  AtomicIntPtr count = make_shared<atomic<int>>(0);
-  {
-    auto worker = std::make_shared<g3LogWorker>();
-    {
-       auto handle =   worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+   {
+      auto worker = g3::LogWorker::createLogWorker();
+      size_t index = 0;
+      for (auto& flag : flags) {
+         auto& count = counts[index++]; 
+         // ignore the handle
+         worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+      }
+
+      // 100 logs
+   for (size_t index = 0; index < NumberOfItems; ++index) {
+      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      message.get()->write().append("Hello to 100 receivers :)");
+      worker->save(message);
     }
-    EXPECT_FALSE(flag->load());
-    EXPECT_TRUE(0 == count->load());
-    worker->save("this message should trigger an atomic increment at the sink");
-  }
-  EXPECT_TRUE(flag->load());
-  EXPECT_TRUE(1 == count->load());
-}
+   } // RAII exit 
 
-//Perfect det här testet triggar felet
-
-typedef vector<AtomicBoolPtr> BoolPtrVector;
-typedef vector<AtomicIntPtr> IntPtrVector;
-TEST(Sink, OneHundredSinks) {
-  BoolPtrVector flags;
-  IntPtrVector counts;
-
-  size_t NumberOfItems = 100;
-  for (size_t index = 0; index < NumberOfItems; ++index) {
-    flags.push_back(make_shared < atomic<bool >> (false));
-    counts.push_back(make_shared < atomic<int >> (0));
-  }
-
-  {
-    auto worker = std::make_shared<g3LogWorker>();
-    size_t index = 0;
-    for (auto& flag : flags) {
+   // at the curly brace above the ScopedLogger will go out of scope and all the
+   // 100 logging receivers will get their message to exit after all messages are
+   // are processed at the curly brace above the ScopedLogger will go out of scope and all the
+   // 100 logging receivers will get their message to exit after all messages are
+   // are processed
+   size_t index = 0;
+   for (auto& flag : flags) {
       auto& count = counts[index++];
-      // ignore the handle
-      worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
-    }
-    worker->save("Hello to 100 receivers :)");
-  }
-
-  // at the curly brace above the ScopedLogger will go out of scope and all the 
-  // 100 logging receivers will get their message to exit after all messages are
-  // are processed // at the curly brace above the ScopedLogger will go out of scope and all the 
-  // 100 logging receivers will get their message to exit after all messages are
-  // are processed
-  size_t index = 0;
-  for (auto& flag : flags) {
-    auto& count = counts[index++];
-    EXPECT_TRUE(flag->load());
-    EXPECT_EQ(100, count->load());
-    cout << "test one hundred sinks is finished finished\n";
-  }
+      EXPECT_TRUE(flag->load());
+      EXPECT_EQ(NumberOfItems, count->load()); 
+   }
 }
 
- */
 
+TEST(ConceptSink, OneSinkWithHandleOutOfScope) {
+   AtomicBooleanPtr flag = make_shared<atomic<bool>>(false);
+   AtomicIntegerPtr count = make_shared<atomic<int>>(0);
+   {
+      auto worker = g3::LogWorker::createLogWorker();
+      {
+         auto handle =   worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+      }
+      EXPECT_FALSE(flag->load());
+      EXPECT_TRUE(0 == count->load());
+
+      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      message.get()->write().append("this message should trigger an atomic increment at the sink");
+      worker->save(message);
+   }
+   EXPECT_TRUE(flag->load());
+   EXPECT_TRUE(1 == count->load());
+}

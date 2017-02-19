@@ -311,6 +311,7 @@ TEST(LogTest, LOGF__FATAL) {
    EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
 
+#ifndef DISABLE_FATAL_SIGNALHANDLING
 
 TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {
    RestoreFileLogger logger(log_directory);
@@ -321,26 +322,47 @@ TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {
    EXPECT_EQ(g_fatal_counter.load(), size_t{1});
 }
 
+#if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))   
 namespace {
    std::atomic<size_t> customFatalCounter = {0};
    std::atomic<int> lastEncounteredSignal = {0};
    void customSignalHandler(int signal_number, siginfo_t* info, void* unused_context) {
       lastEncounteredSignal.store(signal_number);
-      ++customFatalCounter;
+	  ++customFatalCounter;
    }
-
-
-
-   void installCustomSIGTERM () {
+   void installCustomSIGTERM() {
       struct sigaction action;
-      memset(&action, 0, sizeof (action));
-      sigemptyset(&action.sa_mask);
-      action.sa_sigaction = &customSignalHandler;
-      action.sa_flags = SA_SIGINFO;
-      sigaction(SIGTERM, &action, nullptr);
+	  memset(&action, 0, sizeof(action));
+	  sigemptyset(&action.sa_mask);
+	  action.sa_sigaction = &customSignalHandler;
+	  action.sa_flags = SA_SIGINFO;
+	  sigaction(SIGTERM, &action, nullptr);
    }
-
 } // anonymous
+
+// Override of signal handling and testing of it should be fairly easy to port to windows
+// ref: https://github.com/KjellKod/g3log/blob/master/src/crashhandler_windows.cpp
+// what is missing is the override of signals and custom installation of signals
+// ref: https://github.com/KjellKod/g3log/blob/master/src/crashhandler_unix.cpp
+//      functions: void restoreSignalHandlerToDefault()
+//                 void overrideSetupSignals(const std::map<int, std::string> overrideSignals)
+//                 void restoreSignalHandler(int signal_number)
+//
+// It would require some adding of unit test (see the test below)
+// and good Windows experience. Since I am not currently working much on the Windows
+// side I am reaching out to the community for this one:
+//
+//
+// For the test to work the following code should be added in this test
+//void customSignalHandler(int signal_number) {
+//	lastEncounteredSignal.store(signal_number);
+//	++customFatalCounter;
+//}
+//
+//void installCustomSIGTERM() {
+//	ASSERT_TRUE(SIG_ERR != signal(SIGTERM, customSignalHandler));
+//} 
+
 
 TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
    RestoreFileLogger logger(log_directory);
@@ -360,8 +382,9 @@ TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
    EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
    EXPECT_EQ(customFatalCounter.load(), size_t{1});
 }
+#endif
 
-
+#endif
 
 TEST(LogTest, LOG_preFatalLogging_hook) {
    {
@@ -463,7 +486,6 @@ TEST(CheckTest, CHECK_F__thisWILL_PrintErrorMsg) {
 TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This message is added to throw %s and %s";
-   std::string msg3 = "This message is added to throw message and log";
    std::string arg1 = "message";
    std::string arg3 = "log";
 
@@ -477,25 +499,19 @@ TEST(CHECK_F_Test, CHECK_F__thisWILL_PrintErrorMsg) {
 
 TEST(CHECK_Test, CHECK__thisWILL_PrintErrorMsg) {
    RestoreFileLogger logger(log_directory);
-   std::string msg = "This message is added to throw %s and %s";
-   std::string msg3 = "This message is added to throw message and log";
-   std::string arg1 = "message";
-   std::string arg3 = "log";
-   CHECK(1 >= 2) << msg3;
+   std::string msg = "This message is added to throw message and log";
+   CHECK(1 >= 2) << msg;
 
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    EXPECT_TRUE(verifyContent(mockFatalMessage(), "EXIT trigger caused by "));
    EXPECT_TRUE(verifyContent(file_content, "CONTRACT"));
-   EXPECT_TRUE(verifyContent(file_content, msg3));
+   EXPECT_TRUE(verifyContent(file_content, msg));
 }
 TEST(CHECK, CHECK_ThatWontThrow) {
    RestoreFileLogger logger(log_directory);
    std::string msg = "This %s should never appear in the %s";
    std::string msg3 = "This message should never appear in the log";
-   std::string arg1 = "message";
-   std::string arg3 = "log";
-
    CHECK(1 == 1);
    CHECK_F(1 == 1, msg.c_str(), "message", "log");
    logger.reset();
@@ -662,7 +678,6 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
 
    std::string msg_debugOn = "This %s SHOULD  appear in the %s";
    std::string msg_debugOff = "This message should never appear in the log";
-   std::string msg_info1 = "This info msg log";
    try {
       {
          RestoreFileLogger logger(log_directory);
@@ -681,8 +696,7 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
       }
 
    } catch (std::exception const& e) {
-      std::cerr << e.what() << std::endl;
-      ADD_FAILURE() << "Should never have thrown";
+      ADD_FAILURE() << "Should never have thrown: " << e.what();
    }
 }
 TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {

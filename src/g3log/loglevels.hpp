@@ -32,7 +32,7 @@ struct LEVELS {
    // "dynamic, runtime loading of shared libraries"
 
    LEVELS(const LEVELS& other): value(other.value), text(other.text.c_str()) {}
-   LEVELS(int id, const char* idtext) : value(id), text(idtext) {}
+   LEVELS(int id, const std::string& idtext) : value(id), text(idtext) {}
 
    bool operator==(const LEVELS& rhs)  const {
       return (value == rhs.value && text == rhs.text);
@@ -74,9 +74,9 @@ namespace g3 {
 
 const LEVELS TRACE{g3::kTraceValue,{ "TRACE" } },
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-      DBUG {g3::kDebugValue, {"DEBUG"}},
+const LEVELS DBUG {g3::kDebugValue, {"DEBUG"}},
 #else
-      DEBUG {g3::kDebugValue, {"DEBUG"}},
+const LEVELS DEBUG {g3::kDebugValue, {"DEBUG"}},
 #endif
       INFO {g3::kInfoValue, {"INFO"}},
       WARNING {g3::kWarningValue, {"WARNING"}},
@@ -90,8 +90,8 @@ const LEVELS TRACE{g3::kTraceValue,{ "TRACE" } },
 //
 // example: MyLoggingLevel.h
 // #pragma once
-//  const LEVELS MYINFO {WARNING.value +1, {"MyInfoLevel"}};
-//  const LEVELS MYFATAL {FATAL.value +1, {"MyFatalLevel"}};
+//  const LEVELS MYINFO {WARNING.value +1, "MyInfoLevel"};
+//  const LEVELS MYFATAL {FATAL.value +1, "MyFatalLevel"};
 //
 // IMPORTANT: As of yet dynamic on/off of logging is NOT changed automatically
 //     any changes of this, if you use dynamic on/off must be done in loglevels.cpp,

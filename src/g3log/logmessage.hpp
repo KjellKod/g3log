@@ -31,6 +31,9 @@ namespace g3 {
    * desired way.
    */
    struct LogMessage {
+      std::string file_path() const {
+         return _file_path;
+      }
       std::string file() const {
          return _file;
       }
@@ -47,9 +50,6 @@ namespace g3 {
       /// use a different format string to get a different look on the time.
       //  default look is Y/M/D H:M:S
       std::string timestamp(const std::string& time_format = {internal::date_formatted + " " + internal::time_formatted}) const;
-      std::string microseconds() const {
-         return std::to_string(_microseconds);
-      }
 
       std::string message() const  {
          return _message;
@@ -87,10 +87,10 @@ namespace g3 {
       // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
-      std::time_t _timestamp;
+      timespec _timestamp;
       std::thread::id _call_thread_id;
-      int64_t _microseconds;
       std::string _file;
+      std::string _file_path;
       int _line;
       std::string _function;
       LEVELS _level;
@@ -100,11 +100,9 @@ namespace g3 {
 
 
       friend void swap(LogMessage& first, LogMessage& second) {
-         // enable ADL (not necessary in our case, but good practice)
          using std::swap;
          swap(first._timestamp, second._timestamp);
          swap(first._call_thread_id, second._call_thread_id);
-         swap(first._microseconds, second._microseconds);
          swap(first._file, second._file);
          swap(first._line, second._line);
          swap(first._function, second._function);
@@ -114,7 +112,6 @@ namespace g3 {
       }
 
    };
-
 
 
 

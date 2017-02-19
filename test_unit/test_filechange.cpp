@@ -79,7 +79,7 @@ TEST(TestOf_ChangingLogFile, Expecting_NewLogFileUsed) {
 
 TEST(TestOf_ChangingLogFile_Id, Expecting_NewLogFileUsed1) {
    auto old_log = getLogName();
-   std::string name = setLogNameAndAddCount(name_path_1);
+   setLogNameAndAddCount(name_path_1);
    auto new_log = setLogName("foo", "new_logger_id");
    ASSERT_NE(old_log, new_log);
    std::string new_name = getLogName();
@@ -90,7 +90,7 @@ TEST(TestOf_ChangingLogFile_Id, Expecting_NewLogFileUsed1) {
 
 TEST(TestOf_ChangingLogFile_NoId, Expecting_NewLogFileUsed2) {
    auto old_log = getLogName();
-   std::string name = setLogNameAndAddCount(name_path_1);
+   setLogNameAndAddCount(name_path_1);
    auto new_log = setLogName("foo", "");
    ASSERT_NE(old_log, new_log);
    std::string new_name = getLogName();
@@ -137,6 +137,7 @@ TEST(TestOf_SinkHandleDifferentId, Expecting_DifferentId) {
 TEST(TestOf_LegalLogFileNam,  With_parenthesis) {
    std::string original = getLogName();
    auto perhaps_a_name = setLogName("(test)"); // does not exist
+   EXPECT_NE(original, perhaps_a_name);
    std::string post_legal = getLogName();
    EXPECT_TRUE(std::string::npos != post_legal.find("(test)")) << "filename was: " << post_legal;
 }

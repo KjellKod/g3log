@@ -75,6 +75,7 @@ namespace testing_helpers {
       std::ostringstream oss;
       oss << in.rdbuf();
       return oss.str();
+      // RAII of std::ifstream will automatically close the file
    }
 
    size_t LogFileCleaner::size() {
