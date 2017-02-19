@@ -69,6 +69,7 @@ ELSEIF(MSVC)
    if(${CMAKE_CL_64} STREQUAL "0")
        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /arch:IA32")
    endif()
+endif()
 
 IF (MSVC OR MINGW)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8") # source code already in utf-8, force it for compilers in non-utf8_windows_locale

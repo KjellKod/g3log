@@ -74,9 +74,9 @@ namespace g3 {
 
 const LEVELS TRACE{g3::kTraceValue,{ "TRACE" } },
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-const LEVELS DBUG {g3::kDebugValue, {"DEBUG"}},
+      DBUG {g3::kDebugValue, {"DEBUG"}},
 #else
-const LEVELS DEBUG {g3::kDebugValue, {"DEBUG"}},
+      DEBUG {g3::kDebugValue, {"DEBUG"}},
 #endif
       INFO {g3::kInfoValue, {"INFO"}},
       WARNING {g3::kWarningValue, {"WARNING"}},
