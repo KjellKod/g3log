@@ -10,7 +10,6 @@
 #include <atomic>
 #include <cassert>
 #include <map>
-#include <unordered_map>
 
 namespace {
    namespace {
@@ -42,7 +41,8 @@ namespace g3 {
 
 #ifdef G3_DYNAMIC_LOGGING
       std::map<int, atomicbool> g_log_level_status = {{g3::kTraceValue, true}, {g3::kDebugValue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true}, {FATAL.value, true} };
-      std::unordered_map<std::string, int> g_log_level_name = {{TRACE.text, g3::kTraceValue}, {DEBUG.text, g3::kDebugValue}, {INFO.text, INFO.value }, {WARNING.text, WARNING.value}, {ERROR.text, ERROR.value}, {FATAL.text, FATAL.value} };
+      std::map<std::string, int> g_log_level_name = {{TRACE.text, g3::kTraceValue}, {DEBUG.text, g3::kDebugValue}, {INFO.text, INFO.value }, {WARNING.text, WARNING.value}, {ERROR.text, ERROR.value}, {FATAL.text, FATAL.value} };
+      std::vector<std::string> g_log_all_levels = { TRACE.text, DEBUG.text, INFO.text, WARNING.text, ERROR.text, FATAL.text};
 #endif
    } // internal
 
@@ -91,11 +91,7 @@ namespace g3 {
    }
 
    std::vector<std::string> getAllLevels() {
-     std::vector<std::string> levels;
-     for (auto& v : internal::g_log_level_name) {
-       levels.push_back(v.first);
-     }
-     return levels;
+     return internal::g_log_all_levels;
    }
 #endif
 
