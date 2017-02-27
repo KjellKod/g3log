@@ -24,6 +24,7 @@
 
 #include <string> 
 #include <algorithm>
+#include <vector>
 
 
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod
@@ -125,8 +126,10 @@ namespace g3 {
       std::string printLevels();
       void reset();
       void disableAll();
-
    } // only_change_at_initialization
+
+   bool isValidLevel(const std::string &log_level);
+   std::vector<std::string> getAllLevels();
 #endif
    bool logLevel(LEVELS level);
 } // g3
