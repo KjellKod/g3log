@@ -41,8 +41,8 @@ namespace g3 {
       }
 
 #ifdef G3_DYNAMIC_LOGGING
-      std::map<int, atomicbool> g_log_level_status = {{g3::kTraceValue, true}, {g3::kDebugValue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true}, {ERRORF.value, true}, {FATAL.value, true} };
-      std::unordered_map<std::string, int> g_log_level_name = {{TRACE.text, g3::kTraceValue}, {DEBUG.text, g3::kDebugValue}, {INFO.text, INFO.value }, {WARNING.text, WARNING.value}, {ERROR.text, ERROR.value}, {ERRORF.text, ERRORF.value}, {ERRORF.text,FATAL.value } };
+      std::map<int, atomicbool> g_log_level_status = {{g3::kTraceValue, true}, {g3::kDebugValue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true}, {FATAL.value, true} };
+      std::unordered_map<std::string, int> g_log_level_name = {{TRACE.text, g3::kTraceValue}, {DEBUG.text, g3::kDebugValue}, {INFO.text, INFO.value }, {WARNING.text, WARNING.value}, {ERROR.text, ERROR.value}, {FATAL.text, FATAL.value} };
 #endif
    } // internal
 
@@ -63,12 +63,12 @@ namespace g3 {
 
       void reset() {
          internal::g_log_level_status.clear();
-         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kTraceValue, true}, {g3::kDebugValue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true}, {ERRORF.value, true}, {FATAL.value, true}};
+         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kTraceValue, true}, {g3::kDebugValue, true}, {INFO.value, true}, {WARNING.value, true}, {ERROR.value, true}, {FATAL.value, true}};
       }
 
       void disableAll() {
          internal::g_log_level_status.clear();
-         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kTraceValue, false}, {g3::kDebugValue, false}, {INFO.value, false}, {WARNING.value, false}, {ERROR.value, false}, {ERRORF.value, false}, {FATAL.value, false}};
+         internal::g_log_level_status = std::map<int, atomicbool>{{g3::kTraceValue, false}, {g3::kDebugValue, false}, {INFO.value, false}, {WARNING.value, false}, {ERROR.value, false}, {FATAL.value, false}};
       }
 
       void setLogLevel(const std::string &log_level) {

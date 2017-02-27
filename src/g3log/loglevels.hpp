@@ -68,7 +68,6 @@ namespace g3 {
    static const int kInfoValue = 300;
    static const int kWarningValue = 500;
    static const int kErrorValue = 600;
-   static const int kErrorFatalValue = 700;
    static const int kFatalValue = 1000;
    static const int kInternalFatalValue = 2000;
 }
@@ -82,7 +81,6 @@ const LEVELS TRACE{g3::kTraceValue,{ "TRACE" } },
       INFO {g3::kInfoValue, {"INFO"}},
       WARNING {g3::kWarningValue, {"WARNING"}},
       ERROR {g3::kErrorValue, {"ERROR"}},
-      ERRORF {g3::kErrorFatalValue, {"FATAL_ERROR"}}, // logical fatal error
 
 
 // Insert here *any* extra logging levels that is needed. You can do so in your own source file
@@ -119,7 +117,7 @@ namespace g3 {
 #ifdef G3_DYNAMIC_LOGGING
    // Only safe if done at initialization in a single-thread context
    namespace only_change_at_initialization {
-      // Enable/Disable a log level {DEBUG,INFO,WARNING,ERROR,FATAL_ERROR,FATAL}
+      // Enable/Disable a log level {DEBUG,INFO,WARNING,ERROR,FATAL}
       void setLogLevel(LEVELS level, bool enabled_status);
       // Enable log level >= log_level
       void setLogLevel(const std::string &log_level);
