@@ -205,6 +205,9 @@ more details
 
 ```
 cd g3log
+cd 3rdParty/gtest
+unzip gtest-1.7.0.zip
+cd ../../
 mkdir build
 cd build
 ```
@@ -213,6 +216,15 @@ cd build
 ```
 cmake -DCMAKE_BUILD_TYPE=Release ..
 make 
+```
+## Installing On Linux
+```
+sudo make install
+```
+Alternative on Debian
+```
+make package
+sudo dpkg -i g3log-<version>-Linux.deb
 ```
 
 ## Building on Windows
