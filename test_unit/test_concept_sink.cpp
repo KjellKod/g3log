@@ -197,8 +197,8 @@ TEST(ConceptSink, OneHundredSinks_part2) {
    BoolPtrVector flags;
    IntPtrVector counts;
 
-   size_t NumberOfItems = 100;
-   for (size_t index = 0; index < NumberOfItems; ++index) {
+   int NumberOfItems = 100;
+   for (int index = 0; index < NumberOfItems; ++index) {
       flags.push_back(make_shared<atomic<bool>>(false));
       counts.push_back(make_shared<atomic<int>>(0));
    }
@@ -213,7 +213,7 @@ TEST(ConceptSink, OneHundredSinks_part2) {
       }
 
       // 100 logs
-   for (size_t index = 0; index < NumberOfItems; ++index) {
+   for (int index = 0; index < NumberOfItems; ++index) {
       LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       message.get()->write().append("Hello to 100 receivers :)");
       worker->save(message);

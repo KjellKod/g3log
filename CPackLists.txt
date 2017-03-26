@@ -6,8 +6,6 @@
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
-
-
  #  INSTALL( TARGETS g3logger_shared
  #           ARCHIVE
  #           LIBRARY DESTINATION lib/g3log
@@ -17,47 +15,73 @@
  #           DESTINATION include
  #           COMPONENT headers)
 
+SET(MAJOR_VERSION 1)
+IF (NOT DEFINED ${VERSION})
+   MESSAGE("Extracting git software version")
+   execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
+   SET(MINOR_VERSION ${GIT_VERSION})
+   SET(BUILD_NUMBER 0)
+   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}) 
+ENDIF()
+MESSAGE("Software Version: ${VERSION}")
 
-   SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output dir for libraries")
-   SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output dir for headers")
+SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output dir for libraries")
+SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output dir for headers")
 
-   INSTALL( TARGETS g3logger g3logger_shared
+IF (NOT DEFINED ${CPACK_INSTALL_PREFIX})
+   SET(CPACK_INSTALL_PREFIX "/usr/local")
+ENDIF()
+
+
+SET(CPACK_PACKAGE_NAME g3log)
+SET(CPACK_PACKAGE_VERSION_MAJOR ${MAJOR_VERSION})
+SET(CPACK_PACKAGE_VERSION_MINOR ${MINOR_VERSION})
+SET(CPACK_PACKAGE_VERSION_PATCH ${BUILD_NUMBER})
+SET(CPACK_PACKAGE_DESCRIPTION "Asynchronous 'crash safe' logger
+    License: http://unlicense.org
+    Repository: https://github.com/KjellKod/g3log")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_DESCRIPTION})
+SET(CPACK_PACKAGE_CONTACT "Kjell Hedstrom hedstrom@kjellkoc.cc")
+SET(CPACK_RESOURCE_FILE_LICENSE  ${g3log_SOURCE_DIR}/LICENSE)
+SET(CPACK_PACKAGE_VENDOR "KjellKod")
+
+
+INSTALL( TARGETS g3logger g3logger_shared
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             COMPONENT libraries)
 
-   INSTALL( FILES ${HEADER_FILES}
+INSTALL( FILES ${HEADER_FILES}
             DESTINATION ${CMAKE_INSTALL_HEADERDIR}/g3log
             COMPONENT headers)
 
-   INSTALL( FILES ${PROJECT_SOURCE_DIR}/cmake/G3LOGConfig.cmake
+INSTALL( FILES ${PROJECT_SOURCE_DIR}/cmake/G3LOGConfig.cmake
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/G3LOG)
 
-  SET(CPACK_COMPONENTS_ALL libraries headers)
-  SET(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "G3Log libraries")
-  SET(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "G3Log C++ headers")
+SET(CPACK_COMPONENTS_ALL libraries headers)
+SET(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "G3Log libraries")
+SET(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "G3Log C++ headers")
 
-  SET(CPACK_GENERATOR "DEB")
-  SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Kjell Hedstrom")
-
-
-set(CPACK_PACKAGE_VERSION_MAJOR "1")
-set(CPACK_PACKAGE_VERSION_MINOR "1")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
-set(CPACK_PACKAGE_DESCRIPTION "Asynchronous 'crash safe' logger")
-set(CPACK_PACKAGE_CONTACT "Kjell Hedstrom hedstrom@kjellkod.cc")
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+   SET(CPACK_GENERATOR "DEB")
+   SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "KjellKod - Kjell Hedstrom")
+   MESSAGE("\nTo create installation package: ")
+   MESSAGE("make package")
+ENDIF()
 
 
-MESSAGE("\n\nTo install on Ubuntu\t\t(after cmake with options && make)")
-MESSAGE("make package")
-
-MESSAGE("Headers installation directory: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}")
+MESSAGE("\nOption to install using 'sudo make install")
+MESSAGE("Installation locations: ")
+MESSAGE("====================")
+MESSAGE("Headers: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}/g3log")
 MESSAGE("Library installation directory: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-MESSAGE("For more information please see g3log/CpackLists.txt")
-MESSAGE("To install: sudo dpkg -i g3log-***Linux.deb\n\n")
-MESSAGE("To list installed files: sudo dpkg -L g3log\n\n")
-MESSAGE("To remove: sudo dpkg -r g3log\n\n")
-MESSAGE("To remove: sudo dpkg -r g3log\n\n")
+
+MESSAGE("For more information please see g3log/CPackLists.txt\n\n")
+MESSAGE("To install: sudo dpkg -i g3log-***Linux.deb")
+MESSAGE("To list package contents: sudo dpkg --contents g3log-***Linux.deb")
+
+MESSAGE("List content of the installed package: sudo dpkg -L g3log")
+MESSAGE("To remove: sudo dpkg -r g3log")
 
 #  NOTE: to change installation locations you can use the settings below
 #  examples:
