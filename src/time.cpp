@@ -99,10 +99,18 @@ namespace g3 {
       // 
       // Time stamps will later have system clock accuracy but relative times will have the precision
       // of the high resolution clock.   
-      thread_local const auto os =
-         time_point_cast<nanoseconds>(system_clock::now()).time_since_epoch() -
+      thread_local const auto os_system =
+         time_point_cast<nanoseconds>(system_clock::now()).time_since_epoch();
+      thread_local const auto os_high_resolution = 
          time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch();
-      
+      thread_local auto os = os_system - os_high_resolution;
+
+      // 32-bit system work-around, where apparenetly the os correction above could sometimes 
+      // become negative. This correction will only be done once per thread
+      if (os.count() < 0 ) {
+         os =  os_system;
+      }
+
       auto now_ns = (time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch() + os).count();
       const auto kNanos = 1000000000;
       ts ->tv_sec = now_ns / kNanos;
