@@ -52,7 +52,7 @@ ELSEIF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
        set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
        set(PLATFORM_LINK_LIBRIES dbghelp)
 
-       # ERROR level conflicts with windows.h
+       # deal with ERROR level conflicts with windows.h
        ADD_DEFINITIONS (-DNOGDI)
    ELSE()
        set(PLATFORM_LINK_LIBRIES rt)
@@ -73,7 +73,6 @@ ELSEIF(MSVC)
 endif()
 
 IF (MSVC OR MINGW)
-  set(PLATFORM_LINK_LIBRIES dbghelp)
       # VC11 bug: http://code.google.com/p/googletest/issues/detail?id=408
       #          add_definition(-D_VARIADIC_MAX=10)
       # https://github.com/anhstudios/swganh/pull/186/files
@@ -112,6 +111,8 @@ ENDIF()
       OUTPUT_NAME g3logger
       CLEAN_DIRECT_OUTPUT 1)
    target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
+   // Kjell is this really necessary?
+   // Ref CPackage test with and without it.
    target_include_directories(g3logger PUBLIC ${LOG_SRC})
    SET(G3LOG_LIBRARY g3logger)
 
