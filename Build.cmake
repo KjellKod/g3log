@@ -111,8 +111,7 @@ ENDIF()
       OUTPUT_NAME g3logger
       CLEAN_DIRECT_OUTPUT 1)
    target_link_libraries(g3logger ${PLATFORM_LINK_LIBRIES})
-   // Kjell is this really necessary?
-   // Ref CPackage test with and without it.
+   # Kjell: This is likely not necessary, except for Windows?
    target_include_directories(g3logger PUBLIC ${LOG_SRC})
    SET(G3LOG_LIBRARY g3logger)
 

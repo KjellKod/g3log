@@ -26,7 +26,6 @@ make -j
  
 
 
-
 #if [[ $CXX == *"g++"* ]]
 #then
 #   echo "Testing with g++"
