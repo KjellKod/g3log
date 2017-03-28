@@ -8,6 +8,7 @@ Most of the API that you need for using g3log is described in this readme. For m
   * custom logging levels
 * Sink [creation](#sink_creation) and utilization 
 * LOG [flushing](#log_flushing)
+* G3log and G3Sinks [usage example](#g3log-and-sink-usage-code-example)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
   * <strike>[TOWRITE: Windows](#fatal_handling_windows)</strike>
@@ -38,7 +39,7 @@ If the ```<boolean-expression>``` evaluates to false then the the message for th
 (\* * ```CHECK_F(<boolean-expression>, ...);``` was the the previous API for printf-like CHECK. It is still kept for backwards compatability but is exactly the same as ```CHECKF``` *)
 
 
-## Logging levels ```
+## Logging levels 
  The default logging levels are ```DEBUG```, ```INFO```, ```WARNING``` and ```FATAL``` (see FATAL usage [above](#fatal_logging)). The logging levels are defined in [loglevels.hpp](src/g3log/loglevels.hpp).
 
  For some windows framework there is a clash with the ```DEBUG``` logging level. One of the CMake [Build options](#build_options) can be used to then change offending default level from ```DEBUG``` TO ```DBUG```.
@@ -117,6 +118,45 @@ At a discovered fatal event (SIGSEGV et.al) all enqueued logs will be flushed to
 
 A programmatically triggered abrupt process exit such as a call to   ```exit(0)``` will of course not get the enqueued log entries flushed. Similary  a bug that does not trigger a fatal signal but a process exit will also not get the enqueued log entries flushed.  G3log can catch several fatal crashes and it deals well with RAII exits but magic is so far out of its' reach.
 
+# G3log and Sink Usage Code Example
+Example usage where a [logrotate sink (g3sinks)](https://github.com/KjellKod/g3sinks) is added. In the example it is shown how the logrotate API is called. The logrotate limit is changed from the default to instead be 10MB. The limit is changed by calling the sink handler which passes the function call through to the actual logrotate sink object.
+```
+
+// main.cpp
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.h>
+#include <g3sinks/logrotate.hpp>
+#include <g3log/std2_make_unique.hpp
+
+int main(int argc, char**argv) {
+   using namespace g3;
+   std::unique_ptr<LogWorker> logworker{ LogWorker::createLogWorker() };
+   auto sinkHandle = logworker->addSink(std2::make_unique<LogRotate>(),
+                                          &LogRotate::save);
+   
+   // initialize the logger before it can receive LOG calls
+   initializeLogging(logworker.get());            
+            
+   // You can call in a thread safe manner public functions on the logrotate sink
+   // The call is asynchronously executed on your custom sink.
+   const int k10MBInBytes = 10 * 1024 * 1024;
+   std::future<void> received = sinkHandle->call(&LogRotate::setMaxLogSize, k10MBInBytes);
+   
+   // Run the main part of the application. This can be anything of course, in this example
+   // we'll call it "RunApplication". Once this call exits we are in shutdown mode
+   RunApplication();
+
+   // If the LogWorker is initialized then at scope exit the g3::shutDownLogging() will be 
+   // called automatically. 
+   //  
+   // This is important since it protects from LOG calls from static or other entities that will go out of
+   // scope at a later time. 
+   //
+   // It can also be called manually if for some reason your setup is different then the one highlighted in
+   // this example
+   g3::shutDownLogging();
+}
+```
 
 
 ## Fatal handling
