@@ -8,7 +8,7 @@ Most of the API that you need for using g3log is described in this readme. For m
   * custom logging levels
 * Sink [creation](#sink_creation) and utilization 
 * LOG [flushing](#log_flushing)
-* G3log and G3Sinks [usage example](#g3log-and-g3sinks-usage-example)
+* G3log and G3Sinks [usage example](#g3log-and-sink-usage-code-example)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
   * <strike>[TOWRITE: Windows](#fatal_handling_windows)</strike>
