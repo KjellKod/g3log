@@ -168,17 +168,190 @@ TEST(Message, localtime_formatted) {
    ts.tv_nsec = 123;
    auto format = g3::localtime_formatted(ts, g3::internal::date_formatted); // %Y/%m/%d
    EXPECT_EQ("2016/08/09", format);
-   
+
    auto us_format = g3::localtime_formatted(ts, g3::internal::time_formatted); // "%H:%M:%S %f6";
    EXPECT_EQ("22:58:45 000000", us_format);
-   
-   auto ns_format = g3::localtime_formatted(ts, "%H:%M:%S %f"); 
+
+   auto ns_format = g3::localtime_formatted(ts, "%H:%M:%S %f");
    EXPECT_EQ("22:58:45 000000123", ns_format);
-   
+
    ts.tv_nsec = 1234000;
-   auto ms_format = g3::localtime_formatted(ts, "%H:%M:%S %f3"); 
+   auto ms_format = g3::localtime_formatted(ts, "%H:%M:%S %f3");
    EXPECT_EQ("22:58:45 001", ms_format);
 }
 #endif
 
+
+#ifdef G3_DYNAMIC_LOGGING
+namespace {
+   using LevelsContainer = std::map<int, g3::LoggingLevel>;
+   const LevelsContainer g_test_log_level_defaults = {
+      {g3::kDebugValue, {DEBUG}},
+      {INFO.value, {INFO}},
+      {WARNING.value, {WARNING}},
+      {FATAL.value, {FATAL}}
+   };
+
+   const LevelsContainer g_test_all_disabled = {
+      {g3::kDebugValue, {DEBUG, false}},
+      {INFO.value, {INFO, false}},
+      {WARNING.value, {WARNING, false}},
+      {FATAL.value, {FATAL, false}}
+   };
+
+
+   bool mapCompare (LevelsContainer const& lhs, LevelsContainer const& rhs) {
+      auto pred = [] (auto a, auto b) {
+         return (a.first == b.first) &&
+                (a.second == b.second);
+      };
+
+      return lhs.size() == rhs.size()
+             && std::equal(lhs.begin(), lhs.end(), rhs.begin(), pred);
+   }
+
+
+
+} // anonymous
+TEST(Level, Default) {
+   g3::only_change_at_initialization::reset();
+   auto defaults = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_EQ(defaults.size(), g_test_log_level_defaults.size());
+   EXPECT_TRUE(mapCompare(defaults, g_test_log_level_defaults));
+}
+
+TEST(Level, DefaultChanged) {
+   g3::only_change_at_initialization::reset();
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   g3::only_change_at_initialization::setLogLevel(INFO, false);
+   auto defaults = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_EQ(defaults.size(), g_test_log_level_defaults.size());
+   EXPECT_FALSE(mapCompare(defaults, g_test_log_level_defaults));
+
+   const LevelsContainer defaultsWithInfoChangged = {
+      {g3::kDebugValue, {DEBUG, true}},
+      {INFO.value, {INFO, false}},
+      {WARNING.value, {WARNING, true}},
+      {FATAL.value, {FATAL, true}}
+   };
+   EXPECT_TRUE(mapCompare(defaults, defaultsWithInfoChangged));
+}
+
+TEST(Level, Reset) {
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   g3::only_change_at_initialization::disableAll();
+   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_TRUE(mapCompare(all_levels, g_test_all_disabled));
+
+   g3::only_change_at_initialization::reset();
+   all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_TRUE(mapCompare(all_levels, g_test_log_level_defaults));
+
+
+
+}
+
+
+
+TEST(Level, AllDisabled) {
+   g3::only_change_at_initialization::reset();
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+
+   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_EQ(all_levels.size(), g_test_all_disabled.size());
+   EXPECT_FALSE(mapCompare(all_levels, g_test_all_disabled));
+
+   g3::only_change_at_initialization::disableAll();
+   all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_TRUE(mapCompare(all_levels, g_test_all_disabled));
+}
+
+TEST(Level, StepWiseDisableAll) {
+   g3::only_change_at_initialization::reset();
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   LevelsContainer changing_levels = {
+      {g3::kDebugValue, {DEBUG, true}},
+      {INFO.value, {INFO, true}},
+      {WARNING.value, {WARNING, true}},
+      {FATAL.value, {FATAL, true}}
+   };
+
+   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_TRUE(mapCompare(all_levels, g_test_log_level_defaults));
+
+   size_t counter = 0;
+   for (auto& lvl : changing_levels) {
+      g3::only_change_at_initialization::setLogLevel(lvl.second.level);
+      all_levels = g3::only_change_at_initialization::getAllLevels();
+
+      ASSERT_TRUE(mapCompare(all_levels, changing_levels)) <<
+            "counter: " << counter << "\nsystem:\n" <<
+            g3::only_change_at_initialization::printLevels(all_levels) <<
+            "\nexpected:\n" <<
+            g3::only_change_at_initialization::printLevels(changing_levels);
+
+      ++counter;
+      if (counter != changing_levels.size()) {
+         // for next round this level will be disabled
+         lvl.second.status = false;
+      }
+   }
+
+
+   // in the end all except the last should be disabled
+   auto mostly_disabled = g_test_all_disabled;
+   mostly_disabled[FATAL.value].status = true;
+   EXPECT_TRUE(mapCompare(changing_levels, mostly_disabled));
+
+   all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_TRUE(mapCompare(all_levels, mostly_disabled)) <<
+         "\nsystem:\n" <<
+         g3::only_change_at_initialization::printLevels(all_levels) <<
+         "\nexpected:\n" <<
+         g3::only_change_at_initialization::printLevels(mostly_disabled);
+}
+
+TEST(Level, Print) {
+   g3::only_change_at_initialization::reset();
+   std::string expected = std::string{"name: DEBUG level: 100 status: 1\n"}
+                          + "name: INFO level: 300 status: 1\n"
+                          + "name: WARNING level: 500 status: 1\n"
+                          + "name: FATAL level: 1000 status: 1\n";
+   EXPECT_EQ(g3::only_change_at_initialization::printLevels(), expected);
+}
+
+TEST(Level, AddOneEnabled) {
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+
+   LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
+   g3::only_change_at_initialization::setLogLevel(MYINFO, true);
+
+   auto modified = g_test_log_level_defaults;
+   modified[MYINFO.value] = MYINFO;
+
+   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_TRUE(mapCompare(modified, all_levels)) << "\nsystem:\n" <<
+         g3::only_change_at_initialization::printLevels(all_levels) <<
+         "\nexpected:\n" <<
+         g3::only_change_at_initialization::printLevels(modified);
+
+}
+
+
+#endif // G3_DYNAMIC_LOGGING
 

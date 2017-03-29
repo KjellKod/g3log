@@ -53,8 +53,8 @@ TEST(Initialization, No_Logger_Initialized___LevelsAreONByDefault) {
    EXPECT_TRUE(g3::logLevel(INFO));
    EXPECT_TRUE(g3::logLevel(WARNING));
    EXPECT_TRUE(g3::logLevel(FATAL));
-   EXPECT_EQ(DEBUG.value, 0);
-   EXPECT_EQ(INFO.value, 100);
+   EXPECT_EQ(DEBUG.value, 100);
+   EXPECT_EQ(INFO.value, 300);
    EXPECT_EQ(WARNING.value, 500);
    EXPECT_EQ(FATAL.value, 1000);
    EXPECT_EQ(g3::internal::CONTRACT.value, 2000);
