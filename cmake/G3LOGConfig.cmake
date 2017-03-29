@@ -11,10 +11,13 @@
 #
 # ``G3LOG_INCLUDE_DIRS``
 #   where to find g3log.hpp, etc.
+#
 # ``G3LOG_LIBRARIES``
 #   the libraries to link against to use libg3logger.
+#
 #   that includes libg3logger library files.
 # ``G3LOG_FOUND``
+#
 #   If false, do not try to use G3LOG.
 include(FindPackageHandleStandardArgs)
 find_path(G3LOG_INCLUDE_DIR 
