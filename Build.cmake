@@ -15,7 +15,7 @@ include_directories(${LOG_SRC})
 SET(ACTIVE_CPP0xx_DIR "Release")
 
 #cmake -DCMAKE_CXX_COMPILER=clang++ ..
-  # WARNING: If Clang for Linux does not work with full C++11 support it might be your
+  # WARNING: If Clang for Linux does not work with full c++14 support it might be your
   # installation that is faulty. When I tested Clang on Ubuntu I followed the following
   # description
   #  1) http://kjellkod.wordpress.com/2013/09/23/experimental-g3log-with-clang/
@@ -23,7 +23,7 @@ SET(ACTIVE_CPP0xx_DIR "Release")
 IF (${CMAKE_CXX_COMPILER_ID} MATCHES ".*Clang")
    MESSAGE("")
    MESSAGE("cmake for Clang ")
-   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++11 -Wunused -D_GLIBCXX_USE_NANOSLEEP")
+   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -std=c++14 -Wunused -D_GLIBCXX_USE_NANOSLEEP")
    IF (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libstdc++ -pthread")
    ELSE()
@@ -47,16 +47,16 @@ IF (${CMAKE_CXX_COMPILER_ID} MATCHES ".*Clang")
 ELSEIF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
    MESSAGE("cmake for GCC ")
    IF (APPLE)
-       set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP")
+       set(CMAKE_CXX_FLAGS   "${CMAKE_CXX_FLAGS} -Wall -Wunused -std=c++14  -pthread -D_GLIBCXX_USE_NANOSLEEP")
    ELSEIF (MINGW)
-       set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wunused -std=c++11  -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
+       set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wall -Wunused -std=c++14  -pthread -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
        set(PLATFORM_LINK_LIBRIES dbghelp)
 
        # deal with ERROR level conflicts with windows.h
        ADD_DEFINITIONS (-DNOGDI)
    ELSE()
        set(PLATFORM_LINK_LIBRIES rt)
-       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -rdynamic -Wunused -std=c++11 -pthread -lrt -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
+       set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -rdynamic -Wunused -std=c++14 -pthread -lrt -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
    ENDIF()
 ELSEIF(MSVC)
    set(PLATFORM_LINK_LIBRIES dbghelp)
