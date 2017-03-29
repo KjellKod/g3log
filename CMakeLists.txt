@@ -74,14 +74,6 @@ endif()
    INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
 
 
-   # =========================================================================
-   # G3 Macro definitions in Options.cmake are written to file
-   #    this avoids having to re-state your definitions in your source code
-   #    or compile options
-   #==========================================================================
-   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
-
-   option (ADD_BUILD_WIN_SHARED  "Build shared library on Windows" OFF)
 
    # =========================================================================
    # G3LOG BUILD
@@ -113,6 +105,12 @@ endif()
    INCLUDE (${g3log_SOURCE_DIR}/test_unit/Test.cmake)
 
 
+   # =========================================================================
+   # G3 Macro definitions in Options.cmake are written to file
+   #    this avoids having to re-state your definitions in your source code
+   #    or compile options
+   #==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
 
 
 
