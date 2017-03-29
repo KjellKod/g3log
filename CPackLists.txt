@@ -6,7 +6,7 @@
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
- #  INSTALL( TARGETS g3logger_shared
+ #  INSTALL( TARGETS g3loggerd
  #           ARCHIVE
  #           LIBRARY DESTINATION lib/g3log
  #           COMPONENT libraries)
@@ -15,15 +15,6 @@
  #           DESTINATION include
  #           COMPONENT headers)
 
-SET(MAJOR_VERSION 1)
-IF (NOT DEFINED ${VERSION})
-   MESSAGE("Extracting git software version")
-   execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
-   SET(MINOR_VERSION 2)
-   SET(BUILD_NUMBER ${GIT_VERSION})
-   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}) 
-ENDIF()
-MESSAGE("Software Version: ${VERSION}")
 
 
 SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output dir for libraries")
@@ -48,7 +39,7 @@ SET(CPACK_PACKAGE_VENDOR "KjellKod")
 SET(CMAKE_INSTALL_HEADERDIR ${CMAKE_INSTALL_HEADERDIR}/g3log)
 
 
-INSTALL( TARGETS g3logger g3logger_shared
+INSTALL( TARGETS g3logger
             ARCHIVE DESTINATION ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}
             LIBRARY DESTINATION ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}
             COMPONENT libraries)

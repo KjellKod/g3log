@@ -67,6 +67,17 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 
+SET(MAJOR_VERSION 1)
+IF (NOT DEFINED ${VERSION})
+   MESSAGE("Extracting git software version")
+   execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
+   SET(MINOR_VERSION 2)
+   SET(BUILD_NUMBER ${GIT_VERSION})
+   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}) 
+ENDIF()
+MESSAGE("Software Version: ${VERSION}")
+
+
 
    # ============================================================================
    # G3LOG OPTIONAL FEATURES
