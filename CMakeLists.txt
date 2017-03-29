@@ -46,7 +46,7 @@
 #
 # ============================================================================
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required (VERSION 3.1)
 ENABLE_LANGUAGE(CXX)
 
 if(NOT CMAKE_BUILD_TYPE)
