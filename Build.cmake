@@ -126,8 +126,10 @@ ENDIF()
       ENDIF()
    ENDIF()
 
-   target_link_libraries(${G3LOG_LIBRARY} ${PLATFORM_LINK_LIBRIES})
+
+   TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} ${PLATFORM_LINK_LIBRIES})
+
    # Kjell: This is likely not necessary, except for Windows?
-   target_include_directories(${G3LOG_LIBRARY} PUBLIC ${LOG_SRC})
+   TARGET_INCLUDE_DIRECTORIES(${G3LOG_LIBRARY} PUBLIC ${LOG_SRC})
 
 
