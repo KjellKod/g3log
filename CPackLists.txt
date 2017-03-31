@@ -6,7 +6,7 @@
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
- #  INSTALL( TARGETS g3loggerd
+ #  INSTALL( TARGETS g3logger_shared
  #           ARCHIVE
  #           LIBRARY DESTINATION lib/g3log
  #           COMPONENT libraries)
