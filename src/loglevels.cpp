@@ -38,10 +38,15 @@ namespace g3 {
       }
 
 
-      void setLogLevel(LEVELS enabledFrom) {
+      void addLogLevel(LEVELS level) {
+         setLogLevel(level, true);
+      }
+
+
+      void setHighestLogLevel(LEVELS enabledFrom) {
          auto it = internal::g_log_levels.find(enabledFrom.value);
          if (it == internal::g_log_levels.end()) {
-            return;
+            addLogLevel(enabledFrom);
          }
          for (auto& v : internal::g_log_levels) {
             if (v.first < enabledFrom.value) {
@@ -77,6 +82,20 @@ namespace g3 {
       std::map<int, g3::LoggingLevel> getAllLevels() {
          return internal::g_log_levels;
       }
+
+      //enum class level_status {Absent, Enabled, Disabled};
+      level_status LevelStatus(LEVELS level) {
+         const auto it = internal::g_log_levels.find(level.value);
+         if (internal::g_log_levels.end() == it) {
+            return level_status::Absent;
+         }
+
+         return (it->second.status.get().load() ? level_status::Enabled : level_status::Disabled);
+
+      }
+
+
+
    } // only_change_at_initialization
 
 #endif

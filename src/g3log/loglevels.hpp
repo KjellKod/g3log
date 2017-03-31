@@ -149,8 +149,16 @@ namespace g3 {
       // If the logging level is NEW it will also ADD the logging level to the set of logging levels.
       void setLogLevel(LEVELS level, bool enabled_status);
 
-      /// Enable log level >= log_level
-      void setLogLevel(LEVELS level);
+      /// for a custom level, 'MYL_LEVEL', previously not added the following is equivalent
+      /// setLogLevel(myLevel, true)
+      void addLogLevel(LEVELS level);
+
+      /// Enable log level >= log_level. 
+      /// log levels below will be disabled
+      /// log levels equal or higher will be enabled.
+      /// NOTE: If the level didn't exist prior then it will be added. This is similar to how
+      ///       'setLogLevel' works
+      void setHighestLogLevel(LEVELS level);
 
       /// print all levels with their disabled or enabled status
       std::string printLevels(std::map<int, g3::LoggingLevel> levelsToPrint);
@@ -170,6 +178,10 @@ namespace g3 {
 
       /// Snapshot view of the current logging levels' status
       std::map<int, g3::LoggingLevel> getAllLevels();
+
+      enum class level_status {Absent, Enabled, Disabled};
+      level_status LevelStatus(LEVELS level);  
+
    } // only_change_at_initialization
 
 #endif

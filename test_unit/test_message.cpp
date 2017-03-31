@@ -275,7 +275,7 @@ TEST(Level, AllDisabled) {
    EXPECT_TRUE(mapCompare(all_levels, g_test_all_disabled));
 }
 
-TEST(Level, StepWiseDisableAll) {
+TEST(Level, setHighestLogLevel_StepWiseDisableAll) {
    g3::only_change_at_initialization::reset();
    std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
       g3::only_change_at_initialization::reset();
@@ -293,7 +293,7 @@ TEST(Level, StepWiseDisableAll) {
 
    size_t counter = 0;
    for (auto& lvl : changing_levels) {
-      g3::only_change_at_initialization::setLogLevel(lvl.second.level);
+      g3::only_change_at_initialization::setHighestLogLevel(lvl.second.level);
       all_levels = g3::only_change_at_initialization::getAllLevels();
 
       ASSERT_TRUE(mapCompare(all_levels, changing_levels)) <<
@@ -332,7 +332,7 @@ TEST(Level, Print) {
    EXPECT_EQ(g3::only_change_at_initialization::printLevels(), expected);
 }
 
-TEST(Level, AddOneEnabled) {
+TEST(Level, AddOneEnabled_option1) {
    std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
       g3::only_change_at_initialization::reset();
    });
@@ -352,6 +352,84 @@ TEST(Level, AddOneEnabled) {
 
 }
 
+TEST(Level, AddOneEnabled_option2) {
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+
+   LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
+   g3::only_change_at_initialization::addLogLevel(MYINFO);
+
+   auto modified = g_test_log_level_defaults;
+   modified[MYINFO.value] = MYINFO;
+
+   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   EXPECT_TRUE(mapCompare(modified, all_levels)) << "\nsystem:\n" <<
+         g3::only_change_at_initialization::printLevels(all_levels) <<
+         "\nexpected:\n" <<
+         g3::only_change_at_initialization::printLevels(modified);
+
+}
+
+
+
+
+TEST(Level, Addlevel_using_addLevel) {
+      std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
+   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+
+   g3::only_change_at_initialization::addLogLevel(MYINFO);
+   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);
+}
+
+TEST(Level, Addlevel_using_setLogLevel_disabled) {
+      std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
+   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+
+   g3::only_change_at_initialization::setLogLevel(MYINFO, false);
+   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Disabled);   
+}
+
+TEST(Level, Addlevel_using_setLogLevel_enabled) {
+      std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
+   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+
+   g3::only_change_at_initialization::setLogLevel(MYINFO, true);
+   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);      
+}
+
+TEST(Level, Addlevel_using_setHighestLogLevel) {
+         std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
+   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+
+   g3::only_change_at_initialization::setHighestLogLevel(MYINFO);
+   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);   
+}
 
 #endif // G3_DYNAMIC_LOGGING
 
