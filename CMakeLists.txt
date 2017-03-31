@@ -48,7 +48,11 @@
 
 cmake_minimum_required (VERSION 3.1)
 ENABLE_LANGUAGE(CXX)
-set(CMAKE_BUILD_TYPE Release)
+
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type, one of: Release, Debug" FORCE)
+endif()
+message("Build type: ${CMAKE_BUILD_TYPE}")
 
 project (g3log)
 
@@ -63,6 +67,17 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 
+SET(MAJOR_VERSION 1)
+IF (NOT DEFINED ${VERSION})
+   MESSAGE("Extracting git software version")
+   execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
+   SET(MINOR_VERSION 3)
+   SET(BUILD_NUMBER ${GIT_VERSION})
+   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}) 
+ENDIF()
+MESSAGE("Software Version: ${VERSION}")
+
+
 
    # ============================================================================
    # G3LOG OPTIONAL FEATURES
@@ -70,14 +85,6 @@ endif()
    INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
 
 
-   # =========================================================================
-   # G3 Macro definitions in Options.cmake are written to file
-   #    this avoids having to re-state your definitions in your source code
-   #    or compile options
-   #==========================================================================
-   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
-
-   option (ADD_BUILD_WIN_SHARED  "Build shared library on Windows" OFF)
 
    # =========================================================================
    # G3LOG BUILD
@@ -109,6 +116,12 @@ endif()
    INCLUDE (${g3log_SOURCE_DIR}/test_unit/Test.cmake)
 
 
+   # =========================================================================
+   # G3 Macro definitions in Options.cmake are written to file
+   #    this avoids having to re-state your definitions in your source code
+   #    or compile options
+   #==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
 
 
 

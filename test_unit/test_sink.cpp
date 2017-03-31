@@ -187,7 +187,7 @@ TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    std::atomic<bool> keepRunning{true};
 
    std::vector<std::thread> threads;
-   const size_t numberOfThreads = 100;
+   const size_t numberOfThreads = std::thread::hardware_concurrency() * 4;
    threads.reserve(numberOfThreads);
 
    g3::internal::shutDownLogging();

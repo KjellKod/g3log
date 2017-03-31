@@ -20,11 +20,35 @@
 #
 #   If false, do not try to use G3LOG.
 include(FindPackageHandleStandardArgs)
-find_path(G3LOG_INCLUDE_DIR g3log/g3log.hpp)
+find_path(G3LOG_INCLUDE_DIR 
+         g3log/active.hpp
+         g3log/atomicbool.hpp
+         g3log/crashhandler.hpp
+         g3log/filesink.hpp
+         g3log/future.hpp
+         g3log/g3log.hpp
+         g3log/generated_definitions.hpp
+         g3log/logcapture.hpp
+         g3log/loglevels.hpp
+         g3log/logmessage.hpp
+         g3log/logworker.hpp
+         g3log/moveoncopy.hpp
+         g3log/shared_queue.hpp
+         g3log/sinkhandle.hpp
+         g3log/sink.hpp
+         g3log/sinkwrapper.hpp
+         g3log/stacktrace_windows.hpp
+         g3log/std2_make_unique.hpp
+         g3log/stlpatch_future.hpp
+         g3log/time.hpp
+)
+
 find_library(G3LOG_LIBRARY
             NAMES libg3logger g3logger)
+
 find_package_handle_standard_args(G3LOG  DEFAULT_MSG
             G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
+
 mark_as_advanced(G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
 set(G3LOG_LIBRARIES ${G3LOG_LIBRARY})
 set(G3LOG_INCLUDE_DIRS ${G3LOG_INCLUDE_DIR})
