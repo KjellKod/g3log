@@ -68,7 +68,7 @@ endif()
 
 
 SET(MAJOR_VERSION 1)
-IF (NOT DEFINED ${VERSION})
+IF (${VERSION}.x STREQUAL ".x")
    MESSAGE("Extracting git software version")
    execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION)
    SET(MINOR_VERSION 3)
