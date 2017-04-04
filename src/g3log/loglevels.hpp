@@ -145,44 +145,50 @@ namespace g3 {
    // Only safe if done at initialization in a single-thread context
    namespace only_change_at_initialization {
 
-      // This sets the logging level status enabled or disabled for a logging level.
-      // If the logging level is NEW it will also ADD the logging level to the set of logging levels.
-      void setLogLevel(LEVELS level, bool enabled_status);
+      /// add a custom level - enabled or disabled
+      void addLogLevel(LEVELS level, bool enabled);
 
-      /// for a custom level, 'MYL_LEVEL', previously not added the following is equivalent
-      /// setLogLevel(myLevel, true)
+      /// add a custom level - enabled
       void addLogLevel(LEVELS level);
-
-      /// Enable log level >= log_level. 
-      /// log levels below will be disabled
-      /// log levels equal or higher will be enabled.
-      /// NOTE: If the level didn't exist prior then it will be added. This is similar to how
-      ///       'setLogLevel' works
-      void setHighestLogLevel(LEVELS level);
-
-      /// print all levels with their disabled or enabled status
-      std::string printLevels(std::map<int, g3::LoggingLevel> levelsToPrint);
-
-      /// print snapshot of system levels with their
-      /// disabled or enabled status
-      std::string printLevels();
 
       /// reset all default logging levels to enabled
       /// remove any added logging levels so that the only ones left are
       ///  {DEBUG,INFO,WARNING,ERROR,FATAL}
       void reset();
+   } // only_change_at_initialization
+
+
+   namespace log_levels {
+      /// Enable log level >= log_level. 
+      /// log levels below will be disabled
+      /// log levels equal or higher will be enabled.
+      void setHighest(LEVELS level);
+
+      void disable(LEVELS level);
+      void enable(LEVELS level);
 
       /// disable all logging levels
       /// WARNING: This will also disable FATAL events from being logged
       void disableAll();
 
+      /// enable all logging levels
+      void enableAll();
+
+
+     /// print all levels with their disabled or enabled status
+     std::string to_string(std::map<int, g3::LoggingLevel> levelsToPrint);
+
+      /// print snapshot of system levels with their
+      /// disabled or enabled status
+      std::string to_string();
+
+
       /// Snapshot view of the current logging levels' status
-      std::map<int, g3::LoggingLevel> getAllLevels();
+      std::map<int, g3::LoggingLevel> getAll();
 
-      enum class level_status {Absent, Enabled, Disabled};
-      level_status LevelStatus(LEVELS level);  
-
-   } // only_change_at_initialization
+      enum class status {Absent, Enabled, Disabled};
+      status getStatus(LEVELS level);  
+} // log_levels
 
 #endif
    /// Enabled status for the given logging level

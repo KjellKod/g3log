@@ -168,11 +168,13 @@ TEST(ConceptSink, IntCall__TwoCalls_ExpectingTwoAdd) {
 
 
  
-void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
+void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter, std::atomic<size_t>* startup_counter) {
+   ++(*startup_counter);
    while(doWhileTrue->load()) {
       LOG(INFO) << "Calling from #" << counter;
-      std::this_thread::yield();
    }
+   std::cout << "\n#" << counter << " is finished "<< std::endl;
+   --(*startup_counter);
 } 
 
 
@@ -185,21 +187,26 @@ TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
 
 TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    std::atomic<bool> keepRunning{true};
+   std::atomic<size_t> atomic_counter{0};
 
    std::vector<std::thread> threads;
    const size_t numberOfThreads = std::thread::hardware_concurrency() * 4;
    threads.reserve(numberOfThreads);
 
    g3::internal::shutDownLogging();
-    
+    {
    // Avoid annoying printouts at log shutdown
    stringstream cerr_buffer; 
    testing_helpers::ScopedOut guard1(std::cerr, &cerr_buffer);
 
    // these threads will continue to write to a logger
    // while the receiving logger is instantiated, and destroyed repeatedly
-   for (size_t caller = 0; caller < numberOfThreads; ++ caller) {
-      threads.push_back(std::thread(DoLogCalls, &keepRunning, caller));
+   size_t caller = 0;
+   for (; caller < numberOfThreads; ++caller) {
+      threads.push_back(std::thread(DoLogCalls, &keepRunning, caller, &atomic_counter));
+      while(atomic_counter.load() == caller) {
+        std::this_thread::yield(); // wait until the thread is actually running
+      }
    }
 
 
@@ -219,11 +226,17 @@ TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
       while(atomicCounter.load() < 10) {
          std::this_thread::sleep_for(std::chrono::milliseconds(5));
       }
+      g3::internal::shutDownLogging();
    } // g3log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
-
-
+   std::cout << "\nlog cycles are ended" << std::endl;
+  
   // exit the threads
-  keepRunning = false;
+  std::ostringstream oss;
+  oss << "number of threads: " << caller << ", started: " << atomic_counter.load() << std::endl;
+  std::cout << oss.str();
+  keepRunning.store(false);
+  }
+
   for (auto& t : threads) {
     t.join();
   }
