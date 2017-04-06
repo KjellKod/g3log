@@ -167,11 +167,8 @@ namespace g3 {
       void disable(LEVELS level);
       void enable(LEVELS level);
 
-      /// disable all logging levels
       /// WARNING: This will also disable FATAL events from being logged
       void disableAll();
-
-      /// enable all logging levels
       void enableAll();
 
 
