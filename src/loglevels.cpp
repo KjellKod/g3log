@@ -64,8 +64,7 @@ namespace g3 {
          }
       }
 
-      // basically the same as the 'setLevel' but for clarity
-      // and without any CHECKs for error for illegal level
+
       void set(LEVELS level, bool enabled) {
          auto it = internal::g_log_levels.find(level.value);
          if (it != internal::g_log_levels.end()) {
