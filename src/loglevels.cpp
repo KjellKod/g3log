@@ -39,37 +39,40 @@ namespace g3 {
 
 
       void addLogLevel(LEVELS level) {
-         setLogLevel(level, true);
+         addLogLevel(level, true);
       }
 
       void reset() {
          g3::internal::g_log_levels = g3::internal::g_log_level_defaults;
       }
-} // only_change_at_initialization
+   } // only_change_at_initialization
 
 
-namespace log_levels {
+   namespace log_levels {
 
       void setHighest(LEVELS enabledFrom) {
          auto it = internal::g_log_levels.find(enabledFrom.value);
-         CHECK(it != internal::g_log_levels.end());
-         for (auto& v : internal::g_log_levels) {
-            if (v.first < enabledFrom.value) {
-               disable(v.second.level);
+         if (it != internal::g_log_levels.end()) {
+            for (auto& v : internal::g_log_levels) {
+               if (v.first < enabledFrom.value) {
+                  disable(v.second.level);
+               } else {
+                  enable(v.second.level);
+               }
+
             }
          }
       }
 
-      // basically the same as the 'setLevel' but for clarity 
+      // basically the same as the 'setLevel' but for clarity
       // and without any CHECKs for error for illegal level
       void set(LEVELS level, bool enabled) {
          auto it = internal::g_log_levels.find(level.value);
          if (it != internal::g_log_levels.end()) {
-            bool disabled = false;
-            internal::g_log_levels[level.value] = {lvl, disabled};
+            internal::g_log_levels[level.value] = {level, enabled};
          }
       }
-      
+
 
       void disable(LEVELS level) {
          set(level, false);
@@ -114,10 +117,10 @@ namespace log_levels {
       status getStatus(LEVELS level) {
          const auto it = internal::g_log_levels.find(level.value);
          if (internal::g_log_levels.end() == it) {
-            return level_status::Absent;
+            return status::Absent;
          }
 
-         return (it->second.status.get().load() ? level_status::Enabled : level_status::Disabled);
+         return (it->second.status.get().load() ? status::Enabled : status::Disabled);
 
       }
    } // log_levels

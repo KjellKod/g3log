@@ -226,7 +226,7 @@ TEST(Level, DefaultChanged_only_change_at_initialization) {
       g3::only_change_at_initialization::reset();
    });
 
-   g3::only_change_at_initialization::setLogLevel(INFO, false);
+   g3::only_change_at_initialization::addLogLevel(INFO, false);
    auto defaults = g3::log_levels::getAll();
    EXPECT_EQ(defaults.size(), g_test_log_level_defaults.size());
    EXPECT_FALSE(mapCompare(defaults, g_test_log_level_defaults));
@@ -295,6 +295,79 @@ TEST(Level, AllDisabled) {
    EXPECT_TRUE(mapCompare(all_levels, g_test_all_disabled));
 }
 
+
+TEST(Level, setHighestLogLevel_high_end) {
+   g3::only_change_at_initialization::reset();
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+
+      g3::log_levels::enableAll();
+      g3::log_levels::disable(FATAL);
+      g3::log_levels::setHighest(FATAL);      
+
+
+      LevelsContainer expected = {
+      {g3::kDebugValue, {DEBUG, false}},
+      {INFO.value, {INFO, false}},
+      {WARNING.value, {WARNING, false}},
+      {FATAL.value, {FATAL, true}}
+   };
+
+   auto all_levels = g3::log_levels::getAll();
+   EXPECT_TRUE(mapCompare(all_levels, expected)) << g3::log_levels::to_string();
+}
+
+
+TEST(Level, setHighestLogLevel_low_end) {
+   g3::only_change_at_initialization::reset();
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+
+      g3::log_levels::disableAll();
+      g3::log_levels::setHighest(DEBUG);      
+
+
+      LevelsContainer expected = {
+      {g3::kDebugValue, {DEBUG, true}},
+      {INFO.value, {INFO, true}},
+      {WARNING.value, {WARNING, true}},
+      {FATAL.value, {FATAL, true}}
+   };
+
+   auto all_levels = g3::log_levels::getAll();
+   EXPECT_TRUE(mapCompare(all_levels, expected)) << g3::log_levels::to_string();
+}
+
+
+TEST(Level, setHighestLogLevel_middle) {
+   g3::only_change_at_initialization::reset();
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+
+      g3::log_levels::enableAll();
+      g3::log_levels::setHighest(WARNING);      
+
+
+      LevelsContainer expected = {
+      {g3::kDebugValue, {DEBUG, false}},
+      {INFO.value, {INFO, false}},
+      {WARNING.value, {WARNING, true}},
+      {FATAL.value, {FATAL, true}}
+   };
+
+   auto all_levels = g3::log_levels::getAll();
+   EXPECT_TRUE(mapCompare(all_levels, expected));
+}
+
+
+
+
 TEST(Level, setHighestLogLevel_StepWiseDisableAll) {
    g3::only_change_at_initialization::reset();
    std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
@@ -314,7 +387,7 @@ TEST(Level, setHighestLogLevel_StepWiseDisableAll) {
    size_t counter = 0;
    for (auto& lvl : changing_levels) {
       g3::log_levels::setHighest(lvl.second.level);
-      all_levels = g3::log_levels::getAl();
+      all_levels = g3::log_levels::getAll();
 
       ASSERT_TRUE(mapCompare(all_levels, changing_levels)) <<
             "counter: " << counter << "\nsystem:\n" <<
@@ -396,21 +469,21 @@ TEST(Level, AddOneEnabled_option2) {
 
 
 TEST(Level, Addlevel_using_addLevel) {
-      std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
       g3::only_change_at_initialization::reset();
    });
 
    LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
-   auto status = g3::log_levels::LevelStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+   auto status = g3::log_levels::getStatus(MYINFO);
+   EXPECT_EQ(status, g3::log_levels::status::Absent);
 
    g3::only_change_at_initialization::addLogLevel(MYINFO);
    status = g3::log_levels::getStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);
+   EXPECT_EQ(status, g3::log_levels::status::Enabled);
 }
 
-TEST(Level, Addlevel_using_setLogLevel_disabled) {
-      std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+TEST(Level, Addlevel_using_addLogLevel_disabled) {
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
       g3::only_change_at_initialization::reset();
    });
 
@@ -420,11 +493,11 @@ TEST(Level, Addlevel_using_setLogLevel_disabled) {
 
    g3::only_change_at_initialization::addLogLevel(MYINFO, false);
    status = g3::log_levels::getStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Disabled);   
+   EXPECT_EQ(status, g3::log_levels::status::Disabled);
 }
 
-TEST(Level, Addlevel_using_setLogLevel_enabled) {
-      std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+TEST(Level, Addlevel__disabled) {
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
       g3::only_change_at_initialization::reset();
    });
 
@@ -434,11 +507,19 @@ TEST(Level, Addlevel_using_setLogLevel_enabled) {
 
    g3::log_levels::enable(MYINFO);
    status = g3::log_levels::getStatus(MYINFO);
-   EXPECT_EQ(status, g3::log_levels::status::Enabled);      
+   EXPECT_EQ(status, g3::log_levels::status::Absent);
+
+   g3::log_levels::set(MYINFO, true);
+   status = g3::log_levels::getStatus(MYINFO);
+   EXPECT_EQ(status, g3::log_levels::status::Absent);
+
+   g3::only_change_at_initialization::addLogLevel(MYINFO, false);
+   status = g3::log_levels::getStatus(MYINFO);
+   EXPECT_EQ(status, g3::log_levels::status::Disabled);
 }
 
-TEST(Level, Addlevel_using_setHighestLogLevel) {
-         std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+TEST(Level, Addlevel__enabled) {
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
       g3::only_change_at_initialization::reset();
    });
 
@@ -446,9 +527,10 @@ TEST(Level, Addlevel_using_setHighestLogLevel) {
    auto status = g3::log_levels::getStatus(MYINFO);
    EXPECT_EQ(status, g3::log_levels::status::Absent);
 
-   g3::log_levels::setHighest(MYINFO);
+
+   g3::only_change_at_initialization::addLogLevel(MYINFO);
    status = g3::log_levels::getStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);   
+   EXPECT_EQ(status, g3::log_levels::status::Enabled);
 }
 
 #endif // G3_DYNAMIC_LOGGING

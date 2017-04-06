@@ -62,7 +62,7 @@ struct LEVELS {
 };
 
 // If you want to add any extra logging level then please add to your own source file the logging level you need
-// then insert it using g3::setLogLevel(...). Please note that this only works for dynamic logging levels.
+// then insert it using g3::only_change_at_initialization::addLogLevel(...). Please note that this only works for dynamic logging levels.
 //
 // There should be NO reason for modifying this source file when adding custom levels
 //
@@ -75,11 +75,11 @@ struct LEVELS {
 //  const LEVELS MYFATAL {FATAL.value +1, "MyFatalLevel"};
 //
 //  ... somewhere else when G3_DYNAMIC_LOGGING is enabled
-//  setLogLevel(MYINFO, true);
+//  addLogLevel(MYINFO, true);
 //  LOG(MYINFO) << "some text";
 //
 //  ... another example, when G3_DYNAMIC_LOGGING is enabled
-//  'setLogLevel' is NOT required
+//  'addLogLevel' is NOT required
 //  LOG(MYFATL) << "this will just work, and it will be counted as a FATAL event";
 namespace g3 {
    static const int kDebugValue = 100;
