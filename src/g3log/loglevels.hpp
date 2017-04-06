@@ -164,6 +164,7 @@ namespace g3 {
       /// log levels equal or higher will be enabled.
       void setHighest(LEVELS level);
 
+      void set(LEVELS level, bool enabled);
       void disable(LEVELS level);
       void enable(LEVELS level);
 
