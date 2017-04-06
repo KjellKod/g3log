@@ -32,7 +32,7 @@ namespace g3 {
 #ifdef G3_DYNAMIC_LOGGING
    namespace only_change_at_initialization {
 
-      void setLogLevel(LEVELS lvl, bool enabled) {
+      void addLogLevel(LEVELS lvl, bool enabled) {
          int value = lvl.value;
          internal::g_log_levels[value] = {lvl, enabled};
       }
@@ -42,36 +42,43 @@ namespace g3 {
          setLogLevel(level, true);
       }
 
+      void reset() {
+         g3::internal::g_log_levels = g3::internal::g_log_level_defaults;
+      }
+} // only_change_at_initialization
 
-      void setHighestLogLevel(LEVELS enabledFrom) {
+
+namespace log_levels {
+
+      void setHighest(LEVELS enabledFrom) {
          auto it = internal::g_log_levels.find(enabledFrom.value);
-         if (it == internal::g_log_levels.end()) {
-            addLogLevel(enabledFrom);
-         }
+         CHECK(it != internal::g_log_levels.end());
          for (auto& v : internal::g_log_levels) {
             if (v.first < enabledFrom.value) {
-               setLogLevel(v.second.level, false);
+               disable(v.second.level);
             }
          }
       }
 
-
-      std::string printLevels(std::map<int, g3::LoggingLevel> levelsToPrint) {
-
-         std::string levels;
-         for (auto& v : levelsToPrint) {
-            levels += "name: " + v.second.level.text + " level: " + std::to_string(v.first) + " status: " + std::to_string(v.second.status.value()) + "\n";
+      // basically the same as the 'setLevel' but for clarity 
+      // and without any CHECKs for error for illegal level
+      void set(LEVELS level, bool enabled) {
+         auto it = internal::g_log_levels.find(level.value);
+         if (it != internal::g_log_levels.end()) {
+            bool disabled = false;
+            internal::g_log_levels[level.value] = {lvl, disabled};
          }
-         return levels;
+      }
+      
+
+      void disable(LEVELS level) {
+         set(level, false);
       }
 
-      std::string printLevels() {
-         return printLevels(internal::g_log_levels);
+      void enable(LEVELS level) {
+         set(level, true);
       }
 
-      void reset() {
-         g3::internal::g_log_levels = g3::internal::g_log_level_defaults;
-      }
 
       void disableAll() {
          for (auto& v : internal::g_log_levels) {
@@ -79,12 +86,32 @@ namespace g3 {
          }
       }
 
-      std::map<int, g3::LoggingLevel> getAllLevels() {
+      void enableAll() {
+         for (auto& v : internal::g_log_levels) {
+            v.second.status = true;
+         }
+      }
+
+
+      std::string to_string(std::map<int, g3::LoggingLevel> levelsToPrint) {
+         std::string levels;
+         for (auto& v : levelsToPrint) {
+            levels += "name: " + v.second.level.text + " level: " + std::to_string(v.first) + " status: " + std::to_string(v.second.status.value()) + "\n";
+         }
+         return levels;
+      }
+
+      std::string to_string() {
+         return to_string(internal::g_log_levels);
+      }
+
+
+      std::map<int, g3::LoggingLevel> getAll() {
          return internal::g_log_levels;
       }
 
-      //enum class level_status {Absent, Enabled, Disabled};
-      level_status LevelStatus(LEVELS level) {
+      // status : {Absent, Enabled, Disabled};
+      status getStatus(LEVELS level) {
          const auto it = internal::g_log_levels.find(level.value);
          if (internal::g_log_levels.end() == it) {
             return level_status::Absent;
@@ -93,10 +120,7 @@ namespace g3 {
          return (it->second.status.get().load() ? level_status::Enabled : level_status::Disabled);
 
       }
-
-
-
-   } // only_change_at_initialization
+   } // log_levels
 
 #endif
 

@@ -215,19 +215,39 @@ namespace {
 } // anonymous
 TEST(Level, Default) {
    g3::only_change_at_initialization::reset();
-   auto defaults = g3::only_change_at_initialization::getAllLevels();
+   auto defaults = g3::log_levels::getAll();
    EXPECT_EQ(defaults.size(), g_test_log_level_defaults.size());
    EXPECT_TRUE(mapCompare(defaults, g_test_log_level_defaults));
 }
 
-TEST(Level, DefaultChanged) {
+TEST(Level, DefaultChanged_only_change_at_initialization) {
    g3::only_change_at_initialization::reset();
    std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
       g3::only_change_at_initialization::reset();
    });
 
    g3::only_change_at_initialization::setLogLevel(INFO, false);
-   auto defaults = g3::only_change_at_initialization::getAllLevels();
+   auto defaults = g3::log_levels::getAll();
+   EXPECT_EQ(defaults.size(), g_test_log_level_defaults.size());
+   EXPECT_FALSE(mapCompare(defaults, g_test_log_level_defaults));
+
+   const LevelsContainer defaultsWithInfoChangged = {
+      {g3::kDebugValue, {DEBUG, true}},
+      {INFO.value, {INFO, false}},
+      {WARNING.value, {WARNING, true}},
+      {FATAL.value, {FATAL, true}}
+   };
+   EXPECT_TRUE(mapCompare(defaults, defaultsWithInfoChangged));
+}
+
+TEST(Level, DefaultChanged_log_levels) {
+   g3::only_change_at_initialization::reset();
+   std::shared_ptr<void> RaiiLeveReset(nullptr, [&](void*) {
+      g3::only_change_at_initialization::reset();
+   });
+
+   g3::log_levels::disable(INFO);
+   auto defaults = g3::log_levels::getAll();
    EXPECT_EQ(defaults.size(), g_test_log_level_defaults.size());
    EXPECT_FALSE(mapCompare(defaults, g_test_log_level_defaults));
 
@@ -245,12 +265,12 @@ TEST(Level, Reset) {
       g3::only_change_at_initialization::reset();
    });
 
-   g3::only_change_at_initialization::disableAll();
-   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   g3::log_levels::disableAll();
+   auto all_levels = g3::log_levels::getAll();
    EXPECT_TRUE(mapCompare(all_levels, g_test_all_disabled));
 
    g3::only_change_at_initialization::reset();
-   all_levels = g3::only_change_at_initialization::getAllLevels();
+   all_levels = g3::log_levels::getAll();
    EXPECT_TRUE(mapCompare(all_levels, g_test_log_level_defaults));
 
 
@@ -266,12 +286,12 @@ TEST(Level, AllDisabled) {
    });
 
 
-   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   auto all_levels = g3::log_levels::getAll();
    EXPECT_EQ(all_levels.size(), g_test_all_disabled.size());
    EXPECT_FALSE(mapCompare(all_levels, g_test_all_disabled));
 
-   g3::only_change_at_initialization::disableAll();
-   all_levels = g3::only_change_at_initialization::getAllLevels();
+   g3::log_levels::disableAll();
+   all_levels = g3::log_levels::getAll();
    EXPECT_TRUE(mapCompare(all_levels, g_test_all_disabled));
 }
 
@@ -288,19 +308,19 @@ TEST(Level, setHighestLogLevel_StepWiseDisableAll) {
       {FATAL.value, {FATAL, true}}
    };
 
-   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   auto all_levels = g3::log_levels::getAll();
    EXPECT_TRUE(mapCompare(all_levels, g_test_log_level_defaults));
 
    size_t counter = 0;
    for (auto& lvl : changing_levels) {
-      g3::only_change_at_initialization::setHighestLogLevel(lvl.second.level);
-      all_levels = g3::only_change_at_initialization::getAllLevels();
+      g3::log_levels::setHighest(lvl.second.level);
+      all_levels = g3::log_levels::getAl();
 
       ASSERT_TRUE(mapCompare(all_levels, changing_levels)) <<
             "counter: " << counter << "\nsystem:\n" <<
-            g3::only_change_at_initialization::printLevels(all_levels) <<
+            g3::log_levels::to_string(all_levels) <<
             "\nexpected:\n" <<
-            g3::only_change_at_initialization::printLevels(changing_levels);
+            g3::log_levels::to_string(changing_levels);
 
       ++counter;
       if (counter != changing_levels.size()) {
@@ -315,12 +335,12 @@ TEST(Level, setHighestLogLevel_StepWiseDisableAll) {
    mostly_disabled[FATAL.value].status = true;
    EXPECT_TRUE(mapCompare(changing_levels, mostly_disabled));
 
-   all_levels = g3::only_change_at_initialization::getAllLevels();
+   all_levels = g3::log_levels::getAll();
    EXPECT_TRUE(mapCompare(all_levels, mostly_disabled)) <<
          "\nsystem:\n" <<
-         g3::only_change_at_initialization::printLevels(all_levels) <<
+         g3::log_levels::to_string(all_levels) <<
          "\nexpected:\n" <<
-         g3::only_change_at_initialization::printLevels(mostly_disabled);
+         g3::log_levels::to_string(mostly_disabled);
 }
 
 TEST(Level, Print) {
@@ -329,7 +349,7 @@ TEST(Level, Print) {
                           + "name: INFO level: 300 status: 1\n"
                           + "name: WARNING level: 500 status: 1\n"
                           + "name: FATAL level: 1000 status: 1\n";
-   EXPECT_EQ(g3::only_change_at_initialization::printLevels(), expected);
+   EXPECT_EQ(g3::log_levels::to_string(), expected);
 }
 
 TEST(Level, AddOneEnabled_option1) {
@@ -339,16 +359,16 @@ TEST(Level, AddOneEnabled_option1) {
 
 
    LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
-   g3::only_change_at_initialization::setLogLevel(MYINFO, true);
+   g3::only_change_at_initialization::addLogLevel(MYINFO, true);
 
    auto modified = g_test_log_level_defaults;
    modified[MYINFO.value] = MYINFO;
 
-   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   auto all_levels = g3::log_levels::getAll();
    EXPECT_TRUE(mapCompare(modified, all_levels)) << "\nsystem:\n" <<
-         g3::only_change_at_initialization::printLevels(all_levels) <<
+         g3::log_levels::to_string(all_levels) <<
          "\nexpected:\n" <<
-         g3::only_change_at_initialization::printLevels(modified);
+         g3::log_levels::to_string(modified);
 
 }
 
@@ -364,11 +384,11 @@ TEST(Level, AddOneEnabled_option2) {
    auto modified = g_test_log_level_defaults;
    modified[MYINFO.value] = MYINFO;
 
-   auto all_levels = g3::only_change_at_initialization::getAllLevels();
+   auto all_levels = g3::log_levels::getAll();
    EXPECT_TRUE(mapCompare(modified, all_levels)) << "\nsystem:\n" <<
-         g3::only_change_at_initialization::printLevels(all_levels) <<
+         g3::log_levels::to_string(all_levels) <<
          "\nexpected:\n" <<
-         g3::only_change_at_initialization::printLevels(modified);
+         g3::log_levels::to_string(modified);
 
 }
 
@@ -381,11 +401,11 @@ TEST(Level, Addlevel_using_addLevel) {
    });
 
    LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
-   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   auto status = g3::log_levels::LevelStatus(MYINFO);
    EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
 
    g3::only_change_at_initialization::addLogLevel(MYINFO);
-   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   status = g3::log_levels::getStatus(MYINFO);
    EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);
 }
 
@@ -395,11 +415,11 @@ TEST(Level, Addlevel_using_setLogLevel_disabled) {
    });
 
    LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
-   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+   auto status = g3::log_levels::getStatus(MYINFO);
+   EXPECT_EQ(status, g3::log_levels::status::Absent);
 
-   g3::only_change_at_initialization::setLogLevel(MYINFO, false);
-   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   g3::only_change_at_initialization::addLogLevel(MYINFO, false);
+   status = g3::log_levels::getStatus(MYINFO);
    EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Disabled);   
 }
 
@@ -409,12 +429,12 @@ TEST(Level, Addlevel_using_setLogLevel_enabled) {
    });
 
    LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
-   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+   auto status = g3::log_levels::getStatus(MYINFO);
+   EXPECT_EQ(status, g3::log_levels::status::Absent);
 
-   g3::only_change_at_initialization::setLogLevel(MYINFO, true);
-   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);      
+   g3::log_levels::enable(MYINFO);
+   status = g3::log_levels::getStatus(MYINFO);
+   EXPECT_EQ(status, g3::log_levels::status::Enabled);      
 }
 
 TEST(Level, Addlevel_using_setHighestLogLevel) {
@@ -423,11 +443,11 @@ TEST(Level, Addlevel_using_setHighestLogLevel) {
    });
 
    LEVELS MYINFO {WARNING.value + 1, "MyInfoLevel"};
-   auto status = g3::only_change_at_initialization::LevelStatus(MYINFO);
-   EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Absent);
+   auto status = g3::log_levels::getStatus(MYINFO);
+   EXPECT_EQ(status, g3::log_levels::status::Absent);
 
-   g3::only_change_at_initialization::setHighestLogLevel(MYINFO);
-   status = g3::only_change_at_initialization::LevelStatus(MYINFO);
+   g3::log_levels::setHighest(MYINFO);
+   status = g3::log_levels::getStatus(MYINFO);
    EXPECT_EQ(status, g3::only_change_at_initialization::level_status::Enabled);   
 }
 
