@@ -528,7 +528,7 @@ TEST(CustomLogLevels, AddANonFatal) {
    RestoreFileLogger logger(log_directory);
    const LEVELS MYINFO {WARNING.value + 1, {"MY_INFO_LEVEL"}};
 #ifdef G3_DYNAMIC_LOGGING
-   g3::only_change_at_initialization::setLogLevel(MYINFO, true);
+   g3::only_change_at_initialization::addLogLevel(MYINFO, true);
 #endif
    LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
    logger.reset();
@@ -547,7 +547,7 @@ TEST(CustomLogLevels, AddFatal) {
    ASSERT_FALSE(mockFatalWasCalled());
    g3::setFatalPreLoggingHook(fatalCounter);
 #ifdef G3_DYNAMIC_LOGGING
-   g3::only_change_at_initialization::setLogLevel(DEADLY, true);
+   g3::only_change_at_initialization::addLogLevel(DEADLY, true);
 #endif
 
    LOG(DEADLY) << "Testing my own custom level"; auto line = __LINE__;
@@ -573,10 +573,10 @@ namespace {
       };
       ~RestoreDynamicLoggingLevels() {
          g3::only_change_at_initialization::reset();
-         g3::only_change_at_initialization::setLogLevel(DEBUG, false);
-         g3::only_change_at_initialization::setLogLevel(INFO, false);
-         g3::only_change_at_initialization::setLogLevel(WARNING, false);
-         g3::only_change_at_initialization::setLogLevel(FATAL, false);
+         g3::only_change_at_initialization::addLogLevel(DEBUG, false);
+         g3::only_change_at_initialization::addLogLevel(INFO, false);
+         g3::only_change_at_initialization::addLogLevel(WARNING, false);
+         g3::only_change_at_initialization::addLogLevel(FATAL, false);
       }
    };
 } // anonymous
@@ -586,7 +586,7 @@ TEST(CustomLogLevels, AddANonFatal__ThenReset) {
    RestoreFileLogger logger(log_directory);
    const LEVELS MYINFO {WARNING.value + 2, {"MY_INFO_LEVEL"}};
    EXPECT_FALSE(g3::logLevel(MYINFO));
-   g3::only_change_at_initialization::setLogLevel(MYINFO, true);
+   g3::only_change_at_initialization::addLogLevel(MYINFO, true);
    EXPECT_TRUE(g3::logLevel(MYINFO));
    g3::only_change_at_initialization::reset();
    EXPECT_FALSE(g3::logLevel(MYINFO));
@@ -603,7 +603,7 @@ TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue1) {
    std::string expected;
    expected += "MY_INFO_LEVEL [test_io.cpp:" + std::to_string(line);
    EXPECT_FALSE(verifyContent(file_content, expected)) << file_content
-         << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::only_change_at_initialization::printLevels();
+         << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::log_levels::to_string();
 }
 
 TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue2) {
@@ -617,13 +617,13 @@ TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue2) {
    std::string expected;
    expected += "MY_INFO_LEVEL [test_io.cpp:" + std::to_string(line);
    EXPECT_FALSE(verifyContent(file_content, expected)) << file_content
-         << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::only_change_at_initialization::printLevels();
+         << "\n\nExpected: \n" << expected  << "\nLevels:\n" << g3::log_levels::to_string();
 }
 
 TEST(CustomLogLevels, AddANonFatal__DidtAddItToEnabledValue) {
    RestoreFileLogger logger(log_directory);
    const LEVELS MYINFO {WARNING.value + 3, {"MY_INFO_LEVEL"}};
-   g3::only_change_at_initialization::setLogLevel(MYINFO, true);
+   g3::only_change_at_initialization::addLogLevel(MYINFO, true);
    LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
@@ -641,25 +641,25 @@ TEST(DynamicLogging, DynamicLogging_IS_ENABLED) {
    ASSERT_TRUE(g3::logLevel(INFO));
    ASSERT_TRUE(g3::logLevel(WARNING));
    ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
-   g3::only_change_at_initialization::setLogLevel(DEBUG, false);
+   g3::only_change_at_initialization::addLogLevel(DEBUG, false);
    ASSERT_FALSE(g3::logLevel(DEBUG));
    ASSERT_TRUE(g3::logLevel(INFO));
    ASSERT_TRUE(g3::logLevel(WARNING));
    ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 
-   g3::only_change_at_initialization::setLogLevel(INFO, false);
+   g3::only_change_at_initialization::addLogLevel(INFO, false);
    ASSERT_FALSE(g3::logLevel(DEBUG));
    ASSERT_FALSE(g3::logLevel(INFO));
    ASSERT_TRUE(g3::logLevel(WARNING));
    ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 
-   g3::only_change_at_initialization::setLogLevel(WARNING, false);
+   g3::only_change_at_initialization::addLogLevel(WARNING, false);
    ASSERT_FALSE(g3::logLevel(DEBUG));
    ASSERT_FALSE(g3::logLevel(INFO));
    ASSERT_FALSE(g3::logLevel(WARNING));
    ASSERT_TRUE(g3::logLevel(FATAL)); // Yes FATAL can be turned off. Thereby rendering it ineffective.
 
-   g3::only_change_at_initialization::setLogLevel(FATAL, false);
+   g3::only_change_at_initialization::addLogLevel(FATAL, false);
    ASSERT_FALSE(g3::logLevel(DEBUG));
    ASSERT_FALSE(g3::logLevel(INFO));
    ASSERT_FALSE(g3::logLevel(WARNING));
@@ -688,7 +688,7 @@ TEST(DynamicLogging, DynamicLogging_No_Logs_If_Disabled) {
 
       {
          RestoreFileLogger logger(log_directory);
-         g3::only_change_at_initialization::setLogLevel(DEBUG, false);
+         g3::only_change_at_initialization::addLogLevel(DEBUG, false);
          EXPECT_FALSE(g3::logLevel(DEBUG));
          LOG(DEBUG) << msg_debugOff;
          auto content = logger.resetAndRetrieveContent();
@@ -718,7 +718,7 @@ TEST(DynamicLogging, DynamicLogging_No_Fatal_If_Disabled) {
    EXPECT_FALSE(mockFatalWasCalled());
 
 
-   g3::only_change_at_initialization::setLogLevel(FATAL, false);
+   g3::only_change_at_initialization::addLogLevel(FATAL, false);
    std::string msg3 = "This is NOT fatal (not crash, since it is unit test. FATAL is disabled";
    LOG(FATAL) << msg3;
    EXPECT_FALSE(mockFatalWasCalled());
@@ -741,7 +741,7 @@ TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disab
    EXPECT_FALSE(mockFatalWasCalled());
 
    // Disable also CHECK calls
-   g3::only_change_at_initialization::setLogLevel(FATAL, false);
+   g3::only_change_at_initialization::addLogLevel(FATAL, false);
    ASSERT_FALSE(g3::logLevel(FATAL));
    LOG(FATAL) << msg3;
    EXPECT_FALSE(mockFatalWasCalled());
@@ -753,7 +753,7 @@ TEST(DynamicLogging, DynamicLogging_Check_WillAlsoBeTurnedOffWhen_Fatal_Is_Disab
 #else
 TEST(DynamicLogging, DynamicLogging_IS_NOT_ENABLED) {
    ASSERT_TRUE(g3::logLevel(DEBUG));
-   //g3::setLogLevel(DEBUG, false);  this line will not compile since G3_DYNAMIC_LOGGING is not enabled. Kept for show.
+   //g3::addLogLevel(DEBUG, false);  this line will not compile since G3_DYNAMIC_LOGGING is not enabled. Kept for show.
    //ASSERT_FALSE(g3::logLevel(DEBUG));
 }
 #endif // Dynamic logging

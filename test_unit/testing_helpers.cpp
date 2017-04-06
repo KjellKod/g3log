@@ -122,10 +122,10 @@ namespace testing_helpers {
       _log_file = filename.get();
 
 #ifdef G3_DYNAMIC_LOGGING
-      g3::only_change_at_initialization::setLogLevel(INFO, true);
-      g3::only_change_at_initialization::setLogLevel(DEBUG, true);
-      g3::only_change_at_initialization::setLogLevel(WARNING, true);
-      g3::only_change_at_initialization::setLogLevel(FATAL, true);
+      g3::only_change_at_initialization::addLogLevel(INFO, true);
+      g3::only_change_at_initialization::addLogLevel(DEBUG, true);
+      g3::only_change_at_initialization::addLogLevel(WARNING, true);
+      g3::only_change_at_initialization::addLogLevel(FATAL, true);
 #endif
    }
 
