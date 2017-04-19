@@ -48,6 +48,10 @@ namespace g3 {
             return std::move(promise.get_future());
          }
       }
+
+      std::shared_ptr<internal::Sink<T>> sink() {
+         return _sink.lock();
+      }
    };
 }
 
