@@ -84,6 +84,13 @@ MESSAGE("Software Version: ${VERSION}")
    # ============================================================================
    INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
 
+   # =========================================================================
+   # G3 Macro definitions in Options.cmake are written to file
+   #    this avoids having to re-state your definitions in your source code
+   #    or compile options
+   #==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
+
 
 
    # =========================================================================
@@ -116,14 +123,7 @@ MESSAGE("Software Version: ${VERSION}")
    INCLUDE (${g3log_SOURCE_DIR}/test_unit/Test.cmake)
 
 
-   # =========================================================================
-   # G3 Macro definitions in Options.cmake are written to file
-   #    this avoids having to re-state your definitions in your source code
-   #    or compile options
-   #==========================================================================
-   INCLUDE (${g3log_SOURCE_DIR}/GenerateMacroDefinitionsFile.cmake)
-
-
+   
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # ==========================================================================
