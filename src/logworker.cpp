@@ -29,7 +29,7 @@ namespace g3 {
 
       if (_sinks.empty()) {
          std::string err_msg {"g3logworker has no sinks. Message: ["};
-         err_msg.append(uniqueMsg.get()->toString()).append({"]\n"});
+         err_msg.append(uniqueMsg.get()->toString()).append("]\n");
          std::cerr << err_msg;
       }
    }
