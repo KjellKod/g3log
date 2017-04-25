@@ -79,7 +79,8 @@ namespace g3 {
       std::string header() {
          std::ostringstream ss_entry;
          //  Day Month Date Time Year: is written as "%a %b %d %H:%M:%S %Y" and formatted output as : Wed Sep 19 08:28:16 2012
-         ss_entry << "\t\tg3log created log at: " << g3::localtime_formatted(g3::systemtime_now(), "%a %b %d %H:%M:%S %Y") << "\n";
+         auto now = std::chrono::system_clock::now();
+         ss_entry << "\t\tg3log created log at: " << g3::localtime_formatted(now, "%a %b %d %H:%M:%S %Y") << "\n";
          ss_entry << "\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message";
          ss_entry << "\t\t(uuu*: microseconds fractions of the seconds value)\n\n";
          return ss_entry.str();
@@ -88,8 +89,11 @@ namespace g3 {
       std::string createLogFileName(const std::string &verified_prefix, const std::string &logger_id) {
          std::stringstream oss_name;
          oss_name << verified_prefix << ".";
-         if( logger_id != "" ) oss_name << logger_id << ".";
-         oss_name << g3::localtime_formatted(g3::systemtime_now(), file_name_time_formatted);
+         if( logger_id != "" ) {
+            oss_name << logger_id << ".";
+         }
+         auto now = std::chrono::system_clock::now();
+         oss_name << g3::localtime_formatted(now, file_name_time_formatted);
          oss_name << ".log";
          return oss_name.str();
       }

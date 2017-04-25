@@ -87,7 +87,7 @@ namespace g3 {
       // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
-      timespec _timestamp;
+      g3::system_time_point _timestamp;
       std::thread::id _call_thread_id;
       std::string _file;
       std::string _file_path;

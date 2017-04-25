@@ -9,6 +9,7 @@
 #include "g3log/filesink.hpp"
 #include "filesinkhelper.ipp"
 #include <cassert>
+#include <chrono>
 
 namespace g3 {
    using namespace internal;
@@ -41,7 +42,8 @@ namespace g3 {
 
    FileSink::~FileSink() {
       std::string exit_msg {"g3log g3FileSink shutdown at: "};
-      exit_msg.append(localtime_formatted(systemtime_now(), internal::time_formatted)).append("\n");
+      auto now = std::chrono::system_clock::now();
+      exit_msg.append(localtime_formatted(now, internal::time_formatted)).append("\n");
       filestream() << exit_msg << std::flush;
 
       exit_msg.append("Log file at: [").append(_log_file_with_path).append("]\n");
@@ -56,7 +58,7 @@ namespace g3 {
 
    std::string FileSink::changeLogFile(const std::string &directory, const std::string &logger_id) {
 
-      auto now = g3::systemtime_now();
+      auto now = std::chrono::system_clock::now();
       auto now_formatted = g3::localtime_formatted(now, {internal::date_formatted + " " + internal::time_formatted});
 
       std::string file_name = createLogFileName(_log_prefix_backup, logger_id);
