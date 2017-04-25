@@ -22,10 +22,14 @@
 //          std::string put_time(const struct tm* tmb, const char* c_time_format)
 
 namespace g3 {
+   typedef std::chrono::time_point<std::chrono::system_clock>  system_time_point;
+   typedef std::chrono::milliseconds milliseconds;
+   typedef std::chrono::microseconds microseconds;
+
    namespace internal {
       enum class Fractional {Millisecond, Microsecond, Nanosecond, NanosecondDefault};
       Fractional getFractional(const std::string& format_buffer, size_t pos);
-      std::string to_string(const timespec& time_snapshot, Fractional fractional);
+      std::string localtime_formatted_fractions(const g3::system_time_point& ts, std::string format_buffer);
       static const std::string date_formatted = "%Y/%m/%d";
       // %f: fractions of seconds (%f is nanoseconds)
       // %f3: milliseconds, 3 digits: 001
@@ -34,9 +38,6 @@ namespace g3 {
       static const std::string time_formatted = "%H:%M:%S %f6";
    } // internal
 
-   typedef std::chrono::time_point<std::chrono::system_clock>  system_time_point;
-   typedef std::chrono::milliseconds milliseconds;
-   typedef std::chrono::microseconds microseconds;
 
       
 
