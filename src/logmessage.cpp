@@ -133,10 +133,6 @@ namespace g3 {
       , _function(function)
       , _level(level)
    {
-      //g3::timespec_get(&_timestamp/*, TIME_UTC*/);
-      // Another possibility could be to Falling back to clock_gettime as TIME_UTC 
-      // is not recognized by travis CI. 
-      // i.e. clock_gettime(CLOCK_REALTIME, &_timestamp);
    }
 
 

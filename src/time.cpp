@@ -39,8 +39,47 @@ namespace g3 {
       }
 
 
-/*
-   localtime_formatted_fractions(const system_time_point& ts, const std::string& time_format);
+
+
+
+
+      // Returns the fractional as a string with padded zeroes
+      // 1 ms --> 001
+      // 1 us --> 000001
+      // 1 ns --> 000000001
+      std::string to_string(const g3::system_time_point& ts, Fractional fractional) {
+         auto duration = ts.time_since_epoch();         
+         auto sec_duration = std::chrono::duration_cast<std::chrono::seconds>(duration);
+         duration -= sec_duration;
+         auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
+
+         auto zeroes = 9; // default ns
+         auto digitsToCut = 1; // default ns, divide by 1 makes no change
+         switch (fractional) {
+            case Fractional::Millisecond : {
+               zeroes = 3;
+               digitsToCut = 1000000;
+               break;
+            }
+            case Fractional::Microsecond : {
+               zeroes = 6;
+               digitsToCut = 1000;
+               break;
+            }
+            case Fractional::Nanosecond :
+            case Fractional::NanosecondDefault:
+            default:
+               zeroes = 9;
+               digitsToCut = 1;
+
+         }
+
+         ns /= digitsToCut;
+         auto value = std::string(std::to_string(ns));
+         return std::string(zeroes - value.size(), '0') + value;
+}
+
+   std::string localtime_formatted_fractions(const g3::system_time_point& ts, std::string format_buffer) {
       // iterating through every "%f" instance in the format string
       auto identifierExtraSize = 0;
       for (size_t pos = 0; 
@@ -57,130 +96,15 @@ namespace g3 {
          // replacing "%f[3|6|9]" with sec fractional part value
          format_buffer.replace(pos, g3::internal::kFractionalIdentier.size() + padding, value);
       }
+      return format_buffer;
+   }
 
-
-*/
-      // Returns the fractional as a string with padded zeroes
-      // %f: fractions of seconds (%f is nanoseconds)
-      // %f3: ms -> milliseconds, 3 digits: 001
-      // %6: us -> microseconds: 6 digits: 000001  --- default for the time_format
-      // %f9, %f: ns -> nanoseconds, 9 digits: 000000001
-      std::string localtime_formatted_fractions(const g3::system_time_point& ts, std::string format_buffer) {
-         auto duration = ts.time_since_epoch();
-         
-         auto sec = std::chrono::duration_cast<std::chrono::seconds>(duration);
-         duration -= sec;
-         auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(duration);
-         duration -= ms;
-         auto us = std::chrono::duration_cast<std::chrono::microseconds>(duration);
-         duration -= us;
-         auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration);
-
-         .... wrong. The formatting is ONLY for nanoseconds. 
-         I.e. we must follow the old approach of only retrieving the nanoseconds
-         and then use division to get the value.
-
-         
-         
-         // iterating through every "%f" instance in the format string
-         auto identifierExtraSize = 0;
-         for (size_t pos = 0; 
-            (pos = format_buffer.find(g3::internal::kFractionalIdentier, pos)) != std::string::npos; 
-            pos += g3::internal::kFractionalIdentierSize + identifierExtraSize) {
-            // figuring out whether this is nano, micro or milli identifier
-            auto type = g3::internal::getFractional(format_buffer, pos);
-            //auto digits = static_cast<size_t>(type);
-
-
-            auto number = 0;
-            auto zeroes = 9; // default ns
-            switch (type) {
-               case Fractional::Millisecond : {
-                  zeroes = 3;
-                  number = ms.count();
-                  break;
-               }
-               case Fractional::Microsecond : {
-                  zeroes = 6;
-                  number = us.count();
-                  break;
-               }
-               case Fractional::Nanosecond :
-               case Fractional::NanosecondDefault:
-               default:
-                  zeroes = 9;
-                  number = ns.count();
-            }
-
-            auto padding = 0;
-            if (type != g3::internal::Fractional::NanosecondDefault) {
-               padding = 1;
-            }
-         
-            auto value = std::to_string(number);
-            return std::string(zeroes - value.size(), '0') + value;
-
-            // replacing "%f[3|6|9]" with sec fractional part value
-            format_buffer.replace(pos, g3::internal::kFractionalIdentier.size() + padding, value);
-         }
-         return format_buffer;
-      }
    } // internal
 } // g3
 
 
 
 namespace g3 {
-//   struct timespec systemtime_now() {
-//      struct timespec ts = {};
-//      timespec_get(&ts);
-//      return ts;
-//   }
-
-
-   // std::timespec_get or posix clock_gettime)(...) are not
-   // implemented on OSX and ubuntu gcc5 has no support for std::timespec_get(...) as of yet
-   // so instead we roll our own.
-   //int timespec_get(struct timespec* ts/*, int base*/) {
-   //   using namespace std::chrono;
-      
-      // thanks @AndreasSchoenle for the implementation and the explanation:
-      // The time since epoch for the steady_clock is not necessarily really the time since 1970.
-      // It usually is the time since program start. Thus, here is calculated the offset between 
-      // the starting point and the real start of the epoch as reported by the system clock 
-      // with the precision of the system clock. 
-      // 
-      // Time stamps will later have system clock accuracy but relative times will have the precision
-      // of the high resolution clock.   
-      //thread_local const auto os_system =
-      //   time_point_cast<nanoseconds>(system_clock::now()).time_since_epoch();
-      //thread_local const auto os_high_resolution = 
-      //   time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch();
-      //thread_local auto os = os_system - os_high_resolution;
-
-      // 32-bit system work-around, where apparenetly the os correction above could sometimes 
-      // become negative. This correction will only be done once per thread
-      //if (os.count() < 0 ) {
-      //   os =  os_system;
-      //}
-
-      //auto now_ns = (time_point_cast<nanoseconds>(high_resolution_clock::now()).time_since_epoch() + os).count();
-      //const auto kNanos = 1000000000;
-      //ts ->tv_sec = now_ns / kNanos;
-      //ts ->tv_nsec = now_ns % kNanos;
-
-      //const auto kNanos = 1000000000;
-     // auto now = system_clock::now();
-     // ts ->tv_sec = time_point_cast<seconds>(now).time_since_epoch().count();
-     // ts ->tv_nsec = time_point_cast<nanoseconds>(now).time_since_epoch().count();
-     // #ifdef TIME_UTC
-     //    return TIME_UTC;
-     // #endif
-     // return 1;
-   //}
-
-
-
    // This mimics the original "std::put_time(const std::tm* tmb, const charT* fmt)"
    // This is needed since latest version (at time of writing) of gcc4.7 does not implement this library function yet.
    // return value is SIMPLIFIED to only return a std::string

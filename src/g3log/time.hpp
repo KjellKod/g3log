@@ -29,6 +29,7 @@ namespace g3 {
    namespace internal {
       enum class Fractional {Millisecond, Microsecond, Nanosecond, NanosecondDefault};
       Fractional getFractional(const std::string& format_buffer, size_t pos);
+      std::string to_string(const g3::system_time_point& ts, Fractional fractional);
       std::string localtime_formatted_fractions(const g3::system_time_point& ts, std::string format_buffer);
       static const std::string date_formatted = "%Y/%m/%d";
       // %f: fractions of seconds (%f is nanoseconds)
@@ -38,17 +39,6 @@ namespace g3 {
       static const std::string time_formatted = "%H:%M:%S %f6";
    } // internal
 
-
-      
-
-   //  custom wrap for std::chrono::system_clock::now()but this one 
-   // returns timespec struct instead which is what we use in g3log
-   //struct timespec systemtime_now();
-
-   // OSX, Windows needed wrapper for std::timespec_get(struct timespec *ts, int base)
-   //   OSX and Windows also lacks the POSIX clock_gettime(int base, struct timespec *ts)
-   //   so for that reason we go with the std::timespec_get(...) but wrap it
-   //int timespec_get(struct timespec* ts/*, int base*/);
 
    // This mimics the original "std::put_time(const std::tm* tmb, const charT* fmt)"
    // This is needed since latest version (at time of writing) of gcc4.7 does not implement this library function yet.

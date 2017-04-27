@@ -12,6 +12,13 @@
 #include <iostream>
 #include <ctime>
 
+
+namespace {
+   // https://www.epochconverter.com/
+   // epoc value for: Thu, 27 Apr 2017 06:22:49 GMT
+   time_t kTime1= 1493274147; 
+}
+
 TEST(Message, CppSupport) {
    // ref: http://www.cplusplus.com/reference/clibrary/ctime/strftime/
    // ref: http://en.cppreference.com/w/cpp/io/manip/put_time
@@ -20,14 +27,14 @@ TEST(Message, CppSupport) {
    // ---  For formatting options to std::put_time that are NOT YET implemented on Windows fatal errors/assert will occurr
    // ---  the last example is such an example.
    try {
-      std::cout << g3::localtime_formatted(g3::systemtime_now(), "%a %b %d %H:%M:%S %Y")  << std::endl;
+      std::cout << g3::localtime_formatted(std::chrono::system_clock::now(), "%a %b %d %H:%M:%S %Y")  << std::endl;
       std::this_thread::sleep_for(std::chrono::seconds(1));
-      std::cout << g3::localtime_formatted(g3::systemtime_now(), "%%Y/%%m/%%d %%H:%%M:%%S = %Y/%m/%d %H:%M:%S")  << std::endl;
+      std::cout << g3::localtime_formatted(std::chrono::system_clock::now(), "%%Y/%%m/%%d %%H:%%M:%%S = %Y/%m/%d %H:%M:%S")  << std::endl;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
       std::cerr << "Formatting options skipped due to VS2012, C++11 non-conformance for" << std::endl;
       std::cerr << " some formatting options. The skipped code was:\n\t\t %EX %Ec, \n(see http://en.cppreference.com/w/cpp/io/manip/put_time for details)"  << std::endl;
 #else
-      std::cout << "C++11 new formatting options:\n" << g3::localtime_formatted(g3::systemtime_now(), "%%EX: %EX\n%%z: %z\n%%Ec: %Ec")  << std::endl;
+      std::cout << "C++11 new formatting options:\n" << g3::localtime_formatted(std::chrono::system_clock::now(), "%%EX: %EX\n%%z: %z\n%%Ec: %Ec")  << std::endl;
 #endif
    }
 // This does not work. Other kinds of fatal exits (on Windows) seems to be used instead of exceptions
@@ -96,72 +103,71 @@ TEST(Message, GetFractional_All) {
 }
 
 TEST(Message, FractionalToString) {
-   timespec ts = {};
-   ts.tv_nsec = 123456789;
-   auto value = g3::internal::to_string(ts, g3::internal::Fractional::Nanosecond);
+   auto ignored = std::chrono::system_clock::now();
+   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Nanosecond);
    EXPECT_EQ("123456789", value);
-   value = g3::internal::to_string(ts, g3::internal::Fractional::NanosecondDefault);
+   value = g3::internal::to_string(ignored, g3::internal::Fractional::NanosecondDefault);
    EXPECT_EQ("123456789", value);
 
    // us
-   value = g3::internal::to_string(ts, g3::internal::Fractional::Microsecond);
+   value = g3::internal::to_string(ignored, g3::internal::Fractional::Microsecond);
    EXPECT_EQ("123456", value);
 // ms
-   value = g3::internal::to_string(ts, g3::internal::Fractional::Millisecond);
+   value = g3::internal::to_string(ignored, g3::internal::Fractional::Millisecond);
    EXPECT_EQ("123", value);
 }
 
 TEST(Message, FractionalToStringNanoPadded) {
-   timespec ts = {};
-   ts.tv_nsec = 1;
-   auto value = g3::internal::to_string(ts, g3::internal::Fractional::Nanosecond);
+   auto ignored = std::chrono::system_clock::now();
+   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Nanosecond);
    EXPECT_EQ("000000001", value);
    // 0000000012
-   value = g3::internal::to_string(ts, g3::internal::Fractional::NanosecondDefault);
+   value = g3::internal::to_string(ignored, g3::internal::Fractional::NanosecondDefault);
    EXPECT_EQ("000000001", value);
 }
 
 TEST(Message, FractionalToString12NanoPadded) {
-   timespec ts = {};
-   ts.tv_nsec = 12;
-   auto value = g3::internal::to_string(ts, g3::internal::Fractional::Nanosecond);
+   auto ignored = std::chrono::system_clock::now();
+   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Nanosecond);
    EXPECT_EQ("000000012", value);
    // 0000000012
-   value = g3::internal::to_string(ts, g3::internal::Fractional::NanosecondDefault);
+   value = g3::internal::to_string(ignored, g3::internal::Fractional::NanosecondDefault);
    EXPECT_EQ("000000012", value);
 }
 
 
 TEST(Message, FractionalToStringMicroPadded) {
-   timespec ts = {};
-   ts.tv_nsec = 1000;
-   auto value = g3::internal::to_string(ts, g3::internal::Fractional::Microsecond);
+   auto ignored = std::chrono::system_clock::now();
+   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Microsecond);
    EXPECT_EQ("000001", value);
-   ts.tv_nsec = 11000;
-   value = g3::internal::to_string(ts, g3::internal::Fractional::Microsecond);
+   //ts.tv_nsec = 11000;
+   value = g3::internal::to_string(ignored, g3::internal::Fractional::Microsecond);
    EXPECT_EQ("000011", value);
 
 }
 
 
 TEST(Message, FractionalToStringMilliPadded) {
-   timespec ts = {};
-   ts.tv_nsec = 1000000;
-   auto value = g3::internal::to_string(ts, g3::internal::Fractional::Millisecond);
+   auto ignored = std::chrono::system_clock::now();
+   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Millisecond);
    EXPECT_EQ("001", value);
-   ts.tv_nsec = 21000000;
-   value = g3::internal::to_string(ts, g3::internal::Fractional::Millisecond);
+   //ts.tv_nsec = 21000000;
+   value = g3::internal::to_string(ignored, g3::internal::Fractional::Millisecond);
    EXPECT_EQ("021", value);
 }
 
 
 
-#if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 TEST(Message, localtime_formatted) {
-   struct tm tm;
-   time_t t;
 
-   ASSERT_TRUE(nullptr != strptime("2016-08-09 22:58:45", "%Y-%m-%d %H:%M:%S", &tm));
+   
+   auto time_point = std::chrono::system_clock::from_time_t(kTime1);
+   auto format = g3::localtime_formatted(time_point, "%Y-%m-%d %H:%M:%S"); // %Y/%m/%d
+   EXPECT_EQ("2017-04-27 06:22:27", format);
+
+}
+
+/*   ASSERT_TRUE(nullptr != strptime("2016-08-09 22:58:45", "%Y-%m-%d %H:%M:%S", &tm));
    t = mktime(&tm);
    timespec ts = {};
    ts.tv_sec = t;
@@ -178,8 +184,8 @@ TEST(Message, localtime_formatted) {
    ts.tv_nsec = 1234000;
    auto ms_format = g3::localtime_formatted(ts, "%H:%M:%S %f3");
    EXPECT_EQ("22:58:45 001", ms_format);
+   
 }
-#endif
 
 
 #ifdef G3_DYNAMIC_LOGGING
@@ -535,3 +541,4 @@ TEST(Level, Addlevel__enabled) {
 
 #endif // G3_DYNAMIC_LOGGING
 
+*/
