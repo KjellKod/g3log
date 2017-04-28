@@ -125,17 +125,13 @@ namespace g3 {
 
    LogMessage::LogMessage(const std::string& file, const int line,
                           const std::string& function, const LEVELS& level)
-      : _call_thread_id(std::this_thread::get_id())
+      : _timestamp(std::chrono::system_clock::now())
+      , _call_thread_id(std::this_thread::get_id())
       , _file(splitFileName(file))
       , _file_path(file)
       , _line(line)
       , _function(function)
-      , _level(level)
-   {
-      g3::timespec_get(&_timestamp/*, TIME_UTC*/);
-      // Another possibility could be to Falling back to clock_gettime as TIME_UTC 
-      // is not recognized by travis CI. 
-      // i.e. clock_gettime(CLOCK_REALTIME, &_timestamp);
+      , _level(level) {
    }
 
 
@@ -156,7 +152,7 @@ namespace g3 {
       , _message(other._message) {
    }
 
-   LogMessage::LogMessage(LogMessage &&other)
+   LogMessage::LogMessage(LogMessage&& other)
       : _timestamp(other._timestamp)
       , _call_thread_id(other._call_thread_id)
       , _file(std::move(other._file))
