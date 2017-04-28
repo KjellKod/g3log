@@ -11,7 +11,7 @@
 #include <g3log/time.hpp>
 #include <iostream>
 #include <ctime>
-
+#include <cstdlib>
 
 namespace {
    // https://www.epochconverter.com/
@@ -153,23 +153,43 @@ TEST(Message, FractionalToStringMilliPadded) {
 }
 
 
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 
 TEST(Message, localtime_formatted) {
+   char* tz = nullptr;
+
+   std::shared_ptr<void> RaiiTimeZoneReset(nullptr, [&](void*) {
+      if (tz)
+         setenv("TZ", tz, 1);
+      else
+         unsetenv("TZ");
+      tzset();
+
+   });
+   tz = getenv("TZ");
+   setenv("TZ", "", 1);
+   tzset();
+
+
    auto time_point = std::chrono::system_clock::from_time_t(k2017_April_27th);
    auto format = g3::localtime_formatted(time_point, "%Y-%m-%d %H:%M:%S"); // %Y/%m/%d
-   std::string expected = {"2017-04-27 00:22:27"};
+   std::string expected = {"2017-04-27 06:22:27"};
    EXPECT_EQ(expected, format);
 
    auto us_format = g3::localtime_formatted(time_point, g3::internal::time_formatted); // "%H:%M:%S %f6";
-   EXPECT_EQ("00:22:27 000000", us_format);
+   EXPECT_EQ("06:22:27 000000", us_format);
 
    auto ns_format = g3::localtime_formatted(time_point, "%H:%M:%S %f");
-   EXPECT_EQ("00:22:27 000000000", ns_format);
+   EXPECT_EQ("06:22:27 000000000", ns_format);
 
    auto ms_format = g3::localtime_formatted(time_point, "%H:%M:%S %f3");
-   EXPECT_EQ("00:22:27 000", ms_format);
+   EXPECT_EQ("06:22:27 000", ms_format);
 
 }
+#endif // timezone 
+
+
+
 
 
 #ifdef G3_DYNAMIC_LOGGING
