@@ -36,7 +36,7 @@
 
 namespace {
    std::once_flag g_initialize_flag;
-   g3::LogWorker *g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
+   g3::LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
    std::mutex g_logging_init_mutex;
 
    std::unique_ptr<g3::LogMessage> g_first_unintialized_msg = {nullptr};
@@ -59,7 +59,7 @@ namespace g3 {
    // several times...
    //                    for all other practical use, it shouldn't!
 
-   void initializeLogging(LogWorker *bgworker) {
+   void initializeLogging(LogWorker* bgworker) {
       std::call_once(g_initialize_flag, [] {
          installCrashHandler();
       });
@@ -139,7 +139,7 @@ namespace g3 {
        *         and the logging continues to be active.
        * @return true if the correct worker was given,. and shutDownLogging was called
        */
-      bool shutDownLoggingForActiveOnly(LogWorker *active) {
+      bool shutDownLoggingForActiveOnly(LogWorker* active) {
          if (isLoggingInitialized() && nullptr != active && (active != g_logger_instance)) {
             LOG(WARNING) << "\n\t\tAttempted to shut down logging, but the ID of the Logger is not the one that is active."
                          << "\n\t\tHaving multiple instances of the g3::LogWorker is likely a BUG"
@@ -156,8 +156,8 @@ namespace g3 {
 
       /** explicits copy of all input. This is makes it possibly to use g3log across dynamically loaded libraries
       * i.e. (dlopen + dlsym)  */
-      void saveMessage(const char *entry, const char *file, int line, const char *function, const LEVELS &level,
-                       const char *boolean_expression, int fatal_signal, const char *stack_trace) {
+      void saveMessage(const char* entry, const char* file, int line, const char* function, const LEVELS& level,
+                       const char* boolean_expression, int fatal_signal, const char* stack_trace) {
          LEVELS msgLevel {level};
          LogMessagePtr message {std2::make_unique<LogMessage>(file, line, function, msgLevel)};
          message.get()->write().append(entry);
@@ -209,7 +209,7 @@ namespace g3 {
                g_first_unintialized_msg = incoming.release();
                std::string err = {"LOGGER NOT INITIALIZED:\n\t\t"};
                err.append(g_first_unintialized_msg->message());
-               std::string &str = g_first_unintialized_msg->write();
+               std::string& str = g_first_unintialized_msg->write();
                str.clear();
                str.append(err); // replace content
                std::cerr << str << std::endl;

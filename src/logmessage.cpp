@@ -131,8 +131,7 @@ namespace g3 {
       , _file_path(file)
       , _line(line)
       , _function(function)
-      , _level(level)
-   {
+      , _level(level) {
    }
 
 
@@ -153,7 +152,7 @@ namespace g3 {
       , _message(other._message) {
    }
 
-   LogMessage::LogMessage(LogMessage &&other)
+   LogMessage::LogMessage(LogMessage&& other)
       : _timestamp(other._timestamp)
       , _call_thread_id(other._call_thread_id)
       , _file(std::move(other._file))

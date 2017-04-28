@@ -16,7 +16,7 @@
 namespace {
    // https://www.epochconverter.com/
    // epoc value for: Thu, 27 Apr 2017 06:22:49 GMT
-   time_t k2017_April_27th = 1493274147; 
+   time_t k2017_April_27th = 1493274147;
    auto kTimePoint_2017_April_27th = std::chrono::system_clock::from_time_t(k2017_April_27th);
    std::chrono::time_point<std::chrono::system_clock> k1970_January_1st = {};
 }
@@ -119,7 +119,7 @@ TEST(Message, FractionalToString_SizeCheck) {
 }
 
 TEST(Message, FractionalToStringNanoPadded) {
-   
+
    auto value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::Nanosecond);
    EXPECT_EQ("000000000", value);
    // 0000000012
@@ -168,7 +168,7 @@ TEST(Message, localtime_formatted) {
 
    auto ms_format = g3::localtime_formatted(time_point, "%H:%M:%S %f3");
    EXPECT_EQ("00:22:27 000", ms_format);
-   
+
 }
 
 
@@ -290,12 +290,12 @@ TEST(Level, setHighestLogLevel_high_end) {
    });
 
 
-      g3::log_levels::enableAll();
-      g3::log_levels::disable(FATAL);
-      g3::log_levels::setHighest(FATAL);      
+   g3::log_levels::enableAll();
+   g3::log_levels::disable(FATAL);
+   g3::log_levels::setHighest(FATAL);
 
 
-      LevelsContainer expected = {
+   LevelsContainer expected = {
       {g3::kDebugValue, {DEBUG, false}},
       {INFO.value, {INFO, false}},
       {WARNING.value, {WARNING, false}},
@@ -314,11 +314,11 @@ TEST(Level, setHighestLogLevel_low_end) {
    });
 
 
-      g3::log_levels::disableAll();
-      g3::log_levels::setHighest(DEBUG);      
+   g3::log_levels::disableAll();
+   g3::log_levels::setHighest(DEBUG);
 
 
-      LevelsContainer expected = {
+   LevelsContainer expected = {
       {g3::kDebugValue, {DEBUG, true}},
       {INFO.value, {INFO, true}},
       {WARNING.value, {WARNING, true}},
@@ -337,11 +337,11 @@ TEST(Level, setHighestLogLevel_middle) {
    });
 
 
-      g3::log_levels::enableAll();
-      g3::log_levels::setHighest(WARNING);      
+   g3::log_levels::enableAll();
+   g3::log_levels::setHighest(WARNING);
 
 
-      LevelsContainer expected = {
+   LevelsContainer expected = {
       {g3::kDebugValue, {DEBUG, false}},
       {INFO.value, {INFO, false}},
       {WARNING.value, {WARNING, true}},

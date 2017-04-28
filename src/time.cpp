@@ -24,8 +24,6 @@ namespace g3 {
       const std::string kFractionalIdentier   = "%f";
       const size_t kFractionalIdentierSize = 2;
 
-
-
       Fractional getFractional(const std::string& format_buffer, size_t pos) {
          char  ch  = (format_buffer.size() > pos + kFractionalIdentierSize ? format_buffer.at(pos + kFractionalIdentierSize) : '\0');
          Fractional type = Fractional::NanosecondDefault;
@@ -38,17 +36,12 @@ namespace g3 {
          return type;
       }
 
-
-
-
-
-
       // Returns the fractional as a string with padded zeroes
       // 1 ms --> 001
       // 1 us --> 000001
       // 1 ns --> 000000001
       std::string to_string(const g3::system_time_point& ts, Fractional fractional) {
-         auto duration = ts.time_since_epoch();         
+         auto duration = ts.time_since_epoch();
          auto sec_duration = std::chrono::duration_cast<std::chrono::seconds>(duration);
          duration -= sec_duration;
          auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
@@ -77,27 +70,27 @@ namespace g3 {
          ns /= digitsToCut;
          auto value = std::string(std::to_string(ns));
          return std::string(zeroes - value.size(), '0') + value;
-}
-
-   std::string localtime_formatted_fractions(const g3::system_time_point& ts, std::string format_buffer) {
-      // iterating through every "%f" instance in the format string
-      auto identifierExtraSize = 0;
-      for (size_t pos = 0; 
-         (pos = format_buffer.find(g3::internal::kFractionalIdentier, pos)) != std::string::npos; 
-         pos += g3::internal::kFractionalIdentierSize + identifierExtraSize) {
-         // figuring out whether this is nano, micro or milli identifier
-         auto type = g3::internal::getFractional(format_buffer, pos);
-         auto value = g3::internal::to_string(ts, type);
-         auto padding = 0;
-         if (type != g3::internal::Fractional::NanosecondDefault) {
-            padding = 1;
-         }
-
-         // replacing "%f[3|6|9]" with sec fractional part value
-         format_buffer.replace(pos, g3::internal::kFractionalIdentier.size() + padding, value);
       }
-      return format_buffer;
-   }
+
+      std::string localtime_formatted_fractions(const g3::system_time_point& ts, std::string format_buffer) {
+         // iterating through every "%f" instance in the format string
+         auto identifierExtraSize = 0;
+         for (size_t pos = 0;
+               (pos = format_buffer.find(g3::internal::kFractionalIdentier, pos)) != std::string::npos;
+               pos += g3::internal::kFractionalIdentierSize + identifierExtraSize) {
+            // figuring out whether this is nano, micro or milli identifier
+            auto type = g3::internal::getFractional(format_buffer, pos);
+            auto value = g3::internal::to_string(ts, type);
+            auto padding = 0;
+            if (type != g3::internal::Fractional::NanosecondDefault) {
+               padding = 1;
+            }
+
+            // replacing "%f[3|6|9]" with sec fractional part value
+            format_buffer.replace(pos, g3::internal::kFractionalIdentier.size() + padding, value);
+         }
+         return format_buffer;
+      }
 
    } // internal
 } // g3
@@ -120,7 +113,7 @@ namespace g3 {
       char buffer[size]; // IMPORTANT: check now and then for when gcc will implement std::put_time.
       //                    ... also ... This is way more buffer space then we need
 
-     auto success = std::strftime(buffer, size, c_time_format, tmb);
+      auto success = std::strftime(buffer, size, c_time_format, tmb);
       // In DEBUG the assert will trigger a process exit. Once inside the if-statement
       // the 'always true' expression will be displayed as reason for the exit
       //
@@ -130,7 +123,6 @@ namespace g3 {
          assert((0 != success) && "strftime fails with illegal formatting");
          return c_time_format;
       }
-
       return buffer;
 #endif
    }
@@ -148,12 +140,10 @@ namespace g3 {
    }
 
 
-
-
    std::string localtime_formatted(const g3::system_time_point& ts, const std::string& time_format) {
       auto format_buffer = internal::localtime_formatted_fractions(ts, time_format);
       auto time_point = std::chrono::system_clock::to_time_t(ts);
-      std::tm t = localtime(time_point);   
+      std::tm t = localtime(time_point);
       return g3::put_time(&t, format_buffer.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
    }
 } // g3
