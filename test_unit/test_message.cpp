@@ -153,7 +153,7 @@ TEST(Message, FractionalToStringMilliPadded) {
 }
 
 
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 
 TEST(Message, localtime_formatted) {
    char* tz = nullptr;
