@@ -16,7 +16,9 @@
 namespace {
    // https://www.epochconverter.com/
    // epoc value for: Thu, 27 Apr 2017 06:22:49 GMT
-   time_t kTime1= 1493274147; 
+   time_t k2017_April_27th = 1493274147; 
+   auto kTimePoint_2017_April_27th = std::chrono::system_clock::from_time_t(k2017_April_27th);
+   std::chrono::time_point<std::chrono::system_clock> k1970_January_1st = {};
 }
 
 TEST(Message, CppSupport) {
@@ -102,88 +104,70 @@ TEST(Message, GetFractional_All) {
    EXPECT_EQ(fractional, expected);
 }
 
-TEST(Message, FractionalToString) {
-   auto ignored = std::chrono::system_clock::now();
-   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Nanosecond);
-   EXPECT_EQ("123456789", value);
-   value = g3::internal::to_string(ignored, g3::internal::Fractional::NanosecondDefault);
-   EXPECT_EQ("123456789", value);
+TEST(Message, FractionalToString_SizeCheck) {
+   auto value = g3::internal::to_string(kTimePoint_2017_April_27th, g3::internal::Fractional::Nanosecond);
+   EXPECT_EQ("000000000", value);
+   value = g3::internal::to_string(kTimePoint_2017_April_27th, g3::internal::Fractional::NanosecondDefault);
+   EXPECT_EQ("000000000", value);
 
    // us
-   value = g3::internal::to_string(ignored, g3::internal::Fractional::Microsecond);
-   EXPECT_EQ("123456", value);
+   value = g3::internal::to_string(kTimePoint_2017_April_27th, g3::internal::Fractional::Microsecond);
+   EXPECT_EQ("000000", value);
 // ms
-   value = g3::internal::to_string(ignored, g3::internal::Fractional::Millisecond);
-   EXPECT_EQ("123", value);
+   value = g3::internal::to_string(kTimePoint_2017_April_27th, g3::internal::Fractional::Millisecond);
+   EXPECT_EQ("000", value);
 }
 
 TEST(Message, FractionalToStringNanoPadded) {
-   auto ignored = std::chrono::system_clock::now();
-   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Nanosecond);
-   EXPECT_EQ("000000001", value);
+   
+   auto value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::Nanosecond);
+   EXPECT_EQ("000000000", value);
    // 0000000012
-   value = g3::internal::to_string(ignored, g3::internal::Fractional::NanosecondDefault);
-   EXPECT_EQ("000000001", value);
+   value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::NanosecondDefault);
+   EXPECT_EQ("000000000", value);
 }
 
 TEST(Message, FractionalToString12NanoPadded) {
-   auto ignored = std::chrono::system_clock::now();
-   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Nanosecond);
-   EXPECT_EQ("000000012", value);
+   auto value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::Nanosecond);
+   EXPECT_EQ("000000000", value);
    // 0000000012
-   value = g3::internal::to_string(ignored, g3::internal::Fractional::NanosecondDefault);
-   EXPECT_EQ("000000012", value);
+   value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::NanosecondDefault);
+   EXPECT_EQ("000000000", value);
 }
 
 
 TEST(Message, FractionalToStringMicroPadded) {
-   auto ignored = std::chrono::system_clock::now();
-   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Microsecond);
-   EXPECT_EQ("000001", value);
-   //ts.tv_nsec = 11000;
-   value = g3::internal::to_string(ignored, g3::internal::Fractional::Microsecond);
-   EXPECT_EQ("000011", value);
+   auto value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::Microsecond);
+   EXPECT_EQ("000000", value);
+   value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::Microsecond);
+   EXPECT_EQ("000000", value);
 
 }
 
 
 TEST(Message, FractionalToStringMilliPadded) {
-   auto ignored = std::chrono::system_clock::now();
-   auto value = g3::internal::to_string(ignored, g3::internal::Fractional::Millisecond);
-   EXPECT_EQ("001", value);
-   //ts.tv_nsec = 21000000;
-   value = g3::internal::to_string(ignored, g3::internal::Fractional::Millisecond);
-   EXPECT_EQ("021", value);
+   auto value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::Millisecond);
+   EXPECT_EQ("000", value);
+   value = g3::internal::to_string(k1970_January_1st, g3::internal::Fractional::Millisecond);
+   EXPECT_EQ("000", value);
 }
 
 
 
 TEST(Message, localtime_formatted) {
-
-   
-   auto time_point = std::chrono::system_clock::from_time_t(kTime1);
+   auto time_point = std::chrono::system_clock::from_time_t(k2017_April_27th);
    auto format = g3::localtime_formatted(time_point, "%Y-%m-%d %H:%M:%S"); // %Y/%m/%d
-   EXPECT_EQ("2017-04-27 06:22:27", format);
+   std::string expected = {"2017-04-27 00:22:27"};
+   EXPECT_EQ(expected, format);
 
-}
+   auto us_format = g3::localtime_formatted(time_point, g3::internal::time_formatted); // "%H:%M:%S %f6";
+   EXPECT_EQ("00:22:27 000000", us_format);
 
-/*   ASSERT_TRUE(nullptr != strptime("2016-08-09 22:58:45", "%Y-%m-%d %H:%M:%S", &tm));
-   t = mktime(&tm);
-   timespec ts = {};
-   ts.tv_sec = t;
-   ts.tv_nsec = 123;
-   auto format = g3::localtime_formatted(ts, g3::internal::date_formatted); // %Y/%m/%d
-   EXPECT_EQ("2016/08/09", format);
+   auto ns_format = g3::localtime_formatted(time_point, "%H:%M:%S %f");
+   EXPECT_EQ("00:22:27 000000000", ns_format);
 
-   auto us_format = g3::localtime_formatted(ts, g3::internal::time_formatted); // "%H:%M:%S %f6";
-   EXPECT_EQ("22:58:45 000000", us_format);
-
-   auto ns_format = g3::localtime_formatted(ts, "%H:%M:%S %f");
-   EXPECT_EQ("22:58:45 000000123", ns_format);
-
-   ts.tv_nsec = 1234000;
-   auto ms_format = g3::localtime_formatted(ts, "%H:%M:%S %f3");
-   EXPECT_EQ("22:58:45 001", ms_format);
+   auto ms_format = g3::localtime_formatted(time_point, "%H:%M:%S %f3");
+   EXPECT_EQ("00:22:27 000", ms_format);
    
 }
 
@@ -215,9 +199,6 @@ namespace {
       return lhs.size() == rhs.size()
              && std::equal(lhs.begin(), lhs.end(), rhs.begin(), pred);
    }
-
-
-
 } // anonymous
 TEST(Level, Default) {
    g3::only_change_at_initialization::reset();
@@ -541,4 +522,3 @@ TEST(Level, Addlevel__enabled) {
 
 #endif // G3_DYNAMIC_LOGGING
 
-*/
