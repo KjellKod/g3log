@@ -47,6 +47,10 @@
 # ============================================================================
 
 cmake_minimum_required (VERSION 3.1)
+include( BpcPackage.cmake )
+# ai-master sets its own version from here
+set( VERSION "1.3.0" )
+
 ENABLE_LANGUAGE(CXX)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT (MSVC_IDE OR XCODE))
@@ -150,9 +154,10 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"
    #   usage:   make package
    #   Check the output result and install accordingly.
    # ==========================================================================
-   INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+   # INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 ENDIF()
 
+BpcInstallPackage( NAME g3log NAMESPACE VERSION ${VERSION} TARGETS g3logger USE_HEADER_SUBFOLDER )
 
 IF (NOT MSVC)
    MESSAGE("\n\n

@@ -23,7 +23,7 @@
 
    # Unit test for g3log  (cmake -DUSE_G3LOG_UNIT_TEST=ON ..)
    #    remember to unzip gtest at g3log/3rdParty/gtest
-   option (ADD_G3LOG_UNIT_TEST "g3log unit tests" OFF)
+   option (ADD_G3LOG_UNIT_TEST "g3log unit tests" ON)
 
 
    # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
@@ -74,7 +74,7 @@
        add_library(tester_sharedlib SHARED ${DIR_UNIT_TEST}/tester_sharedlib.h ${DIR_UNIT_TEST}/tester_sharedlib.cpp)
        target_link_libraries(tester_sharedlib ${G3LOG_LIBRARY})
 
-       add_executable(test_dynamic_loaded_shared_lib ../test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
+       add_executable(test_dynamic_loaded_shared_lib ${g3log_SOURCE_DIR}/test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
        target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} -ldl  gtest_170_lib )
