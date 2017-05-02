@@ -49,11 +49,11 @@
 cmake_minimum_required (VERSION 3.1)
 ENABLE_LANGUAGE(CXX)
 
-if(NOT MSVC)
-if(NOT CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE AND NOT (MSVC_IDE OR XCODE))
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type, one of: Release, Debug" FORCE)
-endif()
-message("Build type: ${CMAKE_BUILD_TYPE}")
+  message("Build type: ${CMAKE_BUILD_TYPE}")
+else()
+  message("Configuration types: ${CMAKE_CONFIGURATION_TYPES}")
 endif()
 
 project (g3log)
