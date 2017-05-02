@@ -95,7 +95,7 @@ ENDIF()
    file(GLOB SRC_FILES ${LOG_SRC}/g3log/*.h ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
    file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.hpp)
    
-   set( HEADER_FILES "${HEADER_FILES} ${GENERATED_G3_DEFINITIONS}" )
+    list( APPEND HEADER_FILES ${GENERATED_G3_DEFINITIONS} )
 
    IF (MSVC OR MINGW)
          list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
