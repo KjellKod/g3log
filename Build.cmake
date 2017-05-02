@@ -89,6 +89,9 @@ IF (MSVC OR MINGW)
    MESSAGE("")
 ENDIF()
 
+   INCLUDE (CheckIncludeFileCXX)
+   CHECK_INCLUDE_FILE_CXX( "codecvt" HAVE_CODECVT )
+
    # GENERIC STEPS
    file(GLOB SRC_FILES ${LOG_SRC}/g3log/*.h ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
    file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.hpp)
@@ -104,7 +107,7 @@ ENDIF()
 
    # Create the g3log library
    INCLUDE_DIRECTORIES(${LOG_SRC})
-  SET(G3LOG_LIBRARY g3logger)
+   SET(G3LOG_LIBRARY g3logger)
 
    ADD_LIBRARY(${G3LOG_LIBRARY} SHARED ${SRC_FILES})
    SET(${G3LOG_LIBRARY}_VERSION_STRING ${VERSION})
@@ -126,7 +129,9 @@ ENDIF()
       ENDIF()
    ENDIF()
 
-
+   if( HAVE_CODECVT )
+      target_compile_definitions(g3logger PUBLIC G3LOG_USE_CODECVT)
+   endif()
    TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} ${PLATFORM_LINK_LIBRIES})
 
    # Kjell: This is likely not necessary, except for Windows?
