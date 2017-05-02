@@ -99,15 +99,6 @@ IF (MSVC OR MINGW)
        MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled") 
     ENDIF(DEBUG_BREAK_AT_FATAL_SIGNAL)
 
-
-
-# Option for adding windows shared library
-    option (ADD_BUILD_WIN_SHARED  "Build shared library on Windows" OFF)
-       IF(ADD_BUILD_WIN_SHARED)
-          MESSAGE("-DADD_BUILD_WIN_SHARED=ON") 
-       ELSE() 
-          MESSAGE("-DADD_BUILD_WIN_SHARED=OFF") 
-      ENDIF()
 ENDIF (MSVC OR MINGW)
 MESSAGE("\n\n\n")
 
