@@ -64,6 +64,7 @@
            set_target_properties(${test} PROPERTIES COMPILE_FLAGS "-isystem -pthread ")
         ENDIF( NOT(MSVC)) 
         target_link_libraries(${test} g3logger gtest_170_lib)
+		add_test( ${test} ${test} )
       ENDFOREACH(test)
    
     #
