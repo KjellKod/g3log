@@ -70,9 +70,15 @@ struct LogCapture {
       return _stream;
    }
 
+   void capturef(const wchar_t *printf_like_message, ...);
 
+   std::wostringstream &wstream() {
+      return _wstream;
+   }
 
    std::ostringstream _stream;
+   std::wostringstream _wstream;
+
    std::string _stack_trace;
    const char *_file;
    const int _line;

@@ -91,6 +91,9 @@ IF (MSVC OR MINGW)
    MESSAGE("")
 ENDIF()
 
+   INCLUDE (CheckIncludeFileCXX)
+   CHECK_INCLUDE_FILE_CXX( "codecvt" HAVE_CODECVT )
+
    # GENERIC STEPS
    file(GLOB SRC_FILES ${LOG_SRC}/g3log/*.h ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
    file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.hpp)
@@ -127,6 +130,9 @@ ENDIF()
       set_target_properties(${G3LOG_LIBRARY} PROPERTIES MACOSX_RPATH TRUE)
    ENDIF()
 
+   if( HAVE_CODECVT )
+      target_compile_definitions(g3logger PUBLIC G3LOG_USE_CODECVT)
+   endif()
    TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} ${PLATFORM_LINK_LIBRIES})
 
    set_property( TARGET g3logger PROPERTY PUBLIC_HEADER ${HEADER_FILES} )
