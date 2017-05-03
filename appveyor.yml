@@ -1,12 +1,6 @@
 environment:
   P: "c:/projects/libs"
 
-# branches to build
-branches:
-  # whitelist
-  #only:
-  #  - master
-
 # Operating system (build VM template)
 os: Visual Studio 2015
 
