@@ -35,7 +35,7 @@ IF(USE_DYNAMIC_LOGGING_LEVELS)
    MESSAGE("\tDynamic logging levels is used")
    MESSAGE("\tUse  [g3::addLogLevel(LEVEL boolean)] to enable/disable logging on specified levels\n\n")
 ELSE() 
-  MESSAGE("-DUSE_DYNAMIC_LOGGING_LEVELS=OFF") 
+   MESSAGE("-DUSE_DYNAMIC_LOGGING_LEVELS=OFF") 
 ENDIF(USE_DYNAMIC_LOGGING_LEVELS)
 
 
@@ -48,8 +48,8 @@ option (CHANGE_G3LOG_DEBUG_TO_DBUG
 IF(CHANGE_G3LOG_DEBUG_TO_DBUG)
    LIST(APPEND G3_DEFINITIONS CHANGE_G3LOG_DEBUG_TO_DBUG)
    MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=ON                 DBUG instead of DEBUG logging level is used")
-   ELSE() 
-  MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')") 
+ELSE() 
+   MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')") 
 ENDIF(CHANGE_G3LOG_DEBUG_TO_DBUG)
 
 
@@ -61,11 +61,11 @@ option (ENABLE_FATAL_SIGNALHANDLING
     "Vectored exception / crash handling with improved stack trace" ON)
 
 IF(NOT ENABLE_FATAL_SIGNALHANDLING)
-  LIST(APPEND G3_DEFINITIONS DISABLE_FATAL_SIGNALHANDLING)
+   LIST(APPEND G3_DEFINITIONS DISABLE_FATAL_SIGNALHANDLING)
 
-    MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=OFF               Fatal signal handler is disabled")
-  ELSE() 
-  MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=ON\tFatal signal handler is enabled")
+   MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=OFF               Fatal signal handler is disabled")
+ELSE() 
+   MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=ON\tFatal signal handler is enabled")
 ENDIF(NOT ENABLE_FATAL_SIGNALHANDLING)
 
 # WINDOWS OPTIONS
@@ -78,8 +78,8 @@ IF (MSVC OR MINGW)
        "Vectored exception / crash handling with improved stack trace" ON)
 
     IF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
-      LIST(APPEND G3_DEFINITIONS DISABLE_VECTORED_EXCEPTIONHANDLING)
-      MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled") 
+       LIST(APPEND G3_DEFINITIONS DISABLE_VECTORED_EXCEPTIONHANDLING)
+       MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled") 
     ELSE() 
        MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=ON\t\t\tVectored exception handling is enabled") 
     ENDIF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
@@ -99,6 +99,15 @@ IF (MSVC OR MINGW)
        MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled") 
     ENDIF(DEBUG_BREAK_AT_FATAL_SIGNAL)
 
+
+
+# Option for building as a static library in windows
+    option (G3_SHARED_LIB  "Build shared library" ON)
+       IF(G3_SHARED_LIB)
+          MESSAGE("Building shared library") 
+       ELSE() 
+          MESSAGE("Building static library") 
+      ENDIF()
 ENDIF (MSVC OR MINGW)
 MESSAGE("\n\n\n")
 
