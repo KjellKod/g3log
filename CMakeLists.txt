@@ -69,7 +69,6 @@ endif()
 
 SET(MAJOR_VERSION 1)
 IF (${VERSION}.x STREQUAL ".x")
-   MESSAGE("Extracting git software version")
    IF (MSVC)
       message("windows: Extracting git software version")
       execute_process(COMMAND cmd "/c" "cd ${CMAKE_SOURCE_DIR} & git rev-list --branches HEAD | find /c /v """ OUTPUT_VARIABLE GIT_VERSION)
