@@ -28,11 +28,11 @@ before_build:
   - cd c:\projects\g3log\
   - mkdir build
   - cd build 
-  - cmake -G "Visual Studio 14 2015 Win64" -DADD_G3LOG_UNIT_TEST=ON ..
+  - cmake -G "Visual Studio 14 2015 Win64" -DADD_G3LOG_UNIT_TEST=ON -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON ..
   - msbuild g3log.sln /p:Configuration=Release
   
 # scripts to run after build
 after_build:
-  - Release\g3log-FATAL-contract.exe
+  - cmd /c Release\g3log-FATAL-contract.exe || exit /B 0
   - msbuild RUN_TESTS.vcxproj /p:Configuration=Release
 
