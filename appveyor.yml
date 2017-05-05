@@ -33,7 +33,6 @@ before_build:
   
 # scripts to run after build
 after_build:
+  - Release\g3log-FATAL-contract.exe
   - msbuild RUN_TESTS.vcxproj /p:Configuration=Release
-  - cd c:\projects\g3log\build\Release
-  - g3log-FATAL-contract.exe
 
