@@ -34,5 +34,5 @@ before_build:
 # scripts to run after build
 after_build:
   - cmd /c Release\g3log-FATAL-contract.exe || exit /B 0
-  - ctest -C Release --verbose
+  - msbuild RUN_TESTS.vcxproj /p:Configuration=Release
 

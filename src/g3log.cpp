@@ -36,10 +36,7 @@
 
 namespace {
    std::once_flag g_initialize_flag;
-   // When logging is re-initialized while logging occurs this may have to take a few
-   // messages to avoid a crash
-   auto g_empty_worker = g3::LogWorker::createLogWorker();
-   std::atomic<g3::LogWorker*> g_logger_instance = g_empty_worker.get(); // instantiated and OWNED somewhere else (main)
+   g3::LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
    std::mutex g_logging_init_mutex;
 
    std::unique_ptr<g3::LogMessage> g_first_unintialized_msg = {nullptr};
@@ -47,6 +44,7 @@ namespace {
    std::once_flag g_save_first_unintialized_flag;
    const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = [] { /*does nothing */};
    std::function<void(void)> g_fatal_pre_logging_hook;
+
 
    std::atomic<size_t> g_fatal_hook_recursive_counter = {0};
 }
@@ -65,13 +63,6 @@ namespace g3 {
       std::call_once(g_initialize_flag, [] {
          installCrashHandler();
       });
-	  if (!g_logger_instance.is_lock_free())
-	  {
-		  std::cerr << "This would cost too much performance!" << std::endl;
-		  std::exit(EXIT_FAILURE);
-	  }
-
-
       std::lock_guard<std::mutex> lock(g_logging_init_mutex);
       if (internal::isLoggingInitialized() || nullptr == bgworker) {
          std::ostringstream exitMsg;
@@ -129,7 +120,7 @@ namespace g3 {
    namespace internal {
 
       bool isLoggingInitialized() {
-         return g_logger_instance != g_empty_worker.get();
+         return g_logger_instance != nullptr;
       }
 
       /**
@@ -138,7 +129,7 @@ namespace g3 {
        */
       void shutDownLogging() {
          std::lock_guard<std::mutex> lock(g_logging_init_mutex);
-         g_logger_instance = g_empty_worker.get();
+         g_logger_instance = nullptr;
 
       }
 
@@ -227,7 +218,7 @@ namespace g3 {
          }
 
          // logger is initialized
-         g_logger_instance.load()->save(incoming);
+         g_logger_instance->save(incoming);
       }
 
       /** Fatal call saved to logger. This will trigger SIGABRT or other fatal signal
@@ -244,7 +235,7 @@ namespace g3 {
             std::cerr << error.str() << std::flush;
             internal::exitWithDefaultSignalHandler(message.get()->_level, message.get()->_signal_id);
          }
-         g_logger_instance.load()->fatal(message);
+         g_logger_instance->fatal(message);
          while (shouldBlockForFatalHandling()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
          }
