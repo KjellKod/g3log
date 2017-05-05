@@ -123,7 +123,7 @@ namespace testing_helpers {
 
 #ifdef G3_DYNAMIC_LOGGING
       g3::only_change_at_initialization::addLogLevel(INFO, true);
-      g3::only_change_at_initialization::addLogLevel(DEBUG, true);
+      g3::only_change_at_initialization::addLogLevel(G3LOG_DEBUG, true);
       g3::only_change_at_initialization::addLogLevel(WARNING, true);
       g3::only_change_at_initialization::addLogLevel(FATAL, true);
 #endif

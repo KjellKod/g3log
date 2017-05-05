@@ -47,8 +47,10 @@ option (CHANGE_G3LOG_DEBUG_TO_DBUG
        "Use DBUG logging level instead of DEBUG. By default DEBUG is the debugging level" ON)
 IF(CHANGE_G3LOG_DEBUG_TO_DBUG)
    LIST(APPEND G3_DEFINITIONS CHANGE_G3LOG_DEBUG_TO_DBUG)
+   LIST(APPEND G3_DEFINITIONS "G3LOG_DEBUG DBUG")
    MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=ON                 DBUG instead of DEBUG logging level is used")
 ELSE() 
+   LIST(APPEND G3_DEFINITIONS "G3LOG_DEBUG DEBUG")
    MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')") 
 ENDIF(CHANGE_G3LOG_DEBUG_TO_DBUG)
 
@@ -68,6 +70,14 @@ ELSE()
    MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=ON\tFatal signal handler is enabled")
 ENDIF(NOT ENABLE_FATAL_SIGNALHANDLING)
 
+# Option for building as a static or shared library in all platforms
+option (G3_SHARED_LIB  "Build shared library" ON)
+IF(G3_SHARED_LIB)
+   MESSAGE("Building shared library") 
+ELSE() 
+   MESSAGE("Building static library") 
+ENDIF()
+   
 # WINDOWS OPTIONS
 IF (MSVC OR MINGW) 
 # -DENABLE_VECTORED_EXCEPTIONHANDLING=ON   : defualt change the
@@ -77,12 +87,12 @@ IF (MSVC OR MINGW)
    option (ENABLE_VECTORED_EXCEPTIONHANDLING
        "Vectored exception / crash handling with improved stack trace" OFF)
 
-    IF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
-       LIST(APPEND G3_DEFINITIONS DISABLE_VECTORED_EXCEPTIONHANDLING)
-       MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled") 
-    ELSE() 
-       MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=ON\t\t\tVectored exception handling is enabled") 
-    ENDIF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
+   IF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
+      LIST(APPEND G3_DEFINITIONS DISABLE_VECTORED_EXCEPTIONHANDLING)
+      MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled") 
+   ELSE() 
+      MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=ON\t\t\tVectored exception handling is enabled") 
+   ENDIF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
 
 
 
@@ -92,22 +102,13 @@ IF (MSVC OR MINGW)
 #
    option (DEBUG_BREAK_AT_FATAL_SIGNAL
        "Enable Visual Studio break point when receiving a fatal exception. In __DEBUG mode only" OFF)
-    IF(DEBUG_BREAK_AT_FATAL_SIGNAL)
-      LIST(APPEND G3_DEFINITIONS DEBUG_BREAK_AT_FATAL_SIGNAL)
-      MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=ON                  Break point for fatal signal is enabled for __DEBUG.") 
-    ELSE() 
-       MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled") 
-    ENDIF(DEBUG_BREAK_AT_FATAL_SIGNAL)
+   IF(DEBUG_BREAK_AT_FATAL_SIGNAL)
+     LIST(APPEND G3_DEFINITIONS DEBUG_BREAK_AT_FATAL_SIGNAL)
+     MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=ON                  Break point for fatal signal is enabled for __DEBUG.") 
+   ELSE() 
+      MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled") 
+   ENDIF(DEBUG_BREAK_AT_FATAL_SIGNAL)
 
-
-
-# Option for building as a static library in windows
-    option (G3_SHARED_LIB  "Build shared library" ON)
-       IF(G3_SHARED_LIB)
-          MESSAGE("Building shared library") 
-       ELSE() 
-          MESSAGE("Building static library") 
-      ENDIF()
 ENDIF (MSVC OR MINGW)
 MESSAGE("\n\n\n")
 

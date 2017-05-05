@@ -24,11 +24,6 @@
 #define NOEXCEPT throw()
 #endif
 
-#ifdef CHANGE_G3LOG_DEBUG_TO_DBUG
-#undef DEBUG
-#define DEBUG DBUG
-#endif
-
 namespace
 {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -46,33 +41,33 @@ namespace
 
    void RaiseSIGABRT() {
       raise(SIGABRT);
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RaiseSIGFPE() {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
       raise(SIGFPE);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RaiseSIGSEGV() {
-      LOG(DEBUG) << " trigger exit";
-      LOG(DEBUG) << "Exit by SIGSEGV";
+      LOG(G3LOG_DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << "Exit by SIGSEGV";
       raise(SIGSEGV);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RaiseSIGILL() {
-      LOG(DEBUG) << " trigger exit";
-      LOGF(DEBUG, "Exit by %s", "SIGILL");
+      LOG(G3LOG_DEBUG) << " trigger exit";
+      LOGF(G3LOG_DEBUG, "Exit by %s", "SIGILL");
       raise(SIGILL);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void RAiseSIGTERM() {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       LOGF_IF(INFO, (false != true), "Exiting %s SIGFPE", "by");
       raise(SIGTERM);
       LOG(WARNING) << "Expected to have died by now...";
@@ -80,7 +75,7 @@ namespace
 
    int gShouldBeZero = 1;
    void DivisionByZero() {
-      LOG(DEBUG) << " trigger exit   Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero;
+      LOG(G3LOG_DEBUG) << " trigger exit   Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero;
       LOG(INFO) << "Division by zero is a big no-no";
       int value = 3;
       auto test = value / gShouldBeZero;
@@ -88,14 +83,14 @@ namespace
    }
 
    void IllegalPrintf() {
-      LOG(DEBUG) << " trigger exit";
-      LOG(DEBUG) << "Impending doom due to illeteracy";
+      LOG(G3LOG_DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << "Impending doom due to illeteracy";
       LOGF(INFO, "2nd attempt at ILLEGAL PRINTF_SYNTAX %d EXAMPLE. %s %s", "hello", 1);
       LOG(WARNING) << "Expected to have died by now...";
    }
 
    void OutOfBoundsArrayIndexing() {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       std::vector<int> v;
       v[0] = 5;
       LOG(WARNING) << "Expected to have died by now...";
@@ -103,7 +98,7 @@ namespace
 
 
    void AccessViolation() {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       char *ptr = 0;
       LOG(INFO) << "Death by access violation is imminent";
       *ptr = 0;
@@ -111,12 +106,12 @@ namespace
    }
 
    void NoExitFunction() {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       CHECK(false) << "This function should never be called";
    }
 
    void RaiseSIGABRTAndAccessViolation() {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
 
       auto f1 = std::async(std::launch::async, &RaiseSIGABRT);
       auto f2 = std::async(std::launch::async, &AccessViolation);
@@ -127,7 +122,7 @@ namespace
 
    using deathfunc =  void (*) (void);
    void Death_x10000(deathfunc func, std::string funcname) NOEXCEPT {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       std::vector<std::future<void>> asyncs;
       asyncs.reserve(10000);
       for (auto idx = 0; idx < 10000; ++idx) {
@@ -143,7 +138,7 @@ namespace
 
 
    void Throw() NOEXCEPT {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       std::future<int> empty;
       empty.get(); 
       // --> thows future_error http://en.cppreference.com/w/cpp/thread/future_error
@@ -162,7 +157,7 @@ namespace
    }
 
    void FailedCHECK() {
-      LOG(DEBUG) << " trigger exit";
+      LOG(G3LOG_DEBUG) << " trigger exit";
       CHECK(false) << "This is fatal";
    }
 
@@ -177,7 +172,7 @@ namespace
 
 
    void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
-      LOG(DEBUG) << "trigger exit";
+      LOG(G3LOG_DEBUG) << "trigger exit";
 
       auto exitFunction = &NoExitFunction;
       switch (fatalChoice) {
@@ -286,7 +281,7 @@ void breakHere() {
    std::ostringstream oss;
    oss  << "Fatal hook function: " << __FUNCTION__ << ":" << __LINE__  << " was called";
    oss << " through g3::setFatalPreLoggingHook(). setFatalPreLoggingHook should be called AFTER g3::initializeLogging()" << std::endl;
-   LOG(DEBUG) << oss.str();
+   LOG(G3LOG_DEBUG) << oss.str();
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    __debugbreak();
 #endif
@@ -306,7 +301,7 @@ int main(int argc, char **argv)
              << "The logfile is generated at:  [" << log_file_name.get() << "]\n\n" << std::endl;
 
 
-   LOGF(DEBUG, "Fatal exit example starts now, it's as easy as  %d", 123);
+   LOGF(G3LOG_DEBUG, "Fatal exit example starts now, it's as easy as  %d", 123);
    LOG(INFO) << "Feel free to read the source code also in g3log/example/main_fatal_choice.cpp";
 
    while (true) {

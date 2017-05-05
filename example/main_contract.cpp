@@ -30,11 +30,6 @@ namespace example_fatal
    }
 } // example fatal
 
-#ifdef CHANGE_G3LOG_DEBUG_TO_DBUG
-#undef DEBUG
-#define DEBUG DBUG
-#endif
-
 int main(int argc, char **argv)
 {
    double pi_d = 3.1415926535897932384626433832795;
@@ -51,14 +46,14 @@ int main(int argc, char **argv)
 
    LOGF(INFO, "Hi log %d", 123);
    LOG(INFO) << "Test SLOG INFO";
-   LOG(DEBUG) << "Test SLOG DEBUG";
+   LOG(G3LOG_DEBUG) << "Test SLOG DEBUG";
    LOG(INFO) << "one: " << 1;
    LOG(INFO) << "two: " << 2;
    LOG(INFO) << "one and two: " << 1 << " and " << 2;
-   LOG(DEBUG) << "float 2.14: " << 1000 / 2.14f;
-   LOG(DEBUG) << "pi double: " << pi_d;
-   LOG(DEBUG) << "pi float: " << pi_f;
-   LOG(DEBUG) << "pi float (width 10): " << std::setprecision(10) << pi_f;
+   LOG(G3LOG_DEBUG) << "float 2.14: " << 1000 / 2.14f;
+   LOG(G3LOG_DEBUG) << "pi double: " << pi_d;
+   LOG(G3LOG_DEBUG) << "pi float: " << pi_f;
+   LOG(G3LOG_DEBUG) << "pi float (width 10): " << std::setprecision(10) << pi_f;
    LOGF(INFO, "pi float printf:%f", pi_f);
 
    // FATAL SECTION
