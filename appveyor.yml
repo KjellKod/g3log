@@ -18,7 +18,7 @@ install:
   # by default, all script lines are interpreted as batch
 
 build:
-  project: g3log\build\g3log.sln
+  project: c:\projects\g3log\build\g3log.sln
 
 # scripts to run before build
 before_build:
