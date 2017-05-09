@@ -30,7 +30,7 @@
    option (ADD_FATAL_EXAMPLE  "Fatal (fatal-crashes/contract) examples " ON)
 
 
-   IF (ADD_FATAL_EXAMPLE)
+   IF (ADD_FATAL_EXAMPLE AND LIB_DYNAMIC)
       MESSAGE("-DADD_FATAL_EXAMPLE=ON")
       MESSAGE("\t\t[contract][sigsegv][fatal choice] are examples of when g3log comes in handy\n")
       include_directories (${DIR_EXAMPLE})
@@ -43,4 +43,4 @@
       target_link_libraries(g3log-FATAL-choice ${G3LOG_LIBRARY} ${EXAMPLE_PLATFORM_LINK_LIBRIES})
    ELSE()
        MESSAGE("-DADD_SIMPLE_EXAMPLE=OFF")
-   ENDIF (ADD_FATAL_EXAMPLE)
+   ENDIF (ADD_FATAL_EXAMPLE AND LIB_DYNAMIC)

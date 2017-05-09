@@ -109,9 +109,26 @@ IF (MSVC OR MINGW)
           MESSAGE("-DADD_BUILD_WIN_SHARED=OFF") 
       ENDIF()
 ENDIF (MSVC OR MINGW)
+
+# -DLIB_DYNAMIC=ON : Build dynamic version of the library
+option (LIB_DYNAMIC
+  "Build dynamic version of the library. By default the dynamic library will be generated" ON)
+IF (LIB_DYNAMIC)
+  MESSAGE("-DLIB_DYNAMIC=ON\t\t\t(Dynamic library will be built)") 
+ELSE() 
+  MESSAGE("-DLIB_DYNAMIC=OFF\t\t\t(Dynamic library will not be built)") 
+ENDIF(LIB_DYNAMIC)
+
+# -DLIB_STATIC=ON : Build static version of the library
+option (LIB_STATIC
+  "Build static version of the library. By default the static library will not be generated" OFF)
+IF (LIB_STATIC)
+  MESSAGE("-DLIB_STATIC=ON\t\t\t\t(Static library will be built)") 
+ELSE() 
+  MESSAGE("-DLIB_STATIC=OFF\t\t\t(Static library will not be built)") 
+ENDIF(LIB_STATIC)
+
 MESSAGE("\n\n\n")
-
-
 
 
 
