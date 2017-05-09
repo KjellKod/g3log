@@ -18,7 +18,7 @@ install:
   # by default, all script lines are interpreted as batch
 
 build:
-  project: g3log\build\g3log.sln
+  project: c:\projects\g3log\build\g3log.sln
 
 # scripts to run before build
 before_build:
@@ -28,11 +28,11 @@ before_build:
   - cd c:\projects\g3log\
   - mkdir build
   - cd build 
-  - cmake -DCMAKE_BUILD=Relese -G "Visual Studio 14 2015 Win64" -DADD_G3LOG_UNIT_TEST=ON ..
-  - msbuild g3log.sln
+  - cmake -G "Visual Studio 14 2015 Win64" -DADD_G3LOG_UNIT_TEST=ON -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON ..
+  - msbuild g3log.sln /p:Configuration=Release
   
 # scripts to run after build
 after_build:
-  - cd c:\projects\g3log\build\Release
-  - g3log-FATAL-contract.exe
+  - cmd /c Release\g3log-FATAL-contract.exe || exit /B 0
+  - ctest -C Release --verbose
 

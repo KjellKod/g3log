@@ -90,14 +90,10 @@ namespace g3 {
 } // g3
 
 
-#if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
-const LEVELS DBUG {g3::kDebugValue, {"DEBUG"}},
-#else
-const LEVELS DEBUG {g3::kDebugValue, {"DEBUG"}},
-#endif
-      INFO {g3::kInfoValue, {"INFO"}},
-      WARNING {g3::kWarningValue, {"WARNING"}},
-      FATAL {g3::kFatalValue, {"FATAL"}};
+const LEVELS G3LOG_DEBUG{g3::kDebugValue, {"DEBUG"}},
+   INFO {g3::kInfoValue, {"INFO"}},
+   WARNING {g3::kWarningValue, {"WARNING"}},
+   FATAL {g3::kFatalValue, {"FATAL"}};
 
 
 

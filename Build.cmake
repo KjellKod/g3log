@@ -12,6 +12,7 @@
 
 SET(LOG_SRC ${g3log_SOURCE_DIR}/src)
 include_directories(${LOG_SRC})
+include_directories("${CMAKE_CURRENT_BINARY_DIR}/include")
 SET(ACTIVE_CPP0xx_DIR "Release")
 
 #cmake -DCMAKE_CXX_COMPILER=clang++ ..
@@ -60,9 +61,6 @@ ELSEIF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
    ENDIF()
 ELSEIF(MSVC)
    set(PLATFORM_LINK_LIBRIES dbghelp)
-   set(CMAKE_CXX_FLAGS_RELEASE "/MT")
-   set(CMAKE_CXX_FLAGS_DEBUG "/MTd")
-
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8") # source code already in utf-8, force it for compilers in non-utf8_windows_locale
    # ERROR level conflicts with windows.h
    ADD_DEFINITIONS (-DNOGDI)
@@ -93,20 +91,32 @@ ENDIF()
    file(GLOB SRC_FILES ${LOG_SRC}/g3log/*.h ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
    file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.hpp)
    
+   list( APPEND HEADER_FILES ${GENERATED_G3_DEFINITIONS} )
+   list( APPEND SRC_FILES ${GENERATED_G3_DEFINITIONS} )
 
    IF (MSVC OR MINGW)
-         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
+      list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
    ELSE()
-         list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
+      list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
    ENDIF (MSVC OR MINGW)
 
    set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
 
    # Create the g3log library
    INCLUDE_DIRECTORIES(${LOG_SRC})
-  SET(G3LOG_LIBRARY g3logger)
+   SET(G3LOG_LIBRARY g3logger)
 
-   ADD_LIBRARY(${G3LOG_LIBRARY} SHARED ${SRC_FILES})
+   IF( G3_SHARED_LIB )
+      IF(NOT(CMAKE_VERSION LESS 3.4))
+         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+      ELSE()
+         message( FATAL "Need CMake version >=3.4 to build shared windows library!" )
+      ENDIF()
+      ADD_LIBRARY(${G3LOG_LIBRARY} SHARED ${SRC_FILES})
+   ELSE()
+      ADD_LIBRARY(${G3LOG_LIBRARY} STATIC ${SRC_FILES})
+   ENDIF()
+
    SET(${G3LOG_LIBRARY}_VERSION_STRING ${VERSION})
    MESSAGE("Creating ${G3LOG_LIBRARY} VERSION: " ${VERSION})
    SET_TARGET_PROPERTIES(g3logger PROPERTIES LINKER_LANGUAGE CXX SOVERSION ${VERSION})
@@ -119,13 +129,6 @@ ENDIF()
    IF(APPLE)
       set_target_properties(${G3LOG_LIBRARY} PROPERTIES MACOSX_RPATH TRUE)
    ENDIF()
-
-   IF(NOT ${ADD_BUILD_WIN_SHARED}.x STREQUAL ".x")
-      IF(NOT(CMAKE_VERSION LESS 3.4) AND MSVC)
-         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-      ENDIF()
-   ENDIF()
-
 
    TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} ${PLATFORM_LINK_LIBRIES})
 

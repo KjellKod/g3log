@@ -68,7 +68,7 @@ TEST(ConceptSink, OneHundredSinks) {
          // ignore the handle
          worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
-      LOG(DEBUG) << "start message";
+      LOG(G3LOG_DEBUG) << "start message";
       LogMessagePtr message1{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       LogMessagePtr message2{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       auto& write1 = message1.get()->write();
@@ -183,7 +183,7 @@ TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
   EXPECT_ANY_THROW(failed.get());
 }
 
-TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
+TEST(ConceptSink, DISABLED_AggressiveThreadCallsDuringShutdown) {
    std::atomic<bool> keepRunning{true};
 
    std::vector<std::thread> threads;
