@@ -73,9 +73,9 @@ ENDIF(NOT ENABLE_FATAL_SIGNALHANDLING)
 # Option for building as a static or shared library in all platforms
 option (G3_SHARED_LIB  "Build shared library" ON)
 IF(G3_SHARED_LIB)
-   MESSAGE("Building shared library") 
-ELSE() 
-   MESSAGE("Building static library") 
+   MESSAGE("-DG3_SHARED_LIB=ON\tBuild shared library") 
+ELSE()
+   MESSAGE("-DG3_SHARED_LIB=ON\tBuild static library")  
 ENDIF()
    
 # WINDOWS OPTIONS

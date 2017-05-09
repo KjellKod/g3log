@@ -1,10 +1,10 @@
-# ==========================================================================
+# =============================================================================
 # 2010 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 # with no warranties. This code is yours to share, use and modify with no
 # strings attached and no restrictions or obligations.
 #
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
-# ============================================================================*/
+# ==============================================================================
 
 
 # Below are details for compiling on Windows and Linux
@@ -51,12 +51,13 @@ ENABLE_LANGUAGE(CXX)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT (MSVC_IDE OR XCODE))
   set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type, one of: Release, Debug" FORCE)
-  message("Build type: ${CMAKE_BUILD_TYPE}")
-else()
-  message("Configuration types: ${CMAKE_CONFIGURATION_TYPES}")
 endif()
 
+
 project (g3log)
+
+message("Build type: ${CMAKE_BUILD_TYPE}")
+message("Configuration types: ${CMAKE_CONFIGURATION_TYPES}")
 
 # Detect 64 or 32 bit
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)
