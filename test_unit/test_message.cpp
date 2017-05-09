@@ -12,6 +12,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <g3log/generated_definitions.hpp>
 
 namespace {
    // https://www.epochconverter.com/
@@ -189,21 +190,31 @@ TEST(Message, localtime_formatted) {
 #endif // timezone 
 
 
-
+#if defined(CHANGE_G3LOG_DEBUG_TO_DBUG)
+TEST(Level, G3LogDebug_is_DBUG) {
+ LOG(DBUG) << "DBUG equals G3LOG_DEBUG";
+ LOG(G3LOG_DEBUG) << "G3LOG_DEBUG equals DBUG";
+}
+#else
+TEST(Level, G3LogDebug_is_DEBUG) {
+ LOG(DEBUG) << "DEBUG equals G3LOG_DEBUG";
+ LOG(G3LOG_DEBUG) << "G3LOG_DEBUG equals DEBUG";
+}
+#endif
 
 
 #ifdef G3_DYNAMIC_LOGGING
 namespace {
    using LevelsContainer = std::map<int, g3::LoggingLevel>;
    const LevelsContainer g_test_log_level_defaults = {
-      {g3::kDebugValue, {DEBUG}},
+	  {G3LOG_DEBUG.value, {G3LOG_DEBUG}},
       {INFO.value, {INFO}},
       {WARNING.value, {WARNING}},
       {FATAL.value, {FATAL}}
    };
 
    const LevelsContainer g_test_all_disabled = {
-      {g3::kDebugValue, {DEBUG, false}},
+	  {G3LOG_DEBUG.value, {G3LOG_DEBUG,false}},
       {INFO.value, {INFO, false}},
       {WARNING.value, {WARNING, false}},
       {FATAL.value, {FATAL, false}}
@@ -239,7 +250,7 @@ TEST(Level, DefaultChanged_only_change_at_initialization) {
    EXPECT_FALSE(mapCompare(defaults, g_test_log_level_defaults));
 
    const LevelsContainer defaultsWithInfoChangged = {
-      {g3::kDebugValue, {DEBUG, true}},
+      {G3LOG_DEBUG.value, {G3LOG_DEBUG, true}},
       {INFO.value, {INFO, false}},
       {WARNING.value, {WARNING, true}},
       {FATAL.value, {FATAL, true}}
@@ -259,7 +270,7 @@ TEST(Level, DefaultChanged_log_levels) {
    EXPECT_FALSE(mapCompare(defaults, g_test_log_level_defaults));
 
    const LevelsContainer defaultsWithInfoChangged = {
-      {g3::kDebugValue, {DEBUG, true}},
+      {G3LOG_DEBUG.value, {G3LOG_DEBUG, true}},
       {INFO.value, {INFO, false}},
       {WARNING.value, {WARNING, true}},
       {FATAL.value, {FATAL, true}}
@@ -316,7 +327,7 @@ TEST(Level, setHighestLogLevel_high_end) {
 
 
    LevelsContainer expected = {
-      {g3::kDebugValue, {DEBUG, false}},
+      {G3LOG_DEBUG.value, {G3LOG_DEBUG, false}},
       {INFO.value, {INFO, false}},
       {WARNING.value, {WARNING, false}},
       {FATAL.value, {FATAL, true}}
@@ -335,11 +346,11 @@ TEST(Level, setHighestLogLevel_low_end) {
 
 
    g3::log_levels::disableAll();
-   g3::log_levels::setHighest(DEBUG);
+   g3::log_levels::setHighest(G3LOG_DEBUG);
 
 
    LevelsContainer expected = {
-      {g3::kDebugValue, {DEBUG, true}},
+      {G3LOG_DEBUG.value,{G3LOG_DEBUG, true}},
       {INFO.value, {INFO, true}},
       {WARNING.value, {WARNING, true}},
       {FATAL.value, {FATAL, true}}
@@ -362,7 +373,7 @@ TEST(Level, setHighestLogLevel_middle) {
 
 
    LevelsContainer expected = {
-      {g3::kDebugValue, {DEBUG, false}},
+      {G3LOG_DEBUG.value, {G3LOG_DEBUG, false}},
       {INFO.value, {INFO, false}},
       {WARNING.value, {WARNING, true}},
       {FATAL.value, {FATAL, true}}
@@ -382,7 +393,7 @@ TEST(Level, setHighestLogLevel_StepWiseDisableAll) {
    });
 
    LevelsContainer changing_levels = {
-      {g3::kDebugValue, {DEBUG, true}},
+      {G3LOG_DEBUG.value, {G3LOG_DEBUG, true}},
       {INFO.value, {INFO, true}},
       {WARNING.value, {WARNING, true}},
       {FATAL.value, {FATAL, true}}

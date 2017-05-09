@@ -11,6 +11,12 @@
 #include <g3log/logworker.hpp>
 #include "tester_sharedlib.h"
 
+#if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
+#define DEBUG_NAME DBUG
+#else
+#define DEBUG_NAME DEBUG
+#endif
+
 struct RuntimeLoadedLib : public SomeLibrary {
 
    RuntimeLoadedLib() {
@@ -19,7 +25,7 @@ struct RuntimeLoadedLib : public SomeLibrary {
    }
 
    ~RuntimeLoadedLib() {
-      LOG(DEBUG) << "Library destroyed";
+      LOG(DEBUG_NAME) << "Library destroyed";
    }
 
    void action() {
