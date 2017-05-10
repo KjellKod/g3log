@@ -133,9 +133,6 @@ ENDIF()
       set_target_properties(${G3LOG_LIBRARY} PROPERTIES MACOSX_RPATH TRUE)
    ENDIF()
 
-   if( HAVE_CODECVT )
-      target_compile_definitions(g3logger PUBLIC G3LOG_USE_CODECVT)
-   endif()
    TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} ${PLATFORM_LINK_LIBRIES})
 
    # Kjell: This is likely not necessary, except for Windows?
