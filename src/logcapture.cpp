@@ -63,7 +63,7 @@ void LogCapture::capturef(const wchar_t *printf_like_message, ...) {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
    const int nbrcharacters = _vsnwprintf_s(finished_message, _countof(finished_message), _TRUNCATE, printf_like_message, arglist);
 #else
-   const int nbrcharacters = vswprintf(finished_message, sizeof(finished_message), printf_like_message, arglist);
+   const int nbrcharacters = vswprintf(finished_message, sizeof(finished_message)/sizeof(wchar_t), printf_like_message, arglist);
 #endif
    va_end(arglist);
 
