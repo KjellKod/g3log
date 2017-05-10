@@ -23,7 +23,7 @@ SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output dir for headers")
 
 IF (${CPACK_INSTALL_PREFIX}.x STREQUAL ".x")
    SET(CPACK_INSTALL_PREFIX "/usr/local")
-   MESSAGE("CPACK_INSTALL_PREFIX: ${CPACK_INSTALL_PREFIX}")
+   message( STATUS "CPACK_INSTALL_PREFIX: ${CPACK_INSTALL_PREFIX}" )
 ENDIF()
 
 
@@ -60,23 +60,23 @@ SET(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "G3Log C++ headers")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    SET(CPACK_GENERATOR "DEB")
    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "KjellKod - Kjell Hedstrom")
-   MESSAGE("\nTo create installation package: ")
-   MESSAGE("make package")
+   message( STATUS "\nTo create installation package: " )
+   message( STATUS "make package" )
 ENDIF()
 
 
-MESSAGE("\nOption to install using 'sudo make install")
-MESSAGE("Installation locations: ")
-MESSAGE("====================")
-MESSAGE("Headers: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}")
-MESSAGE("Library installation directory: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+message( STATUS "\nOption to install using 'sudo make install" )
+message( STATUS "Installation locations: " )
+message( STATUS "====================" )
+message( STATUS "Headers: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}" )
+message( STATUS "Library installation directory: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" )
 
-MESSAGE("For more information please see g3log/CPackLists.txt\n\n")
-MESSAGE("To install: sudo dpkg -i g3log-***Linux.deb")
-MESSAGE("To list package contents: sudo dpkg --contents g3log-***Linux.deb")
+message( STATUS "For more information please see g3log/CPackLists.txt\n\n" )
+message( STATUS "To install: sudo dpkg -i g3log-***Linux.deb" )
+message( STATUS "To list package contents: sudo dpkg --contents g3log-***Linux.deb" )
 
-MESSAGE("List content of the installed package: sudo dpkg -L g3log")
-MESSAGE("To remove: sudo dpkg -r g3log")
+message( STATUS "List content of the installed package: sudo dpkg -L g3log" )
+message( STATUS "To remove: sudo dpkg -r g3log" )
 
 #  NOTE: to change installation locations you can use the settings below
 #  examples:
