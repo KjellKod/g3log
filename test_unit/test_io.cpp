@@ -279,7 +279,7 @@ TEST(LogTest, LOG_FW) {
 		std::cout << "logfilename: " << logger.logFile() << std::flush << std::endl;
 
 		LOGF(INFO, std::wstring(t_infow + L"%d").c_str(), 123);
-		LOGF(DEBUG, std::wstring(t_debugw + L"%f").c_str(), 1.123456);
+		LOGF(G3LOG_DEBUG, std::wstring(t_debugw + L"%f").c_str(), 1.123456f);
 		LOGF(WARNING, std::wstring(t_warningw + L"%s").c_str(), L"yello");
 		logger.reset(); // force flush of logger
 		file_content = readFileToText(logger.logFile());
@@ -295,7 +295,7 @@ TEST(LogTest, LOGW) {
 	{
 		RestoreFileLogger logger(log_directory);
 		LOGW(INFO) << t_infow << 123;
-		LOGW(DEBUG) << t_debugw << std::setprecision(7) << 1.123456f;
+		LOGW(G3LOG_DEBUG) << t_debugw << std::setprecision(7) << 1.123456f;
 		LOGW(WARNING) << t_warningw << L"yello";
 		logger.reset(); // force flush of logger
 		file_content = readFileToText(logger.logFile());
