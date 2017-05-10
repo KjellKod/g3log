@@ -15,7 +15,7 @@
 #include <chrono>
 #include <string>
 #include <future>
-
+#include <g3log/generated_definitions.hpp>
 #include "testing_helpers.h"
 #include "g3log/logmessage.hpp"
 #include "g3log/logworker.hpp"
