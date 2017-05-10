@@ -116,14 +116,17 @@ namespace g3 {
       std::string msg;
       if (!_wmessage.empty())
       {
-#if !defined(__GNUC__) || (__GNUC__ >= 5)
+#ifdef G3LOG_USE_CODECVT
          std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> convert;
-         msg.append(_message.append(convert.to_bytes(_wmessage)));
+         return msg.append(_message.append(convert.to_bytes(_wmessage)));
 #else
-         msg.append("[unconverted wstring]");
+         return msg.append(_message.append("[unconverted wstring]"));
 #endif
       }
-      return msg.append(_message);
+	  else
+	  {
+		  return msg.append(_message);
+	  }
    }
 
    std::string LogMessage::timestamp(const std::string& time_look) const {
