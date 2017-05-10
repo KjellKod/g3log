@@ -19,7 +19,7 @@ struct RuntimeLoadedLib : public SomeLibrary {
    }
 
    ~RuntimeLoadedLib() {
-      LOG(DEBUG) << "Library destroyed";
+      LOG(G3LOG_DEBUG) << "Library destroyed";
    }
 
    void action() {
