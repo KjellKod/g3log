@@ -25,6 +25,12 @@
 # compiling your binary (if done in a separate build step from the g3log library)
 SET(G3_DEFINITIONS "")
 
+# -DG3_IOS_LIB=ON : iOS version of library
+option(G3_IOS_LIB
+      "iOS version of library." OFF)
+IF(G3_IOS_LIB)
+   MESSAGE("-DG3_IOS_LIB=ON\t\t\t\tBuilding iOS version")
+ENDIF(G3_IOS_LIB)
 
 # -DUSE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
 option (USE_DYNAMIC_LOGGING_LEVELS
@@ -75,9 +81,9 @@ option (G3_SHARED_LIB  "Build shared library" ON)
 IF(G3_SHARED_LIB)
    MESSAGE("-DG3_SHARED_LIB=ON\tBuild shared library") 
 ELSE()
-   MESSAGE("-DG3_SHARED_LIB=ON\tBuild static library")  
+   MESSAGE("-DG3_SHARED_LIB=OFF\tBuild static library")
 ENDIF()
-   
+
 # WINDOWS OPTIONS
 IF (MSVC OR MINGW) 
 # -DENABLE_VECTORED_EXCEPTIONHANDLING=ON   : defualt change the
