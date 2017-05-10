@@ -43,9 +43,8 @@ IF (${CMAKE_CXX_COMPILER_ID} MATCHES ".*Clang")
        set(PLATFORM_LINK_LIBRIES rt)
    ENDIF()
 
-ELSEIF(${BPC_TARGET_NISOM})
-   set(PLATFORM_LINK_LIBRIES rt)
-   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a -mtune=cortex-a9 -mfpu=vfpv3 -mfloat-abi=softfp -Wno-psabi -Wall -rdynamic -Wunused -std=c++11 -pthread -lrt -D_GLIBCXX_USE_NANOSLEEP -D_GLIBCXX_USE_SCHED_YIELD")
+
+
 ELSEIF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
    MESSAGE("cmake for GCC ")
    IF (APPLE)
@@ -139,11 +138,7 @@ ENDIF()
    endif()
    TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} ${PLATFORM_LINK_LIBRIES})
 
-   set_property( TARGET g3logger PROPERTY PUBLIC_HEADER ${HEADER_FILES} )
    # Kjell: This is likely not necessary, except for Windows?
-   target_include_directories(g3logger PUBLIC
-      $<BUILD_INTERFACE:${LOG_SRC}>
-      #$<INSTALL_INTERFACE:include>
-  )
+   TARGET_INCLUDE_DIRECTORIES(${G3LOG_LIBRARY} PUBLIC ${LOG_SRC})
 
 
