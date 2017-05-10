@@ -25,6 +25,13 @@
 # compiling your binary (if done in a separate build step from the g3log library)
 SET(G3_DEFINITIONS "")
 
+INCLUDE( CheckIncludeFileCXX )
+CHECK_INCLUDE_FILE_CXX( "codecvt" HAVE_CODECVT )
+
+if( HAVE_CODECVT )
+   LIST(APPEND G3_DEFINITIONS G3LOG_USE_CODECVT)
+endif()
+
 
 # -DUSE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
 option (USE_DYNAMIC_LOGGING_LEVELS
