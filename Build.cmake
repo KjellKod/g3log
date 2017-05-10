@@ -62,9 +62,6 @@ ELSEIF(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
    ENDIF()
 ELSEIF(MSVC)
    set(PLATFORM_LINK_LIBRIES dbghelp)
-   # set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MD")
-   # set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
-
    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /utf-8") # source code already in utf-8, force it for compilers in non-utf8_windows_locale
    # ERROR level conflicts with windows.h
    ADD_DEFINITIONS (-DNOGDI)

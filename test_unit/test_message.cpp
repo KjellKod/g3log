@@ -12,6 +12,7 @@
 #include <iostream>
 #include <ctime>
 #include <cstdlib>
+#include <g3log/generated_definitions.hpp>
 
 namespace {
    // https://www.epochconverter.com/
@@ -189,6 +190,19 @@ TEST(Message, localtime_formatted) {
 #endif // timezone 
 
 
+#if defined(CHANGE_G3LOG_DEBUG_TO_DBUG)
+TEST(Level, G3LogDebug_is_DBUG) {
+ LOG(DBUG) << "DBUG equals G3LOG_DEBUG";
+ LOG(G3LOG_DEBUG) << "G3LOG_DEBUG equals DBUG";
+}
+#else
+TEST(Level, G3LogDebug_is_DEBUG) {
+ LOG(DEBUG) << "DEBUG equals G3LOG_DEBUG";
+ LOG(G3LOG_DEBUG) << "G3LOG_DEBUG equals DEBUG";
+}
+#endif
+
+
 #ifdef G3_DYNAMIC_LOGGING
 namespace {
    using LevelsContainer = std::map<int, g3::LoggingLevel>;
@@ -208,7 +222,7 @@ namespace {
 
 
    bool mapCompare (LevelsContainer const& lhs, LevelsContainer const& rhs) {
-      auto pred = [] (LevelsContainer::value_type a, LevelsContainer::value_type b) {
+      auto pred = [] (auto a, auto b) {
          return (a.first == b.first) &&
                 (a.second == b.second);
       };

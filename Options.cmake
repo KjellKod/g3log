@@ -28,7 +28,7 @@ SET(G3_DEFINITIONS "")
 
 # -DUSE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
 option (USE_DYNAMIC_LOGGING_LEVELS
-       "Turn ON/OFF log levels. An disabled level will not push logs of that level to the sink. By default dynamic logging is disabled" ON)
+       "Turn ON/OFF log levels. An disabled level will not push logs of that level to the sink. By default dynamic logging is disabled" OFF)
 IF(USE_DYNAMIC_LOGGING_LEVELS)
    LIST(APPEND G3_DEFINITIONS G3_DYNAMIC_LOGGING)
    MESSAGE("-DUSE_DYNAMIC_LOGGING_LEVELS=ON")
@@ -44,7 +44,7 @@ ENDIF(USE_DYNAMIC_LOGGING_LEVELS)
 # -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON   : change the DEBUG logging level to be DBUG to avoid clash with other libraries that might have
 # predefined DEBUG for their own purposes
 option (CHANGE_G3LOG_DEBUG_TO_DBUG
-       "Use DBUG logging level instead of DEBUG. By default DEBUG is the debugging level" ON)
+       "Use DBUG logging level instead of DEBUG. By default DEBUG is the debugging level" OFF)
 IF(CHANGE_G3LOG_DEBUG_TO_DBUG)
    LIST(APPEND G3_DEFINITIONS CHANGE_G3LOG_DEBUG_TO_DBUG)
    LIST(APPEND G3_DEFINITIONS "G3LOG_DEBUG DBUG")
@@ -60,7 +60,7 @@ ENDIF(CHANGE_G3LOG_DEBUG_TO_DBUG)
 # By default fatal signal handling is enabled. You can disable it with this option
 # enumerated in src/stacktrace_windows.cpp 
 option (ENABLE_FATAL_SIGNALHANDLING
-    "Vectored exception / crash handling with improved stack trace" OFF)
+    "Vectored exception / crash handling with improved stack trace" ON)
 
 IF(NOT ENABLE_FATAL_SIGNALHANDLING)
    LIST(APPEND G3_DEFINITIONS DISABLE_FATAL_SIGNALHANDLING)
@@ -73,9 +73,9 @@ ENDIF(NOT ENABLE_FATAL_SIGNALHANDLING)
 # Option for building as a static or shared library in all platforms
 option (G3_SHARED_LIB  "Build shared library" ON)
 IF(G3_SHARED_LIB)
-   MESSAGE("Building shared library") 
-ELSE() 
-   MESSAGE("Building static library") 
+   MESSAGE("-DG3_SHARED_LIB=ON\tBuild shared library") 
+ELSE()
+   MESSAGE("-DG3_SHARED_LIB=ON\tBuild static library")  
 ENDIF()
    
 # WINDOWS OPTIONS
@@ -85,7 +85,7 @@ IF (MSVC OR MINGW)
 # Please know that only known fatal exceptions will be caught, these exceptions are the ones
 # enumerated in src/stacktrace_windows.cpp 
    option (ENABLE_VECTORED_EXCEPTIONHANDLING
-       "Vectored exception / crash handling with improved stack trace" OFF)
+       "Vectored exception / crash handling with improved stack trace" ON)
 
    IF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
       LIST(APPEND G3_DEFINITIONS DISABLE_VECTORED_EXCEPTIONHANDLING)
