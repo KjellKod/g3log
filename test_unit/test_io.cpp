@@ -280,7 +280,11 @@ TEST(LogTest, LOG_FW) {
 
 		LOGF(INFO, std::wstring(t_infow + L"%d").c_str(), 123);
 		LOGF(G3LOG_DEBUG, std::wstring(t_debugw + L"%f").c_str(), 1.123456f);
+#ifdef WIN32
 		LOGF(WARNING, std::wstring(t_warningw + L"%s").c_str(), L"yello");
+#else
+		LOGF(WARNING, std::wstring(t_warningw + L"%S").c_str(), L"yello");
+#endif
 		logger.reset(); // force flush of logger
 		file_content = readFileToText(logger.logFile());
 		SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
