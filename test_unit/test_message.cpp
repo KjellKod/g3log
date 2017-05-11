@@ -222,7 +222,7 @@ namespace {
 
 
    bool mapCompare (LevelsContainer const& lhs, LevelsContainer const& rhs) {
-      auto pred = [] (auto a, auto b) {
+      auto pred = [] (LevelsContainer::value_type a, LevelsContainer::value_type b) {
          return (a.first == b.first) &&
                 (a.second == b.second);
       };
