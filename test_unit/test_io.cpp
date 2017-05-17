@@ -11,6 +11,7 @@
 #include "g3log/logworker.hpp"
 #include "testing_helpers.h"
 #include "g3log/loglevels.hpp"
+#include "g3log/generated_definitions.hpp"
 
 #include <memory>
 #include <string>
