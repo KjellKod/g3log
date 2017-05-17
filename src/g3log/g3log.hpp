@@ -128,7 +128,7 @@ namespace g3 {
    } // internal
 } // g3
 
-#define INTERNAL_LOG_MESSAGE(level) LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
+#define INTERNAL_LOG_MESSAGE(level) LogCapture(__FILE__, __LINE__, static_cast<const char*>(__PRETTY_FUNCTION__), level)
 
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
    LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, g3::internal::CONTRACT, boolean_expression)
