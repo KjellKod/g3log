@@ -71,9 +71,9 @@ endif()
 
 
 SET(MAJOR_VERSION 1)
-IF (${VERSION}.x STREQUAL ".x")
-   IF (MSVC)
-      message( STATUS "windows: Extracting git software version" )
+IF ( NOT VERSION )
+   IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
+      message("windows: Extracting git software version")
       execute_process(COMMAND powershell "(git rev-list --branches HEAD | Measure-Object -line).Lines" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
    ELSE()
       IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
