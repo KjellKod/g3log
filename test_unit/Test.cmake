@@ -30,7 +30,7 @@
    # =========================
    IF (ADD_G3LOG_UNIT_TEST)
       set(DIR_UNIT_TEST ${g3log_SOURCE_DIR}/test_unit)
-      MESSAGE("-DADD_G3LOG_UNIT_TEST=ON")  
+      message( STATUS "-DADD_G3LOG_UNIT_TEST=ON" )  
       set(GTEST_DIR ${g3log_SOURCE_DIR}/3rdParty/gtest/gtest-1.7.0)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
       include_directories(${GTEST_INCLUDE_DIRECTORIES})
@@ -80,5 +80,5 @@
        target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} -ldl  gtest_170_lib )
     ENDIF()
 ELSE() 
-  MESSAGE("-DADD_G3LOG_UNIT_TEST=OFF") 
+  message( STATUS "-DADD_G3LOG_UNIT_TEST=OFF" ) 
 ENDIF (ADD_G3LOG_UNIT_TEST)
