@@ -75,7 +75,7 @@ option (G3_SHARED_LIB  "Build shared library" ON)
 IF(G3_SHARED_LIB)
    message( STATUS "-DG3_SHARED_LIB=ON\tBuild shared library" ) 
 ELSE()
-   message( STATUS "-DG3_SHARED_LIB=ON\tBuild static library" )  
+   MESSAGE("-DG3_SHARED_LIB=OFF\tBuild static library")  
 ENDIF()
    
 # WINDOWS OPTIONS
