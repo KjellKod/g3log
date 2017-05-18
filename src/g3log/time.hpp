@@ -22,7 +22,8 @@
 //          std::string put_time(const struct tm* tmb, const char* c_time_format)
 
 namespace g3 {
-   typedef std::chrono::time_point<std::chrono::system_clock>  system_time_point;
+   typedef std::chrono::time_point<std::chrono::system_clock> system_time_point;
+   typedef std::chrono::time_point<std::chrono::high_resolution_clock> high_resolution_time_point;
    typedef std::chrono::milliseconds milliseconds;
    typedef std::chrono::microseconds microseconds;
 
@@ -55,6 +56,12 @@ namespace g3 {
    * std::put_time. A possible fix if your c++11 library is not updated is to
    * modify this to use std::strftime instead */
    std::string localtime_formatted(const system_time_point& ts, const std::string& time_format) ;
+
+   inline system_time_point to_system_time(const high_resolution_time_point& ts)
+   {
+	   using namespace std::chrono;
+	   return time_point_cast<system_clock::duration>(system_clock::now() + (ts - steady_clock::now()));
+   }
 }
 
 
