@@ -60,8 +60,8 @@ namespace g3 {
    inline system_time_point to_system_time(const high_resolution_time_point& ts)
    {
 	   using namespace std::chrono;
-	   static auto hrs_now = high_resolution_clock::now();
-	   static auto sys_now = system_clock::now();
+	   static const auto hrs_now = high_resolution_clock::now();
+	   static const auto sys_now = system_clock::now();
 
 	   return time_point_cast<system_clock::duration>(sys_now + (ts - hrs_now));
    }
