@@ -141,7 +141,7 @@ namespace g3 {
 
 
    std::string localtime_formatted(const g3::system_time_point& ts, const std::string& time_format) {
-	  auto format_buffer = internal::localtime_formatted_fractions(ts, time_format);
+      auto format_buffer = internal::localtime_formatted_fractions(ts, time_format);
       auto time_point = std::chrono::system_clock::to_time_t(ts);
       std::tm t = localtime(time_point);
       return g3::put_time(&t, format_buffer.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
