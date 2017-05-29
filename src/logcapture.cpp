@@ -19,6 +19,12 @@
 #define SIGNAL_HANDLER_VERIFY() do {} while(0)
 #endif
 
+// MaxMessageSize is message limit used with vsnprintf/vsnprintf_s
+static int MaxMessageSize = 2048;
+
+void g3::only_change_at_initialization::setMaxMessageSize(size_t max_size) {
+   MaxMessageSize = max_size;
+}
 
 
 /** logCapture is a simple struct for capturing log/fatal entries. At destruction the
@@ -60,9 +66,8 @@ LogCapture::LogCapture(const char *file, const int line, const char *function, c
 * See also for the attribute formatting ref:  http://www.codemaestro.com/reviews/18
 */
 void LogCapture::capturef(const char *printf_like_message, ...) {
-   static const int kMaxMessageSize = 2048;
    static const std::string kTruncatedWarningText = "[...truncated...]";
-   char finished_message[kMaxMessageSize];
+   char finished_message[MaxMessageSize];
    va_list arglist;
    va_start(arglist, printf_like_message);
 
@@ -76,7 +81,7 @@ void LogCapture::capturef(const char *printf_like_message, ...) {
    if (nbrcharacters <= 0) {
       stream() << "\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully the message";
       stream() << '"' << printf_like_message << '"' << std::endl;
-   } else if (nbrcharacters > kMaxMessageSize) {
+   } else if (nbrcharacters > MaxMessageSize) {
       stream() << finished_message << kTruncatedWarningText;
    } else {
       stream() << finished_message;
