@@ -23,7 +23,7 @@
 static int MaxMessageSize = 2048;
 
 void g3::only_change_at_initialization::setMaxMessageSize(size_t max_size) {
-   MaxMessageSize = max_size;
+   MaxMessageSize = static_cast<int>(max_size);
 }
 
 
