@@ -59,6 +59,15 @@ namespace g3 {
 
    inline system_time_point to_system_time(const high_resolution_time_point& ts)
    {
+	   // On some (windows) systems, the system_clock does not provide the highest possible time
+	   // resolution. Thus g3log uses high_resolution_clock for message time stamps. However,
+	   // unlike system_clock, high_resolution_clock cannot be converted to a time and date as
+	   // it usually measures reflects the time since power-up. 
+	   // Thus, hrs_now and sys_now are recorded once when the program starts to be able to convert
+	   // timestamps to dime and date using to_system_time(). The precision of the absolute time is
+	   // of course that of system_clock() with some error added due to the non-simultaneous initialization
+	   // of the two static variables but relative times within one log will be as precise as 
+	   // high_resolution_clock.
 	   using namespace std::chrono;
 	   static const auto hrs_now = high_resolution_clock::now();
 	   static const auto sys_now = system_clock::now();
