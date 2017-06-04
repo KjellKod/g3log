@@ -30,6 +30,10 @@ FILE(APPEND ${GENERATED_G3_DEFINITIONS} "// CMake induced definitions below. See
 
 FOREACH(definition ${G3_DEFINITIONS} )
    FILE(APPEND ${GENERATED_G3_DEFINITIONS} "#define ${definition}\n")
+   if(definition MATCHES ".* .*")
+   else()
+       add_definitions(-D${definition})
+   endif()
 ENDFOREACH(definition)
 
 message( STATUS "Generated ${GENERATED_G3_DEFINITIONS}" )
