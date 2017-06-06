@@ -130,7 +130,7 @@ namespace g3 {
    }
 
    std::string LogMessage::timestamp(const std::string& time_look) const {
-      return g3::localtime_formatted(_timestamp, time_look);
+      return g3::localtime_formatted(to_system_time(_timestamp), time_look);
    }
 
 
@@ -144,7 +144,7 @@ namespace g3 {
 
    LogMessage::LogMessage(const std::string& file, const int line,
                           const std::string& function, const LEVELS& level)
-      : _timestamp(std::chrono::system_clock::now())
+      : _timestamp(std::chrono::high_resolution_clock::now())
       , _call_thread_id(std::this_thread::get_id())
       , _file(splitFileName(file))
       , _file_path(file)
