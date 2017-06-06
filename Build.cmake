@@ -87,9 +87,6 @@ IF (MSVC OR MINGW)
    message( STATUS "" )
 ENDIF()
 
-   INCLUDE (CheckIncludeFileCXX)
-   CHECK_INCLUDE_FILE_CXX( "codecvt" HAVE_CODECVT )
-
    # GENERIC STEPS
    file(GLOB SRC_FILES ${LOG_SRC}/g3log/*.h ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
    file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp ${LOG_SRC}/*.hpp)
