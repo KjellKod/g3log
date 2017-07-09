@@ -9,6 +9,7 @@ Most of the API that you need for using g3log is described in this readme. For m
 * Sink [creation](#sink_creation) and utilization 
 * LOG [flushing](#log_flushing)
 * G3log and G3Sinks [usage example](#g3log-and-sink-usage-code-example)
+* Support for [dynamic message sizing](#dynamic_message_sizing)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
   * <strike>[TOWRITE: Windows](#fatal_handling_windows)</strike>
@@ -156,6 +157,20 @@ int main(int argc, char**argv) {
    // this example
    g3::shutDownLogging();
 }
+```
+
+
+## Dynamic Message Sizing <a name="dynamic_message_sizing"></a>
+The default build uses a fixed size buffer for formatting messages. The size of this buffer is 2048 bytes. If an incoming message results in a formatted message that is greater than 2048 bytes, it will be bound to 2048 bytes and will have the string ```[...truncated...]``` appended to the end of the bound message. There are cases where one would like to dynamically change the size at runtime. For example, when debugging payloads for a server, it may be desirable to handle larger message sizes in order to examine the whole payload. Rather than forcing the developer to rebuild the server, dynamic message sizing could be used along with a config file which defines the message size at runtime.
+
+This feature supported as a CMake option:
+
+**CMake option: (default OFF)** ```cmake -DUSE_G3_DYNAMIC_MAX_MESSAGE_SIZE=ON ..```
+
+The following is an example of changing the size for the message.
+
+```
+    g3::only_change_at_initialization::setMaxMessageSize(10000);
 ```
 
 
