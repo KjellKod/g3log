@@ -189,7 +189,7 @@ The default behaviour for G3log is to catch several fatal events before they for
             stack dump [6]  ./g3log-FATAL-sigsegv() [0x40ffa2]
 
     Exiting after fatal event  (FATAL_SIGNAL). Fatal type:  SIGSEGV
-    Log content flushed flushed sucessfully to sink
+    Log content flushed sucessfully to sink
 
     "
     g3log g3FileSink shutdown at: 16:33:18
