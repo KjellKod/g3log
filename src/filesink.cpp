@@ -62,7 +62,7 @@ namespace g3 {
       auto now_formatted = g3::localtime_formatted(now, {internal::date_formatted + " " + internal::time_formatted});
 
       std::string file_name = createLogFileName(_log_prefix_backup, logger_id);
-      std::string prospect_log = directory + file_name;
+      std::string prospect_log = pathSanityFix(directory, file_name);
       std::unique_ptr<std::ofstream> log_stream = createLogFile(prospect_log);
       if (nullptr == log_stream) {
          filestream() << "\n" << now_formatted << " Unable to change log file. Illegal filename or busy? Unsuccessful log name was: " << prospect_log;
