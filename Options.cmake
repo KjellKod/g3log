@@ -17,6 +17,7 @@
 #   add_definitions(-DDISABLE_FATAL_SIGNALHANDLING)
 #   add_definitions(-DDISABLE_VECTORED_EXCEPTIONHANDLING)
 #   add_definitions(-DDEBUG_BREAK_AT_FATAL_SIGNAL)
+#   add_definitions(-DG3_DYNAMIC_MAX_MESSAGE_SIZE)
 
 
 
@@ -40,7 +41,6 @@ ENDIF(USE_DYNAMIC_LOGGING_LEVELS)
 
 
 
-
 # -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON   : change the DEBUG logging level to be DBUG to avoid clash with other libraries that might have
 # predefined DEBUG for their own purposes
 option (CHANGE_G3LOG_DEBUG_TO_DBUG
@@ -54,6 +54,16 @@ ELSE()
    message( STATUS "-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')" ) 
 ENDIF(CHANGE_G3LOG_DEBUG_TO_DBUG)
 
+
+# -DG3_DYNAMIC_MAX_MESSAGE_SIZE   : use dynamic memory for final_message in logcapture.cpp
+option (USE_G3_DYNAMIC_MAX_MESSAGE_SIZE
+       "Use dynamic memory for message buffer during log capturing" OFF)
+IF(USE_G3_DYNAMIC_MAX_MESSAGE_SIZE)
+   LIST(APPEND G3_DEFINITIONS G3_DYNAMIC_MAX_MESSAGE_SIZE)
+   message( STATUS "-DUSE_G3_DYNAMIC_MAX_MESSAGE_SIZE=ON\t\tDynamic memory used during log capture" )
+ELSE()
+   message( STATUS "-DUSE_G3_DYNAMIC_MAX_MESSAGE_SIZE=OFF" )
+ENDIF(USE_G3_DYNAMIC_MAX_MESSAGE_SIZE)
 
 
 # -DENABLE_FATAL_SIGNALHANDLING=ON   : defualt change the
