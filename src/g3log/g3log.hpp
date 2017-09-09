@@ -24,6 +24,7 @@
 #include "g3log/loglevels.hpp"
 #include "g3log/logcapture.hpp"
 #include "g3log/logmessage.hpp"
+#include "g3log/generated_definitions.hpp"
 
 #include <string>
 #include <functional>
@@ -85,7 +86,16 @@ namespace g3 {
    void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
 
 
-
+#ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
+  // only_change_at_initialization namespace is for changes to be done only during initialization. More specifically
+  // items here would be called prior to calling other parts of g3log
+  namespace only_change_at_initialization {
+    // Sets the MaxMessageSize to be used when capturing log messages. Currently this value is set to 2KB. Messages
+    // Longer than this are bound to 2KB with the string "[...truncated...]" at the end. This function allows
+    // this limit to be changed.
+    void setMaxMessageSize(size_t max_size);
+  }
+#endif /* G3_DYNAMIC_MAX_MESSAGE_SIZE */
 
    // internal namespace is for completely internal or semi-hidden from the g3 namespace due to that it is unlikely
    // that you will use these
@@ -128,7 +138,7 @@ namespace g3 {
    } // internal
 } // g3
 
-#define INTERNAL_LOG_MESSAGE(level) LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, level)
+#define INTERNAL_LOG_MESSAGE(level) LogCapture(__FILE__, __LINE__, static_cast<const char*>(__PRETTY_FUNCTION__), level)
 
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
    LogCapture(__FILE__, __LINE__, __PRETTY_FUNCTION__, g3::internal::CONTRACT, boolean_expression)

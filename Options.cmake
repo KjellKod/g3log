@@ -17,6 +17,7 @@
 #   add_definitions(-DDISABLE_FATAL_SIGNALHANDLING)
 #   add_definitions(-DDISABLE_VECTORED_EXCEPTIONHANDLING)
 #   add_definitions(-DDEBUG_BREAK_AT_FATAL_SIGNAL)
+#   add_definitions(-DG3_DYNAMIC_MAX_MESSAGE_SIZE)
 
 
 
@@ -37,13 +38,12 @@ option (USE_DYNAMIC_LOGGING_LEVELS
        "Turn ON/OFF log levels. An disabled level will not push logs of that level to the sink. By default dynamic logging is disabled" OFF)
 IF(USE_DYNAMIC_LOGGING_LEVELS)
    LIST(APPEND G3_DEFINITIONS G3_DYNAMIC_LOGGING)
-   MESSAGE("-DUSE_DYNAMIC_LOGGING_LEVELS=ON")
-   MESSAGE("\tDynamic logging levels is used")
-   MESSAGE("\tUse  [g3::addLogLevel(LEVEL boolean)] to enable/disable logging on specified levels\n\n")
+   message( STATUS "-DUSE_DYNAMIC_LOGGING_LEVELS=ON" )
+   message( STATUS "\tDynamic logging levels is used" )
+   message( STATUS "\tUse  [g3::addLogLevel(LEVEL boolean)] to enable/disable logging on specified levels\n\n" )
 ELSE() 
-   MESSAGE("-DUSE_DYNAMIC_LOGGING_LEVELS=OFF") 
+   message( STATUS "-DUSE_DYNAMIC_LOGGING_LEVELS=OFF" ) 
 ENDIF(USE_DYNAMIC_LOGGING_LEVELS)
-
 
 
 
@@ -54,12 +54,22 @@ option (CHANGE_G3LOG_DEBUG_TO_DBUG
 IF(CHANGE_G3LOG_DEBUG_TO_DBUG)
    LIST(APPEND G3_DEFINITIONS CHANGE_G3LOG_DEBUG_TO_DBUG)
    LIST(APPEND G3_DEFINITIONS "G3LOG_DEBUG DBUG")
-   MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=ON                 DBUG instead of DEBUG logging level is used")
+   message( STATUS "-DCHANGE_G3LOG_DEBUG_TO_DBUG=ON                 DBUG instead of DEBUG logging level is used" )
 ELSE() 
    LIST(APPEND G3_DEFINITIONS "G3LOG_DEBUG DEBUG")
-   MESSAGE("-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')") 
+   message( STATUS "-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')" ) 
 ENDIF(CHANGE_G3LOG_DEBUG_TO_DBUG)
 
+
+# -DG3_DYNAMIC_MAX_MESSAGE_SIZE   : use dynamic memory for final_message in logcapture.cpp
+option (USE_G3_DYNAMIC_MAX_MESSAGE_SIZE
+       "Use dynamic memory for message buffer during log capturing" OFF)
+IF(USE_G3_DYNAMIC_MAX_MESSAGE_SIZE)
+   LIST(APPEND G3_DEFINITIONS G3_DYNAMIC_MAX_MESSAGE_SIZE)
+   message( STATUS "-DUSE_G3_DYNAMIC_MAX_MESSAGE_SIZE=ON\t\tDynamic memory used during log capture" )
+ELSE()
+   message( STATUS "-DUSE_G3_DYNAMIC_MAX_MESSAGE_SIZE=OFF" )
+ENDIF(USE_G3_DYNAMIC_MAX_MESSAGE_SIZE)
 
 
 # -DENABLE_FATAL_SIGNALHANDLING=ON   : defualt change the
@@ -71,17 +81,17 @@ option (ENABLE_FATAL_SIGNALHANDLING
 IF(NOT ENABLE_FATAL_SIGNALHANDLING)
    LIST(APPEND G3_DEFINITIONS DISABLE_FATAL_SIGNALHANDLING)
 
-   MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=OFF               Fatal signal handler is disabled")
+   message( STATUS "-DENABLE_FATAL_SIGNALHANDLING=OFF               Fatal signal handler is disabled" )
 ELSE() 
-   MESSAGE("-DENABLE_FATAL_SIGNALHANDLING=ON\tFatal signal handler is enabled")
+   message( STATUS "-DENABLE_FATAL_SIGNALHANDLING=ON\tFatal signal handler is enabled" )
 ENDIF(NOT ENABLE_FATAL_SIGNALHANDLING)
 
 # Option for building as a static or shared library in all platforms
 option (G3_SHARED_LIB  "Build shared library" ON)
 IF(G3_SHARED_LIB)
-   MESSAGE("-DG3_SHARED_LIB=ON\tBuild shared library") 
+   message( STATUS "-DG3_SHARED_LIB=ON\tBuild shared library" ) 
 ELSE()
-   MESSAGE("-DG3_SHARED_LIB=OFF\tBuild static library")
+   MESSAGE("-DG3_SHARED_LIB=OFF\tBuild static library")  
 ENDIF()
 
 # WINDOWS OPTIONS
@@ -95,9 +105,9 @@ IF (MSVC OR MINGW)
 
    IF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
       LIST(APPEND G3_DEFINITIONS DISABLE_VECTORED_EXCEPTIONHANDLING)
-      MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled") 
+      message( STATUS "-DENABLE_VECTORED_EXCEPTIONHANDLING=OFF           Vectored exception handling is disabled" ) 
    ELSE() 
-      MESSAGE("-DENABLE_VECTORED_EXCEPTIONHANDLING=ON\t\t\tVectored exception handling is enabled") 
+      message( STATUS "-DENABLE_VECTORED_EXCEPTIONHANDLING=ON\t\t\tVectored exception handling is enabled" ) 
    ENDIF(NOT ENABLE_VECTORED_EXCEPTIONHANDLING)
 
 
@@ -110,13 +120,13 @@ IF (MSVC OR MINGW)
        "Enable Visual Studio break point when receiving a fatal exception. In __DEBUG mode only" OFF)
    IF(DEBUG_BREAK_AT_FATAL_SIGNAL)
      LIST(APPEND G3_DEFINITIONS DEBUG_BREAK_AT_FATAL_SIGNAL)
-     MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=ON                  Break point for fatal signal is enabled for __DEBUG.") 
+     message( STATUS "-DDEBUG_BREAK_AT_FATAL_SIGNAL=ON                  Break point for fatal signal is enabled for __DEBUG." ) 
    ELSE() 
-      MESSAGE("-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled") 
+      message( STATUS "-DDEBUG_BREAK_AT_FATAL_SIGNAL=OFF\t\t\tBreak point for fatal signal is disabled" ) 
    ENDIF(DEBUG_BREAK_AT_FATAL_SIGNAL)
 
 ENDIF (MSVC OR MINGW)
-MESSAGE("\n\n\n")
+message( STATUS "\n\n\n" )
 
 
 

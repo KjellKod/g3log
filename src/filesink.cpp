@@ -80,7 +80,7 @@ namespace g3 {
       _log_file_with_path = prospect_log;
       _outptr = std::move(log_stream);
       ss_change << "\n\tNew log file. The previous log file was at: ";
-      ss_change << old_log;
+      ss_change << old_log << "\n";
       filestream() << now_formatted << ss_change.str();
       return _log_file_with_path;
    }

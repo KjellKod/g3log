@@ -15,7 +15,7 @@ set(cmake_generated ${CMAKE_BINARY_DIR}/CMakeCache.txt
 
 foreach(file ${cmake_generated})
   if (EXISTS ${file})
-     MESSAGE("Removing: ${file}")
+     message( STATUS "Removing: ${file}" )
      file(REMOVE_RECURSE ${file})
   endif()
 endforeach(file)

@@ -21,7 +21,7 @@
 #include "g3log/sinkwrapper.hpp"
 #include "g3log/sinkhandle.hpp"
 #include "g3log/logmessage.hpp"
-
+#include "g3log/generated_definitions.hpp"
 
 using namespace std;
 using namespace std2;

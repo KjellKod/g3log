@@ -31,8 +31,8 @@
 
 
    IF (ADD_FATAL_EXAMPLE)
-      MESSAGE("-DADD_FATAL_EXAMPLE=ON")
-      MESSAGE("\t\t[contract][sigsegv][fatal choice] are examples of when g3log comes in handy\n")
+      message( STATUS "-DADD_FATAL_EXAMPLE=ON" )
+      message( STATUS "\t\t[contract][sigsegv][fatal choice] are examples of when g3log comes in handy\n" )
       include_directories (${DIR_EXAMPLE})
       add_executable(g3log-FATAL-contract ${DIR_EXAMPLE}/main_contract.cpp)
       add_executable(g3log-FATAL-sigsegv ${DIR_EXAMPLE}/main_sigsegv.cpp)
@@ -42,5 +42,5 @@
       target_link_libraries(g3log-FATAL-sigsegv ${G3LOG_LIBRARY} ${EXAMPLE_PLATFORM_LINK_LIBRIES})
       target_link_libraries(g3log-FATAL-choice ${G3LOG_LIBRARY} ${EXAMPLE_PLATFORM_LINK_LIBRIES})
    ELSE()
-       MESSAGE("-DADD_SIMPLE_EXAMPLE=OFF")
+       message( STATUS "-DADD_SIMPLE_EXAMPLE=OFF" )
    ENDIF (ADD_FATAL_EXAMPLE)

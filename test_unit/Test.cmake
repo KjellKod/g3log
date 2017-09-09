@@ -30,7 +30,7 @@
    # =========================
    IF (ADD_G3LOG_UNIT_TEST)
       set(DIR_UNIT_TEST ${g3log_SOURCE_DIR}/test_unit)
-      MESSAGE("-DADD_G3LOG_UNIT_TEST=ON")  
+      message( STATUS "-DADD_G3LOG_UNIT_TEST=ON" )  
       set(GTEST_DIR ${g3log_SOURCE_DIR}/3rdParty/gtest/gtest-1.7.0)
       set(GTEST_INCLUDE_DIRECTORIES ${GTEST_DIR}/include ${GTEST_DIR} ${GTEST_DIR}/src)
       include_directories(${GTEST_INCLUDE_DIRECTORIES})
@@ -74,11 +74,11 @@
        add_library(tester_sharedlib SHARED ${DIR_UNIT_TEST}/tester_sharedlib.h ${DIR_UNIT_TEST}/tester_sharedlib.cpp)
        target_link_libraries(tester_sharedlib ${G3LOG_LIBRARY})
 
-       add_executable(test_dynamic_loaded_shared_lib ../test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
+       add_executable(test_dynamic_loaded_shared_lib ${g3log_SOURCE_DIR}/test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
        target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} -ldl  gtest_170_lib )
     ENDIF()
 ELSE() 
-  MESSAGE("-DADD_G3LOG_UNIT_TEST=OFF") 
+  message( STATUS "-DADD_G3LOG_UNIT_TEST=OFF" ) 
 ENDIF (ADD_G3LOG_UNIT_TEST)
