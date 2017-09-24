@@ -82,7 +82,7 @@ void LogCapture::capturef(const char *printf_like_message, ...) {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
    auto finished_message_len = _countof(finished_message);
 #else
-   auto finished_message_len = sizeof(finished_message);
+   int finished_message_len = sizeof(finished_message);
 #endif
 #endif /* G3_DYNAMIC_MAX_MESSAGE_SIZE*/
 
