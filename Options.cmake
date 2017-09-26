@@ -26,6 +26,19 @@
 # compiling your binary (if done in a separate build step from the g3log library)
 SET(G3_DEFINITIONS "")
 
+INCLUDE( CheckIncludeFileCXX )
+if( UNIX )
+   set( CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -std=c++11" )
+endif()
+CHECK_INCLUDE_FILE_CXX( "codecvt" HAVE_CODECVT )
+
+if( HAVE_CODECVT )
+   LIST(APPEND G3_DEFINITIONS G3LOG_USE_CODECVT)
+   message( "Found <codecvt>. G3LOG_USE_CODECVT is defined." )
+else()
+   message( "Did not find <codecvt>. G3LOG_USE_CODECVT is NOT defined." )
+endif()
+
 
 # -DUSE_DYNAMIC_LOGGING_LEVELS=ON   : run-type turn on/off levels
 option (USE_DYNAMIC_LOGGING_LEVELS

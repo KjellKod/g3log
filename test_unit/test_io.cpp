@@ -24,10 +24,13 @@
 namespace {
    const std::string log_directory = "./";
    const std::string t_info = "test INFO ";
+   const std::wstring t_infow = L"test INFO ";
    const std::string t_info2 = "test INFO 123";
    const std::string t_debug = "test DEBUG ";
+   const std::wstring t_debugw = L"test DEBUG ";
    const std::string t_debug3 = "test DEBUG 1.123456";
    const std::string t_warning = "test WARNING ";
+   const std::wstring t_warningw = L"test WARNING ";
    const std::string t_warning3 = "test WARNING yello";
 
    std::atomic<size_t> g_fatal_counter = {0};
@@ -269,6 +272,46 @@ TEST(LogTest, LOG) {
    ASSERT_TRUE(verifyContent(file_content, t_warning3));
 }
 
+#ifdef G3LOG_USE_CODECVT
+TEST(LogTest, LOG_FW) {
+	std::string file_content;
+	{
+		RestoreFileLogger logger(log_directory);
+		std::cout << "logfilename: " << logger.logFile() << std::flush << std::endl;
+
+		LOGF(INFO, std::wstring(t_infow + L"%d").c_str(), 123);
+		LOGF(G3LOG_DEBUG, std::wstring(t_debugw + L"%f").c_str(), 1.123456f);
+#ifdef WIN32
+		LOGF(WARNING, std::wstring(t_warningw + L"%s").c_str(), L"yello");
+#else
+		LOGF(WARNING, std::wstring(t_warningw + L"%S").c_str(), L"yello");
+#endif
+		logger.reset(); // force flush of logger
+		file_content = readFileToText(logger.logFile());
+		SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
+	}
+	ASSERT_TRUE(verifyContent(file_content, t_info2));
+	ASSERT_TRUE(verifyContent(file_content, t_debug3));
+	ASSERT_TRUE(verifyContent(file_content, t_warning3));
+}
+
+TEST(LogTest, LOGW) {
+	std::string file_content;
+	{
+		RestoreFileLogger logger(log_directory);
+		LOGW(INFO) << t_infow << 123;
+		LOGW(G3LOG_DEBUG) << t_debugw << std::setprecision(7) << 1.123456f;
+		LOGW(WARNING) << t_warningw << L"yello";
+		logger.reset(); // force flush of logger
+		file_content = readFileToText(logger.logFile());
+		SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
+	}
+	// Assume all these to be converted to UTF8
+	ASSERT_TRUE(verifyContent(file_content, t_info2));
+	ASSERT_TRUE(verifyContent(file_content, t_debug3));
+	ASSERT_TRUE(verifyContent(file_content, t_warning3));
+}
+#endif
 
 TEST(LogTest, LOG_F_IF) {
    std::string file_content;
