@@ -103,6 +103,22 @@ message( STATUS "Software Version: ${VERSION}" )
    # ============================================================================
    INCLUDE (${g3log_SOURCE_DIR}/Options.cmake)
 
+
+
+   # ============================================================================
+   # G3LOG iOS BUILD SUPPORT
+   # ============================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/iOSBuild.cmake)
+
+   if(G3_IOS_LIB)
+      # G3_IOS_LIB is the pass used to generate all the other cmakefiles for the
+      # different architectures needed for the universal library. So we're done
+      # at here.
+      return()
+   endif()
+
+
+
    # =========================================================================
    # G3 Macro definitions in Options.cmake are written to file
    #    this avoids having to re-state your definitions in your source code
