@@ -150,7 +150,7 @@ namespace g3 {
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
-   if(true == boolean_expression)  \
+   if(true == (boolean_expression))  \
       if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).stream()
 
 // 'Design By Contract' stream API. For Broken Contracts:
@@ -213,7 +213,7 @@ And here is possible output
 
 // Conditional log printf syntax
 #define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
-   if(true == boolean_expression)                                     \
+   if(true == (boolean_expression))                                     \
       if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Design By Contract, printf-like API syntax with variadic input parameters.

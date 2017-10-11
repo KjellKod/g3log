@@ -72,6 +72,17 @@ ELSE()
 ENDIF(USE_G3_DYNAMIC_MAX_MESSAGE_SIZE)
 
 
+# G3LOG_FULL_FILENAME logs full file name instead of short filename.  This makes it
+# easier to copy filenames to open them without needing to search.
+option (G3_LOG_FULL_FILENAME "Log full filename" OFF)
+IF(G3_LOG_FULL_FILENAME)
+   LIST(APPEND G3_DEFINITIONS G3_LOG_FULL_FILENAME)
+   message( STATUS "-DG3_LOG_FULL_FILENAME=ON\t\tShowing full filenames with logs")
+ELSE()
+   message( STATUS "-DG3_LOG_FULL_FILENAME=OFF")
+ENDIF(G3_LOG_FULL_FILENAME)
+
+
 # -DENABLE_FATAL_SIGNALHANDLING=ON   : defualt change the
 # By default fatal signal handling is enabled. You can disable it with this option
 # enumerated in src/stacktrace_windows.cpp 
