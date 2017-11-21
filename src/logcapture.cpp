@@ -7,6 +7,7 @@
  * ============================================================================*/
 
 #include "g3log/logcapture.hpp"
+#include "g3log/g3log.hpp"
 #include "g3log/crashhandler.hpp"
 
 #ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
@@ -14,7 +15,7 @@
 #endif /* G3_DYNAMIC_MAX_MESSAGE_SIZE */
 
 // For Windows we need force a thread_local install per thread of three
-// signals that must have a signal handler instealled per thread-basis
+// signals that must have a signal handler installed per thread-basis
 // It is really a royal pain. Seriously Microsoft? Seriously?
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #define SIGNAL_HANDLER_VERIFY() g3::installSignalHandlerForThread()
@@ -97,7 +98,7 @@ void LogCapture::capturef(const char *printf_like_message, ...) {
    va_end(arglist);
 
    if (nbrcharacters <= 0) {
-      stream() << "\n\tERROR LOG MSG NOTIFICATION: Failure to parse successfully the message";
+      stream() << "\n\tERROR LOG MSG NOTIFICATION: Failure to successfully parse the message";
       stream() << '"' << printf_like_message << '"' << std::endl;
    } else if (nbrcharacters > finished_message_len) {
       stream() << finished_message << kTruncatedWarningText;

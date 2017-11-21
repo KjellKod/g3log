@@ -77,7 +77,7 @@ namespace {
       trigger.stream() << fatal_stream.str();
 
       // Trigger debug break point, if we're in debug. This breakpoint CAN cause a slowdown when it happens.
-      // Be patient. The "Debug" dialogue should pop-up eventually if you doing it in Visual Studio.
+      // Be patient. The "Debug" dialog should pop-up eventually if you doing it in Visual Studio.
       // For fatal signals only, not exceptions.
       // This is a way to tell the IDE (if in dev mode) that it can stop at this breakpoint
       // Note that at this time the fatal log event with stack trace is NOT yet flushed to the logger
@@ -102,9 +102,9 @@ namespace {
       const auto fatal_id = static_cast<g3::SignalType>(exception_code);
       LogCapture trigger(g3::internal::FATAL_EXCEPTION, fatal_id, dump.c_str());
       trigger.stream() << fatal_stream.str();
-      // FATAL Exception: It doesn't necessarily stop here we pass on continue search
+      // FATAL Exception: It doesn't necessarily stop here. we pass on continue search
       // if no one else will catch that then it's goodbye anyhow.
-      // The RISK here is if someone is cathing this and returning "EXCEPTION_EXECUTE_HANDLER"
+      // The RISK here is if someone is catching this and returning "EXCEPTION_EXECUTE_HANDLER"
       // but does not shutdown then the software will be running with g3log shutdown.
       // .... However... this must be seen as a bug from standard handling of fatal exceptions
       // https://msdn.microsoft.com/en-us/library/6wxdsc38.aspx
@@ -192,7 +192,7 @@ namespace g3 {
          ReverseToOriginalFatalHandling();
          // For windows exceptions we want to continue the possibility of
          // exception handling now when the log and stacktrace are flushed
-         // to sinks. We therefore avoid to kill the preocess here. Instead
+         // to sinks. We therefore avoid to kill the process here. Instead
          //  it will be the exceptionHandling functions above that
          // will let exception handling continue with: EXCEPTION_CONTINUE_SEARCH
          if (g3::internal::FATAL_EXCEPTION == level) {
@@ -200,7 +200,7 @@ namespace g3 {
             return;
          }
 
-         // for a sigal however, we exit through that fatal signal
+         // for a signal however, we exit through that fatal signal
          const int signal_number = static_cast<int>(fatal_signal_id);
          raise(signal_number);
       }
@@ -243,8 +243,8 @@ namespace g3 {
 
 #if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
       // const size_t kFirstExceptionHandler = 1;
-      // kFirstExeptionsHandler is kept here for documentational purposes.
-      // The last exception seems more what we want
+      // kFirstExeptionsHandler is kept here for documentation purposes.
+      // The last exception seems more like what we want.
       const size_t kLastExceptionHandler = 0;
       g_vector_exception_handler = AddVectoredExceptionHandler(kLastExceptionHandler, vectorExceptionHandling);
 #endif

@@ -47,8 +47,8 @@
  * first commercial project to use it used 'g3' as an internal denominator for
  * the current project. g3 as in 'generation 2'. I decided to keep the g3 and g3log names
  * to give credit to the people in that project (you know who you are :) and I guess also
- * for 'sentimental' reasons. That a big influence was google's glog is just a happy
- *  concidence or subconscious choice. Either way g3log became the name for this logger.
+ * for 'sentimental' reasons. That a big influence was Google's glog is just a happy
+ * coincidence or subconscious choice. Either way g3log became the name for this logger.
  *
  * --- Thanks for a great 2011 and good luck with 'g3' --- KjellKod
  */
@@ -58,7 +58,7 @@ namespace g3 {
    struct FatalMessage;
 
    /** Should be called at very first startup of the software with \ref g3LogWorker
-    *  pointer. Ownership of the \ref g3LogWorker is the responsibilkity of the caller */
+    *  pointer. Ownership of the \ref g3LogWorker is the responsibility of the caller */
    void initializeLogging(LogWorker *logger);
 
 
@@ -114,14 +114,14 @@ namespace g3 {
       // forwards a FATAL message to all sinks,. after which the g3logworker
       // will trigger crashhandler / g3::internal::exitWithDefaultSignalHandler
       //
-      // By default the "fatalCall" will forward a Fatalessageptr to this function
-      // this behaviour can be changed if you set a different fatal handler through
+      // By default the "fatalCall" will forward a FatalMessageptr to this function
+      // this behavior can be changed if you set a different fatal handler through
       // "setFatalExitHandler"
       void pushFatalMessageToLogger(FatalMessagePtr message);
 
 
-      // Save the created FatalMessage to any existing sinks and exit with
-      // the originating fatal signal,. or SIGABRT if it originated from a broken contract
+      // Saves the created FatalMessage to any existing sinks and exits with
+      // the originating fatal signal,. or SIGABRT if it originated from a broken contract.
       // By default forwards to: pushFatalMessageToLogger, see "setFatalExitHandler" to override
       //
       // If you override it then you probably want to call "pushFatalMessageToLogger" after your
