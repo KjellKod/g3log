@@ -31,7 +31,7 @@ namespace g3 {
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    typedef unsigned long SignalType;
-   ///  SIGFPE, SIGILL, and SIGSEGV handling must be installed per thread
+   /// SIGFPE, SIGILL, and SIGSEGV handling must be installed per thread
    /// on Windows. This is automatically done if you do at least one LOG(...) call
    /// you can also use this function call, per thread so make sure these three
    /// fatal signals are covered in your thread (even if you don't do a LOG(...) call
