@@ -149,7 +149,7 @@ namespace g3 {
 
       /// reset all default logging levels to enabled
       /// remove any added logging levels so that the only ones left are
-      ///  {DEBUG,INFO,WARNING,ERROR,FATAL}
+      ///  {DEBUG,INFO,WARNING,FATAL}
       void reset();
    } // only_change_at_initialization
 
