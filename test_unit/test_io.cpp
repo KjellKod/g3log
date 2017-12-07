@@ -269,6 +269,43 @@ TEST(LogTest, LOG) {
    ASSERT_TRUE(verifyContent(file_content, t_warning3));
 }
 
+TEST(LogTest, LOG_after_if) {
+   std::string file_content;
+   {
+      RestoreFileLogger logger(log_directory);
+      if(false == file_content.empty()) 
+         LOG(INFO) << "This-should-NOT-show-up";
+      else
+        LOG(INFO) << "This-should-show-up";
+
+      logger.reset(); // force flush of logger
+      file_content = readFileToText(logger.logFile());
+   }
+
+   ASSERT_FALSE(verifyContent(file_content, "This-should-NOT-show-up"));
+   ASSERT_TRUE(verifyContent(file_content, "This-should-show-up"));
+}
+
+
+TEST(LogTest, LOG_after_if_with_parentesis) {
+   std::string file_content;
+   {
+      RestoreFileLogger logger(log_directory);
+      if(false == file_content.empty()) {
+         LOG(INFO) << "This-should-NOT-show-up";
+      } else {
+        LOG(INFO) << "This-should-show-up";
+      }
+
+      logger.reset(); // force flush of logger
+      file_content = readFileToText(logger.logFile());
+   }
+
+   ASSERT_FALSE(verifyContent(file_content, "This-should-NOT-show-up"));
+   ASSERT_TRUE(verifyContent(file_content, "This-should-show-up"));
+}
+
+
 
 TEST(LogTest, LOG_F_IF) {
    std::string file_content;

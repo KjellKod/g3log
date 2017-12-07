@@ -145,7 +145,7 @@ namespace g3 {
 
 
 // LOG(level) is the API for the stream log
-#define LOG(level) if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).stream()
+#define LOG(level) if(!g3::logLevel(level)){ } else INTERNAL_LOG_MESSAGE(level).stream()
 
 
 // 'Conditional' stream log
@@ -209,7 +209,7 @@ And here is possible output
 :      Width trick:    10
 :      A string  \endverbatim */
 #define LOGF(level, printf_like_message, ...)                 \
-   if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
+   if(!g3::logLevel(level)){ } else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Conditional log printf syntax
 #define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
