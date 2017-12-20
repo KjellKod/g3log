@@ -175,7 +175,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"
    #   Alternative 2: 
    #      usage: make; sudo make install
    #
-   ==========================================================================
+   # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 ENDIF()
 
