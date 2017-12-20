@@ -20,6 +20,9 @@
 SET(CMAKE_INSTALL_LIBDIR lib CACHE PATH "Output dir for libraries")
 SET(CMAKE_INSTALL_HEADERDIR include CACHE PATH "Output dir for headers")
 
+IF (CMAKE_INSTALL_PREFIX)
+   set(CPACK_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+ENDIF()
 
 IF (${CPACK_INSTALL_PREFIX}.x STREQUAL ".x")
    SET(CPACK_INSTALL_PREFIX "/usr/local")
@@ -64,27 +67,29 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    message( STATUS "make package" )
 ENDIF()
 
-
-message( STATUS "\nOption to install using 'sudo make install" )
+message( STATUS "\nOption to install using 'make install'" )
 message( STATUS "Installation locations: " )
 message( STATUS "====================" )
 message( STATUS "Headers: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}" )
 message( STATUS "Library installation directory: ${CPACK_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" )
 
 message( STATUS "For more information please see g3log/CPackLists.txt\n\n" )
-message( STATUS "To install: sudo dpkg -i g3log-***Linux.deb" )
-message( STATUS "To list package contents: sudo dpkg --contents g3log-***Linux.deb" )
+IF(NOT MINGW)
+   message( STATUS "To install: sudo dpkg -i g3log-***Linux.deb" )
+   message( STATUS "To list package contents: sudo dpkg --contents g3log-***Linux.deb" )
 
-message( STATUS "List content of the installed package: sudo dpkg -L g3log" )
-message( STATUS "To remove: sudo dpkg -r g3log" )
-
+   message( STATUS "List content of the installed package: sudo dpkg -L g3log" )
+   message( STATUS "To remove: sudo dpkg -r g3log" )
+ENDIF()
 #  NOTE: to change installation locations you can use the settings below
 #  examples:
 #  CPACK_INSTALL_PREFIX
 #  CPACK_PACKAGE_INSTALL_DIRECTORY
+#  CMAKE_INSTALL_PREFIX
 #  CMAKE_INSTALL_HEADERDIR
 #  CMAKE_INSTALL_LIBDIR
 
-
-INCLUDE(CPack)
+IF(NOT MINGW)
+   INCLUDE(CPack)
+ENDIF()
 
