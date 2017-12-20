@@ -162,16 +162,20 @@ message( STATUS "Software Version: ${VERSION}" )
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # ==========================================================================
-   # BETA : package manager for G3Log,. not yet reliable. Use at your own risk
-   #        only tested on Ubuntu and CentOS
-   #
-   #        For OSX you can install an older version using 'brew install'
+   #        Only tested on Ubuntu, CentOS and OSX. 
+   #        For OSX you can also install an older version using 'brew install'
    #
    # ==========================================================================
-   #   Package handling is done AFTER all other CMake setup
-   #   usage:   make package
-   #   Check the output result and install accordingly.
-   # ==========================================================================
+   #    
+   #   Alternative 1: 
+   #      Package handling is done AFTER all other CMake setup
+   #      usage:   make package
+   #      Check the output result and install accordingly.
+   # 
+   #   Alternative 2: 
+   #      usage: make; sudo make install
+   #
+   ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 ENDIF()
 
