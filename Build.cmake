@@ -108,7 +108,7 @@ ENDIF()
 
    IF( G3_SHARED_LIB )
       IF( WIN32 )
-         IF(NOT(CMAKE_VERSION LESS 3.4))
+         IF(NOT(${CMAKE_VERSION} VERSION_LESS "3.4"))
             set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
          ELSE()
             message( FATAL_ERROR "Need CMake version >=3.4 to build shared windows library!" )
