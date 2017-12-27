@@ -76,23 +76,23 @@ IF ( NOT VERSION )
       message("windows: Extracting git software version")
       execute_process(COMMAND powershell "(git rev-list --branches HEAD | Measure-Object -line).Lines" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
    ELSE()
-      IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin") 
-         message( STATUS "nix: Extracting git software version" ) 
+      IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+         message( STATUS "nix: Extracting git software version" )
       ELSE()
-         message( STATUS "unknown platform: extracting git software version" ) 
+         message( STATUS "unknown platform: extracting git software version" )
       ENDIF()
       execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
    ENDIF()
- 
+
    SET(MINOR_VERSION 3)
    math(EXPR VERSION-BASE ${GIT_VERSION}/255)
    math(EXPR VERSION-REMAINDER ${GIT_VERSION}%255)
-   message( STATUS "git build version: ${GIT_VERSION}" ) 
-   message( STATUS "version base: ${VERSION-BASE}" ) 
-   message( STATUS "version remainder: ${VERSION-REMAINDER}" ) 
+   message( STATUS "git build version: ${GIT_VERSION}" )
+   message( STATUS "version base: ${VERSION-BASE}" )
+   message( STATUS "version remainder: ${VERSION-REMAINDER}" )
    # SET(BUILD_NUMBER ${GIT_VERSION})
-   SET(BUILD_NUMBER ${VERSION-BASE}) 
-   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}-${VERSION-REMAINDER}) 
+   SET(BUILD_NUMBER ${VERSION-BASE})
+   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}-${VERSION-REMAINDER})
 ENDIF()
 message( STATUS "Software Version: ${VERSION}" )
 
@@ -158,27 +158,35 @@ message( STATUS "Software Version: ${VERSION}" )
    INCLUDE (${g3log_SOURCE_DIR}/test_unit/Test.cmake)
 
 
-   
+
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # ==========================================================================
-   #        Only tested on Ubuntu, CentOS and OSX. 
+   #        Only tested on Ubuntu, CentOS and OSX.
    #        For OSX you can also install an older version using 'brew install'
    #
    # ==========================================================================
-   #    
-   #   Alternative 1: 
+   #
+   #   Alternative 1:
    #      Package handling is done AFTER all other CMake setup
    #      usage:   make package
    #      Check the output result and install accordingly.
-   # 
-   #   Alternative 2: 
+   #
+   #   Alternative 2:
    #      usage: make; sudo make install
    #
    # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 ENDIF()
 
+IF(MINGW)
+   # ==========================================================================
+   #
+   #   usage: make; make install
+   #
+   # ==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+ENDIF()
 
 IF (NOT MSVC)
    message( STATUS "\n\n
