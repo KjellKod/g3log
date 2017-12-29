@@ -15,12 +15,10 @@
  #           DESTINATION include
  #           COMPONENT headers)
 
-IF(MINGW)
-   SET(CMAKE_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}/g3log")
-ENDIF()
-
 IF(NOT MINGW)
-   IF(NOT CPACK_PACKAGING_INSTALL_PREFIX)
+   IF(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+      SET(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
+   ELSEIF(NOT CPACK_PACKAGING_INSTALL_PREFIX)
       SET(CPACK_PACKAGING_INSTALL_PREFIX /usr/local)
    ENDIF()
 ENDIF()
@@ -82,8 +80,8 @@ message( STATUS "make package" )
 message( STATUS "\nOption to install using 'make install'" )
 message( STATUS "Installation locations: " )
 message( STATUS "====================" )
-message( STATUS "Headers: ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}" )
-message( STATUS "Library installation directory: ${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" )
+message( STATUS "Headers: ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}" )
+message( STATUS "Library installation directory: ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" )
 
 message( STATUS "For more information please see g3log/CPackLists.txt\n\n" )
 IF(NOT MINGW)
