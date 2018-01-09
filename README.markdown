@@ -211,6 +211,14 @@ cd ../../
 mkdir build
 cd build
 ```
+## Configuring for installing on nix (OSX, Linux, MinGW)
+Default install prefix on Linux is `/usr/local`
+To change it please set  `CPACK_PACKAGING_INSTALL_PREFIX `
+
+```
+cmake -DCPACK_PACKAGING_INSTALL_PREFIX= ...
+```
+
 
 ## Building on Linux
 ```
@@ -225,6 +233,21 @@ Alternative on Debian
 ```
 make package
 sudo dpkg -i g3log-<version>-Linux.deb
+```
+
+## Building on MinGW
+```
+cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
+make 
+```
+## Installing on MinGW
+```
+make install
+```
+Alternative using NSIS
+```
+make package
+g3log-<version>-win32.exe
 ```
 
 ## Building on Windows
