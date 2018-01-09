@@ -211,6 +211,14 @@ cd ../../
 mkdir build
 cd build
 ```
+## Configuring for installing on nix (OSX, Linux, MinGW)
+Default install prefix on Linux is `/usr/local`
+To change it please set  `CPACK_PACKAGING_INSTALL_PREFIX `
+
+```
+cmake -DCPACK_PACKAGING_INSTALL_PREFIX= ...
+```
+
 
 ## Building on Linux
 ```
