@@ -110,7 +110,7 @@ struct CustomSink {
 
 // in main.cpp, main() function
 
-auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
+auto sinkHandle = logworker->addSink(std::make_unique<CustomSink>(),
                                      &CustomSink::ReceiveLogMessage);
 ```
 
@@ -124,14 +124,14 @@ Example usage where a custom sink is added. A function is called though the sink
 // main.cpp
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
-#include <g3log/std2_make_unique.hpp>
+#include <memory>
 
 #include "CustomSink.h"
 
 int main(int argc, char**argv) {
    using namespace g3;
    std::unique_ptr<LogWorker> logworker{ LogWorker::createLogWorker() };
-   auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
+   auto sinkHandle = logworker->addSink(std::make_unique<CustomSink>(),
                                           &CustomSink::ReceiveLogMessage);
    
    // initialize the logger before it can receive LOG calls
@@ -170,7 +170,7 @@ Example usage where a the default file logger is used **and** a custom sink is a
 // main.cpp
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
-#include <g3log/std2_make_unique.hpp>
+#include <memory>
 
 #include "CustomSink.h"
 
@@ -185,7 +185,7 @@ int main(int argc, char**argv) {
    
    LOG(DEBUG) << "Make log call, then add another sink";
    
-   worker->addSink(std2::make_unique<CustomSink>(),
+   worker->addSink(std::make_unique<CustomSink>(),
                                   &CustomSink::ReceiveLogMessage);
    
    ...
