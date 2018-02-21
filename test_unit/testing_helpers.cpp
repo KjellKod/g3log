@@ -9,7 +9,6 @@
 
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
-#include <g3log/std2_make_unique.hpp>
 #include <g3log/logmessage.hpp>
 
 #include "testing_helpers.h"
@@ -111,7 +110,7 @@ namespace testing_helpers {
    }
 
    RestoreFileLogger::RestoreFileLogger(std::string directory)
-   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std2::make_unique<g3::FileSink>("UNIT_TEST_LOGGER", directory), &g3::FileSink::fileWrite)) {
+   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std::make_unique<g3::FileSink>("UNIT_TEST_LOGGER", directory), &g3::FileSink::fileWrite)) {
       using namespace g3;
       g3::initializeLogging(_scope->_currentWorker.get());
       clearMockFatal();

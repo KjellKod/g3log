@@ -127,12 +127,12 @@ Example usage where a [logrotate sink (g3sinks)](https://github.com/KjellKod/g3s
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.h>
 #include <g3sinks/logrotate.hpp>
-#include <g3log/std2_make_unique.hpp
+#include <memory>
 
 int main(int argc, char**argv) {
    using namespace g3;
    std::unique_ptr<LogWorker> logworker{ LogWorker::createLogWorker() };
-   auto sinkHandle = logworker->addSink(std2::make_unique<LogRotate>(),
+   auto sinkHandle = logworker->addSink(std::make_unique<LogRotate>(),
                                           &LogRotate::save);
    
    // initialize the logger before it can receive LOG calls

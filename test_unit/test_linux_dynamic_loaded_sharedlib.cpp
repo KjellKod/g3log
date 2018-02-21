@@ -10,7 +10,7 @@
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
 #include <g3log/filesink.hpp>
-#include <g3log/std2_make_unique.hpp>
+#include <memory>
 
 #include <gtest/gtest.h>
 #include <string>
@@ -34,10 +34,10 @@ TEST(DynamicLoadOfLibrary, JustLoadAndExit) {
    
    { // scope to flush logs at logworker exit
       auto worker = g3::LogWorker::createLogWorker();
-      auto handle = worker->addSink(std2::make_unique<LogMessageCounter>(std::ref(receiver)), &LogMessageCounter::countMessages);
+      auto handle = worker->addSink(std::make_unique<LogMessageCounter>(std::ref(receiver)), &LogMessageCounter::countMessages);
       
       // add another sink just for more throughput of data
-      auto fileHandle = worker->addSink(std2::make_unique<g3::FileSink>("runtimeLoadOfDynamiclibs", "/tmp"), &g3::FileSink::fileWrite);
+      auto fileHandle = worker->addSink(std::make_unique<g3::FileSink>("runtimeLoadOfDynamiclibs", "/tmp"), &g3::FileSink::fileWrite);
       g3::initializeLogging(worker.get());
 
       void* libHandle = dlopen("libtester_sharedlib.so", RTLD_LAZY | RTLD_GLOBAL);

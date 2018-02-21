@@ -128,7 +128,7 @@ TEST(TestOf_IllegalLogFileName, Expecting_NoChangeToOriginalFileName) {
 }
 
 TEST(TestOf_SinkHandleDifferentId, Expecting_DifferentId) {
-   auto sink = std2::make_unique<g3::FileSink>("AnotherLogFile", name_path_1, "logger_id");
+   auto sink = std::make_unique<g3::FileSink>("AnotherLogFile", name_path_1, "logger_id");
    auto name = sink->fileName();
    ASSERT_STREQ( name.substr(0, 26).c_str(), "./AnotherLogFile.logger_id");
    g_cleaner_ptr->addLogToClean(name);

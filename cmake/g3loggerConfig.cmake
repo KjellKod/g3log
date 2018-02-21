@@ -38,7 +38,6 @@ find_path(G3LOG_INCLUDE_DIR
          g3log/sink.hpp
          g3log/sinkwrapper.hpp
          g3log/stacktrace_windows.hpp
-         g3log/std2_make_unique.hpp
          g3log/stlpatch_future.hpp
          g3log/time.hpp
 )

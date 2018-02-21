@@ -121,7 +121,7 @@ namespace g3 {
    }
 
    std::unique_ptr<FileSinkHandle>LogWorker::addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id) {
-      return addSink(std2::make_unique<g3::FileSink>(log_prefix, log_directory, default_id), &FileSink::fileWrite);
+      return addSink(std::make_unique<g3::FileSink>(log_prefix, log_directory, default_id), &FileSink::fileWrite);
    }
 
 

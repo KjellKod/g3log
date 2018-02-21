@@ -19,7 +19,6 @@
  * ********************************************* */
 
 #include "g3log/g3log.hpp"
-#include "g3log/std2_make_unique.hpp"
 #include "g3log/logworker.hpp"
 #include "g3log/crashhandler.hpp"
 #include "g3log/logmessage.hpp"
@@ -159,7 +158,7 @@ namespace g3 {
       void saveMessage(const char* entry, const char* file, int line, const char* function, const LEVELS& level,
                        const char* boolean_expression, int fatal_signal, const char* stack_trace) {
          LEVELS msgLevel {level};
-         LogMessagePtr message {std2::make_unique<LogMessage>(file, line, function, msgLevel)};
+         LogMessagePtr message {std::make_unique<LogMessage>(file, line, function, msgLevel)};
          message.get()->write().append(entry);
          message.get()->setExpression(boolean_expression);
 
@@ -183,7 +182,7 @@ namespace g3 {
                        "A recursive crash detected. It is likely the hook set with 'setFatalPreLoggingHook(...)' is responsible\n\n")
                .append("---First crash stacktrace: ").append(first_stack_trace).append("\n---End of first stacktrace\n");
             }
-            FatalMessagePtr fatal_message { std2::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal) };
+            FatalMessagePtr fatal_message { std::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal) };
             // At destruction, flushes fatal message to g3LogWorker
             // either we will stay here until the background worker has received the fatal
             // message, flushed the crash message to the sinks and exits with the same fatal signal
