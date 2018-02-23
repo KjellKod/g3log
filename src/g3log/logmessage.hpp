@@ -67,7 +67,6 @@ namespace g3 {
 
       std::string threadID() const;
 
-      std::string toString() const;
       void setExpression(const std::string expression) {
          _expression = expression;
       }
@@ -76,17 +75,37 @@ namespace g3 {
       LogMessage& operator=(LogMessage other);
 
 
-      LogMessage(const std::string& file, const int line, const std::string& function, const LEVELS& level);
+      LogMessage(std::string file, const int line, std::string function, const LEVELS level);
 
       explicit LogMessage(const std::string& fatalOsSignalCrashMessage);
       LogMessage(const LogMessage& other);
       LogMessage(LogMessage&& other);
       virtual ~LogMessage() {}
 
+
+      // helper log printing functions used by "toString()"
+      static std::string splitFileName(const std::string& str);
+      static std::string fatalSignalToString(const LogMessage& msg);
+      // windows only: fatalExceptionToString
+      static  std::string fatalExceptionToString(const LogMessage& msg);
+      static std::string fatalLogToString(const LogMessage& msg);
+      static std::string fatalCheckToString(const LogMessage& msg);
+
+      static std::string DefaultLogDetailsToString(const LogMessage& msg);
+      static std::string ThreadIdLogDetailsToString(const LogMessage& msg);
+      static std::string normalToString(const LogMessage& msg);     
+
+      using LogDetailsFunc = std::string (*) (const LogMessage&);
+      void overrideLogDetailsFunc(LogDetailsFunc func);      
+
+      std::string toString() const;
+
+
       //
       // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
+      LogDetailsFunc _logDetailsToStringFunc;
       g3::high_resolution_time_point _timestamp;
       std::thread::id _call_thread_id;
       std::string _file;
@@ -113,6 +132,7 @@ namespace g3 {
 
    };
 
+ 
 
 
    /** Trigger for flushing the message queue and exiting the application

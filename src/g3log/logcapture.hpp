@@ -73,11 +73,11 @@ struct LogCapture {
 
    std::ostringstream _stream;
    std::string _stack_trace;
-   const char *_file;
+   const char* _file;
    const int _line;
-   const char *_function;
+   const char* _function;
    const LEVELS &_level;
-   const char *_expression;
+   const char* _expression;
    const g3::SignalType _fatal_signal;
 
 };

@@ -76,13 +76,12 @@ namespace g3 {
          return path;
       }
 
-      std::string header() {
+      std::string header(const std::string& headerFormat) {
          std::ostringstream ss_entry;
          //  Day Month Date Time Year: is written as "%a %b %d %H:%M:%S %Y" and formatted output as : Wed Sep 19 08:28:16 2012
          auto now = std::chrono::system_clock::now();
          ss_entry << "\t\tg3log created log at: " << g3::localtime_formatted(now, "%a %b %d %H:%M:%S %Y") << "\n";
-         ss_entry << "\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message";
-         ss_entry << "\t\t(uuu*: microseconds fractions of the seconds value)\n\n";
+         ss_entry << headerFormat;         
          return ss_entry.str();
       }
 

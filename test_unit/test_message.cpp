@@ -13,6 +13,7 @@
 #include <ctime>
 #include <cstdlib>
 #include <g3log/generated_definitions.hpp>
+#include <testing_helpers.h>
 
 namespace {
    // https://www.epochconverter.com/
@@ -20,7 +21,51 @@ namespace {
    time_t k2017_April_27th = 1493274147;
    auto kTimePoint_2017_April_27th = std::chrono::system_clock::from_time_t(k2017_April_27th);
    std::chrono::time_point<std::chrono::system_clock> k1970_January_1st = {};
+   const std::string kFile = __FILE__;
+   const int kLine = 123;
+   const std::string kFunction = "MyTest::Foo";
+   const LEVELS kLevel = INFO;
+
+
 }
+
+
+TEST(Message, DefaultLogDetals_toString) {
+   using namespace g3;
+   LogMessage msg{kFile, kLine, kFunction, kLevel};
+   auto details = LogMessage::DefaultLogDetailsToString(msg);
+   auto details2 = msg._logDetailsToStringFunc(msg);
+   EXPECT_EQ(details, details2);
+}
+
+TEST(Message, Default_toString) {
+   using namespace g3;
+   LogMessage msg{kFile, kLine, kFunction, kLevel};
+   auto details = LogMessage::DefaultLogDetailsToString(msg);
+   auto output = msg.toString();
+   testing_helpers::verifyContent(output, details);
+}
+
+
+TEST(Message, DetailsWithThreadID_toString) {
+   using namespace g3;
+   LogMessage msg{kFile, kLine, kFunction, kLevel};
+   msg.overrideLogDetailsFunc(&LogMessage::ThreadIdLogDetailsToString);
+   auto output = msg.toString();
+
+   std::ostringstream thread_id_oss;
+   thread_id_oss << std::this_thread::get_id();
+   testing_helpers::verifyContent(output, thread_id_oss.str());
+   testing_helpers::verifyContent(output, kFile);
+   testing_helpers::verifyContent(output, kLevel.text);
+   testing_helpers::verifyContent(output, kFunction);
+   testing_helpers::verifyContent(output, std::to_string(kLine));
+   std::cout << output << std::endl;
+}
+
+
+
+
 
 TEST(Message, CppSupport) {
    // ref: http://www.cplusplus.com/reference/clibrary/ctime/strftime/
@@ -105,6 +150,8 @@ TEST(Message, GetFractional_All) {
    EXPECT_EQ(fractional, expected);
 }
 
+
+
 TEST(Message, FractionalToString_SizeCheck) {
    auto value = g3::internal::to_string(kTimePoint_2017_April_27th, g3::internal::Fractional::Nanosecond);
    EXPECT_EQ("000000000", value);
@@ -188,7 +235,6 @@ TEST(Message, localtime_formatted) {
 
 }
 #endif // timezone 
-
 
 #if defined(CHANGE_G3LOG_DEBUG_TO_DBUG)
 TEST(Level, G3LogDebug_is_DBUG) {
