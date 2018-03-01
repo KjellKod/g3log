@@ -103,11 +103,13 @@ namespace g3 {
 using namespace g3;
 using namespace g3::internal;
 
+
 TEST(ConceptSink, CreateHandle) {
    Worker worker;
    auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save);
    ASSERT_NE(nullptr, handle.get());
 }
+
 
 TEST(ConceptSink, OneSink__VerifyMsgIn) {
    Worker worker;
