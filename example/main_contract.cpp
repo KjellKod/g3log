@@ -41,7 +41,7 @@ int main(int argc, char **argv)
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
 
    // Exmple of overriding the default formatting of log entry
-   auto changeFormatting = handle->call(&g3::FileSink::overrideLogDetails, g3::LogMessage::ThreadIdLogDetailsToString);
+   auto changeFormatting = handle->call(&g3::FileSink::overrideLogDetails, g3::LogMessage::FullLogDetailsToString);
    const std::string newHeader = "\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL THREAD_ID FILE->FUNCTION:LINE] message\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n";
    // example of ovrriding the default formatting of header
    auto changeHeader = handle->call(&g3::FileSink::overrideLogHeader, newHeader);

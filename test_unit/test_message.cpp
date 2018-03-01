@@ -14,7 +14,7 @@
 #include <cstdlib>
 #include <g3log/generated_definitions.hpp>
 #include <testing_helpers.h>
-
+#include <g3log/filesink.hpp>
 namespace {
    // https://www.epochconverter.com/
    // epoc value for: Thu, 27 Apr 2017 06:22:49 GMT
@@ -25,6 +25,7 @@ namespace {
    const int kLine = 123;
    const std::string kFunction = "MyTest::Foo";
    const LEVELS kLevel = INFO;
+   const std::string testdirectory = "./";
 
 
 }
@@ -47,10 +48,10 @@ TEST(Message, Default_toString) {
 }
 
 
-TEST(Message, DetailsWithThreadID_toString) {
+TEST(Message, UseOverride_4_DetailsWithThreadID_toString) {
    using namespace g3;
    LogMessage msg{kFile, kLine, kFunction, kLevel};
-   msg.overrideLogDetailsFunc(&LogMessage::ThreadIdLogDetailsToString);
+   msg.overrideLogDetailsFunc(&LogMessage::FullLogDetailsToString);
    auto output = msg.toString();
 
    std::ostringstream thread_id_oss;
@@ -63,7 +64,56 @@ TEST(Message, DetailsWithThreadID_toString) {
    std::cout << output << std::endl;
 }
 
+TEST(Message, UseLogCall_4_DetailsWithThreadID_toString) {
+   using namespace g3;
+   LogMessage msg{kFile, kLine, kFunction, kLevel};
+   auto output = msg.toString(&LogMessage::FullLogDetailsToString);
 
+   std::ostringstream thread_id_oss;
+   thread_id_oss << std::this_thread::get_id();
+   testing_helpers::verifyContent(output, thread_id_oss.str());
+   testing_helpers::verifyContent(output, kFile);
+   testing_helpers::verifyContent(output, kLevel.text);
+   testing_helpers::verifyContent(output, kFunction);
+   testing_helpers::verifyContent(output, std::to_string(kLine));
+   std::cout << output << std::endl;
+}
+
+
+
+TEST(Message, DefaultFormattingToLogFile) {
+   using namespace g3;
+   std::string file_content;
+   {
+      testing_helpers::RestoreFileLogger logger(testdirectory);
+      LOG(WARNING) << "testing";
+      logger.reset(); // force flush of logger (which will trigger a shutdown)
+      file_content = testing_helpers::readFileToText(logger.logFile()); // logger is already reset
+   }
+   
+   std::ostringstream thread_id_oss;
+   thread_id_oss << " [" << std::this_thread::get_id() << " ";
+   EXPECT_FALSE(testing_helpers::verifyContent(file_content, thread_id_oss.str()));
+}
+
+
+
+TEST(Message, FullFormattingToLogFile) {
+   using namespace g3;
+   std::string file_content;
+   {
+      testing_helpers::RestoreFileLogger logger(testdirectory);
+      logger._handle->call(&FileSink::overrideLogDetails, &LogMessage::FullLogDetailsToString);
+
+      LOG(WARNING) << "testing";
+      logger.reset(); // force flush of logger (which will trigger a shutdown)
+      file_content = testing_helpers::readFileToText(logger.logFile()); // logger is already reset
+   }
+   
+   std::ostringstream thread_id_oss;
+   thread_id_oss << " [" << std::this_thread::get_id() << " ";
+   EXPECT_TRUE(testing_helpers::verifyContent(file_content, thread_id_oss.str()));
+}
 
 
 

@@ -90,22 +90,30 @@ namespace g3 {
       static  std::string fatalExceptionToString(const LogMessage& msg);
       static std::string fatalLogToString(const LogMessage& msg);
       static std::string fatalCheckToString(const LogMessage& msg);
-
-      static std::string DefaultLogDetailsToString(const LogMessage& msg);
-      static std::string ThreadIdLogDetailsToString(const LogMessage& msg);
       static std::string normalToString(const LogMessage& msg);     
 
-      using LogDetailsFunc = std::string (*) (const LogMessage&);
-      void overrideLogDetailsFunc(LogDetailsFunc func);      
 
-      std::string toString() const;
+
+      // the default formatting option
+      static std::string DefaultLogDetailsToString(const LogMessage& msg);
+
+      // this function can be used by the logging sink to add thread ID 
+      // see this concept and it is easy to make your own custom formatting 
+      static std::string FullLogDetailsToString(const LogMessage& msg);
+
+      using LogDetailsFunc = std::string (*) (const LogMessage&);
+      std::string toString(LogDetailsFunc formattingFunc = DefaultLogDetailsToString) const;
+
+
+     void overrideLogDetailsFunc(LogDetailsFunc func) const;
+
 
 
       //
       // Complete access to the raw data in case the helper functions above
       // are not enough.
       //
-      LogDetailsFunc _logDetailsToStringFunc;
+      mutable LogDetailsFunc _logDetailsToStringFunc;
       g3::high_resolution_time_point _timestamp;
       std::thread::id _call_thread_id;
       std::string _file;

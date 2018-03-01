@@ -60,8 +60,7 @@ namespace g3 {
       }
 
       std::ofstream &out(filestream());
-      message.get().overrideLogDetailsFunc(_log_details_func);
-      out << message.get().toString() << std::flush;
+      out << message.get().toString(_log_details_func) << std::flush;
    }
 
    std::string FileSink::changeLogFile(const std::string &directory, const std::string &logger_id) {

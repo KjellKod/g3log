@@ -74,7 +74,7 @@ namespace g3 {
    }
 
 
-   std::string LogMessage::ThreadIdLogDetailsToString(const LogMessage& msg) {
+   std::string LogMessage::FullLogDetailsToString(const LogMessage& msg) {
       std::string out;
       out.append(msg.timestamp() + "\t"
                  + msg.level() 
@@ -82,8 +82,7 @@ namespace g3 {
                  + msg.threadID() 
                  + " "
                  + msg.file() 
-                 + "->" 
-                 + msg.function() 
+                 + "->"+ msg.function() 
                  + ":" + msg.line() + "]\t");
       return out;
    }
@@ -100,14 +99,16 @@ namespace g3 {
 
  // end static functions section
 
-   void LogMessage::overrideLogDetailsFunc(LogDetailsFunc func) {
+   void LogMessage::overrideLogDetailsFunc(LogDetailsFunc func) const{
       _logDetailsToStringFunc = func;
    }
 
 
 
    // Format the log message according to it's type
-   std::string LogMessage::toString() const {
+   std::string LogMessage::toString(LogDetailsFunc formattingFunc) const {
+      overrideLogDetailsFunc(formattingFunc);
+
       if (false == wasFatal()) {
          return LogMessage::normalToString(*this);
       }

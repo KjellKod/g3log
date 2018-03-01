@@ -7,6 +7,11 @@ Most of the API that you need for using g3log is described in this readme. For m
   * disable/enabled levels at runtime
   * custom logging levels
 * Sink [creation](#sink_creation) and utilization 
+* Custom [log formatting](#log_formatting) 
+  * Overriding the Default File Sink's file header
+  * Overriding the Default FileSink's log formatting
+  * Adding thread ID to the log formatting
+  * Override log formatting in a custom sink
 * LOG [flushing](#log_flushing)
 * G3log and G3Sinks [usage example](#g3log-and-sink-usage-code-example)
 * Support for [dynamic message sizing](#dynamic_message_sizing)
@@ -107,8 +112,68 @@ With the default id left as is (i.e. "g3log") a creation of the logger in the un
 ```
 The resulting filename would be something like: 
 ```
-./(ReplaceLogFile).g3log.20160217-001406.log
+   ./(ReplaceLogFile).g3log.20160217-001406.log
 ```
+
+
+## Custom LOG <a name="log_formatting">formatting</a>
+### Overriding the Default File Sink's file header
+The default file header can be customized in the default file sink in calling 
+```
+   FileSink::overrideLogHeader(std::string);
+```
+
+
+### Overriding the Default FileSink's log formatting
+The default log formatting is defined in `LogMessage.hpp`
+```
+   static std::string DefaultLogDetailsToString(const LogMessage& msg);
+```
+
+### Adding thread ID to the log formatting
+An "all details" log formatting function is also defined - this one also adds the "calling thread's ID"
+```
+   static std::string DefaultLogDetailsToString(const LogMessage& msg);
+```
+
+### Override log formatting in a custom sink
+The default log formatting look can be overriden by any sink.  For convenience the *Default* sink has a function
+for doing exactly this
+```
+  void overrideLogDetails(LogMessage::LogDetailsFunc func);
+```
+
+
+Example calling for overriding the default log formatting
+
+```
+   auto worker = g3::LogWorker::createLogWorker();
+   auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
+   g3::initializeLogging(worker.get());
+   handle->call(&g3::FileSink::overrideLogDetails, &LogMessage::DefaultLogDetailsToString);
+```
+
+See [test_message.cpp](http://www.github.com/KjellKod/g3log/test_unit/test_message.cpp) for details and testing
+
+
+For overloading the formatting for a custom sink. The log formatting function can be passed into the 
+`LogMessage::toString(...)` this will override the default log formatting
+
+Example
+```
+namespace {
+      std::string MyCustomFormatting(const LogMessage& msg) {
+        ... how you want it ...
+      }
+    }
+
+   void MyCustomSink::ReceiveLogEntry(LogMessageMover message) {
+      std::string formatted = message.get().toString(&MyCustomFormatting) << std::flush;
+   }
+```
+
+
+
 
 
 ## LOG <a name="log_flushing">flushing</a> 
