@@ -11,7 +11,8 @@ Most of the API that you need for using g3log is described in this readme. For m
   * Overriding the Default File Sink's file header
   * Overriding the Default FileSink's log formatting
   * Adding thread ID to the log formatting
-  * Override log formatting in a custom sink
+  * Override log formatting in a default and custom sinks
+  * Override the log formatting in the default sink
 * LOG [flushing](#log_flushing)
 * G3log and G3Sinks [usage example](#g3log-and-sink-usage-code-example)
 * Support for [dynamic message sizing](#dynamic_message_sizing)
@@ -136,8 +137,22 @@ An "all details" log formatting function is also defined - this one also adds th
    static std::string DefaultLogDetailsToString(const LogMessage& msg);
 ```
 
-### Override log formatting in a custom sink
-The default log formatting look can be overriden by any sink.  For convenience the *Default* sink has a function
+### Override log formatting in default and custom sinks
+The default log formatting look can be overriden by any sink. 
+If the sink receiving function calls `toString()` then the default log formatting will be used.
+If the sink receiving function calls `toString(&XFunc)` then the `XFunc`will be used instead (see `LogMessage.h/cpp` for code details if it is not clear). (`XFunc` is a place holder for *your* formatting function of choice). 
+
+The API for the function-ptr to pass in is 
+```
+std::string (*) (const LogMessage&)
+```
+or for short as defined in `LogMessage.h`
+```
+using LogDetailsFunc = std::string (*) (const LogMessage&);
+```
+
+### Override the log formatting in the default sink
+For convenience the *Default* sink has a function
 for doing exactly this
 ```
   void overrideLogDetails(LogMessage::LogDetailsFunc func);
