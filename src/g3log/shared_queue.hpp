@@ -77,4 +77,9 @@ public:
       std::lock_guard<std::mutex> lock(m_);
       return queue_.size();
    }
+   
+   unsigned size_unsynchronized() const {
+      return queue_.size();
+   }
+   
 };
