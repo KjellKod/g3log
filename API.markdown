@@ -159,13 +159,13 @@ for doing exactly this
 ```
 
 
-Example code for overriding the default log formatting
+Example code for replacing the default log formatting for "full details" formatting (it adds thread ID)
 
 ```
    auto worker = g3::LogWorker::createLogWorker();
    auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
-   handle->call(&g3::FileSink::overrideLogDetails, &LogMessage::DefaultLogDetailsToString);
+   handle->call(&g3::FileSink::overrideLogDetails, &LogMessage::FullLogDetailsToString);
 ```
 
 See [test_message.cpp](http://www.github.com/KjellKod/g3log/test_unit/test_message.cpp) for details and testing
