@@ -159,7 +159,7 @@ for doing exactly this
 ```
 
 
-Example calling for overriding the default log formatting
+Example code for overriding the default log formatting
 
 ```
    auto worker = g3::LogWorker::createLogWorker();
