@@ -171,7 +171,7 @@ Example code for replacing the default log formatting for "full details" formatt
 See [test_message.cpp](http://www.github.com/KjellKod/g3log/test_unit/test_message.cpp) for details and testing
 
 
-For overloading the formatting for a custom sink. The log formatting function can be passed into the 
+Example code for overloading the formatting of a custom sink. The log formatting function will be passed into the 
 `LogMessage::toString(...)` this will override the default log formatting
 
 Example
@@ -185,6 +185,13 @@ namespace {
    void MyCustomSink::ReceiveLogEntry(LogMessageMover message) {
       std::string formatted = message.get().toString(&MyCustomFormatting) << std::flush;
    }
+...
+...
+ auto worker = g3::LogWorker::createLogWorker();
+ auto sinkHandle = worker->addSink(std::make_unique<MyCustomSink>(),
+                                     &MyCustomSink::ReceiveLogMessage);
+ // ReceiveLogMessage(...) will used the custom formatting function "MyCustomFormatting(...)
+    
 ```
 
 
