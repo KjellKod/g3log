@@ -134,7 +134,7 @@ The default log formatting is defined in `LogMessage.hpp`
 ### Adding thread ID to the log formatting
 An "all details" log formatting function is also defined - this one also adds the "calling thread's ID"
 ```
-   static std::string DefaultLogDetailsToString(const LogMessage& msg);
+   static std::string FullLogDetailsToString(const LogMessage& msg);
 ```
 
 ### Override log formatting in default and custom sinks
