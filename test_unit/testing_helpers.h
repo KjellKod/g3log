@@ -104,7 +104,7 @@ struct RestoreFileLogger {
   std::string resetAndRetrieveContent();
   
 
-private:
+
   std::unique_ptr<g3::SinkHandle<g3::FileSink>> _handle;
   std::string _log_file;
 };

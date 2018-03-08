@@ -21,12 +21,18 @@ namespace g3 {
       void fileWrite(LogMessageMover message);
       std::string changeLogFile(const std::string &directory, const std::string &logger_id);
       std::string fileName();
+      void overrideLogDetails(LogMessage::LogDetailsFunc func);
+      void overrideLogHeader(const std::string& change);
 
 
    private:
+      LogMessage::LogDetailsFunc _log_details_func;
+
       std::string _log_file_with_path;
       std::string _log_prefix_backup; // needed in case of future log file changes of directory
       std::unique_ptr<std::ofstream> _outptr;
+      std::string _header;
+      bool _firstEntry;
 
       void addLogFileHeader();
       std::ofstream &filestream() {

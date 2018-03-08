@@ -39,6 +39,17 @@ int main(int argc, char **argv)
    auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
+
+   // Exmple of overriding the default formatting of log entry
+   auto changeFormatting = handle->call(&g3::FileSink::overrideLogDetails, g3::LogMessage::FullLogDetailsToString);
+   const std::string newHeader = "\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL THREAD_ID FILE->FUNCTION:LINE] message\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n";
+   // example of ovrriding the default formatting of header
+   auto changeHeader = handle->call(&g3::FileSink::overrideLogHeader, newHeader);
+
+   changeFormatting.wait();
+   changeHeader.wait();
+
+
    std::cout << "*   This is an example of g3log. It WILL exit by a failed CHECK(...)" << std::endl;
    std::cout << "*   that acts as a FATAL trigger. Please see the generated log and " << std::endl;
    std::cout << "*   compare to the code at:\n*  \t g3log/test_example/main_contract.cpp" << std::endl;

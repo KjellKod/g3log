@@ -12,5 +12,5 @@ cmake  -DCMAKE_CXX_FLAGS=-std=c++14 -DADD_G3LOG_UNIT_TEST=ON ..
 makeArg=`grep -c ^processor /proc/cpuinfo`    
 
 make -j$makeArg
-../scripts/runAllTests.sh
+/bin/bash ../scripts/runAllTests.sh
 

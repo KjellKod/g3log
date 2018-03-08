@@ -14,11 +14,13 @@
 namespace g3 {
    using namespace internal;
 
-
    FileSink::FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string& logger_id)
-      : _log_file_with_path(log_directory)
+      : _log_details_func(&LogMessage::DefaultLogDetailsToString)
+      ,_log_file_with_path(log_directory)
       , _log_prefix_backup(log_prefix)
       , _outptr(new std::ofstream)
+      , _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] messagen\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n")
+      , _firstEntry(true)
    {
       _log_prefix_backup = prefixSanityFix(log_prefix);
       if (!isValidFilename(_log_prefix_backup)) {
@@ -36,7 +38,7 @@ namespace g3 {
          _outptr = createLogFile(_log_file_with_path);
       }
       assert(_outptr && "cannot open log file at startup");
-      addLogFileHeader();
+      
    }
 
 
@@ -52,8 +54,13 @@ namespace g3 {
 
    // The actual log receiving function
    void FileSink::fileWrite(LogMessageMover message) {
+      if (_firstEntry ) {
+          addLogFileHeader();
+         _firstEntry = false;
+      }
+
       std::ofstream &out(filestream());
-      out << message.get().toString() << std::flush;
+      out << message.get().toString(_log_details_func) << std::flush;
    }
 
    std::string FileSink::changeLogFile(const std::string &directory, const std::string &logger_id) {
@@ -87,8 +94,17 @@ namespace g3 {
    std::string FileSink::fileName() {
       return _log_file_with_path;
    }
-   void FileSink::addLogFileHeader() {
-      filestream() << header();
+
+   void FileSink::overrideLogDetails(LogMessage::LogDetailsFunc func) {
+      _log_details_func = func;
    }
 
+   void FileSink::overrideLogHeader(const std::string& change) {
+      _header = change;
+   }
+
+
+   void FileSink::addLogFileHeader() {
+      filestream() << header(_header);
+   }
 } // g3
