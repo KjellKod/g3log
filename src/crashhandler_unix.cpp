@@ -56,6 +56,26 @@ namespace {
       return (0 == count);
    }
 
+   void reportSigactionError(std::string signal_name) {
+      const std::string error = "sigaction - " + signal_name;
+      perror(error.c_str());
+   }
+
+   void reportSigactionError(int signal_number) {
+      std::string signal_name;
+      const char *signal_name_sz = strsignal(signal_number);
+
+      // From strsignal(3): On some systems (but not on Linux), NULL may instead
+      // be returned for an invalid signal number.
+      if (nullptr == signal_name_sz) {
+         signal_name = "Unknown signal " + std::to_string(signal_number);
+      } else {
+         signal_name = signal_name_sz;
+      }
+
+      reportSigactionError(signal_name);
+   }
+   
    void restoreSignalHandler(int signal_number) {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
       auto old_action_it = gSavedSigActions.find(signal_number);
@@ -65,15 +85,7 @@ namespace {
       }
       
       if (sigaction(signal_number, &(old_action_it->second), nullptr) < 0) {
-         std::string signal_name;
-         auto signal_name_it = gSignals.find(signal_number);
-         if (signal_name_it != gSignals.end()) {
-            signal_name = signal_name_it->second;
-         } else {
-            signal_name = std::to_string(signal_number);
-         }
-         const std::string error = "sigaction - " + signal_name;
-         perror(error.c_str());
+         reportSigactionError(signal_number);
       }
       
       gSavedSigActions.erase(old_action_it);
@@ -123,8 +135,7 @@ namespace {
       // do it verbose style - install all signal actions
       for (const auto& sig_pair : gSignals) {
          if (sigaction(sig_pair.first, &action, &old_action) < 0) {
-            const std::string error = "sigaction - " + sig_pair.second;
-            perror(error.c_str());
+            reportSigactionError(sig_pair.second);
          } else {
             gSavedSigActions[sig_pair.first] = old_action;
          }
