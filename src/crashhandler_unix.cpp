@@ -67,7 +67,7 @@ namespace {
       if (sigaction(signal_number, &(old_action_it->second), nullptr) < 0) {
          std::string signal_name;
          auto signal_name_it = gSignals.find(signal_number);
-         if (signal_name_it == gSignals.end()) {
+         if (signal_name_it != gSignals.end()) {
             signal_name = signal_name_it->second;
          } else {
             signal_name = std::to_string(signal_number);
