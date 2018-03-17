@@ -48,7 +48,7 @@ namespace {
    };
 
    std::map<int, std::string> gSignals = kSignals;
-
+   std::map<int, struct sigaction> gSavedSigActions;
 
    bool shouldDoExit() {
       static std::atomic<uint64_t> firstExit{0};
@@ -58,14 +58,27 @@ namespace {
 
    void restoreSignalHandler(int signal_number) {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-      struct sigaction action;
-      memset(&action, 0, sizeof (action)); //
-      sigemptyset(&action.sa_mask);
-      action.sa_handler = SIG_DFL; // take default action for the signal
-      sigaction(signal_number, &action, NULL);
+      auto old_action_it = gSavedSigActions.find(signal_number);
+      if (old_action_it == gSavedSigActions.end()) {
+         // No saved action, so do nothing.
+         return;
+      }
+      
+      if (sigaction(signal_number, &(old_action_it->second), nullptr) < 0) {
+         std::string signal_name;
+         auto signal_name_it = gSignals.find(signal_number);
+         if (signal_name_it == gSignals.end()) {
+            signal_name = signal_name_it->second;
+         } else {
+            signal_name = std::to_string(signal_number);
+         }
+         const std::string error = "sigaction - " + signal_name;
+         perror(error.c_str());
+      }
+      
+      gSavedSigActions.erase(old_action_it);
 #endif
    }
-
 
    // Dump of stack,. then exit through g3log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
@@ -100,7 +113,7 @@ namespace {
    //  on *NIX systems
    void installSignalHandler() {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-      struct sigaction action;
+      struct sigaction action, old_action;
       memset(&action, 0, sizeof (action));
       sigemptyset(&action.sa_mask);
       action.sa_sigaction = &signalHandler; // callback to crashHandler for fatal signals
@@ -109,9 +122,11 @@ namespace {
 
       // do it verbose style - install all signal actions
       for (const auto& sig_pair : gSignals) {
-         if (sigaction(sig_pair.first, &action, nullptr) < 0) {
+         if (sigaction(sig_pair.first, &action, &old_action) < 0) {
             const std::string error = "sigaction - " + sig_pair.second;
             perror(error.c_str());
+         } else {
+            gSavedSigActions[sig_pair.first] = old_action;
          }
       }
 #endif
