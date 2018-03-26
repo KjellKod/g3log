@@ -56,42 +56,6 @@ namespace {
       return (0 == count);
    }
 
-   void reportSigactionError(std::string signal_name) {
-      const std::string error = "sigaction - " + signal_name;
-      perror(error.c_str());
-   }
-
-   void reportSigactionError(int signal_number) {
-      std::string signal_name;
-      const char *signal_name_sz = strsignal(signal_number);
-
-      // From strsignal(3): On some systems (but not on Linux), NULL may instead
-      // be returned for an invalid signal number.
-      if (nullptr == signal_name_sz) {
-         signal_name = "Unknown signal " + std::to_string(signal_number);
-      } else {
-         signal_name = signal_name_sz;
-      }
-
-      reportSigactionError(signal_name);
-   }
-   
-   void restoreSignalHandler(int signal_number) {
-#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-      auto old_action_it = gSavedSigActions.find(signal_number);
-      if (old_action_it == gSavedSigActions.end()) {
-         // No saved action, so do nothing.
-         return;
-      }
-      
-      if (sigaction(signal_number, &(old_action_it->second), nullptr) < 0) {
-         reportSigactionError(signal_number);
-      }
-      
-      gSavedSigActions.erase(old_action_it);
-#endif
-   }
-
    // Dump of stack,. then exit through g3log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
    // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
@@ -118,15 +82,12 @@ namespace {
       // wait to die
    }
 
-
-
    //
    // Installs FATAL signal handler that is enough to handle most fatal events
    //  on *NIX systems
    void installSignalHandler() {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-      struct sigaction action, old_action;
-      memset(&action, 0, sizeof (action));
+      struct sigaction action;
       sigemptyset(&action.sa_mask);
       action.sa_sigaction = &signalHandler; // callback to crashHandler for fatal signals
       // sigaction to use sa_sigaction file. ref: http://www.linuxprogrammingblog.com/code-examples/sigaction
@@ -134,8 +95,12 @@ namespace {
 
       // do it verbose style - install all signal actions
       for (const auto& sig_pair : gSignals) {
+         struct sigaction old_action;
+         memset(&old_action, 0, sizeof (old_action));
+
          if (sigaction(sig_pair.first, &action, &old_action) < 0) {
-            reportSigactionError(sig_pair.second);
+            std::string signalerror = "sigaction - " +  sig_pair.second;
+            perror(signalerror.c_str());
          } else {
             gSavedSigActions[sig_pair.first] = old_action;
          }
@@ -269,6 +234,38 @@ namespace g3 {
 
       }
    } // end g3::internal
+
+
+   std::string signalToStr(int signal_number) {
+      std::string signal_name;
+      const char* signal_name_sz = strsignal(signal_number);
+
+      // From strsignal(3): On some systems (but not on Linux), NULL may instead
+      // be returned for an invalid signal number.
+      if (nullptr == signal_name_sz) {
+         signal_name = "Unknown signal " + std::to_string(signal_number);
+      } else {
+         signal_name = signal_name_sz;
+      }
+      return signal_name;
+   }
+
+
+   void restoreSignalHandler(int signal_number) {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
+      auto old_action_it = gSavedSigActions.find(signal_number);
+      if (old_action_it == gSavedSigActions.end()) {
+         return;
+      }
+
+      if (sigaction(signal_number, &(old_action_it->second), nullptr) < 0) {
+         auto signalname = std::string("sigaction - ") + signalToStr(signal_number);
+         perror(signalname.c_str());
+      }
+
+      gSavedSigActions.erase(old_action_it);
+#endif
+   }
 
 
    // This will override the default signal handler setup and instead

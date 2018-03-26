@@ -4,7 +4,8 @@ set -v
 #set -x
 
 
-test_execs=`find ./test_* -perm /u=x` 
+# test_execs=`find ./test_* -perm /u=x` 
+test_execs=`find ./test_* -type f -perm +ugo+x -print`
 
 echo "Tests to run: $test_execs"
 
