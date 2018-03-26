@@ -349,6 +349,33 @@ TEST(LogTest, LOGF__FATAL) {
    EXPECT_TRUE(verifyContent(file_content, "FATAL"));
 }
 
+TEST(LogTest, LOGX) {
+   std::string file_content;
+   {
+      RestoreFileLogger logger(log_directory);
+      LOG(INFO) << "testar";
+      for (int i = 0; i < 10; ++i) {
+         LOG_X(INFO, 2) << __FUNCTION__ << ", LOG_X TEST: " << i; 
+         LOG_X(INFO, 3) << __FUNCTION__ << ", LOG_X TEST2: " << i; 
+      }
+
+      logger.reset(); // force flush of logger
+      file_content = readFileToText(logger.logFile());
+      SCOPED_TRACE("LOG_X"); // Scope exit be prepared for destructor failure
+   }
+
+   ASSERT_TRUE(verifyContent(file_content, std::string(__FUNCTION__) + ", LOG_X TEST: " + std::to_string(0)))  << "\n" << file_content;
+   ASSERT_TRUE(verifyContent(file_content, std::string(__FUNCTION__) + ", LOG_X TEST: " + std::to_string(1)))  << "\n" << file_content;
+   ASSERT_FALSE(verifyContent(file_content, std::string(__FUNCTION__) + ", LOG_X TEST: " + std::to_string(2)))  << "\n" << file_content;
+
+   ASSERT_TRUE(verifyContent(file_content, std::string(__FUNCTION__) + ", LOG_X TEST2: " + std::to_string(0)))  << "\n" << file_content;
+   ASSERT_TRUE(verifyContent(file_content, std::string(__FUNCTION__) + ", LOG_X TEST2: " + std::to_string(1)))  << "\n" << file_content;
+   ASSERT_TRUE(verifyContent(file_content, std::string(__FUNCTION__) + ", LOG_X TEST2: " + std::to_string(2)))  << "\n" << file_content;
+   ASSERT_FALSE(verifyContent(file_content, std::string(__FUNCTION__) + ", LOG_X TEST2: " + std::to_string(3)))  << "\n" << file_content;
+}
+
+
+
 #ifndef DISABLE_FATAL_SIGNALHANDLING
 
 TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {

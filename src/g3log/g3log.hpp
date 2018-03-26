@@ -148,6 +148,13 @@ namespace g3 {
 #define LOG(level) if(!g3::logLevel(level)){ } else INTERNAL_LOG_MESSAGE(level).stream()
 
 
+#define GENERATE_LOG_VARIABLE(Count) thread_local size_t local___FUNCTION__##Count##__LINE__ = Count
+#define GET_LOG_VARIABLE(Count) local___FUNCTION__##Count##__LINE__
+#define LOG_X(level, max_log_count)  \
+   GENERATE_LOG_VARIABLE(max_log_count); if(GET_LOG_VARIABLE(max_log_count) != 0 && GET_LOG_VARIABLE(max_log_count)-- != 0) \
+   if(g3::logLevel(level)) INTERNAL_LOG_MESSAGE(level).stream()
+
+
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
    if(true == (boolean_expression))  \
