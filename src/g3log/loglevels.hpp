@@ -14,7 +14,7 @@
 //  "CHANGE_G3LOG_DEBUG_TO_DBUG" and G3log's logging level DEBUG is changed to be DBUG
 #if (defined(CHANGE_G3LOG_DEBUG_TO_DBUG))
 #if (defined(DBUG))
-#error "DEBUG is already defined elsewhere which clashes with G3Log's log level DEBUG"
+#error "DBUG is already defined elsewhere which clashes with G3Log's log level DBUG"
 #endif
 #else
 #if (defined(DEBUG))
