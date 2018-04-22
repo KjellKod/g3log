@@ -74,7 +74,7 @@ SET(MAJOR_VERSION 1)
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
       message("windows: Extracting git software version")
-      execute_process(COMMAND powershell "(git rev-list --branches HEAD | Measure-Object -line).Lines" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+      execute_process(COMMAND cmd /c "git rev-list --branches HEAD | find /v "" /c" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
    ELSE()
       IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
          message( STATUS "nix: Extracting git software version" )
@@ -186,6 +186,9 @@ IF(MINGW)
    #
    # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+   
+   # this enables strerror_s
+   ADD_DEFINITIONS(-DMINGW_HAS_SECURE_API)
 ENDIF()
 
 IF (NOT MSVC)
