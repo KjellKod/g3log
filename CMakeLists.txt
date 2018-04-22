@@ -186,6 +186,9 @@ IF(MINGW)
    #
    # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+   
+   # this enables strerror_s
+   ADD_DEFINITIONS(-DMINGW_HAS_SECURE_API)
 ENDIF()
 
 IF (NOT MSVC)
