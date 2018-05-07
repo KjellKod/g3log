@@ -93,7 +93,7 @@ namespace g3 {
 
       bool openLogFile(const std::string &complete_file_with_path, std::ofstream &outstream) {
          std::ios_base::openmode mode = std::ios_base::out; // for clarity: it's really overkill since it's an ofstream
-         mode |= std::ios_base::trunc;
+         mode |= std::ios_base::app;
          outstream.open(complete_file_with_path, mode);
          if (!outstream.is_open()) {
             std::ostringstream ss_error;
