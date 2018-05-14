@@ -14,7 +14,7 @@
 
 
 #pragma once
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__) && (_MSC_VER <= 1800)
 namespace std {
 
    template<class... _ArgTypes>
