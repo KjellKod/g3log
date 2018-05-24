@@ -18,11 +18,12 @@ Most of the API that you need for using g3log is described in this readme. For m
 * Support for [dynamic message sizing](#dynamic_message_sizing)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
-  * <strike>[TOWRITE: Windows](#fatal_handling_windows)</strike>
   * <strike>[TOWRITE: Custom fatal handling](#fatal_custom_handling)</strike>
   * <strike>[TOWRITE: Pre fatal hook](#fatal_pre_hook)</strike>
   * <strike>[TOWRITE: Override of signal handling](#fatal_signalhandler_override)</strike>
-  * <strike>[Disable fatal handling](#fatal_handling_disabled)</strike>
+  * [Disable fatal handling](#fatal_handling_disabled)
+  * [PID1 Fatal Signal Recommendations](#PID1)
+  * [Windows](#fatal_handling_windows)
 * Build Options
 
 
@@ -305,7 +306,10 @@ The default behaviour for G3log is to catch several fatal events before they for
    Fatal signal handling can be disabled with a CMake option: `ENABLE_FATAL_SIGNALHANDLING`. See [Options.cmake](https://github.com/KjellKod/g3log/blob/master/Options.cmake) for more details
 
 
-   ### <a name="fatal_handling_windows">Windows</a>
+   ### <a name="PID1">PID1 Fatal Signal Recommendations</a>
+  If you are using g3log on a PID1 process then you absolutely should provide your own signal handling  (ref: [issue 269](https://github.com/KjellKod/g3log/issues/269)) as g3log re-emits the fatal signal after it has restored the previous signal handler for that signal.  PID1 processed do *not* shutdown the process for a normal fatal signal so the choice  to exit the PID1 process after such a signal must be taken by the coder - not by g3log.
+
+### <a name="fatal_handling_windows">Windows</a>
   Windows fatal handling also deals with fatal signals just like Linux. In addition to fatal signals it also deals with unhandled exceptions, vectored exceptions.  Windows fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp), [crashhandler_windows.cpp](src/crashhandler_windows.cpp), [stacktrace_windows.hpp](src/g3log/stacktrace_windows.hpp), [stacktrace_windows.cpp](src/stacktrace_windows.cpp)
  
   An example of a Windows stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>. 
