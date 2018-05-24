@@ -22,7 +22,7 @@ Most of the API that you need for using g3log is described in this readme. For m
   * <strike>[TOWRITE: Custom fatal handling](#fatal_custom_handling)</strike>
   * <strike>[TOWRITE: Pre fatal hook](#fatal_pre_hook)</strike>
   * <strike>[TOWRITE: Override of signal handling](#fatal_signalhandler_override)</strike>
-  * <strike>[TOWRITE: Disable fatal handling](#fatal_handling_disabled)</strike>
+  * <strike>[Disable fatal handling](#fatal_handling_disabled)</strike>
 * Build Options
 
 
@@ -298,26 +298,21 @@ The default behaviour for G3log is to catch several fatal events before they for
 
     ```
 
-
-  <strikte>
-   ### <a name="fatal_handling_windows">TOWRITE: Windows</a>
-  Windows fatal handling also deals with fatal signals just like Linux. In addition to fatal signals it also deals with unhandled exceptions, vectored exceptions.  Windows fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp), [crashhandler_windows.cpp](src/crashhandler_windows.cpp), [stacktrace_windows.hpp](src/g3log/stacktrace_windows.hpp), [stacktrace_windows.cpp](src/stacktrace_windows.cpp)
-   
-
-  An example of a Windows stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>. 
-    
-    .... MISSING CONTENT..... since my Windows computer is gone!
-
-   </strike> 
-   
-
-
-
-
    ### <strike><a name="fatal_custom_handling">TOWRITE: Custom fatal handling</a></strike> 
    ### <strike><a name="fatal_pre_hook">TOWRITE: Pre fatal hook</a> </strike> 
    ### <strike><a name="fatal_signalhandler_override">TOWRITE: Override of signal handling</a> </strike> 
-   ### <strike><a name="fatal_handling_disabled">TOWRITE: Disable fatal handling</a> </strike> 
+   ### <a name="fatal_handling_disabled">Disable fatal handling</a>
+   Fatal signal handling can be disabled with a CMake option: `ENABLE_FATAL_SIGNALHANDLING`. See [Options.cmake](https://github.com/KjellKod/g3log/blob/master/Options.cmake) for more details
+
+
+   ### <a name="fatal_handling_windows">Windows</a>
+  Windows fatal handling also deals with fatal signals just like Linux. In addition to fatal signals it also deals with unhandled exceptions, vectored exceptions.  Windows fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp), [crashhandler_windows.cpp](src/crashhandler_windows.cpp), [stacktrace_windows.hpp](src/g3log/stacktrace_windows.hpp), [stacktrace_windows.cpp](src/stacktrace_windows.cpp)
+ 
+  An example of a Windows stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>. 
+
+
+
+
 
 
 
