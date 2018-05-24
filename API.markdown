@@ -19,7 +19,7 @@ Most of the API that you need for using g3log is described in this readme. For m
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
   * [Custom fatal handling](#fatal_custom_handling)
-  * <strike>[TOWRITE: Pre fatal hook](#fatal_pre_hook)</strike>
+  * [Pre fatal hook](#fatal_pre_hook)
   * <strike>[TOWRITE: Override of signal handling](#fatal_signalhandler_override)</strike>
   * [Disable fatal handling](#fatal_handling_disabled)
   * [PID1 Fatal Signal Recommendations](#PID1)
@@ -299,7 +299,7 @@ The default behaviour for G3log is to catch several fatal events before they for
 
     ```
 
-   ### <a name="fatal_custom_handling">TOWRITE: Custom fatal handling</a>
+   ### <a name="fatal_custom_handling">Custom fatal handling</a>
    By default the fatal signals are defined in [src/g3log.cpp](src/g3log.cpp) as 
    ```
    SIGABRT
@@ -317,7 +317,13 @@ The default behaviour for G3log is to catch several fatal events before they for
                               {SIGSEGV, "SIGSEGV"}});
    ```
    
-   ### <strike><a name="fatal_pre_hook">TOWRITE: Pre fatal hook</a> </strike> 
+   ### <a name="fatal_pre_hook">Pre fatal hook</a>
+   You can define a custom call back function that will be called before the fatal signal handling re-emits the `fatal` signal. See [src/g3log/g3log.hpp](src/g3log/g3log.hpp) for details. 
+   ```
+   // Example of how to enforce important shutdown cleanup even in the event of a fatal crash: 
+   g3::setFatalPreLoggingHook([]{ cleanup(); });
+   ```
+   
    ### <strike><a name="fatal_signalhandler_override">TOWRITE: Override of signal handling</a> </strike> 
    ### <a name="fatal_handling_disabled">Disable fatal handling</a>
    Fatal signal handling can be disabled with a CMake option: `ENABLE_FATAL_SIGNALHANDLING`. See [Options.cmake](https://github.com/KjellKod/g3log/blob/master/Options.cmake) for more details
