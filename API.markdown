@@ -18,7 +18,7 @@ Most of the API that you need for using g3log is described in this readme. For m
 * Support for [dynamic message sizing](#dynamic_message_sizing)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
-  * <strike>[TOWRITE: Custom fatal handling](#fatal_custom_handling)</strike>
+  * [Custom fatal handling](#fatal_custom_handling)
   * <strike>[TOWRITE: Pre fatal hook](#fatal_pre_hook)</strike>
   * <strike>[TOWRITE: Override of signal handling](#fatal_signalhandler_override)</strike>
   * [Disable fatal handling](#fatal_handling_disabled)
@@ -299,7 +299,24 @@ The default behaviour for G3log is to catch several fatal events before they for
 
     ```
 
-   ### <strike><a name="fatal_custom_handling">TOWRITE: Custom fatal handling</a></strike> 
+   ### <a name="fatal_custom_handling">TOWRITE: Custom fatal handling</a>
+   By default the fatal signals are defined in [src/g3log.cpp](src/g3log.cpp) as 
+   ```
+   SIGABRT
+   SIGFPE
+   SIGILL
+   SIGSEGV
+   SIGTERM
+   ```
+   If you want to define your own set of fatal signals, override the default ones, then this can be done as shown in [src/g3log/crashhandler.hpp](src/g3log/crashhandler.hpp)
+   ```
+   // Example when SIGTERM is skipped due to ZMQ usage
+   g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, 
+                              {SIGFPE, "SIGFPE"},
+                              {SIGILL, "SIGILL"},
+                              {SIGSEGV, "SIGSEGV"}});
+   ```
+   
    ### <strike><a name="fatal_pre_hook">TOWRITE: Pre fatal hook</a> </strike> 
    ### <strike><a name="fatal_signalhandler_override">TOWRITE: Override of signal handling</a> </strike> 
    ### <a name="fatal_handling_disabled">Disable fatal handling</a>
