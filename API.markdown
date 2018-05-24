@@ -18,9 +18,8 @@ Most of the API that you need for using g3log is described in this readme. For m
 * Support for [dynamic message sizing](#dynamic_message_sizing)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
-  * [Custom fatal handling](#fatal_custom_handling)
+  * [Custom fatal handling - override defaults](#fatal_custom_handling)
   * [Pre fatal hook](#fatal_pre_hook)
-  * <strike>[TOWRITE: Override of signal handling](#fatal_signalhandler_override)</strike>
   * [Disable fatal handling](#fatal_handling_disabled)
   * [PID1 Fatal Signal Recommendations](#PID1)
   * [Windows](#fatal_handling_windows)
@@ -299,8 +298,8 @@ The default behaviour for G3log is to catch several fatal events before they for
 
     ```
 
-   ### <a name="fatal_custom_handling">Custom fatal handling</a>
-   By default the fatal signals are defined in [src/g3log.cpp](src/g3log.cpp) as 
+   ### <a name="fatal_custom_handling">Custom fatal handling - override defaults</a>
+   By <a name="fatal_signalhandler_override">default</a> the fatal signals are defined in [src/g3log.cpp](src/g3log.cpp) as 
    ```
    SIGABRT
    SIGFPE
@@ -324,7 +323,6 @@ The default behaviour for G3log is to catch several fatal events before they for
    g3::setFatalPreLoggingHook([]{ cleanup(); });
    ```
    
-   ### <strike><a name="fatal_signalhandler_override">TOWRITE: Override of signal handling</a> </strike> 
    ### <a name="fatal_handling_disabled">Disable fatal handling</a>
    Fatal signal handling can be disabled with a CMake option: `ENABLE_FATAL_SIGNALHANDLING`. See [Options.cmake](https://github.com/KjellKod/g3log/blob/master/Options.cmake) for more details
 
