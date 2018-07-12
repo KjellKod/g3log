@@ -20,9 +20,9 @@
 #    cd build;
 # 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio XXX" ..
 #     (cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12")
-#     MAKE SURE you check thr CMake documentation so you are using
-#     the correct bit flags also (64 bit etc). The "XXX" needs 
-#     to be replaced for your build system. 
+#     MAKE SURE you check the CMake documentation so you are using
+#     the correct bit flags(64 bit etc). The "XXX" needs 
+#     tto be replaced for your specific build system, ref: cmake docs.
 # 
 #     (Example from Appveyor Ci: 
 #      https://github.com/KjellKod/g3log/blob/master/appveyor.yml
