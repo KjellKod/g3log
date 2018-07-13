@@ -157,9 +157,10 @@ namespace g3 {
       : _logDetailsToStringFunc(LogMessage::DefaultLogDetailsToString)
       , _timestamp(std::chrono::high_resolution_clock::now())
       , _call_thread_id(std::this_thread::get_id())
-      , _file(LogMessage::splitFileName(file))
 #if defined(G3_LOG_FULL_FILENAME)
       , _file(file)
+#else
+	   , _file(LogMessage::splitFileName(file))
 #endif
       , _file_path(file)
       , _line(line)
