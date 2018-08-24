@@ -47,11 +47,6 @@ struct LogCapture {
 
 
 
-   // Use "-Wall" to generate warnings in case of illegal printf format.
-   //      Ref:  http://www.unixwiz.net/techtips/gnu-c-attributes.html
-#ifndef __GNUC__
-#define  __attribute__(x) // Disable 'attributes' if compiler does not support 'em
-#endif 
 #ifdef _MSC_VER 
 #	if _MSC_VER >= 1400
 #		define G3LOG_FORMAT_STRING _Printf_format_string_
@@ -61,7 +56,10 @@ struct LogCapture {
 #else
 #	define G3LOG_FORMAT_STRING
 #endif
-   void capturef(G3LOG_FORMAT_STRING const char *printf_like_message, ...) __attribute__((format(printf, 2, 3))); // 2,3 ref:  http://www.codemaestro.com/reviews/18
+
+   // Use "-Wall" to generate warnings in case of illegal printf format.
+   //      Ref:  http://www.unixwiz.net/techtips/gnu-c-attributes.html
+   [[gnu::format(printf, 2, 3)]] void capturef(G3LOG_FORMAT_STRING const char *printf_like_message, ...); // 2,3 ref:  http://www.codemaestro.com/reviews/18
 
 
    /// prettifying API for this completely open struct
