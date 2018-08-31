@@ -44,7 +44,7 @@ namespace g3 {
          Sink(std::unique_ptr<T> sink, DefaultLogCall call)
             : SinkWrapper(),
          _real_sink {std::move(sink)},
-         _bg(kjellkod::Active::createActive()),
+         _bg(kjellkod::Active::createActive(isAsynchronous())),
          _default_log_call(std::bind(call, _real_sink.get(), std::placeholders::_1)) {
          }
 
@@ -52,7 +52,7 @@ namespace g3 {
          Sink(std::unique_ptr<T> sink, void(T::*Call)(std::string) )
             : SinkWrapper(),
          _real_sink {std::move(sink)},
-         _bg(kjellkod::Active::createActive()) {
+         _bg(kjellkod::Active::createActive(isAsynchronous())) {
             std::function<void(std::string)> adapter = std::bind(Call, _real_sink.get(), std::placeholders::_1);
             _default_log_call = [ = ](LogMessageMover m) {
                adapter(m.get().toString());

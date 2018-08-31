@@ -86,16 +86,20 @@ namespace g3 {
    void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
 
 
-#ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
   // only_change_at_initialization namespace is for changes to be done only during initialization. More specifically
   // items here would be called prior to calling other parts of g3log
   namespace only_change_at_initialization {
+#ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
     // Sets the MaxMessageSize to be used when capturing log messages. Currently this value is set to 2KB. Messages
     // Longer than this are bound to 2KB with the string "[...truncated...]" at the end. This function allows
     // this limit to be changed.
     void setMaxMessageSize(size_t max_size);
-  }
 #endif /* G3_DYNAMIC_MAX_MESSAGE_SIZE */
+  
+      /// Set asynchronous mode flag true or false. Default is true.
+      /// This must be called before creating the LogWorker or it will be ignored.
+      void setAsynchronous(bool mode = true);
+  }
 
    // internal namespace is for completely internal or semi-hidden from the g3 namespace due to that it is unlikely
    // that you will use these
@@ -103,6 +107,9 @@ namespace g3 {
       /// @returns true if logger is initialized
       bool isLoggingInitialized();
 
+      /// @returns true if logger is running in asynchronous mode
+      bool isAsynchronous();
+   
       // Save the created LogMessage to any existing sinks
       void saveMessage(const char *message, const char *file, int line, const char *function, const LEVELS &level,
                        const char *boolean_expression, int fatal_signal, const char *stack_trace);
