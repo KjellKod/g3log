@@ -37,6 +37,7 @@ namespace {
    std::once_flag g_initialize_flag;
    g3::LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
    std::mutex g_logging_init_mutex;
+   bool g_asynchronous_mode = true;
 
    std::unique_ptr<g3::LogMessage> g_first_unintialized_msg = {nullptr};
    std::once_flag g_set_first_uninitialized_flag;
@@ -44,13 +45,8 @@ namespace {
    const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = [] { /*does nothing */};
    std::function<void(void)> g_fatal_pre_logging_hook;
 
-
    std::atomic<size_t> g_fatal_hook_recursive_counter = {0};
 }
-
-
-
-
 
 namespace g3 {
    // signalhandler and internal clock is only needed to install once
@@ -115,13 +111,22 @@ namespace g3 {
       g_fatal_to_g3logworker_function_ptr = fatal_call;
    }
 
-
+   namespace only_change_at_initialization {
+      void setAsynchronous(bool mode) {
+         g_asynchronous_mode = mode;
+      }
+   }
+   
    namespace internal {
 
       bool isLoggingInitialized() {
          return g_logger_instance != nullptr;
       }
 
+      bool isAsynchronous() {
+         return g_asynchronous_mode;
+      }
+   
       /**
        * Shutdown the logging by making the pointer to the background logger to nullptr. The object is not deleted
        * that is the responsibility of its owner. *

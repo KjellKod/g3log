@@ -45,21 +45,28 @@ namespace kjellkod {
       std::thread thd_;
       bool done_;
 
-
    public:
       virtual ~Active() {
          send([this] { done_ = true;});
-         thd_.join();
+         if (thd_.joinable()) {
+            thd_.join();
+         }
       }
 
       void send(Callback msg_) {
-         mq_.push(msg_);
+         if (thd_.joinable()) {
+            mq_.push(msg_);
+         } else {
+            msg_();
+         }
       }
 
       /// Factory: safe construction of object before thread start
-      static std::unique_ptr<Active> createActive() {
+      static std::unique_ptr<Active> createActive(bool spawn_ = true) {
          std::unique_ptr<Active> aPtr(new Active());
-         aPtr->thd_ = std::thread(&Active::run, aPtr.get());
+         if (spawn_) {
+            aPtr->thd_ = std::thread(&Active::run, aPtr.get());
+         }
          return aPtr;
       }
    };
