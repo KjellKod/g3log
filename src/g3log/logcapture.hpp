@@ -53,6 +53,8 @@ struct LogCapture {
 #	else
 #		define G3LOG_FORMAT_STRING __format_string
 #	endif
+   
+    void capturef(G3LOG_FORMAT_STRING const char *printf_like_message, ...);
 #else
 #	define G3LOG_FORMAT_STRING
 
