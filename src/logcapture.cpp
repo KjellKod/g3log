@@ -80,7 +80,7 @@ void LogCapture::capturef(const char *printf_like_message, ...) {
 #else
    static const int kMaxMessageSize = 2048;
    char finished_message[kMaxMessageSize];
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
+#if ((defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__GNUC__))
    auto finished_message_len = _countof(finished_message);
 #else
    int finished_message_len = sizeof(finished_message);
@@ -90,7 +90,7 @@ void LogCapture::capturef(const char *printf_like_message, ...) {
    va_list arglist;
    va_start(arglist, printf_like_message);
 
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
+#if ((defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__GNUC__))
    const int nbrcharacters = vsnprintf_s(finished_message, finished_message_len, _TRUNCATE, printf_like_message, arglist);
 #else
    const int nbrcharacters = vsnprintf(finished_message, finished_message_len, printf_like_message, arglist);

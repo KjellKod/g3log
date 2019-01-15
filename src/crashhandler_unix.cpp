@@ -11,7 +11,7 @@
 #include "g3log/logcapture.hpp"
 #include "g3log/loglevels.hpp"
 
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__) && !defined(__GNUC__))
+#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "crashhandler_unix.cpp used but it's a windows system"
 #endif
 
