@@ -116,8 +116,25 @@ ENDIF()
       ENDIF()
       ADD_LIBRARY(${G3LOG_LIBRARY} SHARED ${SRC_FILES})
    ELSE()
+      IF(MSVC)
+         IF(NOT G3_SHARED_RUNTIME)
+            SET(CompilerFlags
+                  CMAKE_CXX_FLAGS
+                  CMAKE_CXX_FLAGS_DEBUG
+                  CMAKE_CXX_FLAGS_RELEASE
+                  CMAKE_C_FLAGS
+                  CMAKE_C_FLAGS_DEBUG
+                  CMAKE_C_FLAGS_RELEASE
+               )
+            foreach(CompilerFlag ${CompilerFlags})
+               string(REPLACE "/MDd" "/MTd" ${CompilerFlag} "${${CompilerFlag}}")
+               string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+            endforeach()
+         ENDIF()
+      ENDIF()
       ADD_LIBRARY(${G3LOG_LIBRARY} STATIC ${SRC_FILES})
    ENDIF()
+
 
    SET(${G3LOG_LIBRARY}_VERSION_STRING ${VERSION})
    MESSAGE( STATUS "Creating ${G3LOG_LIBRARY} VERSION: ${VERSION}" )

@@ -105,6 +105,14 @@ ELSE()
    MESSAGE( STATUS "-DG3_SHARED_LIB=OFF\tBuild static library")  
 ENDIF()
 
+# Option for building as a static or shared runtime library in MS VC++
+option (G3_SHARED_RUNTIME  "Build shared runtime library MS VC" ON)
+IF(G3_SHARED_RUNTIME)
+   message( STATUS "-DG3_SHARED_RUNTIME=ON\tBuild shared runtime library" )
+ELSE()
+   message( STATUS "-DG3_SHARED_RUNTIME=OFF\tBuild static runtime library")
+ENDIF()
+
 # WINDOWS OPTIONS
 IF (MSVC OR MINGW) 
 # -DENABLE_VECTORED_EXCEPTIONHANDLING=ON   : defualt change the
