@@ -61,7 +61,7 @@ The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal 
 8. The code is given for free as public domain. This gives the option to change, use, and do whatever with it, no strings attached.
 
 9. Two versions of g3log exist that are under active development.
-    * This version: *[g3log](https://github.com/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013). My recommendation is to go with g3log if you have full C++11 support. 
+    * This version: *[g3log](https://github.com/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013). My recommendation is to go with g3log if you have full C++14 support (C++11 support up to version: https://github.com/KjellKod/g3log/releases/tag/1.3.1). 
     * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio.  The focus on g2log is "slow to change" and compiler support. Only well, time tested, features from g3log will make it into g2log. 
 
 
