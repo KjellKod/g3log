@@ -53,7 +53,7 @@
 #
 # ============================================================================
 
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.2)
 ENABLE_LANGUAGE(CXX)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT (MSVC_IDE OR XCODE))
@@ -81,14 +81,14 @@ SET(MAJOR_VERSION 1)
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
       message("windows: Extracting git software version")
-      execute_process(COMMAND cmd /c "git rev-list --branches HEAD | find /v " " /c" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+      execute_process(COMMAND cmd /c "git rev-list --branches HEAD | find /v " " /c" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ELSE()
       IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
          message( STATUS "nix: Extracting git software version" )
       ELSE()
          message( STATUS "unknown platform: extracting git software version" )
       ENDIF()
-      execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+      execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ENDIF()
 
    SET(MINOR_VERSION 3)

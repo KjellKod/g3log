@@ -12,8 +12,8 @@
 
 
    # . performance test (average + worst case) for KjellKod's g3log
-   #    Do 'cmake -DUSE_G3LOG_PERFORMANCE=ON' to enable this 
-   option (ADD_G3LOG_PERFORMANCE "g3log performance test" OFF)
+   #    Do 'cmake -DADD_G3LOG_BENCH_PERFORMANCE=ON' to enable this 
+   option (ADD_G3LOG_BENCH_PERFORMANCE "g3log performance test" OFF)
 
 
 
