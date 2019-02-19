@@ -3,7 +3,7 @@
 set -v
 
 # test_execs=`find ./test_* -perm /u=x` 
-test_execs=`find ./test_* -type f -perm +ugo+x -print`
+test_execs=`find ./test_* -perm -u+x -type f`
 
 echo "Tests to run: $test_execs"
 while read -r testsuite; do

@@ -9,8 +9,8 @@ mkdir -p  build_travis
 cd build_travis
 cmake  -DCMAKE_CXX_FLAGS=-std=c++14 -DADD_G3LOG_BENCH_PERFORMANCE=ON -DADD_G3LOG_UNIT_TEST=ON ..
 
-makeArg=`grep -c ^processor /proc/cpuinfo`    
+#makeArg=`grep -c ^processor /proc/cpuinfo`    
 
-make -j$makeArg
+make -j
 /bin/bash ../scripts/runAllTests.sh
 
