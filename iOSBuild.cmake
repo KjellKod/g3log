@@ -92,7 +92,7 @@ if(G3_IOS_LIB)
 	  COMMAND ${CMAKE_COMMAND}
 	    --build ${ARM_BINARY_DIR}
 	    --config ${CMAKE_BUILD_TYPE}
-	  COMMENT "Building for armv7, armv7s, arm64"
+	  COMMENT "Building for armv7, armv7s, arm64, arm64e"
 	  VERBATIM
 	)
 
