@@ -83,7 +83,7 @@ ELSE()
 ENDIF(G3_LOG_FULL_FILENAME)
 
 
-# -DENABLE_FATAL_SIGNALHANDLING=ON   : defualt change the
+# -DENABLE_FATAL_SIGNALHANDLING=ON   : default change the
 # By default fatal signal handling is enabled. You can disable it with this option
 # enumerated in src/stacktrace_windows.cpp 
 option (ENABLE_FATAL_SIGNALHANDLING
