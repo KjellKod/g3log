@@ -198,6 +198,13 @@ IF(MINGW)
    ADD_DEFINITIONS(-DMINGW_HAS_SECURE_API)
 ENDIF()
 
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+   # ==========================================================================
+   #        Tested with Windows 10 and Visual Studio 2017
+   # ==========================================================================
+   INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+ENDIF()
+
 IF (NOT MSVC)
    message( STATUS "\n\n
       *******************************************************************
