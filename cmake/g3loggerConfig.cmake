@@ -19,6 +19,8 @@ include(FindPackageHandleStandardArgs)
 
 @PACKAGE_INIT@
 
+find_package(Threads REQUIRED)
+
 if (NOT TARGET g3logger)
   include("${CMAKE_CURRENT_LIST_DIR}/g3loggerTargets.cmake")
 
@@ -45,6 +47,11 @@ if (NOT TARGET g3logger)
   elseif (NOT G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
     set(G3LOG_LIBRARY ${G3LOG_LIBRARY_RELEASE})  
   endif ()
+
+  list(APPEND G3LOG_LIBRARY Threads::Threads)
+  if (WIN32)
+    list(APPEND G3LOG_LIBRARY DbgHelp.lib)
+  endif ()
 endif ()
 
 find_package_handle_standard_args(G3LOG
@@ -53,4 +60,3 @@ mark_as_advanced(G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
 set(G3LOG_LIBRARIES ${G3LOG_LIBRARY})
 set(G3LOG_INCLUDE_DIRS ${G3LOG_INCLUDE_DIR})
 
-find_package(Threads REQUIRED)
