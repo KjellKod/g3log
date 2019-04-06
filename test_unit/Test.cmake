@@ -58,7 +58,6 @@
            add_executable(${test} ${g3log_SOURCE_DIR}/test_main/test_main.cpp ${DIR_UNIT_TEST}/${test}.cpp ${helper})
          ENDIF(${test} STREQUAL "test_filechange")
 
-        target_include_directories(${G3LOG_LIBRARY} PRIVATE ${LOG_SRC} ${CMAKE_CURRENT_BINARY_DIR}/include)
         set_target_properties(${test} PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
         set_target_properties(${test} PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
         IF( NOT(MSVC))
@@ -76,7 +75,6 @@
        target_link_libraries(tester_sharedlib ${G3LOG_LIBRARY})
 
        add_executable(test_dynamic_loaded_shared_lib ${g3log_SOURCE_DIR}/test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
-       target_include_directories(${G3LOG_LIBRARY} PRIVATE ${LOG_SRC} ${CMAKE_CURRENT_BINARY_DIR}/include)
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
        target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} -ldl  gtest_170_lib )
