@@ -166,10 +166,8 @@ message( STATUS "Software Version: ${VERSION}" )
 
 
 
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin" OR ${CMAKE_SYSTEM_NAME} MATCHES "Windows")
    # ==========================================================================
-   #        Only tested on Ubuntu, CentOS, OSX and Windows.
+   #        Tested on Ubuntu, CentOS, OSX and Windows.
    #        For OSX you can also install an older version using 'brew install'
    #
    # ==========================================================================
@@ -184,7 +182,7 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"
    #
    # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
-ENDIF()
+
 
 IF(MINGW)
    # ==========================================================================
