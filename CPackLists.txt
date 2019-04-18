@@ -6,20 +6,13 @@
 # For more information see g3log/LICENSE or refer refer to http://unlicense.org
 # ============================================================================*/
 
- #  INSTALL( TARGETS g3logger_shared
- #           ARCHIVE
- #           LIBRARY DESTINATION lib/g3log
- #           COMPONENT libraries)
-
- #  INSTALL( FILES ${HEADER_FILES}
- #           DESTINATION include
- #           COMPONENT headers)
-
-IF(NOT MINGW)
-   IF(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-      SET(CPACK_PACKAGING_INSTALL_PREFIX "${CMAKE_INSTALL_PREFIX}")
-   ELSEIF(NOT CPACK_PACKAGING_INSTALL_PREFIX)
-      SET(CPACK_PACKAGING_INSTALL_PREFIX /usr/local)
+IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+   IF(NOT CPACK_PACKAGING_INSTALL_PREFIX)
+      IF(NOT CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+         SET(CPACK_PACKAGING_INSTALL_PREFIX ${CMAKE_INSTALL_PREFIX})
+      ELSE()
+         SET(CPACK_PACKAGING_INSTALL_PREFIX /usr/local)
+      ENDIF()
    ENDIF()
 ENDIF()
 
@@ -37,31 +30,17 @@ SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY ${CPACK_PACKAGE_DESCRIPTION})
 SET(CPACK_PACKAGE_CONTACT "Kjell Hedstrom hedstrom@kjellkoc.cc")
 SET(CPACK_RESOURCE_FILE_LICENSE  ${g3log_SOURCE_DIR}/LICENSE)
 SET(CPACK_PACKAGE_VENDOR "KjellKod")
-SET(CMAKE_INSTALL_HEADERDIR ${CMAKE_INSTALL_HEADERDIR}/g3log)
 
-IF(NOT MINGW)
-   INSTALL( TARGETS g3logger
-               EXPORT g3logger-targets
-               ARCHIVE DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}
-               LIBRARY DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}
-               RUNTIME DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_BINDIR}
-               COMPONENT libraries)
+INSTALL( TARGETS g3logger
+            EXPORT g3logger-targets
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+            COMPONENT libraries)
 
-   INSTALL( FILES ${HEADER_FILES}
-               DESTINATION ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/g3log
-               COMPONENT headers)
-ELSE()
-   INSTALL( TARGETS g3logger
-               EXPORT g3logger-targets
-               ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-               LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-               RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-               COMPONENT libraries)
-
-   INSTALL( FILES ${HEADER_FILES}
-               DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/g3log
-               COMPONENT headers)
-ENDIF()
+INSTALL( FILES ${HEADER_FILES}
+            DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/g3log
+            COMPONENT headers)
 
 INSTALL(
    EXPORT g3logger-targets
@@ -76,8 +55,8 @@ CONFIGURE_PACKAGE_CONFIG_FILE(
 )
 
 install(
-    FILES ${CMAKE_CURRENT_BINARY_DIR}/g3loggerConfig.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/g3logger
+   FILES ${CMAKE_CURRENT_BINARY_DIR}/g3loggerConfig.cmake
+   DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/g3logger
 )
 
 SET(CPACK_COMPONENTS_ALL libraries headers)
@@ -87,6 +66,8 @@ SET(CPACK_COMPONENT_HEADERS_DISPLAY_NAME "G3Log C++ headers")
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
    SET(CPACK_GENERATOR "DEB")
    SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "KjellKod - Kjell Hedstrom")
+ELSEIF(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
+   SET(CPACK_GENERATOR "ZIP") # Otherwise, NSIS is needed.
 ENDIF()
 
 message( STATUS "\nTo create installation package: " )
@@ -95,7 +76,7 @@ message( STATUS "make package" )
 message( STATUS "\nOption to install using 'make install'" )
 message( STATUS "Installation locations: " )
 message( STATUS "====================" )
-message( STATUS "Headers: ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_HEADERDIR}" )
+message( STATUS "Headers: ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}/g3log" )
 message( STATUS "Library installation directory: ${CPACK_PACKAGING_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}" )
 
 message( STATUS "For more information please see g3log/CPackLists.txt\n\n" )
