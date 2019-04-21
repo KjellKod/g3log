@@ -208,7 +208,8 @@ cd build
 ## Configuring
 g3log provides following CMake options (and default values):
 ```
-$ cmake -LAH
+$ cmake -LAH # List non-advanced cached variables. See `cmake --help` for more details.
+
 ...
 
 // Fatal (fatal-crashes/contract) examples
@@ -272,15 +273,23 @@ USE_G3_DYNAMIC_MAX_MESSAGE_SIZE:BOOL=OFF
 
 ...
 ```
+For additional option context and comments please also see [Options.cmake](https://github.com/KjellKod/g3log/blob/master/Options.cmake)
+
 If you want leave everything as it was, then you should:
 ```
 cmake ..
 ```
 You may also specify one or more of those options listed above from the command line.
 For example, on Windows:
+
 ```
-cmake .. -G "Visual Studio 15 2017" -DG3_SHARED_LIB=OFF -DCMAKE_INSTALL_PREFIX=C:/g3log -DADD_G3LOG_UNIT_TEST=ON -DADD_FATAL_EXAMPLE=OFF
+cmake .. -G "Visual Studio 15 2017"
+         -DG3_SHARED_LIB=OFF
+         -DCMAKE_INSTALL_PREFIX=C:/g3log
+         -DADD_G3LOG_UNIT_TEST=ON
+         -DADD_FATAL_EXAMPLE=OFF
 ```
+
 will use a Visual Studio 2017 solution generator, build g3log as a static library, headers and libraries will be installed to `C:\g3log` when installed from source, enable unit testing, but do not build fatal example.
 
 *Note*: To build the tests, you should uncompress `g3log/3rdParty/gtest/gtest-1.7.0.zip` first. On Linux, you may:
@@ -295,14 +304,13 @@ MinGW users on Windows may find they should use a different generator:
 ```
 cmake .. -G "MinGW Makefiles"
 ```
-
-By default, headers and libraries will be installed to `/usr/local` on Linux when installed from source via `make install`. You may overwrite it by:
+By default, headers and libraries will be installed to `/usr/local` on Linux when installed from build tree via `make install`. You may overwrite it by:
 ```
 cmake .. -DCMAKE_INSTALL_PREFIX=/usr
 ```
 This will install g3log to `/usr` instead of `/usr/local`.
 
-Package maintainers may be interested in the `CPACK_PACKAGING_INSTALL_PREFIX`. For example:
+Linux/OSX package maintainers may be interested in the `CPACK_PACKAGING_INSTALL_PREFIX`. For example:
 ```
 cmake .. -DCPACK_PACKAGING_INSTALL_PREFIX=/usr/local
 ```
@@ -310,10 +318,10 @@ cmake .. -DCPACK_PACKAGING_INSTALL_PREFIX=/usr/local
 ## Building
 Once the configuration is done, you may build g3log with:
 ```
-# Suppose you are still in the `build` directory.
+# Suppose you are still in the `build` directory. I won't repeat it anymore!
 cmake --build . --config Release
 ```
-You may also use a system-specific way to build the library.
+You may also build it with a system-specific way.
 
 On Linux, OSX and MinGW:
 ```
@@ -323,12 +331,11 @@ On Windows:
 ```
 msbuild g3log.sln /p:Configuration=Release
 ```
-Windows users may also open the generated Visual Studio solution file and build it happily.
+Windows users can also open the generated Visual Studio solution file and build it happily.
 
 ## Installing
 Install from source in a CMake way:
 ```
-# Suppose you are still in the `build` directory. I won't say it again!
 cmake --build . --target install
 ```
 Linux users may also use:
