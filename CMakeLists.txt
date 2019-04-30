@@ -167,9 +167,7 @@ message( STATUS "Software Version: ${VERSION}" )
 
 
    # ==========================================================================
-   #        Tested on Ubuntu, CentOS, OSX and Windows.
-   #        For OSX you can also install an older version using 'brew install'
-   #
+   # CMAKE INSTALL AND CPACK OPTIONS:
    # ==========================================================================
    #
    #   Alternative 1:
@@ -180,18 +178,13 @@ message( STATUS "Software Version: ${VERSION}" )
    #   Alternative 2:
    #      usage: make; sudo make install
    #
+   #   For OSX you can also install an older version using 'brew install'
+   #
    # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
 
 
 IF(MINGW)
-   # ==========================================================================
-   #
-   #   usage: make; make install
-   #
-   # ==========================================================================
-   INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
-   
    # this enables strerror_s
    ADD_DEFINITIONS(-DMINGW_HAS_SECURE_API)
 ENDIF()

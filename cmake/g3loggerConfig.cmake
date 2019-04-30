@@ -22,36 +22,38 @@ include(FindPackageHandleStandardArgs)
 find_package(Threads REQUIRED)
 
 if (NOT TARGET g3logger)
-  include("${CMAKE_CURRENT_LIST_DIR}/g3loggerTargets.cmake")
+   include("${CMAKE_CURRENT_LIST_DIR}/g3loggerTargets.cmake")
 
-  get_target_property(G3LOG_INCLUDE_DIR g3logger INTERFACE_INCLUDE_DIRECTORIES)
+   get_target_property(G3LOG_INCLUDE_DIR g3logger INTERFACE_INCLUDE_DIRECTORIES)
 
-  get_target_property(G3LOG_LIBRARY_DEBUG g3logger IMPORTED_IMPLIB_DEBUG)
-  if (G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND")
-    get_target_property(G3LOG_LIBRARY_DEBUG g3logger IMPORTED_LOCATION_DEBUG)
-  endif ()
+   get_target_property(G3LOG_LIBRARY_DEBUG g3logger IMPORTED_IMPLIB_DEBUG)
+   if (G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND")
+      get_target_property(G3LOG_LIBRARY_DEBUG g3logger IMPORTED_LOCATION_DEBUG)
+   endif ()
 
-  get_target_property(G3LOG_LIBRARY_RELEASE g3logger IMPORTED_IMPLIB_RELEASE)
-  if (G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
-    get_target_property(G3LOG_LIBRARY_RELEASE g3logger IMPORTED_LOCATION_RELEASE)
-  endif ()
+   get_target_property(G3LOG_LIBRARY_RELEASE g3logger IMPORTED_IMPLIB_RELEASE)
+   if (G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
+      get_target_property(G3LOG_LIBRARY_RELEASE g3logger IMPORTED_LOCATION_RELEASE)
+   endif ()
 
-  if (NOT G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND" AND
-      NOT G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
-    set(G3LOG_LIBRARY
-      debug ${G3LOG_LIBRARY_DEBUG}
-      optimized ${G3LOG_LIBRARY_RELEASE}
-    )
-  elseif (NOT G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND")
-    set(G3LOG_LIBRARY ${G3LOG_LIBRARY_DEBUG})
-  elseif (NOT G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
-    set(G3LOG_LIBRARY ${G3LOG_LIBRARY_RELEASE})  
-  endif ()
+   if (NOT G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND" AND
+       NOT G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
+      set(G3LOG_LIBRARY
+          debug ${G3LOG_LIBRARY_DEBUG}
+          optimized ${G3LOG_LIBRARY_RELEASE}
+      )
+   elseif (NOT G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND")
+      set(G3LOG_LIBRARY ${G3LOG_LIBRARY_DEBUG})
+   elseif (NOT G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
+      set(G3LOG_LIBRARY ${G3LOG_LIBRARY_RELEASE})  
+   endif ()
 
-  list(APPEND G3LOG_LIBRARY Threads::Threads)
-  if (WIN32)
-    list(APPEND G3LOG_LIBRARY DbgHelp.lib)
-  endif ()
+   if (G3LOG_LIBRARY)
+      list(APPEND G3LOG_LIBRARY Threads::Threads)
+      if (WIN32)
+         list(APPEND G3LOG_LIBRARY DbgHelp.lib)
+      endif ()
+   endif ()
 endif ()
 
 find_package_handle_standard_args(G3LOG
