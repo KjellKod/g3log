@@ -16,6 +16,7 @@
 # * ``G3LOG_FOUND`` -- check if the lib was found without using the newer ``if(TARGET g3logger)...``
 
 include(FindPackageHandleStandardArgs)
+include(SelectLibraryConfigurations)
 
 @PACKAGE_INIT@
 
@@ -36,17 +37,7 @@ if (NOT TARGET g3logger)
       get_target_property(G3LOG_LIBRARY_RELEASE g3logger IMPORTED_LOCATION_RELEASE)
    endif ()
 
-   if (NOT G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND" AND
-       NOT G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
-      set(G3LOG_LIBRARY
-          debug ${G3LOG_LIBRARY_DEBUG}
-          optimized ${G3LOG_LIBRARY_RELEASE}
-      )
-   elseif (NOT G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND")
-      set(G3LOG_LIBRARY ${G3LOG_LIBRARY_DEBUG})
-   elseif (NOT G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
-      set(G3LOG_LIBRARY ${G3LOG_LIBRARY_RELEASE})  
-   endif ()
+   select_library_configurations(G3LOG)
 
    if (G3LOG_LIBRARY)
       list(APPEND G3LOG_LIBRARY Threads::Threads)
@@ -59,6 +50,5 @@ endif ()
 find_package_handle_standard_args(G3LOG
             REQUIRED_VARS G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
 mark_as_advanced(G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
-set(G3LOG_LIBRARIES ${G3LOG_LIBRARY})
 set(G3LOG_INCLUDE_DIRS ${G3LOG_INCLUDE_DIR})
-
+set(G3LOG_LIBRARIES ${G3LOG_LIBRARY})
