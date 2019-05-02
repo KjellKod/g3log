@@ -202,7 +202,13 @@ If you are interested in the performance or unit tests then you can
 enable the creation of them in the g3log/CMakeLists.txt file. See that file for 
 more details
 
+## Building requires Version Information
+When building g3log it uses git to calculate the software version. If you don't want that, or your setup does not have access to git you can instead pass in the version as part of the CMake build arguments. See this [_issue_](https://github.com/KjellKod/g3log/issues/311#issuecomment-488829282) for more information. 
+```
+cmake -DVERSION=1.3.2  ..
+```
 
+## Building
 ```
 cd g3log
 cd 3rdParty/gtest
