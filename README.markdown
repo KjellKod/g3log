@@ -194,22 +194,28 @@ int main(int argc, char**argv) {
 
 
 
-# BUILDING g3log: 
-g3log uses CMake as a one-stop solution for configuring, building, installing, packaging and testing on Windows, Linux and OSX.
+# BUILDING g3log
 
-## Building requires Version Information
-When building g3log it uses git to calculate the software version. If you don't want that, or your setup does not have access to git you can instead pass in the version as part of the CMake build arguments. See this [_issue_](https://github.com/KjellKod/g3log/issues/311#issuecomment-488829282) for more information. 
-```
-cmake -DVERSION=1.3.2  ..
-```
-
-## Building
 ```
 git clone https://github.com/KjellKod/g3log
 cd g3log
 mkdir build
 cd build
 ```
+
+## Prerequisites
+Assume you have got your shiny C++14 compiler installed, you also need these tools to build g3log from source:
+- CMake (*Required*)
+
+  g3log uses CMake as a one-stop solution for configuring, building, installing, packaging and testing on Windows, Linux and OSX.
+
+- Git (*Optional but Recommended*)
+
+  When building g3log it uses git to calculate the software version from the commit history of this repository. If you don't want that, or your setup does not have access to git, or you download g3log source archive from the GitHub Releases page so that you do not have the commit history downloaded, you can instead pass in the version as part of the CMake build arguments. See this [_issue_](https://github.com/KjellKod/g3log/issues/311#issuecomment-488829282) for more information. 
+  ```
+  cmake -DVERSION=1.3.2  ..
+  ```
+
 ## Configuring
 g3log provides following CMake options (and default values):
 ```
