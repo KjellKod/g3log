@@ -197,8 +197,13 @@ int main(int argc, char**argv) {
 # BUILDING g3log: 
 g3log uses CMake as a one-stop solution for configuring, building, installing, packaging and testing on Windows, Linux and OSX.
 
-g3log also needs Git to extracting version information from the history commits of this repository.
+## Building requires Version Information
+When building g3log it uses git to calculate the software version. If you don't want that, or your setup does not have access to git you can instead pass in the version as part of the CMake build arguments. See this [_issue_](https://github.com/KjellKod/g3log/issues/311#issuecomment-488829282) for more information. 
+```
+cmake -DVERSION=1.3.2  ..
+```
 
+## Building
 ```
 git clone https://github.com/KjellKod/g3log
 cd g3log
