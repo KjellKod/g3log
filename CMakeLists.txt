@@ -166,12 +166,8 @@ message( STATUS "Software Version: ${VERSION}" )
 
 
 
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # ==========================================================================
-   #        Only tested on Ubuntu, CentOS and OSX.
-   #        For OSX you can also install an older version using 'brew install'
-   #
+   # CMAKE INSTALL AND CPACK OPTIONS:
    # ==========================================================================
    #
    #   Alternative 1:
@@ -182,18 +178,13 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"
    #   Alternative 2:
    #      usage: make; sudo make install
    #
+   #   For OSX you can also install an older version using 'brew install'
+   #
    # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
-ENDIF()
+
 
 IF(MINGW)
-   # ==========================================================================
-   #
-   #   usage: make; make install
-   #
-   # ==========================================================================
-   INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
-   
    # this enables strerror_s
    ADD_DEFINITIONS(-DMINGW_HAS_SECURE_API)
 ENDIF()
