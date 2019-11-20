@@ -168,7 +168,7 @@ Example code for replacing the default log formatting for "full details" formatt
    handle->call(&g3::FileSink::overrideLogDetails, &LogMessage::FullLogDetailsToString);
 ```
 
-See [test_message.cpp](http://www.github.com/KjellKod/g3log/test_unit/test_message.cpp) for details and testing
+See [test_message.cpp](test_unit/test_message.cpp) for details and testing
 
 
 Example code for overloading the formatting of a custom sink. The log formatting function will be passed into the 
@@ -324,7 +324,7 @@ The default behaviour for G3log is to catch several fatal events before they for
    ```
    
    ### <a name="fatal_handling_disabled">Disable fatal handling</a>
-   Fatal signal handling can be disabled with a CMake option: `ENABLE_FATAL_SIGNALHANDLING`. See [Options.cmake](https://github.com/KjellKod/g3log/blob/master/Options.cmake) for more details
+   Fatal signal handling can be disabled with a CMake option: `ENABLE_FATAL_SIGNALHANDLING`. See [Options.cmake](Options.cmake) for more details
 
 
    ### <a name="PID1">PID1 Fatal Signal Recommendations</a>
