@@ -118,7 +118,7 @@ auto sinkHandle = logworker->addSink(std::make_unique<CustomSink>(),
 **More sinks** can be found in the repository **[github.com/KjellKod/g3sinks](https://github.com/KjellKod/g3sinks)**.
 
 
-#Code Examples
+# Code Examples
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
 ```
 // main.cpp
