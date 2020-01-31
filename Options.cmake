@@ -139,6 +139,7 @@ IF (MSVC OR MINGW)
 ENDIF (MSVC OR MINGW)
 message( STATUS "\n\n\n" )
 
+option(INSTALL_G3LOG "Enable installation of g3logger. (Projects embedding g3logger may want to turn this OFF.)" ON)
 
 
 
