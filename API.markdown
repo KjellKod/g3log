@@ -7,16 +7,22 @@ Most of the API that you need for using g3log is described in this readme. For m
   * disable/enabled levels at runtime
   * custom logging levels
 * Sink [creation](#sink_creation) and utilization 
+* Custom [log formatting](#log_formatting) 
+  * Overriding the Default File Sink's file header
+  * Overriding the Default FileSink's log formatting
+  * Adding thread ID to the log formatting
+  * Override log formatting in a default and custom sinks
+  * Override the log formatting in the default sink
 * LOG [flushing](#log_flushing)
 * G3log and G3Sinks [usage example](#g3log-and-sink-usage-code-example)
 * Support for [dynamic message sizing](#dynamic_message_sizing)
 * Fatal handling
   * [Linux/*nix](#fatal_handling_linux)
-  * <strike>[TOWRITE: Windows](#fatal_handling_windows)</strike>
-  * <strike>[TOWRITE: Custom fatal handling](#fatal_custom_handling)</strike>
-  * <strike>[TOWRITE: Pre fatal hook](#fatal_pre_hook)</strike>
-  * <strike>[TOWRITE: Override of signal handling](#fatal_signalhandler_override)</strike>
-  * <strike>[TOWRITE: Disable fatal handling](#fatal_handling_disabled)</strike>
+  * [Custom fatal handling - override defaults](#fatal_custom_handling)
+  * [Pre fatal hook](#fatal_pre_hook)
+  * [Disable fatal handling](#fatal_handling_disabled)
+  * [PID1 Fatal Signal Recommendations](#PID1)
+  * [Windows](#fatal_handling_windows)
 * Build Options
 
 
@@ -107,8 +113,89 @@ With the default id left as is (i.e. "g3log") a creation of the logger in the un
 ```
 The resulting filename would be something like: 
 ```
-./(ReplaceLogFile).g3log.20160217-001406.log
+   ./(ReplaceLogFile).g3log.20160217-001406.log
 ```
+
+
+## Custom LOG <a name="log_formatting">formatting</a>
+### Overriding the Default File Sink's file header
+The default file header can be customized in the default file sink in calling 
+```
+   FileSink::overrideLogHeader(std::string);
+```
+
+
+### Overriding the Default FileSink's log formatting
+The default log formatting is defined in `LogMessage.hpp`
+```
+   static std::string DefaultLogDetailsToString(const LogMessage& msg);
+```
+
+### Adding thread ID to the log formatting
+An "all details" log formatting function is also defined - this one also adds the "calling thread's ID"
+```
+   static std::string FullLogDetailsToString(const LogMessage& msg);
+```
+
+### Override log formatting in default and custom sinks
+The default log formatting look can be overriden by any sink. 
+If the sink receiving function calls `toString()` then the default log formatting will be used.
+If the sink receiving function calls `toString(&XFunc)` then the `XFunc`will be used instead (see `LogMessage.h/cpp` for code details if it is not clear). (`XFunc` is a place holder for *your* formatting function of choice). 
+
+The API for the function-ptr to pass in is 
+```
+std::string (*) (const LogMessage&)
+```
+or for short as defined in `LogMessage.h`
+```
+using LogDetailsFunc = std::string (*) (const LogMessage&);
+```
+
+### Override the log formatting in the default sink
+For convenience the *Default* sink has a function
+for doing exactly this
+```
+  void overrideLogDetails(LogMessage::LogDetailsFunc func);
+```
+
+
+Example code for replacing the default log formatting for "full details" formatting (it adds thread ID)
+
+```
+   auto worker = g3::LogWorker::createLogWorker();
+   auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
+   g3::initializeLogging(worker.get());
+   handle->call(&g3::FileSink::overrideLogDetails, &LogMessage::FullLogDetailsToString);
+```
+
+See [test_message.cpp](test_unit/test_message.cpp) for details and testing
+
+
+Example code for overloading the formatting of a custom sink. The log formatting function will be passed into the 
+`LogMessage::toString(...)` this will override the default log formatting
+
+Example
+```
+namespace {
+      std::string MyCustomFormatting(const LogMessage& msg) {
+        ... how you want it ...
+      }
+    }
+
+   void MyCustomSink::ReceiveLogEntry(LogMessageMover message) {
+      std::string formatted = message.get().toString(&MyCustomFormatting) << std::flush;
+   }
+...
+...
+ auto worker = g3::LogWorker::createLogWorker();
+ auto sinkHandle = worker->addSink(std::make_unique<MyCustomSink>(),
+                                     &MyCustomSink::ReceiveLogMessage);
+ // ReceiveLogMessage(...) will used the custom formatting function "MyCustomFormatting(...)
+    
+```
+
+
+
 
 
 ## LOG <a name="log_flushing">flushing</a> 
@@ -211,26 +298,46 @@ The default behaviour for G3log is to catch several fatal events before they for
 
     ```
 
+   ### <a name="fatal_custom_handling">Custom fatal handling - override defaults</a>
+   By <a name="fatal_signalhandler_override">default</a> the fatal signals are defined in [src/g3log.cpp](src/g3log.cpp) as 
+   ```
+   SIGABRT
+   SIGFPE
+   SIGILL
+   SIGSEGV
+   SIGTERM
+   ```
+   If you want to define your own set of fatal signals, override the default ones, then this can be done as shown in [src/g3log/crashhandler.hpp](src/g3log/crashhandler.hpp)
+   ```
+   // Example when SIGTERM is skipped due to ZMQ usage
+   g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, 
+                              {SIGFPE, "SIGFPE"},
+                              {SIGILL, "SIGILL"},
+                              {SIGSEGV, "SIGSEGV"}});
+   ```
+   
+   ### <a name="fatal_pre_hook">Pre fatal hook</a>
+   You can define a custom call back function that will be called before the fatal signal handling re-emits the `fatal` signal. See [src/g3log/g3log.hpp](src/g3log/g3log.hpp) for details. 
+   ```
+   // Example of how to enforce important shutdown cleanup even in the event of a fatal crash: 
+   g3::setFatalPreLoggingHook([]{ cleanup(); });
+   ```
+   
+   ### <a name="fatal_handling_disabled">Disable fatal handling</a>
+   Fatal signal handling can be disabled with a CMake option: `ENABLE_FATAL_SIGNALHANDLING`. See [Options.cmake](Options.cmake) for more details
 
-  <strikte>
-   ### <a name="fatal_handling_windows">TOWRITE: Windows</a>
+
+   ### <a name="PID1">PID1 Fatal Signal Recommendations</a>
+  If you are using g3log on a PID1 process then you absolutely should provide your own signal handling  (ref: [issue 269](https://github.com/KjellKod/g3log/issues/269)) as g3log re-emits the fatal signal after it has restored the previous signal handler for that signal.  PID1 processed do *not* shutdown the process for a normal fatal signal so the choice  to exit the PID1 process after such a signal must be taken by the coder - not by g3log.
+
+### <a name="fatal_handling_windows">Windows</a>
   Windows fatal handling also deals with fatal signals just like Linux. In addition to fatal signals it also deals with unhandled exceptions, vectored exceptions.  Windows fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp), [crashhandler_windows.cpp](src/crashhandler_windows.cpp), [stacktrace_windows.hpp](src/g3log/stacktrace_windows.hpp), [stacktrace_windows.cpp](src/stacktrace_windows.cpp)
-   
-
+ 
   An example of a Windows stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>. 
-    
-    .... MISSING CONTENT..... since my Windows computer is gone!
-
-   </strike> 
-   
 
 
 
 
-   ### <strike><a name="fatal_custom_handling">TOWRITE: Custom fatal handling</a></strike> 
-   ### <strike><a name="fatal_pre_hook">TOWRITE: Pre fatal hook</a> </strike> 
-   ### <strike><a name="fatal_signalhandler_override">TOWRITE: Override of signal handling</a> </strike> 
-   ### <strike><a name="fatal_handling_disabled">TOWRITE: Disable fatal handling</a> </strike> 
 
 
 

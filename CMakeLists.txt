@@ -20,8 +20,15 @@
 #    cd build;
 # 3. cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio XXX" ..
 #     (cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12")
-#    (XXX is the Visual Studio version you are running)
-# 4. msbuild g3log.sln /p:Configuration=Release
+#     MAKE SURE you check the CMake documentation so you are using
+#     the correct bit flags(64 bit etc). The "XXX" needs 
+#     tto be replaced for your specific build system, ref: cmake docs.
+# 
+#     (Example from Appveyor Ci: 
+#      https://github.com/KjellKod/g3log/blob/master/appveyor.yml
+#      cmake -G "Visual Studio 14 2015 Win64" -DADD_G3LOG_UNIT_TEST=ON ..)
+#
+#      4. msbuild g3log.sln /p:Configuration=Release
 #
 # Try to run an example, such as:
 # 5. Release\g3log-FATAL-contract.exe
@@ -46,7 +53,7 @@
 #
 # ============================================================================
 
-cmake_minimum_required (VERSION 3.1)
+cmake_minimum_required (VERSION 3.2)
 ENABLE_LANGUAGE(CXX)
 
 if(NOT CMAKE_BUILD_TYPE AND NOT (MSVC_IDE OR XCODE))
@@ -74,14 +81,14 @@ SET(MAJOR_VERSION 1)
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
       message("windows: Extracting git software version")
-      execute_process(COMMAND powershell "(git rev-list --branches HEAD | Measure-Object -line).Lines" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+      execute_process(COMMAND cmd /c "git rev-list --branches HEAD | find /v " " /c" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ELSE()
       IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
          message( STATUS "nix: Extracting git software version" )
       ELSE()
          message( STATUS "unknown platform: extracting git software version" )
       ENDIF()
-      execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+      execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ENDIF()
 
    SET(MINOR_VERSION 3)
@@ -159,12 +166,8 @@ message( STATUS "Software Version: ${VERSION}" )
 
 
 
-
-IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
    # ==========================================================================
-   #        Only tested on Ubuntu, CentOS and OSX.
-   #        For OSX you can also install an older version using 'brew install'
-   #
+   # CMAKE INSTALL AND CPACK OPTIONS:
    # ==========================================================================
    #
    #   Alternative 1:
@@ -175,17 +178,15 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin"
    #   Alternative 2:
    #      usage: make; sudo make install
    #
+   #   For OSX you can also install an older version using 'brew install'
+   #
    # ==========================================================================
    INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
-ENDIF()
+
 
 IF(MINGW)
-   # ==========================================================================
-   #
-   #   usage: make; make install
-   #
-   # ==========================================================================
-   INCLUDE (${g3log_SOURCE_DIR}/CPackLists.txt)
+   # this enables strerror_s
+   ADD_DEFINITIONS(-DMINGW_HAS_SECURE_API)
 ENDIF()
 
 IF (NOT MSVC)

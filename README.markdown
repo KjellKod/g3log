@@ -61,7 +61,7 @@ The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal 
 8. The code is given for free as public domain. This gives the option to change, use, and do whatever with it, no strings attached.
 
 9. Two versions of g3log exist that are under active development.
-    * This version: *[g3log](https://github.com/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013). My recommendation is to go with g3log if you have full C++11 support. 
+    * This version: *[g3log](https://github.com/KjellKod/g3log)* : which is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with Linux(Clang/gcc), Windows (mingw, visual studio 2013). My recommendation is to go with g3log if you have full C++14 support (C++11 support up to version: https://github.com/KjellKod/g3log/releases/tag/1.3.1). 
     * *[g2log](https://bitbucket.org/KjellKod/g2log)*: The original. Simple, easy to modify and with the most OS support. Clients use g2log on environments such as OSX/Clang, Ubuntu, CentOS, Windows/mingw, Windows/Visual Studio.  The focus on g2log is "slow to change" and compiler support. Only well, time tested, features from g3log will make it into g2log. 
 
 
@@ -118,7 +118,7 @@ auto sinkHandle = logworker->addSink(std::make_unique<CustomSink>(),
 **More sinks** can be found in the repository **[github.com/KjellKod/g3sinks](https://github.com/KjellKod/g3sinks)**.
 
 
-#Code Examples
+# Code Examples
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
 ```
 // main.cpp
@@ -194,73 +194,233 @@ int main(int argc, char**argv) {
 
 
 
-# BUILDING g3log: 
------------
-The default is to build an example binary 'g3log-FATAL-contract' and 'g3log-FATAL-sigsegv'. I suggest you start with that, run it and view the created log also.
-
-If you are interested in the performance or unit tests then you can 
-enable the creation of them in the g3log/CMakeLists.txt file. See that file for 
-more details
-
+# BUILDING g3log
 
 ```
+git clone https://github.com/KjellKod/g3log
 cd g3log
-cd 3rdParty/gtest
-unzip gtest-1.7.0.zip
-cd ../../
 mkdir build
 cd build
 ```
-## Configuring for installing on nix (OSX, Linux, MinGW)
-Default install prefix on Linux is `/usr/local`
-To change it please set  `CPACK_PACKAGING_INSTALL_PREFIX `
 
+## Prerequisites
+Assume you have got your shiny C++14 compiler installed, you also need these tools to build g3log from source:
+- CMake (*Required*)
+
+  g3log uses CMake as a one-stop solution for configuring, building, installing, packaging and testing on Windows, Linux and OSX.
+
+- Git (*Optional but Recommended*)
+
+  When building g3log it uses git to calculate the software version from the commit history of this repository. If you don't want that, or your setup does not have access to git, or you download g3log source archive from the GitHub Releases page so that you do not have the commit history downloaded, you can instead pass in the version as part of the CMake build arguments. See this [_issue_](https://github.com/KjellKod/g3log/issues/311#issuecomment-488829282) for more information. 
+  ```
+  cmake -DVERSION=1.3.2  ..
+  ```
+
+## Configuring
+g3log provides following CMake options (and default values):
 ```
-cmake -DCPACK_PACKAGING_INSTALL_PREFIX= ...
+$ cmake -LAH # List non-advanced cached variables. See `cmake --help` for more details.
+
+...
+
+// Fatal (fatal-crashes/contract) examples
+ADD_FATAL_EXAMPLE:BOOL=ON
+
+// g3log performance test
+ADD_G3LOG_BENCH_PERFORMANCE:BOOL=OFF
+
+// g3log unit tests
+ADD_G3LOG_UNIT_TEST:BOOL=OFF
+
+// Use DBUG logging level instead of DEBUG.
+// By default DEBUG is the debugging level
+CHANGE_G3LOG_DEBUG_TO_DBUG:BOOL=OFF
+
+// Specifies the build type on single-configuration generators.
+// Possible values are empty, Debug, Release, RelWithDebInfo, MinSizeRel, … 
+CMAKE_BUILD_TYPE:STRING=
+
+// Install path prefix, prepended onto install directories.
+// This variable defaults to /usr/local on UNIX
+// and c:/Program Files/${PROJECT_NAME} on Windows.
+CMAKE_INSTALL_PREFIX:PATH=
+
+// The prefix used in the built package.
+// On Linux, if this option is not set:
+// 1) If CMAKE_INSTALL_PREFIX is given, then it will be
+//    set with the value of CMAKE_INSTALL_PREFIX by g3log.
+// 2) Otherwise, it will be set as /usr/local by g3log. 
+CPACK_PACKAGING_INSTALL_PREFIX:PATH=
+
+// Enable Visual Studio break point when receiving a fatal exception.
+// In __DEBUG mode only
+DEBUG_BREAK_AT_FATAL_SIGNAL:BOOL=OFF
+
+// Vectored exception / crash handling with improved stack trace
+ENABLE_FATAL_SIGNALHANDLING:BOOL=ON
+
+// Vectored exception / crash handling with improved stack trace
+ENABLE_VECTORED_EXCEPTIONHANDLING:BOOL=ON
+
+// iOS version of library.
+G3_IOS_LIB:BOOL=OFF
+
+// Log full filename
+G3_LOG_FULL_FILENAME:BOOL=OFF
+
+// Build shared library
+G3_SHARED_LIB:BOOL=ON
+
+// Build shared runtime library MSVC
+G3_SHARED_RUNTIME:BOOL=ON
+
+// Turn ON/OFF log levels.
+// An disabled level will not push logs of that level to the sink.
+// By default dynamic logging is disabled
+USE_DYNAMIC_LOGGING_LEVELS:BOOL=OFF
+
+// Use dynamic memory for message buffer during log capturing
+USE_G3_DYNAMIC_MAX_MESSAGE_SIZE:BOOL=OFF
+
+...
+```
+For additional option context and comments please also see [Options.cmake](https://github.com/KjellKod/g3log/blob/master/Options.cmake)
+
+If you want to leave everything as it was, then you should:
+```
+cmake ..
+```
+You may also specify one or more of those options listed above from the command line.
+For example, on Windows:
+```
+cmake .. -G "Visual Studio 15 2017"
+         -DG3_SHARED_LIB=OFF
+         -DCMAKE_INSTALL_PREFIX=C:/g3log
+         -DADD_G3LOG_UNIT_TEST=ON
+         -DADD_FATAL_EXAMPLE=OFF
+```
+will use a Visual Studio 2017 solution generator, build g3log as a static library, headers and libraries will be installed to `C:\g3log` when installed from source, enable unit testing, but do not build fatal example.
+
+*Note*: To build the tests, you should uncompress `g3log/3rdParty/gtest/gtest-1.7.0.zip` first. On Linux, you may:
+```
+# Suppose you are still in `g3log/build`
+pushd ../3rdParty/gtest
+unzip gtest-1.7.0.zip
+popd
 ```
 
+MinGW users on Windows may find they should use a different generator:
+```
+cmake .. -G "MinGW Makefiles"
+```
 
-## Building on Linux
+By default, headers and libraries will be installed to `/usr/local` on Linux when installed from build tree via `make install`. You may overwrite it by:
 ```
-cmake -DCMAKE_BUILD_TYPE=Release ..
-make 
+cmake .. -DCMAKE_INSTALL_PREFIX=/usr
 ```
-## Installing On Linux
+This will install g3log to `/usr` instead of `/usr/local`.
+
+Linux/OSX package maintainers may be interested in the `CPACK_PACKAGING_INSTALL_PREFIX`. For example:
+```
+cmake .. -DCPACK_PACKAGING_INSTALL_PREFIX=/usr/local
+```
+
+## Building
+Once the configuration is done, you may build g3log with:
+```
+# Suppose you are still in the `build` directory. I won't repeat it anymore!
+cmake --build . --config Release
+```
+You may also build it with a system-specific way.
+
+On Linux, OSX and MinGW:
+```
+make
+```
+On Windows:
+```
+msbuild g3log.sln /p:Configuration=Release
+```
+Windows users can also open the generated Visual Studio solution file and build it happily.
+
+## Installing
+Install from source in a CMake way:
+```
+cmake --build . --target install
+```
+Linux users may also use:
 ```
 sudo make install
 ```
-Alternative on Debian
+You may also create a package first and install g3log with it. See the next section.
+
+## Packaging
+A CMake way:
+```
+cmake --build . --config Release --target package
+```
+or
+```
+cpack -C Release
+```
+if the whole library has been built in the previous step.
+It will generate a ZIP package on Windows, and a DEB package on Linux.
+
+Linux users may also use a Linux way:
 ```
 make package
+```
+
+If you want to use a different package generator, you should specify a `-G` option.
+
+On Windows:
+```
+cpack -C Release -G NSIS;7Z
+```
+this will create a installable NSIS package and a 7z package.
+
+*Note:* To use the NSIS generator, you should install [```NSIS```](https://nsis.sourceforge.io/Download) first.
+
+On Linux:
+```
+cpack -C Release -G TGZ
+```
+this will create a .tar.gz archive for you.
+
+Once done, you may install or uncompress the package file to the target machine. For example, on Debian or Ubuntu:
+```
 sudo dpkg -i g3log-<version>-Linux.deb
 ```
+will install the g3log library to `CPACK_PACKAGING_INSTALL_PREFIX`.
 
-## Building on MinGW
+## Testing
+
+By default, tests will not be built. To enable unit testing, you should turn on `ADD_G3LOG_UNIT_TEST`. Besides, you should uncompress `g3log/3rdParty/gtest/gtest-1.7.0.zip`(We talked about it in the `Configuring` section).
+
+Suppose the build process has completed, then you can run the tests with:
 ```
-cmake -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release ..
-make 
+ctest -C Release
 ```
-## Installing on MinGW
+or:
 ```
-make install
+make test
 ```
-Alternative using NSIS
+for Linux users.
+
+## CMake module
+
+g3log comes with a CMake module. Once installed, it can be found under `${CMAKE_INSTALL_PREFIX}/lib/cmake/g3logger`. Users can use g3log in a CMake-based project this way:
+
 ```
-make package
-g3log-<version>-win32.exe
+find_package(g3logger CONFIG REQUIRED)
+target_link_libraries(main PRIVATE g3logger)
 ```
 
-## Building on Windows
-Please use the Visual Studio 12 (2013) command prompt "Developer command prompt"
-```
-cmake -DCMAKE_BUILD_TYPE=Release -G "Visual Studio 12" ..
-msbuild g3log.sln /p:Configuration=Release
-```
+*Note:* The CMake package name here is `g3logger`, not `g3log`.
 
-## Building on *nix with Clang
+To make sure that CMake can find g3log(or g3logger), you also need to tell CMake where to search for it:
 ```
-cmake -DCMAKE_CXX_COMPILER=clang++      -DCMAKE_BUILD_TYPE=Release ..
-make 
+cmake .. -DCMAKE_PREFIX_PATH=<g3log's install prefix>
 ```
 
 # API description
@@ -279,7 +439,7 @@ Most of the API that you need for using g3log is described in this readme. For m
 * CHECK calls
 
 
-#Performance
+# Performance
 G3log aims to keep all background logging to sinks with as little log overhead as possible to the logging sink and with as small "worst case latency" as possible. For this reason g3log is a good logger for many systems that deal with critical tasks. Depending on platform the average logging overhead will differ. On my laptop the average call, when doing extreme performance testing, will be about ~2 us.
 
 The worst case latency is kept stabile with no extreme peaks, in spite of any sudden extreme pressure.  I have a blog post regarding comparing worst case latency for g3log and other loggers which might be of interest. 

@@ -145,19 +145,18 @@ namespace g3 {
 
 
 // LOG(level) is the API for the stream log
-#define LOG(level) if(!g3::logLevel(level)){ } else INTERNAL_LOG_MESSAGE(level).stream()
+#define LOG(level) if(!g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).stream()
 
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
-   if(true == (boolean_expression))  \
-      if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).stream()
+   if (false == (boolean_expression) || !g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).stream()
 
 // 'Design By Contract' stream API. For Broken Contracts:
 //         unit testing: it will throw std::runtime_error when a contract breaks
 //         I.R.L : it will exit the application by using fatal signal SIGABRT
 #define CHECK(boolean_expression)        \
-   if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
+   if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
 
 
 /** For details please see this
@@ -209,22 +208,19 @@ And here is possible output
 :      Width trick:    10
 :      A string  \endverbatim */
 #define LOGF(level, printf_like_message, ...)                 \
-   if(!g3::logLevel(level)){ } else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
+   if (!g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Conditional log printf syntax
 #define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
-   if(true == (boolean_expression))                                     \
-      if(g3::logLevel(level))  INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
+   if (false == (boolean_expression) || !g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Throws std::runtime_eror if contract breaks
 #define CHECKF(boolean_expression, printf_like_message, ...)    \
-   if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
+   if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
 
-// Backwards compatible. The same as CHECKF. 
+// Backwards compatible. The same as CHECKF.
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Throws std::runtime_eror if contract breaks
 #define CHECK_F(boolean_expression, printf_like_message, ...)    \
-   if (false == (boolean_expression))  INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
-
-
+   if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)

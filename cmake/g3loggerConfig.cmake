@@ -4,50 +4,51 @@
 #
 # Find libg3logger, G3log is an asynchronous, "crash safe", logger that is easy to use with default logging sinks or you can add your own.
 #
-# Result variables
-# ^^^^^^^^^^^^^^^^
-#
-# This module will set the following variables in your project:
-#
-# ``G3LOG_INCLUDE_DIRS``
-#   where to find g3log.hpp, etc.
-#
-# ``G3LOG_LIBRARIES``
-#   the libraries to link against to use libg3logger.
-#
-#   that includes libg3logger library files.
-# ``G3LOG_FOUND``
-#
-#   If false, do not try to use G3LOG.
+# This defines the cmake import target "g3logger" you can use like this
+#```
+# target_link_libraries(YourTarget PUBLIC g3logger)
+#```
+# Variables and features 
+# ----------------------
+# * ``G3LOG`` -- if this environment variable is set, it'll be used as a hint as to where the g3logger files are. 
+# * ``G3LOG_INCLUDE_DIRS`` -- raw cmake variable with include path 
+# * ``G3LOG_LIBRARIES`` -- raw cmake variable with library link line
+# * ``G3LOG_FOUND`` -- check if the lib was found without using the newer ``if(TARGET g3logger)...``
+
 include(FindPackageHandleStandardArgs)
-find_path(G3LOG_INCLUDE_DIR 
-         g3log/active.hpp
-         g3log/atomicbool.hpp
-         g3log/crashhandler.hpp
-         g3log/filesink.hpp
-         g3log/future.hpp
-         g3log/g3log.hpp
-         g3log/generated_definitions.hpp
-         g3log/logcapture.hpp
-         g3log/loglevels.hpp
-         g3log/logmessage.hpp
-         g3log/logworker.hpp
-         g3log/moveoncopy.hpp
-         g3log/shared_queue.hpp
-         g3log/sinkhandle.hpp
-         g3log/sink.hpp
-         g3log/sinkwrapper.hpp
-         g3log/stacktrace_windows.hpp
-         g3log/stlpatch_future.hpp
-         g3log/time.hpp
-)
+include(SelectLibraryConfigurations)
 
-find_library(G3LOG_LIBRARY
-            NAMES libg3logger g3logger)
+@PACKAGE_INIT@
 
-find_package_handle_standard_args(G3LOG  DEFAULT_MSG
-            G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
+find_package(Threads REQUIRED)
 
+if (NOT TARGET g3logger)
+   include("${CMAKE_CURRENT_LIST_DIR}/g3loggerTargets.cmake")
+
+   get_target_property(G3LOG_INCLUDE_DIR g3logger INTERFACE_INCLUDE_DIRECTORIES)
+
+   get_target_property(G3LOG_LIBRARY_DEBUG g3logger IMPORTED_IMPLIB_DEBUG)
+   if (G3LOG_LIBRARY_DEBUG MATCHES ".*-NOTFOUND")
+      get_target_property(G3LOG_LIBRARY_DEBUG g3logger IMPORTED_LOCATION_DEBUG)
+   endif ()
+
+   get_target_property(G3LOG_LIBRARY_RELEASE g3logger IMPORTED_IMPLIB_RELEASE)
+   if (G3LOG_LIBRARY_RELEASE MATCHES ".*-NOTFOUND")
+      get_target_property(G3LOG_LIBRARY_RELEASE g3logger IMPORTED_LOCATION_RELEASE)
+   endif ()
+
+   select_library_configurations(G3LOG)
+
+   if (G3LOG_LIBRARY)
+      list(APPEND G3LOG_LIBRARY Threads::Threads)
+      if (WIN32)
+         list(APPEND G3LOG_LIBRARY DbgHelp.lib)
+      endif ()
+   endif ()
+endif ()
+
+find_package_handle_standard_args(G3LOG
+            REQUIRED_VARS G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
 mark_as_advanced(G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
-set(G3LOG_LIBRARIES ${G3LOG_LIBRARY})
 set(G3LOG_INCLUDE_DIRS ${G3LOG_INCLUDE_DIR})
+set(G3LOG_LIBRARIES ${G3LOG_LIBRARY})

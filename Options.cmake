@@ -83,7 +83,7 @@ ELSE()
 ENDIF(G3_LOG_FULL_FILENAME)
 
 
-# -DENABLE_FATAL_SIGNALHANDLING=ON   : defualt change the
+# -DENABLE_FATAL_SIGNALHANDLING=ON   : default change the
 # By default fatal signal handling is enabled. You can disable it with this option
 # enumerated in src/stacktrace_windows.cpp 
 option (ENABLE_FATAL_SIGNALHANDLING
@@ -102,7 +102,15 @@ option (G3_SHARED_LIB  "Build shared library" ON)
 IF(G3_SHARED_LIB)
    message( STATUS "-DG3_SHARED_LIB=ON\tBuild shared library" ) 
 ELSE()
-   MESSAGE("-DG3_SHARED_LIB=OFF\tBuild static library")  
+   MESSAGE( STATUS "-DG3_SHARED_LIB=OFF\tBuild static library")  
+ENDIF()
+
+# Option for building as a static or shared runtime library in MS VC++
+option (G3_SHARED_RUNTIME  "Build shared runtime library MS VC" ON)
+IF(G3_SHARED_RUNTIME)
+   message( STATUS "-DG3_SHARED_RUNTIME=ON\tBuild shared runtime library" )
+ELSE()
+   message( STATUS "-DG3_SHARED_RUNTIME=OFF\tBuild static runtime library")
 ENDIF()
 
 # WINDOWS OPTIONS

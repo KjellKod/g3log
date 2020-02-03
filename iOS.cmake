@@ -38,6 +38,13 @@ set (IOS True)
 # Required as of cmake 2.8.10
 set (CMAKE_OSX_DEPLOYMENT_TARGET "" CACHE STRING "Force unset of the deployment target for iOS" FORCE)
 
+# Allow external setting of CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET. This is clumsy
+# but it provides flexibility of not having to hardcode the deployment version in the file or have
+# numerous copies of the file
+if ($ENV{CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET}) 
+	set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET $ENV{CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET})
+endif ($ENV{CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET})
+
 # Determine the cmake host system version so we know where to find the iOS SDKs
 find_program (CMAKE_UNAME uname /bin /usr/bin /usr/local/bin)
 if (CMAKE_UNAME)
@@ -72,7 +79,9 @@ set (CMAKE_CXX_OSX_CURRENT_VERSION_FLAG "${CMAKE_C_OSX_CURRENT_VERSION_FLAG}")
 
 # Hidden visibilty is required for cxx on iOS 
 set (CMAKE_C_FLAGS_INIT "")
-set (CMAKE_CXX_FLAGS_INIT "-fvisibility=hidden -fvisibility-inlines-hidden")
+set (CMAKE_CXX_FLAGS_INIT "-fvisibility=hidden")
+
+set (CMAKE_CXX_COMPILE_OPTIONS_VISIBILITY_INLINES_HIDDEN "" CACHE STRING "Force unset of CMAKE_CXX_COMPILE_OPTIONS_VISIBILITY_INLINES_HIDDEN" FORCE)
 
 set (CMAKE_C_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_C_LINK_FLAGS}")
 set (CMAKE_CXX_LINK_FLAGS "-Wl,-search_paths_first ${CMAKE_CXX_LINK_FLAGS}")
@@ -159,7 +168,7 @@ set (CMAKE_OSX_SYSROOT ${CMAKE_IOS_SDK_ROOT} CACHE PATH "Sysroot used for iOS su
 
 # set the architecture for iOS 
 if (${IOS_PLATFORM} STREQUAL "OS")
-    set (IOS_ARCH armv7 armv7s arm64)
+    set (IOS_ARCH armv7 armv7s arm64 arm64e)
 elseif (${IOS_PLATFORM} STREQUAL "SIMULATOR")
     set (IOS_ARCH i386)
 elseif (${IOS_PLATFORM} STREQUAL "SIMULATOR64")
