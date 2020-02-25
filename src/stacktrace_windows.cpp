@@ -110,7 +110,7 @@ namespace {
 
       DWORD64 displacement64;
       DWORD displacement;
-      char symbol_buffer[sizeof(SYMBOL_INFO) + 256];
+      char symbol_buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
       SYMBOL_INFO *symbol = reinterpret_cast<SYMBOL_INFO *>(symbol_buffer);
       symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
       symbol->MaxNameLen = MAX_SYM_NAME;
@@ -120,7 +120,7 @@ namespace {
       std::string lineInformation;
       std::string callInformation;
       if (SymFromAddr(GetCurrentProcess(), addr, &displacement64, symbol)) {
-         callInformation.append(" ").append({std::string(symbol->Name), symbol->NameLen});
+         callInformation.append(" ").append(std::string(symbol->Name, symbol->NameLen));
          if (SymGetLineFromAddr64(GetCurrentProcess(), addr, &displacement, &line)) {
             lineInformation.append("\t").append(line.FileName).append(" L: ");
             lineInformation.append(std::to_string(line.LineNumber));
