@@ -1,5 +1,5 @@
 # G3log : Asynchronous logger with Dynamic Sinks
-
+Test
 
 ## EXAMPLE USAGE
 #### Optional to use either streaming or printf-like syntax
