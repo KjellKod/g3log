@@ -1,6 +1,9 @@
 sudo: required
 language: cpp
 
+git:
+  quiet: true
+  
 matrix:
   include:
     - os: linux
