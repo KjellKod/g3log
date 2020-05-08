@@ -152,9 +152,8 @@ namespace g3 {
 #define LOG_IF(level, boolean_expression)  \
    if (false == (boolean_expression) || !g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).stream()
 
-// 'Design By Contract' stream API. For Broken Contracts:
-//         unit testing: it will throw std::runtime_error when a contract breaks
-//         I.R.L : it will exit the application by using fatal signal SIGABRT
+// 'Design By Contract' stream API. Broken Contracts will exit the application by using fatal signal SIGABRT
+//  For unit testing, you can override the fatal handling using setFatalExitHandler(...). See tes_io.cpp for examples
 #define CHECK(boolean_expression)        \
    if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
 
