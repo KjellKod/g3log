@@ -215,12 +215,14 @@ And here is possible output
    if (false == (boolean_expression) || !g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Design By Contract, printf-like API syntax with variadic input parameters.
-// Throws std::runtime_eror if contract breaks
+// Calls the signal handler if the contract failed with the default exit for a failed contract. This is typically SIGABRT
+// See g3log, setFatalExitHandler(...) which can be overriden for unit tests (ref test_io.cpp)
 #define CHECKF(boolean_expression, printf_like_message, ...)    \
    if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Backwards compatible. The same as CHECKF.
 // Design By Contract, printf-like API syntax with variadic input parameters.
-// Throws std::runtime_eror if contract breaks
+// Calls the signal handler if the contract failed. See g3log, setFatalExitHandler(...) which can be overriden for unit tests
+// (ref test_io.cpp)
 #define CHECK_F(boolean_expression, printf_like_message, ...)    \
    if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
