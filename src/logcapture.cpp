@@ -38,7 +38,7 @@ void g3::only_change_at_initialization::setMaxMessageSize(size_t max_size) {
 * As a safety precaution: No memory allocated here will be moved into the background
 * worker in case of dynamic loaded library reasons instead the arguments are copied
 * inside of g3log.cpp::saveMessage*/
-LogCapture::~LogCapture() {
+LogCapture::~LogCapture() noexcept (false) {
    using namespace g3::internal;
    SIGNAL_HANDLER_VERIFY();
    saveMessage(_stream.str().c_str(), _file, _line, _function, _level, _expression, _fatal_signal, _stack_trace.c_str());
