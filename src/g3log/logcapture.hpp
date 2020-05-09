@@ -42,7 +42,7 @@ struct LogCapture {
    // At destruction the message will be forwarded to the g3log worker.
    // In the case of dynamically (at runtime) loaded libraries, the important thing to know is that
    // all strings are copied, so the original are not destroyed at the receiving end, only the copy
-   virtual ~LogCapture();
+   virtual ~LogCapture() noexcept (false);
 
 
 

@@ -601,7 +601,34 @@ TEST(CHECK, CHECK_ThatWontThrow) {
    EXPECT_FALSE(verifyContent(mockFatalMessage(), msg3));
 }
 
+TEST(CHECK, CHECK_runtimeError) {
+   RestoreFileLogger logger(log_directory);
 
+   g3::setFatalExitHandler([](g3::FatalMessagePtr msg) {
+     throw std::runtime_error("fatal test handler");
+   });
+
+   class dynamic_int_array {
+     std::unique_ptr<int[]> data_;
+     const int size_;
+   public:
+     explicit dynamic_int_array(int size)
+         : data_{std::make_unique<int[]>(size)}
+         , size_(size)
+    {}
+
+    int& at(int i) {
+      CHECK(i < size_);
+
+      // unreachable if i >= size_
+      return data_[i];
+    }
+   };
+
+   dynamic_int_array arr{3};
+
+   EXPECT_THROW(arr.at(3) = 1, std::runtime_error);
+}
 
 TEST(CustomLogLevels, AddANonFatal) {
    RestoreFileLogger logger(log_directory);
