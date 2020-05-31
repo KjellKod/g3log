@@ -120,7 +120,7 @@ auto sinkHandle = logworker->addSink(std::make_unique<CustomSink>(),
 
 # Code Examples
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
-```
+```cpp
 // main.cpp
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
@@ -145,12 +145,12 @@ int main(int argc, char**argv) {
    std::future<void> received = sinkHandle->call(&CustomSink::Foo, 
                                                  param1, param2);
    
-   // If the LogWorker is initialized then at scope exit the g3::shutDownLogging() will be called. 
+   // If the LogWorker is initialized then at scope exit the g3::internal::shutDownLogging() will be called.
    // This is important since it protects from LOG calls from static or other entities that will go out of
    // scope at a later time. 
    //
    // It can also be called manually:
-   g3::shutDownLogging();
+   g3::internal::shutDownLogging();
 }
 
 
@@ -166,7 +166,7 @@ void SomeFunction() {
 ```
 
 Example usage where a the default file logger is used **and** a custom sink is added
-```
+```cpp
 // main.cpp
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
