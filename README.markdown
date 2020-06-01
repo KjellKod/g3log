@@ -301,14 +301,6 @@ cmake .. -G "Visual Studio 15 2017"
 ```
 will use a Visual Studio 2017 solution generator, build g3log as a static library, headers and libraries will be installed to `C:\g3log` when installed from source, enable unit testing, but do not build fatal example.
 
-*Note*: To build the tests, you should uncompress `g3log/3rdParty/gtest/gtest-1.7.0.zip` first. On Linux, you may:
-```
-# Suppose you are still in `g3log/build`
-pushd ../3rdParty/gtest
-unzip gtest-1.7.0.zip
-popd
-```
-
 MinGW users on Windows may find they should use a different generator:
 ```
 cmake .. -G "MinGW Makefiles"
