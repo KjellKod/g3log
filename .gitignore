@@ -1,6 +1,5 @@
 syntax: glob
 sinks/*
-3rdParty/*
 build/*
 nbproject/*
 build_clang
