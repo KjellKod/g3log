@@ -19,8 +19,6 @@ install:
 
 # scripts to run before build
 before_build:
-  - cd c:\projects\g3log\3rdParty\gtest
-  - 7z x gtest-1.7.0.zip 
   - cd c:\projects\g3log\
   - mkdir build
   - cd build 
