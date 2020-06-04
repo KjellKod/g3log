@@ -125,6 +125,18 @@ target_compile_options(${G3LOG_LIBRARY} PRIVATE
    $<$<CXX_COMPILER_ID:GNU>:-rdynamic>
 )
 
+# Add atomic library for ARM processors
+IF(UNIX)
+  STRING(FIND ${CMAKE_SYSTEM_PROCESSOR} "arm" arm_res)
+  IF(${arm_res} EQUAL -1)
+    TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} atomic)
+  ENDIF()
+  STRING(FIND ${CMAKE_SYSTEM_PROCESSOR} "aarch" arm_res)
+  IF(${arm_res} EQUAL -1)
+    TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} atomic)
+  ENDIF()
+ENDIF()
+
 #cmake -DCMAKE_CXX_COMPILER=clang++ ..
   # WARNING: If Clang for Linux does not work with full c++14 support it might be your
   # installation that is faulty. When I tested Clang on Ubuntu I followed the following
