@@ -468,7 +468,7 @@ Most of the API that you need for using g3log is described in this readme. For m
 # <a name="performance">Performance</a>
 G3log aims to keep all background logging to sinks with as little log overhead as possible to the logging sink and with as small "worst case latency" as possible. For this reason g3log is a good logger for many systems that deal with critical tasks. Depending on platform the average logging overhead will differ. On my 2010 laptop the average call, when doing extreme performance testing, will be about ~2 us.
 
-The worst case latency is kept stabile with no extreme peaks, in spite of any sudden extreme pressure.  I have a blog post regarding comparing worst case latency for g3log and other loggers which might be of interest.
+The worst case latency is kept stable with no extreme peaks, in spite of any sudden extreme pressure.  I have a blog post regarding comparing worst case latency for g3log and other loggers which might be of interest.
 You can find it here: https://kjellkod.wordpress.com/2015/06/30/the-worlds-fastest-logger-vs-g3log/
 
 # <a name="feedback">Feedback</a>
