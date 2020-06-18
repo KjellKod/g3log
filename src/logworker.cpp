@@ -74,17 +74,16 @@ namespace g3 {
       g3::internal::shutDownLoggingForActiveOnly(this);
 
       // The sinks WILL automatically be cleared at exit of this destructor
-      // However, the waiting below ensures that all messages until this point are taken care of
-      // before any internals/LogWorkerImpl of LogWorker starts to be destroyed.
-      // i.e. this avoids a race with another thread slipping through the "shutdownLogging" and calling
-      // calling ::save or ::fatal through LOG/CHECK with lambda messages and "partly deconstructed LogWorkerImpl"
+      // The waiting inside removeAllSinks ensures that all messages until this point are
+      // taken care of before any internals/LogWorkerImpl of LogWorker starts to be destroyed.
+      // i.e. this avoids a race with another thread slipping through the "shutdownLogging" and 
+      // calling ::save or ::fatal through LOG/CHECK with lambda messages and "partly 
+      // deconstructed LogWorkerImpl"
       //
       //   Any messages put into the queue will be OK due to:
       //  *) If it is before the wait below then they will be executed
       //  *) If it is AFTER the wait below then they will be ignored and NEVER executed
-      auto bg_clear_sink_call = [this] { _impl._sinks.clear(); };
-      auto token_cleared = g3::spawn_task(bg_clear_sink_call, _impl._bg.get());
-      token_cleared.wait();
+      removeAllSinks();
 
       // The background worker WILL be automatically cleared at the exit of the destructor
       // However, the explicitly clearing of the background worker (below) makes sure that there can

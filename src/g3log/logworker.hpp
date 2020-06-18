@@ -123,6 +123,15 @@ namespace g3 {
          }
       }
 
+
+      /// This will clear/remove all the sinks. If a sink shared_ptr was retrieved via the sink
+      /// handle then the sink will be removed internally but will live on in the client's instance
+      void removeAllSinks() {
+         auto bg_clear_sink_call = [this] { _impl._sinks.clear(); };
+         auto token_cleared = g3::spawn_task(bg_clear_sink_call, _impl._bg.get());
+         token_cleared.wait();
+      }
+
       /// internal:
       /// pushes in background thread (asynchronously) input messages to log file
       void save(LogMessagePtr entry);

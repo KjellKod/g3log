@@ -144,32 +144,31 @@ TEST(ConceptSink, OneHundredSinks) {
 }
 
 
+using SinkHandleT = std::unique_ptr<g3::SinkHandle<ScopedSetTrue>>;
+void AddManySinks(size_t kNumberOfSinks, BoolList& flags, IntVector& counts,
+                  std::vector<SinkHandleT>& sink_handles, g3::LogWorker* worker) {
+   flags.clear();
+   counts.clear();
+   sink_handles.clear();
+   sink_handles.reserve(kNumberOfSinks);
+   for (size_t idx = 0; idx < kNumberOfSinks; ++idx) {
+      flags.push_back(make_shared<atomic<bool>>(false));
+      counts.push_back(make_shared<atomic<int>>(0));
+      sink_handles.push_back(worker->addSink(std2::make_unique<ScopedSetTrue>(flags[idx], counts[idx]), &ScopedSetTrue::ReceiveMsg));
+
+   }
+}
+
 TEST(ConceptSink, OneHundredSinksRemoved) {
    using namespace g3;
    BoolList flags;
    IntVector counts;
-
    size_t kNumberOfItems = 100;
-   for (size_t index = 0; index < kNumberOfItems; ++index) {
-      flags.push_back(make_shared < atomic<bool >> (false));
-      counts.push_back(make_shared < atomic<int >> (0));
-   }
-
+   std::vector<SinkHandleT> sink_handles;
    {
       RestoreFileLogger logger{"./"};
-      g3::LogWorker* worker = logger._scope->get(); //g3LogWorker::createLogWorker();
-      size_t index = 0;
-
-      using SinkHandleT = std::unique_ptr<g3::SinkHandle<ScopedSetTrue>>;
-      std::vector<SinkHandleT> sink_handles;
-      sink_handles.reserve(kNumberOfItems);
-
-      for (auto& flag : flags) {
-         auto& count = counts[index++];
-         // ignore the handle
-         sink_handles.push_back(worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg));
-      }
-
+      g3::LogWorker* worker = logger._scope->get(); //think: g3LogWorker::createLogWorker();
+      AddManySinks(kNumberOfItems, flags, counts, sink_handles, worker);
       LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       auto& write = message.get()->write();
       write.append("Hello to 100 receivers :)");
@@ -185,8 +184,29 @@ TEST(ConceptSink, OneHundredSinksRemoved) {
    }
 }
 
+TEST(ConceptSink, OneHundredRemoveAllSinks) {
+   using namespace g3;
+   BoolList flags;
+   IntVector counts;
+   size_t kNumberOfItems = 100;
+   std::vector<SinkHandleT> sink_handles;
+   {
+      RestoreFileLogger logger{"./"};
+      g3::LogWorker* worker = logger._scope->get(); //think: g3LogWorker::createLogWorker();
+      AddManySinks(kNumberOfItems, flags, counts, sink_handles, worker);
 
+      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      auto& write = message.get()->write();
+      write.append("Hello to 100 receivers :)");
+      worker->save(message);
 
+      worker->removeAllSinks();
+      EXPECT_EQ(kNumberOfItems, countDestroyedFlags(flags));
+      EXPECT_EQ(kNumberOfItems, countTotalMessages(counts));
+      // at the curly brace above the ScopedLogger will go out of scope. The logging sink removal
+      // is synchronous and all the sinks are guaranteed to have received the message before the sink is removed.
+   }
+}
 
 
 struct VoidReceiver {
