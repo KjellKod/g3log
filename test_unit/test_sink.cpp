@@ -298,7 +298,7 @@ TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
    EXPECT_ANY_THROW(failed.get());
 }
 
-TEST(ConceptSink, DISABLED_AggressiveThreadCallsDuringShutdown) {
+TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    std::atomic<bool> keepRunning{true};
 
    std::vector<std::thread> threads;
@@ -317,13 +317,13 @@ TEST(ConceptSink, DISABLED_AggressiveThreadCallsDuringShutdown) {
       threads.push_back(std::thread(DoLogCalls, &keepRunning, caller));
    }
 
-
    std::atomic<int> atomicCounter{0};
-   size_t numberOfCycles = 25;
+   size_t numberOfCycles = 2500;
    std::cout << "Create logger, delete active logger, " << numberOfCycles << " times\n\tWhile " << numberOfThreads << " threads are continously doing LOG calls" << std::endl;
-   std::cout << "Create/Destroy Times #";
+   std::cout << "Initialize logger / Shutdown logging #";
    for (size_t create = 0; create < numberOfCycles; ++create) {
-      std::cout << create << " ";
+      std::cout << ".";
+
 
       std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createLogWorker()};
       auto handle = worker->addSink(std2::make_unique<IntReceiver>(&atomicCounter), &IntReceiver::receiveMsgIncrementAtomic);
@@ -332,7 +332,7 @@ TEST(ConceptSink, DISABLED_AggressiveThreadCallsDuringShutdown) {
       // wait till some LOGS streaming in
       atomicCounter = 0;
       while (atomicCounter.load() < 10) {
-         std::this_thread::sleep_for(std::chrono::milliseconds(5));
+         std::this_thread::sleep_for(std::chrono::microseconds(1));
       }
    } // g3log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
 
