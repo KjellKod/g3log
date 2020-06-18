@@ -48,6 +48,13 @@ namespace g3 {
             return std::move(promise.get_future());
          }
       }
+
+      /// Get weak_ptr access to the sink(). Make sure to check that the returned pointer is valid,
+      /// auto p = sink(); auto ptr = p.lock(); if (ptr) { .... }
+      /// ref: https://en.cppreference.com/w/cpp/memory/weak_ptr/lock
+      std::weak_ptr<internal::Sink<T>>  sink() {
+         return _sink.lock();
+      }
    };
 }
 
