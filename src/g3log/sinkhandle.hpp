@@ -26,22 +26,21 @@ namespace g3 {
    class SinkHandle {
       std::weak_ptr<internal::Sink<T>> _sink;
 
-   public:
+    public:
       SinkHandle(std::shared_ptr<internal::Sink<T>> sink)
          : _sink(sink) {}
 
       ~SinkHandle() {}
 
-
       // Asynchronous call to the real sink. If the real sink is already deleted
       // the returned future will contain a bad_weak_ptr exception instead of the
       // call result.
       template<typename AsyncCall, typename... Args>
-      auto call(AsyncCall func , Args &&... args) -> std::future<typename std::result_of<decltype(func)(T, Args...)>::type> {
+      auto call(AsyncCall func , Args&& ... args) -> std::future<typename std::result_of<decltype(func)(T, Args...)>::type> {
          try {
             std::shared_ptr<internal::Sink<T>> sink(_sink);
             return sink->async(func, std::forward<Args>(args)...);
-         } catch (const std::bad_weak_ptr &e) {
+         } catch (const std::bad_weak_ptr& e) {
             typedef typename std::result_of<decltype(func)(T, Args...)>::type PromiseType;
             std::promise<PromiseType> promise;
             promise.set_exception(std::make_exception_ptr(e));
