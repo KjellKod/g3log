@@ -22,5 +22,5 @@ fi
 #makeArg=`grep -c ^processor /proc/cpuinfo`    
 
 make -j
-/bin/bash ../scripts/runAllTests.sh
+ctest -V
 
