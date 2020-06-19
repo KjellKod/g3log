@@ -86,7 +86,7 @@ namespace {
 
    // Unhandled exception catching
    LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS* info) {
-      restoreFatalHandlingToDefault();
+      g3::internal::restoreFatalHandlingToDefault();
       return exceptionHandling(info, "Unexpected Exception Handler");
    }
 
@@ -102,15 +102,11 @@ namespace {
          // responsibility to deal with this by the client software.
          return EXCEPTION_CONTINUE_SEARCH;
       } else {
-         restoreFatalHandlingToDefault();
+         g3::internal::restoreFatalHandlingToDefault();
          return exceptionHandling(p, "Vectored Exception Handler");
       }
    }
 #endif
-
-
-
-
 } // end anonymous namespace
 
 

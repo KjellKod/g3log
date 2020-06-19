@@ -49,13 +49,15 @@ namespace g3 {
    void overrideSetupSignals(const std::map<int, std::string> overrideSignals);
 #endif
 
-   /// Resets the fatal signal/exception handling back to default
-   /// which might be needed in case it was previously overridden
-   /// The default signals are: SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM
-   void restoreFatalHandlingToDefault();
-
 
    namespace internal {
+
+      /// Resets the fatal signal/exception handling back to default
+      /// which might be needed in case it was previously overridden
+      /// The default signals are: SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM
+      void restoreFatalHandlingToDefault();
+
+
       /** return whether or any fatal handling is still ongoing
        *  this is used by g3log::fatalCallToLogger
        *  only in the case of Windows exceptions (not fatal signals)
