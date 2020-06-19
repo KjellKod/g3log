@@ -45,7 +45,6 @@ namespace g3 {
    };
 
 
-
    /// Front end of the LogWorker.  API that is usefule is
    /// addSink( sink, default_call ) which returns a handle to the sink. See below and REAME for usage example
    /// save( msg ) : internal use
@@ -66,7 +65,7 @@ namespace g3 {
       /// if you want to use the default file logger then see below for @ref addDefaultLogger
       static std::unique_ptr<LogWorker> createLogWorker();
 
-      
+
       /**
       A convenience function to add the default g3::FileSink to the log worker
        @param log_prefix that you want
@@ -84,9 +83,7 @@ namespace g3 {
        std::cout << "The filename is: " << log_file_name.get() << std::endl;
        //   something like: /tmp/my_test_log.g3log.20150819-100300.log
        */
-       std::unique_ptr<FileSinkHandle> addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id = "g3log");
-
-
+      std::unique_ptr<FileSinkHandle> addDefaultLogger(const std::string& log_prefix, const std::string& log_directory, const std::string& default_id = "g3log");
 
       /// Adds a sink and returns the handle for access to the sink
       /// @param real_sink unique_ptr ownership is passed to the log worker
@@ -99,6 +96,41 @@ namespace g3 {
          auto sink = std::make_shared<Sink<T>> (std::move(real_sink), call);
          addWrappedSink(sink);
          return std::make_unique<SinkHandle<T>> (sink);
+      }
+
+
+      /// Removes a sink. This is a synchronous call.
+      /// You are guaranteed that the sink is removed by the time the call returns
+      /// @param sink_handle the ownership of the sink handle is given
+      template<typename T>
+      void removeSink(std::unique_ptr<SinkHandle<T>> sink_handle) {
+         if (sink_handle) {
+            // sink_handle->sink().use_count() is 1 at this point
+            // i.e. this would be safe as long as no other weak_ptr to shared_ptr conversion
+            // was made by the client: assert(sink_handle->sink().use_count()  == 0);
+            assert(sink_handle->sink().use_count()  == 1);
+            auto weak_ptr_sink = sink_handle->sink(); {
+               auto bg_removesink_call = [this, weak_ptr_sink] {
+                  auto shared_sink = weak_ptr_sink.lock();
+                  if (shared_sink) {
+                     _impl._sinks.erase(std::remove(_impl._sinks.begin(), _impl._sinks.end(), shared_sink), _impl._sinks.end());
+                  }
+               };
+               auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
+               token_done.wait();
+            }
+            // sink_handle->sink().use_count() is 1 at this point.
+            // i.e. this would be safe: assert(sink_handle->sink().use_count()  == 0);
+            // as long as the client has not converted more instances from the weak_ptr
+         }
+      }
+
+      /// This will clear/remove all the sinks. If a sink shared_ptr was retrieved via the sink
+      /// handle then the sink will be removed internally but will live on in the client's instance
+      void removeAllSinks() {
+         auto bg_clear_sink_call = [this] { _impl._sinks.clear(); };
+         auto token_cleared = g3::spawn_task(bg_clear_sink_call, _impl._bg.get());
+         token_cleared.wait();
       }
 
 

@@ -31,36 +31,8 @@ namespace {
 #endif
 
 #if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
-   void *g_vector_exception_handler = nullptr;
+   void* g_vector_exception_handler = nullptr;
 #endif
-
-
-
-   // Restore back to default fatal event handling
-   void ReverseToOriginalFatalHandling() {
-      SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
-
-#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
-      RemoveVectoredExceptionHandler (g_vector_exception_handler);
-#endif
-
-#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-      if (SIG_ERR == signal(SIGABRT, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGFPE, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGSEGV, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGILL, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGTERM, SIG_DFL))
-         perror("signal - SIGABRT");
-#endif
-   }
 
 
 
@@ -92,7 +64,7 @@ namespace {
 
 
    // Unhandled exception catching
-   LONG WINAPI exceptionHandling(EXCEPTION_POINTERS *info, const std::string &handler) {
+   LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info, const std::string& handler) {
       std::string dump = stacktrace::stackdump(info);
 
       std::ostringstream fatal_stream;
@@ -114,8 +86,8 @@ namespace {
 
 
    // Unhandled exception catching
-   LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS *info) {
-      ReverseToOriginalFatalHandling();
+   LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS* info) {
+      g3::internal::restoreFatalHandlingToDefault();
       return exceptionHandling(info, "Unexpected Exception Handler");
    }
 
@@ -131,15 +103,11 @@ namespace {
          // responsibility to deal with this by the client software.
          return EXCEPTION_CONTINUE_SEARCH;
       } else {
-         ReverseToOriginalFatalHandling();
+         g3::internal::restoreFatalHandlingToDefault();
          return exceptionHandling(p, "Vectored Exception Handler");
       }
    }
 #endif
-
-
-
-
 } // end anonymous namespace
 
 
@@ -155,7 +123,7 @@ namespace g3 {
       /// Generate stackdump. Or in case a stackdump was pre-generated and
       /// non-empty just use that one.   i.e. the latter case is only for
       /// Windows and test purposes
-      std::string stackdump(const char *dump) {
+      std::string stackdump(const char* dump) {
          if (nullptr != dump && !std::string(dump).empty()) {
             return {dump};
          }
@@ -166,21 +134,21 @@ namespace g3 {
 
 
       /// string representation of signal ID or Windows exception id
-      std::string exitReasonName(const LEVELS &level, g3::SignalType fatal_id) {
+      std::string exitReasonName(const LEVELS& level, g3::SignalType fatal_id) {
          if (level == g3::internal::FATAL_EXCEPTION) {
             return stacktrace::exceptionIdToText(fatal_id);
          }
 
          switch (fatal_id) {
-         case SIGABRT: return "SIGABRT"; break;
-         case SIGFPE: return "SIGFPE"; break;
-         case SIGSEGV: return "SIGSEGV"; break;
-         case SIGILL: return "SIGILL"; break;
-         case SIGTERM: return "SIGTERM"; break;
-         default:
-            std::ostringstream oss;
-            oss << "UNKNOWN SIGNAL(" << fatal_id << ")";
-            return oss.str();
+            case SIGABRT: return "SIGABRT"; break;
+            case SIGFPE: return "SIGFPE"; break;
+            case SIGSEGV: return "SIGSEGV"; break;
+            case SIGILL: return "SIGILL"; break;
+            case SIGTERM: return "SIGTERM"; break;
+            default:
+               std::ostringstream oss;
+               oss << "UNKNOWN SIGNAL(" << fatal_id << ")";
+               return oss.str();
          }
       }
 
@@ -188,9 +156,8 @@ namespace g3 {
       // Triggered by g3log::LogWorker after receiving a FATAL trigger
       // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
       // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
-      void exitWithDefaultSignalHandler(const LEVELS &level, g3::SignalType fatal_signal_id) {
-
-         ReverseToOriginalFatalHandling();
+      void exitWithDefaultSignalHandler(const LEVELS& level, g3::SignalType fatal_signal_id) {
+         restoreFatalHandlingToDefault();
          // For windows exceptions we want to continue the possibility of
          // exception handling now when the log and stacktrace are flushed
          // to sinks. We therefore avoid to kill the process here. Instead
@@ -206,6 +173,33 @@ namespace g3 {
          raise(signal_number);
       }
 
+
+      // Restore back to default fatal event handling
+      void restoreFatalHandlingToDefault() {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
+         SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
+
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+         RemoveVectoredExceptionHandler (g_vector_exception_handler);
+#endif
+
+
+         if (SIG_ERR == signal(SIGABRT, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGFPE, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGSEGV, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGILL, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGTERM, SIG_DFL))
+            perror("signal - SIGABRT");
+#endif
+      }
 
 
       void installSignalHandler() {

@@ -26,7 +26,7 @@ namespace g3 {
    class SinkHandle {
       std::weak_ptr<internal::Sink<T>> _sink;
 
-   public:
+    public:
       SinkHandle(std::shared_ptr<internal::Sink<T>> sink)
          : _sink(sink) {}
 
@@ -37,18 +37,26 @@ namespace g3 {
       // the returned future will contain a bad_weak_ptr exception instead of the
       // call result.
       template<typename AsyncCall, typename... Args>
-      auto call(AsyncCall func , Args &&... args) -> std::future<typename std::result_of<decltype(func)(T, Args...)>::type> {
+      auto call(AsyncCall func , Args&& ... args) -> std::future<typename std::result_of<decltype(func)(T, Args...)>::type> {
          try {
             std::shared_ptr<internal::Sink<T>> sink(_sink);
             return sink->async(func, std::forward<Args>(args)...);
-         } catch (const std::bad_weak_ptr &e) {
+         } catch (const std::bad_weak_ptr& e) {
             typedef typename std::result_of<decltype(func)(T, Args...)>::type PromiseType;
             std::promise<PromiseType> promise;
             promise.set_exception(std::make_exception_ptr(e));
             return std::move(promise.get_future());
          }
       }
+
+      /// Get weak_ptr access to the sink(). Make sure to check that the returned pointer is valid,
+      /// auto p = sink(); auto ptr = p.lock(); if (ptr) { .... }
+      /// ref: https://en.cppreference.com/w/cpp/memory/weak_ptr/lock
+      std::weak_ptr<internal::Sink<T>> sink() {
+         return _sink.lock();
+      }
    };
-}
+
+} // g3
 
 
