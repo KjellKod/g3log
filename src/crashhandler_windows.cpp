@@ -35,35 +35,6 @@ namespace {
 
 
 
-   // Restore back to default fatal event handling
-   void restoreFatalHandlingToDefault() {
-#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-      SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
-
-#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
-      RemoveVectoredExceptionHandler (g_vector_exception_handler);
-#endif
-
-
-      if (SIG_ERR == signal(SIGABRT, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGFPE, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGSEGV, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGILL, SIG_DFL))
-         perror("signal - SIGABRT");
-
-      if (SIG_ERR == signal(SIGTERM, SIG_DFL))
-         perror("signal - SIGABRT");
-#endif
-   }
-
-
-
    // called for fatal signals SIGABRT, SIGFPE, SIGSEGV, SIGILL, SIGTERM
    void signalHandler(int signal_number) {
       using namespace g3::internal;
@@ -203,6 +174,34 @@ namespace g3 {
          // for a signal however, we exit through that fatal signal
          const int signal_number = static_cast<int>(fatal_signal_id);
          raise(signal_number);
+      }
+
+
+      // Restore back to default fatal event handling
+      void restoreFatalHandlingToDefault() {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
+         SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
+
+#if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
+         RemoveVectoredExceptionHandler (g_vector_exception_handler);
+#endif
+
+
+         if (SIG_ERR == signal(SIGABRT, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGFPE, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGSEGV, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGILL, SIG_DFL))
+            perror("signal - SIGABRT");
+
+         if (SIG_ERR == signal(SIGTERM, SIG_DFL))
+            perror("signal - SIGABRT");
+#endif
       }
 
 
