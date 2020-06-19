@@ -19,8 +19,9 @@ if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     tar zxvf g3log-*-Linux.tar.gz
 fi
 
-#makeArg=`grep -c ^processor /proc/cpuinfo`    
+#                LINUX                    OR   OSX
+makeArg=`grep -c ^processor /proc/cpuinfo || sysctl -n hw.ncpu`
 
-make -j
+make -j$makeArg
 ctest -V
 
