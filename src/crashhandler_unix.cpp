@@ -242,6 +242,16 @@ namespace g3 {
          exit(signal_number);
 
       }
+
+
+      // restores the signal handler back to default
+      void restoreFatalHandlingToDefault() {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
+         overrideSetupSignals(kSignals);
+#endif
+      }
+
+
    } // end g3::internal
 
 
@@ -258,10 +268,8 @@ namespace g3 {
       installCrashHandler(); // installs all the signal handling for gSignals
    }
 
-   // restores the signal handler back to default
-   void restoreSignalHandlerToDefault() {
-      overrideSetupSignals(kSignals);
-   }
+
+
 
 
    // installs the signal handling for whatever signal set that is currently active

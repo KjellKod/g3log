@@ -117,6 +117,26 @@ auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
 
 **More sinks** can be found in the repository **[github.com/KjellKod/g3sinks](https://github.com/KjellKod/g3sinks)**.
 
+# Adding and Removing Sinks
+You can safely remove and add sinks during the running of your program. 
+
+**Keep in mind**
+
+- *Initialization of the logger should happen before you have started any other threads that may call the logger.* 
+- *Destruction of the logger (RAII concept) should happen AFTER shutdown of other threads that are calling the logger.*
+
+**Adding Sinks**
+```cpp
+   auto sinkHandle1 = logworker->addSink(std2::make_unique<CustomSink>(),
+                                          &CustomSink::ReceiveLogMessage);
+   auto sinkHandle2 = logworker->addDefaultLogger(argv[0],
+                                              path_to_log_file);
+   logworker->removeSink(std::move(sinkHandle1)); // this will in a thread-safe manner remove the sinkHandle1
+   logworker->removeAllSinks(); // this will in a thread-safe manner remove any sinks. 
+```
+
+
+
 
 #Code Examples
 Example usage where a custom sink is added. A function is called though the sink handler to the actual sink object.
