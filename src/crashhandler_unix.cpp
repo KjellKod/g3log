@@ -259,9 +259,12 @@ namespace g3 {
    }
 
    // restores the signal handler back to default
-   void restoreSignalHandlerToDefault() {
+   void restoreFatalHandlingToDefault() {
+#if !(defined(DISABLE_FATAL_SIGNALHANDLING))
       overrideSetupSignals(kSignals);
+#endif
    }
+
 
 
    // installs the signal handling for whatever signal set that is currently active

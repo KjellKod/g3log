@@ -38,22 +38,21 @@ namespace g3 {
    void installSignalHandlerForThread();
 #else
    typedef int SignalType;
-
-   /// Probably only needed for unit testing. Resets the signal handling back to default
-   /// which might be needed in case it was previously overridden
-   /// The default signals are: SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM
-   void restoreSignalHandlerToDefault();
-
    /// Overrides the existing signal handling for custom signals
    /// For example: usage of zcmq relies on its own signal handler for SIGTERM
    ///     so users of g3log with zcmq should then use the @ref overrideSetupSignals
    ///     , likely with the original set of signals but with SIGTERM removed
-   /// 
+   ///
    /// call example:
    ///  g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"},{SIGILL, "SIGILL"},
    //                          {SIGSEGV, "SIGSEGV"},});
    void overrideSetupSignals(const std::map<int, std::string> overrideSignals);
 #endif
+
+   /// Resets the fatal signal/exception handling back to default
+   /// which might be needed in case it was previously overridden
+   /// The default signals are: SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM
+   void restoreFatalHandlingToDefault();
 
 
    namespace internal {

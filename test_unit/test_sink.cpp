@@ -286,9 +286,24 @@ TEST(ConceptSink, IntCall__TwoCalls_ExpectingTwoAdd) {
 void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
    while (doWhileTrue->load()) {
       LOG(INFO) << "Calling from #" << counter;
+      std::cout << "-";
       std::this_thread::yield();
    }
 }
+
+void DoSlowLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
+   size_t messages = 0;
+   while (doWhileTrue->load()) {
+      LOG(INFO) << "Calling from #" << counter;
+      ++messages;
+      int random = rand() %10+ 1; // Range 1-10
+      std::this_thread::sleep_for(std::chrono::microseconds(random));
+   }
+
+   std::string out = "#" + std::to_string(counter) + " number of messages sent: " + std::to_string(messages) + "\n";
+   std::cout << out;
+}
+
 
 
 TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
@@ -298,11 +313,11 @@ TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
    EXPECT_ANY_THROW(failed.get());
 }
 
-TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
+TEST(ConceptSink, AggressiveThreadCallsDuringAddAndRemoveSink) {
    std::atomic<bool> keepRunning{true};
-
+   size_t numberOfCycles = 10;
    std::vector<std::thread> threads;
-   const size_t numberOfThreads = std::thread::hardware_concurrency() * 4;
+   const size_t numberOfThreads = std::thread::hardware_concurrency()/2;
    threads.reserve(numberOfThreads);
 
    g3::internal::shutDownLogging();
@@ -310,33 +325,38 @@ TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    // Avoid annoying printouts at log shutdown
    stringstream cerr_buffer;
    testing_helpers::ScopedOut guard1(std::cerr, &cerr_buffer);
+   std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createLogWorker()};
+   g3::initializeLogging(worker.get());
+   using SinkHandleT = std::unique_ptr<g3::SinkHandle<IntReceiver>>;
+   std::vector<SinkHandleT> sink_handles;
+   sink_handles.reserve(numberOfCycles);
 
    // these threads will continue to write to a logger
    // while the receiving logger is instantiated, and destroyed repeatedly
-   for (size_t caller = 0; caller < numberOfThreads; ++ caller) {
-      threads.push_back(std::thread(DoLogCalls, &keepRunning, caller));
+   for (size_t caller = 0; caller <= numberOfThreads; ++caller) {
+      threads.push_back(std::thread(DoSlowLogCalls, &keepRunning, caller));
    }
 
    std::atomic<int> atomicCounter{0};
-   size_t numberOfCycles = 2500;
-   std::cout << "Create logger, delete active logger, " << numberOfCycles << " times\n\tWhile " << numberOfThreads << " threads are continously doing LOG calls" << std::endl;
-   std::cout << "Initialize logger / Shutdown logging #";
+
+   std::cout << "Add sinks, remove sinks, " << numberOfCycles  << " times\n\tWhile " << numberOfThreads << " threads are continously doing LOG calls" << std::endl;
    for (size_t create = 0; create < numberOfCycles; ++create) {
+      worker->removeAllSinks();
+      sink_handles.clear();
+      sink_handles.reserve(numberOfCycles);
+
       std::cout << ".";
-
-
-      std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createLogWorker()};
-      auto handle = worker->addSink(std2::make_unique<IntReceiver>(&atomicCounter), &IntReceiver::receiveMsgIncrementAtomic);
-      g3::initializeLogging(worker.get());
-
-      // wait till some LOGS streaming in
       atomicCounter = 0;
-      while (atomicCounter.load() < 10) {
-         std::this_thread::sleep_for(std::chrono::microseconds(1));
+      for (size_t sinkIdx = 0; sinkIdx < 2; ++sinkIdx) {
+         sink_handles.push_back(worker->addSink(std2::make_unique<IntReceiver>(&atomicCounter), &IntReceiver::receiveMsgIncrementAtomic));
       }
+      // wait till some LOGS streaming in
+      while (atomicCounter.load() < 10) {
+         std::this_thread::yield();
+      }
+
    } // g3log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
-
-
+   worker.reset();
    // exit the threads
    keepRunning = false;
    for (auto& t : threads) {
@@ -344,5 +364,59 @@ TEST(ConceptSink, AggressiveThreadCallsDuringShutdown) {
    }
    std::cout << "\nAll threads are joined " << std::endl;
 }
+
+
+// This test is commented out but kept here for documentation purposes. 
+// Actually shutting down and re-initializing the logger is not the intention of g3log. 
+// the are several initial setups that happen ONCE and the logger relies on the client
+// to properly own the logworker that is the key object that receives and direct LOG calls. 
+// Making LOG calls thread safe through repeated initialization/shutdowns would come at a 
+// high expense of logworker existance synchronization checks. 
+// 
+// TEST(ConceptSink, DISABLED_AggressiveThreadCallsDuringShutdown) {
+//    std::atomic<bool> keepRunning{true};
+
+//    std::vector<std::thread> threads;
+//    const size_t numberOfThreads = std::thread::hardware_concurrency();
+//    threads.reserve(numberOfThreads);
+
+//    g3::internal::shutDownLogging();
+
+//    // Avoid annoying printouts at log shutdown
+//    stringstream cerr_buffer;
+//    testing_helpers::ScopedOut guard1(std::cerr, &cerr_buffer);
+
+//    // these threads will continue to write to a logger
+//    // while the receiving logger is instantiated, and destroyed repeatedly
+//    for (size_t caller = 0; caller < numberOfThreads; ++ caller) {
+//       threads.push_back(std::thread(DoLogCalls, &keepRunning, caller));
+//    }
+
+//    std::atomic<int> atomicCounter{0};
+//    size_t numberOfCycles = 2500;
+//    std::cout << "Create logger, delete active logger, " << numberOfCycles << " times\n\tWhile " << numberOfThreads << " threads are continously doing LOG calls" << std::endl;
+//    std::cout << "Initialize logger / Shutdown logging #";
+//    for (size_t create = 0; create < numberOfCycles; ++create) {
+//       std::cout << ".";
+
+
+//       std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createLogWorker()};
+//       auto handle = worker->addSink(std2::make_unique<IntReceiver>(&atomicCounter), &IntReceiver::receiveMsgIncrementAtomic);
+//       g3::initializeLogging(worker.get());
+
+//       // wait till some LOGS streaming in
+//       atomicCounter = 0;
+//       while (atomicCounter.load() < 10) {
+//          std::this_thread::sleep_for(std::chrono::microseconds(1));
+//       }
+//    } // g3log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
+
+//    // exit the threads
+//    keepRunning = false;
+//    for (auto& t : threads) {
+//       t.join();
+//    }
+//    std::cout << "\nAll threads are joined " << std::endl;
+// }
 
 

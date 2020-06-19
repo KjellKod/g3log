@@ -382,7 +382,7 @@ namespace {
 // ref: https://github.com/KjellKod/g3log/blob/master/src/crashhandler_windows.cpp
 // what is missing is the override of signals and custom installation of signals
 // ref: https://github.com/KjellKod/g3log/blob/master/src/crashhandler_unix.cpp
-//      functions: void restoreSignalHandlerToDefault()
+//      functions: void restoreFatalHandlingToDefault()
 //                 void overrideSetupSignals(const std::map<int, std::string> overrideSignals)
 //                 void restoreSignalHandler(int signal_number)
 //
