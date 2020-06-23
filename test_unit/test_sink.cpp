@@ -67,7 +67,7 @@ TEST(Sink, OneSinkRemove) {
 }
 
 // just compile test
-TEST(Sink, DefaultSinkRemove) {
+TEST(Sink, DefaultSinkRemove){
    using namespace g3;
    AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
    AtomicIntPtr count = make_shared < atomic<int >> (0);
@@ -80,6 +80,16 @@ TEST(Sink, DefaultSinkRemove) {
    }
 }
 
+TEST(Sink, NullSinkRemove) {
+   using namespace g3;
+   AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
+   AtomicIntPtr count = make_shared < atomic<int >> (0);
+   {
+      auto worker = g3::LogWorker::createLogWorker();
+      std::unique_ptr<g3::SinkHandle<ScopedSetTrue>> nullsink;
+      worker->removeSink(std::move(nullsink));
+   }
+}
 
 
 
