@@ -45,8 +45,8 @@ namespace g3 {
    };
 
 
-   /// Front end of the LogWorker.  API that is usefule is
-   /// addSink( sink, default_call ) which returns a handle to the sink. See below and REAME for usage example
+   /// Front end of the LogWorker.  API that is useful is
+   /// addSink( sink, default_call ) which returns a handle to the sink. See below and README for usage example
    /// save( msg ) : internal use
    /// fatal ( fatal_msg ) : internal use
    class LogWorker final {
@@ -61,7 +61,7 @@ namespace g3 {
     public:
       ~LogWorker();
 
-      /// Creates the LogWorker with no sinks. See exampel below on @ref addSink for how to use it
+      /// Creates the LogWorker with no sinks. See example below on @ref addSink for how to use it
       /// if you want to use the default file logger then see below for @ref addDefaultLogger
       static std::unique_ptr<LogWorker> createLogWorker();
 
