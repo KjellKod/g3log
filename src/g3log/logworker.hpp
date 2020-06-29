@@ -108,7 +108,6 @@ namespace g3 {
             // sink_handle->sink().use_count() is 1 at this point
             // i.e. this would be safe as long as no other weak_ptr to shared_ptr conversion
             // was made by the client: assert(sink_handle->sink().use_count()  == 0);
-            assert(sink_handle->sink().use_count()  == 1);
             auto weak_ptr_sink = sink_handle->sink(); {
                auto bg_removesink_call = [this, weak_ptr_sink] {
                   auto shared_sink = weak_ptr_sink.lock();
