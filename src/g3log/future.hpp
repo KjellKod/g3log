@@ -58,6 +58,6 @@ namespace g3 {
 
       std::future<result_type> result = task.get_future();
       worker->send(MoveOnCopy<task_type>(std::move(task)));
-      return std::move(result);
+      return result;
    }
 } // end namespace g3
