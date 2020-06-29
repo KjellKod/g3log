@@ -104,9 +104,7 @@ namespace g3 {
       template<typename T>
       void removeSink(std::unique_ptr<SinkHandle<T>> sink_handle) {
          if (sink_handle) {
-            // TODO KJELLKOD -- remove assert
-            // sink_handle->sink().use_count() is 1 at this point
-            assert(sink_handle->sink().use_count()  == 1);
+            // FYI: sink_handle->sink().use_count() is 1 at this point
             auto weak_ptr_sink = sink_handle->sink(); {
                auto bg_removesink_call = [this, weak_ptr_sink] {
                   auto shared_sink = weak_ptr_sink.lock();
@@ -117,9 +115,7 @@ namespace g3 {
                auto token_done = g3::spawn_task(bg_removesink_call, _impl._bg.get());
                token_done.wait();
             }
-            // TODO KJELLKOD -- remove assert
-            // sink_handle->sink().use_count() is 1 at this point
-            assert(sink_handle->sink().use_count()  == 0);
+            // FYI sink_handle->sink().use_count() is 1 at this point
          }
       }
 
