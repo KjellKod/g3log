@@ -225,12 +225,12 @@ more details
 
 ```
 cd g3log
-cd 3rdParty/gtest
-unzip gtest-1.7.0.zip
-cd ../../
 mkdir build
 cd build
+cmake .. 
 ```
+
+
 ## Configuring for installing on nix (OSX, Linux, MinGW)
 Default install prefix on Linux is `/usr/local`
 To change it please set  `CPACK_PACKAGING_INSTALL_PREFIX `
