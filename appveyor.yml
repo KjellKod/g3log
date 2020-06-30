@@ -31,6 +31,6 @@ build_script:
 after_build:
   - cmd /c Release\g3log-FATAL-contract.exe || exit /B 0
   - tree /A /F c:\g3log
-  - cpack -C Release -G 7Z
+  - cpack -C Release
   - ctest -C Release --verbose
 
