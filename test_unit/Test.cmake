@@ -83,7 +83,7 @@
         IF( NOT(MSVC))
            set_target_properties(${test} PROPERTIES COMPILE_FLAGS "-isystem -pthread ")
         ENDIF( NOT(MSVC)) 
-        target_link_libraries(${test} g3logger gtest_main)
+        target_link_libraries(${test} g3log gtest_main)
 		add_test( ${test} ${test} )
       ENDFOREACH(test)
    

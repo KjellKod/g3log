@@ -79,7 +79,7 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 8)
 endif()
 
 
-SET(MAJOR_VERSION 1)
+SET(MAJOR_VERSION 2)
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
       message("windows: Extracting git software version")
