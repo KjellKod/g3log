@@ -97,7 +97,7 @@ void LogCapture::capturef(const char *printf_like_message, ...) {
 #endif
    va_end(arglist);
 
-   if (nbrcharacters <= 0) {
+   if (nbrcharacters < 0) {
       stream() << "\n\tERROR LOG MSG NOTIFICATION: Failure to successfully parse the message";
       stream() << '"' << printf_like_message << '"' << std::endl;
    } else if (nbrcharacters > finished_message_len) {
