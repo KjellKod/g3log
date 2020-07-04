@@ -28,6 +28,11 @@
  # Create the g3log library
  SET(G3LOG_LIBRARY g3log)
 
+
+if(NOT APPLE)
+  set(CMAKE_INSTALL_RPATH $ORIGIN)
+endif()
+
  IF( G3_SHARED_LIB )
     IF( WIN32 )
        IF(NOT(${CMAKE_VERSION} VERSION_LESS "3.4"))
