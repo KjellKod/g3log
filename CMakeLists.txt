@@ -65,7 +65,8 @@ else()
   message(STATUS "A 32-bit OS detected")
 endif()
 
-set(MAJOR_VERSION 3)
+
+# Calculate the version number
 if(NOT VERSION)
   if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
     message("windows: Extracting git software version")
@@ -86,10 +87,13 @@ if(NOT VERSION)
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   endif()
 
-  set(MINOR_VERSION 1)
-  message(STATUS "git build version: ${GIT_VERSION}")
-  set(BUILD_NUMBER ${GIT_VERSION})
-  set(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}-${BUILD_NUMBER})
+set(MAJOR_VERSION 3)
+set(MINOR_VERSION 1)
+set(BUILD_NUMBER ${GIT_VERSION})
+math(EXPR VERSION-BASE ${GIT_VERSION}/255)
+math(EXPR VERSION-REMAINDER ${GIT_VERSION}%255)
+SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}-${VERSION-REMAINDER})   
+message( STATUS "Software Version (Major.Minor.Build-xxx  ${VERSION}, xxx-BASE: ${VERSION}")
 endif()
 message(STATUS "Software Version: ${VERSION}")
 
