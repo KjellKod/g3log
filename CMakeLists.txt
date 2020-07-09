@@ -67,34 +67,31 @@ endif()
 
 
 # Calculate the version number
-if(NOT VERSION)
-  if("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-    message("windows: Extracting git software version")
-    execute_process(
-      COMMAND cmd /c "git rev-list --branches HEAD | find /v " " /c"
-      OUTPUT_VARIABLE GIT_VERSION
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  else()
-    if(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-      message(STATUS "nix: Extracting git software version")
-    else()
-      message(STATUS "unknown platform: extracting git software version")
-    endif()
-    execute_process(
-      COMMAND bash "-c"
-              "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'"
-      OUTPUT_VARIABLE GIT_VERSION
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-  endif()
+SET(MAJOR_VERSION 2)
+IF ( NOT VERSION )
+   IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
+      message("windows: Extracting git software version")
+      execute_process(COMMAND cmd /c "git rev-list --branches HEAD | find /v " " /c" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+   ELSE()
+      IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
+         message( STATUS "nix: Extracting git software version" )
+      ELSE()
+         message( STATUS "unknown platform: extracting git software version" )
+      ENDIF()
+      execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+   ENDIF()
 
-set(MAJOR_VERSION 3)
-set(MINOR_VERSION 1)
-set(BUILD_NUMBER ${GIT_VERSION})
-math(EXPR VERSION-BASE ${GIT_VERSION}/255)
-math(EXPR VERSION-REMAINDER ${GIT_VERSION}%255)
-SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}-${VERSION-REMAINDER})   
-endif()
-message(STATUS "Software Version: ${VERSION}")
+   SET(MINOR_VERSION 3)
+   math(EXPR VERSION-BASE ${GIT_VERSION}/255)
+   math(EXPR VERSION-REMAINDER ${GIT_VERSION}%255)
+   message( STATUS "git build version: ${GIT_VERSION}" )
+   message( STATUS "version base: ${VERSION-BASE}" )
+   message( STATUS "version remainder: ${VERSION-REMAINDER}" )
+   # SET(BUILD_NUMBER ${GIT_VERSION})
+   SET(BUILD_NUMBER ${VERSION-BASE})
+   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_NUMBER}-${VERSION-REMAINDER})
+ENDIF()
+message( STATUS "Software Version: ${VERSION}" )
 
 # ============================================================================
 # G3LOG OPTIONAL FEATURES
