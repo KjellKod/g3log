@@ -67,7 +67,9 @@ endif()
 
 
 # Calculate the version number
-SET(MAJOR_VERSION 2)
+SET(MAJOR_VERSION 3)
+SET(MINOR_VERSION 1)
+
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
       message("windows: Extracting git software version")
@@ -81,7 +83,6 @@ IF ( NOT VERSION )
       execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ENDIF()
 
-   SET(MINOR_VERSION 3)
    math(EXPR VERSION-BASE ${GIT_VERSION}/255)
    math(EXPR VERSION-REMAINDER ${GIT_VERSION}%255)
    message( STATUS "git build version: ${GIT_VERSION}" )
