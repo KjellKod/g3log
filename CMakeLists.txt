@@ -67,7 +67,7 @@ endif()
 
 
 # Calculate the version number
-SET(MAJOR_VERSION 3)
+SET(MAJOR_VERSION 2)
 SET(MINOR_VERSION 1)
 
 IF ( NOT VERSION )
