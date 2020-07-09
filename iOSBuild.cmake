@@ -99,7 +99,7 @@ if(G3_IOS_LIB)
 	  VERBATIM
 	)
 
-	set(LIB_G3 libg3logger.a)
+	set(LIB_G3 libg3log.a)
 	add_custom_command(
 	  OUTPUT ${LIB_G3}
 	  COMMAND lipo -create
@@ -116,6 +116,6 @@ if(G3_IOS_LIB)
 	    "${ARM_BINARY_DIR}/Binaries/${CMAKE_BUILD_TYPE}/${LIB_G3}"
 	 VERBATIM
 	)
-	add_custom_target(g3logger ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${LIB_G3})
+	add_custom_target(g3log ALL DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/${LIB_G3})
 endif(G3_IOS_LIB)
 

@@ -19,7 +19,7 @@ namespace g3 {
    // Only through the Sinkhandle can, and should, the real sink's specific API
    // be called.
    //
-   // The real sink will be owned by the g3logger. If the real sink is deleted
+   // The real sink will be owned by g3log. If the real sink is deleted
    // calls to sink's API through the SinkHandle will return an exception embedded
    // in the resulting future. Ref: SinkHandle::call
    template<class T>

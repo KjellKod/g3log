@@ -67,7 +67,7 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    EXPECT_TRUE(g3::logLevel(FATAL));
    EXPECT_TRUE(g3::logLevel(G3LOG_DEBUG));
    EXPECT_TRUE(g3::logLevel(WARNING));
-   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g3logger)";
+   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g3log)";
    std::string err_msg3_ignored = "This uninitialized message should be ignored";
    try {
       LOG(INFO) << err_msg1; // nothing happened. level not ON
@@ -93,7 +93,7 @@ TEST(Initialization, No_Logger_Initialized___Expecting_LOG_calls_to_be_Still_OKi
    EXPECT_TRUE(g3::logLevel(FATAL));
    EXPECT_TRUE(g3::logLevel(G3LOG_DEBUG));
    EXPECT_TRUE(g3::logLevel(WARNING));
-   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g3logger)";
+   std::string err_msg1 = "Hey. I am not instantiated but I still should not crash. (I am g3log)";
    std::string err_msg3_ignored = "This uninitialized message should be ignored";
 
    try {

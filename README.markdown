@@ -453,16 +453,14 @@ cd build;
 
 ## <a name="cmake-module">CMake module</a>
 
-g3log comes with a CMake module. Once installed, it can be found under `${CMAKE_INSTALL_PREFIX}/lib/cmake/g3logger`. Users can use g3log in a CMake-based project this way:
+g3log comes with a CMake module. Once installed, it can be found under `${CMAKE_INSTALL_PREFIX}/lib/cmake/g3log`. Users can use g3log in a CMake-based project this way:
 
 ```
-find_package(g3logger CONFIG REQUIRED)
-target_link_libraries(main PRIVATE g3logger)
+find_package(g3log CONFIG REQUIRED)
+target_link_libraries(main PRIVATE g3log)
 ```
 
-*Note:* The CMake package name here is `g3logger`, not `g3log`.
-
-To make sure that CMake can find g3log(or g3logger), you also need to tell CMake where to search for it:
+To make sure that CMake can find g3log, you also need to tell CMake where to search for it:
 ```
 cmake .. -DCMAKE_PREFIX_PATH=<g3log's install prefix>
 ```
