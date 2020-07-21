@@ -8,6 +8,7 @@ ExternalProject_Add(googletest
   SOURCE_DIR        "${CMAKE_BINARY_DIR}/googletest-src"
   BINARY_DIR        "${CMAKE_BINARY_DIR}/googletest-build"
   CONFIGURE_COMMAND ""
+  CMAKE_COMMAND     "-DCMAKE_CXX_STANDARD=11"
   BUILD_COMMAND     ""
   INSTALL_COMMAND   ""
   TEST_COMMAND      ""

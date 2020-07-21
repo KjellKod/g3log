@@ -9,6 +9,9 @@
 # ===================================================================
 
  # GENERIC STEPS
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
  SET(LOG_SRC ${g3log_SOURCE_DIR}/src)
 
  file(GLOB SRC_FILES  ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
