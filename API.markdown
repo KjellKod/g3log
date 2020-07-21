@@ -188,7 +188,7 @@ namespace {
 ...
 ...
  auto worker = g3::LogWorker::createLogWorker();
- auto sinkHandle = worker->addSink(std::make_unique<MyCustomSink>(),
+ auto sinkHandle = worker->addSink(std2::make_unique<MyCustomSink>(),
                                      &MyCustomSink::ReceiveLogMessage);
  // ReceiveLogMessage(...) will used the custom formatting function "MyCustomFormatting(...)
     
@@ -219,7 +219,7 @@ Example usage where a [logrotate sink (g3sinks)](https://github.com/KjellKod/g3s
 int main(int argc, char**argv) {
    using namespace g3;
    std::unique_ptr<LogWorker> logworker{ LogWorker::createLogWorker() };
-   auto sinkHandle = logworker->addSink(std::make_unique<LogRotate>(),
+   auto sinkHandle = logworker->addSink(std2::make_unique<LogRotate>(),
                                           &LogRotate::save);
    
    // initialize the logger before it can receive LOG calls

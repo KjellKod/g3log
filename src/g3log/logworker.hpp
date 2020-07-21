@@ -16,6 +16,8 @@
 #include "g3log/sinkhandle.hpp"
 #include "g3log/filesink.hpp"
 #include "g3log/logmessage.hpp"
+#include "g3log/std2_make_unique.hpp"
+
 #include <memory>
 
 #include <memory>
@@ -95,7 +97,7 @@ namespace g3 {
          using namespace g3::internal;
          auto sink = std::make_shared<Sink<T>> (std::move(real_sink), call);
          addWrappedSink(sink);
-         return std::make_unique<SinkHandle<T>> (sink);
+         return std2::make_unique<SinkHandle<T>> (sink);
       }
 
 

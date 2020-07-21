@@ -12,6 +12,7 @@
 #include "testing_helpers.h"
 #include "g3log/loglevels.hpp"
 #include "g3log/generated_definitions.hpp"
+#include "g3log/std2_make_unique.hpp"
 
 #include <memory>
 #include <string>
@@ -613,7 +614,7 @@ TEST(CHECK, CHECK_runtimeError) {
      const int size_;
    public:
      explicit dynamic_int_array(int size)
-         : data_{std::make_unique<int[]>(size)}
+         : data_{std2::make_unique<int[]>(size)}
          , size_(size)
     {}
 

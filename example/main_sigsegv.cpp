@@ -8,6 +8,7 @@
 
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
+#include <g3log/std2_make_unique.hpp>
 
 #include <iomanip>
 #include <thread>
@@ -66,7 +67,7 @@ int main(int argc, char **argv)
 
 
    std::unique_ptr<LogWorker> logworker {LogWorker::createLogWorker()};
-   auto sinkHandle = logworker->addSink(std::make_unique<FileSink>(argv[0], path_to_log_file),
+   auto sinkHandle = logworker->addSink(std2::make_unique<FileSink>(argv[0], path_to_log_file),
                                         &FileSink::fileWrite);
 
    initializeLogging(logworker.get());

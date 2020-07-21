@@ -21,6 +21,7 @@
 #include "g3log/sinkhandle.hpp"
 #include "g3log/logmessage.hpp"
 #include "g3log/generated_definitions.hpp"
+#include "g3log/std2_make_unique.hpp"
 
 using namespace std;
 using namespace testing_helpers;
@@ -29,7 +30,7 @@ class CoutSink {
    stringstream buffer;
    unique_ptr<ScopedOut> scope_ptr;
 
-   CoutSink() : scope_ptr(std::make_unique<ScopedOut>(std::cout, &buffer)) {}
+   CoutSink() : scope_ptr(std2::make_unique<ScopedOut>(std::cout, &buffer)) {}
  public:
    void clear() { buffer.str(""); }
    std::string string() { return buffer.str(); }
@@ -90,7 +91,7 @@ namespace g3 {
          auto wait_result = g3::spawn_task(add_sink_call, _bg.get());
          wait_result.wait();
 
-         auto handle = std::make_unique< SinkHandle<T> >(sink);
+         auto handle = std2::make_unique< SinkHandle<T> >(sink);
          return handle;
       }
    };
@@ -126,7 +127,7 @@ TEST(ConceptSink, OneSink__VerifyMsgIn) {
 TEST(ConceptSink, DualSink__VerifyMsgIn) {
    Worker worker;
    auto h1 = worker.addSink(CoutSink::createSink(), &CoutSink::save);
-   auto h2 = worker.addSink(std::make_unique<StringSink>(), &StringSink::append);
+   auto h2 = worker.addSink(std2::make_unique<StringSink>(), &StringSink::append);
    worker.save("Hello World!");
 
 
@@ -140,7 +141,7 @@ TEST(ConceptSink, DualSink__VerifyMsgIn) {
 }
 
 TEST(ConceptSink, DeletedSink__Exptect_badweak_ptr___exception) {
-   auto worker = std::make_unique<Worker>();
+   auto worker = std2::make_unique<Worker>();
    auto h1 = worker->addSink(CoutSink::createSink(), &CoutSink::save);
    worker->save("Hello World!");
    worker.reset();
@@ -172,7 +173,7 @@ TEST(ConceptSink, OneHundredSinks_part1) {
       for (auto& flag : flags) {
          auto& count = counts[index++];
          // ignore the handle
-         worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+         worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
       worker->save("Hello to 100 receivers :)");
       worker->save("Hello to 100 receivers :)");
@@ -209,12 +210,12 @@ TEST(ConceptSink, OneHundredSinks_part2) {
       for (auto& flag : flags) {
          auto& count = counts[index++]; 
          // ignore the handle
-         worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+         worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
 
       // 100 logs
    for (int index = 0; index < NumberOfItems; ++index) {
-      LogMessagePtr message{std::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       message.get()->write().append("Hello to 100 receivers :)");
       worker->save(message);
     }
@@ -240,12 +241,12 @@ TEST(ConceptSink, OneSinkWithHandleOutOfScope) {
    {
       auto worker = g3::LogWorker::createLogWorker();
       {
-         auto handle =   worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+         auto handle =   worker->addSink(std2::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());
 
-      LogMessagePtr message{std::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+      LogMessagePtr message{std2::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       message.get()->write().append("this message should trigger an atomic increment at the sink");
       worker->save(message);
    }

@@ -138,7 +138,7 @@ struct CustomSink {
 
 // in main.cpp, main() function
 
-auto sinkHandle = logworker->addSink(std::make_unique<CustomSink>(),
+auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
                                      &CustomSink::ReceiveLogMessage);
 
 ```
@@ -153,7 +153,7 @@ You can safely remove and add sinks during the running of your program.
 
 **Adding Sinks**
 ```cpp
-   auto sinkHandle1 = logworker->addSink(std::make_unique<CustomSink>(),
+   auto sinkHandle1 = logworker->addSink(std2::make_unique<CustomSink>(),
                                           &CustomSink::ReceiveLogMessage);
    auto sinkHandle2 = logworker->addDefaultLogger(argv[0],
                                               path_to_log_file);
@@ -178,7 +178,7 @@ Example usage where a <a name="custom-sink">custom sink</a> is added. A function
 int main(int argc, char**argv) {
    using namespace g3;
    std::unique_ptr<LogWorker> logworker{ LogWorker::createLogWorker() };
-   auto sinkHandle = logworker->addSink(std::make_unique<CustomSink>(),
+   auto sinkHandle = logworker->addSink(std2::make_unique<CustomSink>(),
                                           &CustomSink::ReceiveLogMessage);
 
    // initialize the logger before it can receive LOG calls
@@ -232,7 +232,7 @@ int main(int argc, char**argv) {
 
    LOG(DEBUG) << "Make log call, then add another sink";
 
-   worker->addSink(std::make_unique<CustomSink>(),
+   worker->addSink(std2::make_unique<CustomSink>(),
                                   &CustomSink::ReceiveLogMessage);
 
    ...
