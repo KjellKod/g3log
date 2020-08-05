@@ -199,7 +199,7 @@ namespace {
 
 
 ## LOG <a name="log_flushing">flushing</a> 
-The default file sink will flush each log entry as it comes in. For different flushing policies please take a look at g3sinks [logrotate and LogRotateWithFilters](https://github.com/KjellKod/g3sinks/tree/master/logrotate).
+The default file sink will flush each log entry as it comes in. For different flushing policies please take a look at g3sinks [logrotate and LogRotateWithFilters](https://github.com/KjellKod/g3sinks/tree/master/sink_logrotate).
 
 At shutdown all enqueued logs will be flushed to the sink.  
 At a discovered fatal event (SIGSEGV et.al) all enqueued logs will be flushed to the sink.
