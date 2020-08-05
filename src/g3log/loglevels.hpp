@@ -62,12 +62,11 @@ struct LEVELS {
 };
 
 // If you want to add any extra logging level then please add to your own source file the logging level you need
-// then insert it using g3::only_change_at_initialization::addLogLevel(...). Please note that this only works for dynamic logging levels.
+// 1. If the cmake option G3_DYNAMIC_LOGGING is enabled then you must use g3::only_change_at_initialization::addLogLevel(...).
+//    to give g3log a record of your logging level and if it is an enabled or disbled logging level. 
 //
-// There should be NO reason for modifying this source file when adding custom levels
-//
-// When dynamic loggins levels are disabled then adding your own logging levels is not required as
-// the new logging level by default will always be enabled.
+// 2. If the cmake dynamic logging option is turned OF
+//    then giving g3log a record of your logging level with 'addLogLevel(...) is NOT needed since all logging levels are enabled
 //
 // example: MyLoggingLevel.h
 // #pragma once
