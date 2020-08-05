@@ -199,7 +199,7 @@ namespace {
 
 
 ## LOG <a name="log_flushing">flushing</a> 
-The default file sink will flush each log entry as it comes in. For different flushing policies please take a look at g3sinks [logrotate and LogRotateWithFilters](https://github.com/KjellKod/g3sinks/tree/master/logrotate).
+The default file sink will flush each log entry as it comes in. For different flushing policies please take a look at g3sinks [logrotate and LogRotateWithFilters](https://github.com/KjellKod/g3sinks/tree/master/sink_logrotate).
 
 At shutdown all enqueued logs will be flushed to the sink.  
 At a discovered fatal event (SIGSEGV et.al) all enqueued logs will be flushed to the sink.
@@ -266,7 +266,7 @@ The default behaviour for G3log is to catch several fatal events before they for
 
 
   ### <a name="fatal_handling_linux">Linux/*nix</a> 
-  The default fatal handling on Linux deals with fatal signals. At the time of writing these signals were   ```SIGABRT, SIGFPE, SIGILL, SIGILL, SIGSEGV, SIGSEGV, SIGTERM```.  The Linux fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp) and [crashhandler_unix.cpp](src/crashhandler_unix.cpp)
+  The default fatal handling on Linux deals with fatal signals. At the time of writing these signals were   ```SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM```.  The Linux fatal handling is handled in [crashhandler.hpp](src/g3log/crashhandler.hpp) and [crashhandler_unix.cpp](src/crashhandler_unix.cpp)
 
 
 
