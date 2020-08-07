@@ -66,9 +66,11 @@ If the ```<boolean-expression>``` evaluates to false then the the message for th
 
 
   ### custom logging levels
-  Custom logging levels can be created and used. When defining a custom logging level you set the value for it as well as the text for it. You can re-use values for other levels such as *INFO*, *WARNING* etc or have your own values.
-
-   Any value with equal or higher value than the *FATAL* value will be considered a *FATAL* logging level. 
+  Custom logging levels can be created and used. When defining a custom logging level you set the value for it as well as the text for it. You can re-use values for other levels such as *INFO*, *WARNING* etc or have your own values. Any value with equal or higher value than the *FATAL* value will be considered a *FATAL* logging level. 
+  
+  **To keep in mind when adding your own custom levels.** 
+1. If the cmake option `G3_DYNAMIC_LOGGING` is enabled then you must use `g3::only_change_at_initialization::addLogLevel(...)` to give g3log a record of your logging level and if it is an enabled or disbled logging level. 
+1. If the cmake `G3_DYNAMIC_LOGGING` is turned OFF, then giving g3log a record of your logging level with 'addLogLevel(...) is **not needed** since no `"disbled/enabled"` check will happen - all logging levels will be considered enabled.
 
   Example:
   ```cpp
@@ -84,6 +86,7 @@ If the ```<boolean-expression>``` evaluates to false then the the message for th
   const LEVELS DEADLY {FATAL.value + 1, {"DEADLY"}}; 
   ```
 
+More examples can be viwed in the [unit tests](https://github.com/KjellKod/g3log/blob/master/test_unit/test_io.cpp). 
 
 
   
