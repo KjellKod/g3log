@@ -68,6 +68,7 @@ struct LEVELS {
 // 2. If the cmake dynamic logging option is turned OFF
 //    then giving g3log a record of your logging level with 'addLogLevel(...) is NOT needed since no "disbled/enabled"
 //    check will happen - all logging levels will be considered enabled.
+// 3. See also the [g3log/API.markdown](https://github.com/KjellKod/g3log/blob/master/API.markdown) for for information.
 //
 // example: MyLoggingLevel.h
 // #pragma once
