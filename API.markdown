@@ -364,7 +364,6 @@ You could also contribute by saying thanks with a a donation. It would go a long
 * $10 for pizza 
 * $25 for a lunch or two
 * $100 for a date night with my wife (which buys family credit for evening coding)
-* $$$ for upgrading my development environment
 
 Cheers
 Kjell
