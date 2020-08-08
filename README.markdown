@@ -1,5 +1,7 @@
 # G3log : Asynchronous logger with Dynamic Sinks
 
+An example project integration of g3log, both statially and dynamically built can be found at [g3log_example_integration](https://github.com/KjellKod/g3log_example_integration/blob/master/README.md)
+
 
 ## EXAMPLE USAGE
 #### Optional to use either streaming or printf-like syntax
