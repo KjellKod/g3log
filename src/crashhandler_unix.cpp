@@ -213,7 +213,7 @@ namespace g3 {
                break;
             default:
                std::ostringstream oss;
-               oss << "UNKNOWN SIGNAL(" << signal_number << ") for " << level.text;
+               oss << "UNKNOWN SIGNAL(" << signal_number << ") for " << level.textString();
                return oss.str();
          }
       }
@@ -226,7 +226,7 @@ namespace g3 {
       void exitWithDefaultSignalHandler(const LEVELS& level, g3::SignalType fatal_signal_id) {
          const int signal_number = static_cast<int>(fatal_signal_id);
          restoreSignalHandler(signal_number);
-         std::cerr << "\n\n" << __FUNCTION__ << ":" << __LINE__ << ". Exiting due to " << level.text << ", " << signal_number << "   \n\n" << std::flush;
+         std::cerr << "\n\n" << __FUNCTION__ << ":" << __LINE__ << ". Exiting due to " << level.textString() << ", " << signal_number << "   \n\n" << std::flush;
 
 
          kill(getpid(), signal_number);
