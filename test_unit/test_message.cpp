@@ -58,7 +58,7 @@ TEST(Message, UseOverride_4_DetailsWithThreadID_toString) {
    thread_id_oss << std::this_thread::get_id();
    testing_helpers::verifyContent(output, thread_id_oss.str());
    testing_helpers::verifyContent(output, kFile);
-   testing_helpers::verifyContent(output, kLevel.text);
+   testing_helpers::verifyContent(output, kLevel.textString());
    testing_helpers::verifyContent(output, kFunction);
    testing_helpers::verifyContent(output, std::to_string(kLine));
    std::cout << output << std::endl;
@@ -73,7 +73,7 @@ TEST(Message, UseLogCall_4_DetailsWithThreadID_toString) {
    thread_id_oss << std::this_thread::get_id();
    testing_helpers::verifyContent(output, thread_id_oss.str());
    testing_helpers::verifyContent(output, kFile);
-   testing_helpers::verifyContent(output, kLevel.text);
+   testing_helpers::verifyContent(output, kLevel.textString());
    testing_helpers::verifyContent(output, kFunction);
    testing_helpers::verifyContent(output, std::to_string(kLine));
    std::cout << output << std::endl;
