@@ -61,6 +61,9 @@ namespace g3 {
    void initializeLogging(LogWorker* bgworker) {
       std::call_once(g_initialize_flag, [] {
          installCrashHandler();
+#ifdef G3_DYNAMIC_LOGGING
+         g3::only_change_at_initialization::reset();  // Initializes the default log level mapping.
+#endif
       });
       std::lock_guard<std::mutex> lock(g_logging_init_mutex);
       if (internal::isLoggingInitialized() || nullptr == bgworker) {

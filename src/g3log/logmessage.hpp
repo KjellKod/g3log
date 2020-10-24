@@ -44,7 +44,7 @@ namespace g3 {
          return _function;
       }
       std::string level() const {
-         return _level.text;
+         return std::string(_level.textString());
       }
 
       /// use a different format string to get a different look on the time.
@@ -90,15 +90,15 @@ namespace g3 {
       static  std::string fatalExceptionToString(const LogMessage& msg);
       static std::string fatalLogToString(const LogMessage& msg);
       static std::string fatalCheckToString(const LogMessage& msg);
-      static std::string normalToString(const LogMessage& msg);     
+      static std::string normalToString(const LogMessage& msg);
 
 
 
       // the default formatting option
       static std::string DefaultLogDetailsToString(const LogMessage& msg);
 
-      // this function can be used by the logging sink to add thread ID 
-      // see this concept and it is easy to make your own custom formatting 
+      // this function can be used by the logging sink to add thread ID
+      // see this concept and it is easy to make your own custom formatting
       static std::string FullLogDetailsToString(const LogMessage& msg);
 
       using LogDetailsFunc = std::string (*) (const LogMessage&);
@@ -140,7 +140,7 @@ namespace g3 {
 
    };
 
- 
+
 
 
    /** Trigger for flushing the message queue and exiting the application

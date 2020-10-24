@@ -22,19 +22,22 @@
 #endif
 #endif
 
-#include <string>
 #include <algorithm>
-#include <map>
+#include <array>
 #include <atomic>
+#include <map>
+#include <string>
+#include <string_view>
+
 #include <g3log/atomicbool.hpp>
 
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod
 struct LEVELS {
-   // force internal copy of the const char*. This is a simple safeguard for when g3log is used in a
-   // "dynamic, runtime loading of shared libraries"
+   LEVELS() = default;
 
-   LEVELS(const LEVELS& other): value(other.value), text(other.text.c_str()) {}
-   LEVELS(int id, const std::string& idtext) : value(id), text(idtext) {}
+   LEVELS(int id, std::string_view idtext) : value(id), text() {
+       idtext.copy(text.data(), text.size());
+   }
 
    bool operator==(const LEVELS& rhs)  const {
       return (value == rhs.value && text == rhs.text);
@@ -44,26 +47,17 @@ struct LEVELS {
       return (value != rhs.value || text != rhs.text);
    }
 
-   friend void swap(LEVELS& first, LEVELS& second) {
-      using std::swap;
-      swap(first.value, second.value);
-      swap(first.text, second.text);
+   std::string textString() const {
+       return std::string(text.data());
    }
-
-
-   LEVELS& operator=(LEVELS other) {
-      swap(*this, other);
-      return *this;
-   }
-
 
    int value;
-   std::string text;
+   std::array<char, 256> text;
 };
 
 // If you want to add any extra logging level then please add to your own source file the logging level you need
 // 1. If the cmake option G3_DYNAMIC_LOGGING is enabled then you must use g3::only_change_at_initialization::addLogLevel(...).
-//    to give g3log a record of your logging level and if it is an enabled or disbled logging level. 
+//    to give g3log a record of your logging level and if it is an enabled or disbled logging level.
 //
 // 2. If the cmake dynamic logging option is turned OFF
 //    then giving g3log a record of your logging level with 'addLogLevel(...) is NOT needed since no "disbled/enabled"
@@ -91,36 +85,27 @@ namespace g3 {
 } // g3
 
 
-const LEVELS G3LOG_DEBUG{g3::kDebugValue, {"DEBUG"}},
-   INFO {g3::kInfoValue, {"INFO"}},
-   WARNING {g3::kWarningValue, {"WARNING"}},
-   FATAL {g3::kFatalValue, {"FATAL"}};
+const LEVELS G3LOG_DEBUG{g3::kDebugValue, "DEBUG"},
+   INFO {g3::kInfoValue, "INFO"},
+   WARNING {g3::kWarningValue, "WARNING"},
+   FATAL {g3::kFatalValue, "FATAL"};
 
 
 
 namespace g3 {
    // Logging level and atomic status collection struct
    struct LoggingLevel {
-      atomicbool status;
-      LEVELS level;
+      LoggingLevel() = default;
 
-      // default operator needed for std::map compliance
-      LoggingLevel(): status(false), level(INFO) {};
-      LoggingLevel(const LoggingLevel& lvl) : status(lvl.status), level(lvl.level) {}
-      LoggingLevel(const LEVELS& lvl): status(true), level(lvl) {};
-      LoggingLevel(const LEVELS& lvl, bool enabled): status(enabled), level(lvl) {};
-      ~LoggingLevel() = default;
-
-      LoggingLevel& operator=(const LoggingLevel& other) {
-         status = other.status;
-         level = other.level;
-         return *this;
-      }
+      LoggingLevel(const LEVELS& lvl): status(true), level(lvl) {}
+      LoggingLevel(const LEVELS& lvl, bool enabled): status(enabled), level(lvl) {}
 
       bool operator==(const LoggingLevel& rhs)  const {
          return (status == rhs.status && level == rhs.level);
       }
 
+      atomicbool status = false;
+      LEVELS level = INFO;
    };
 } // g3
 
@@ -129,9 +114,9 @@ namespace g3 {
 
 namespace g3 {
    namespace internal {
-      const LEVELS CONTRACT {g3::kInternalFatalValue, {"CONTRACT"}},
-            FATAL_SIGNAL {g3::kInternalFatalValue + 1, {"FATAL_SIGNAL"}},
-            FATAL_EXCEPTION {kInternalFatalValue + 2, {"FATAL_EXCEPTION"}};
+      const LEVELS CONTRACT {g3::kInternalFatalValue, "CONTRACT"},
+            FATAL_SIGNAL {g3::kInternalFatalValue + 1, "FATAL_SIGNAL"},
+            FATAL_EXCEPTION {kInternalFatalValue + 2, "FATAL_EXCEPTION"};
 
       /// helper function to tell the logger if a log message was fatal. If it is it will force
       /// a shutdown after all log entries are saved to the sinks
@@ -156,7 +141,7 @@ namespace g3 {
 
 
    namespace log_levels {
-      /// Enable log level >= log_level. 
+      /// Enable log level >= log_level.
       /// log levels below will be disabled
       /// log levels equal or higher will be enabled.
       void setHighest(LEVELS level);
@@ -182,7 +167,7 @@ namespace g3 {
       std::map<int, g3::LoggingLevel> getAll();
 
       enum class status {Absent, Enabled, Disabled};
-      status getStatus(LEVELS level);  
+      status getStatus(LEVELS level);
 } // log_levels
 
 #endif
