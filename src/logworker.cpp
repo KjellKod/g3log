@@ -52,7 +52,7 @@ namespace g3 {
       std::string exiting = {"Fatal type: "};
 
       uniqueMsg->write().append("). ").append(exiting).append(" ").append(reason)
-      .append("\nLog content flushed sucessfully to sink\n\n");
+      .append("\nLog content flushed successfully to sink\n\n");
 
       std::cerr << uniqueMsg->toString() << std::flush;
       for (auto& sink : _sinks) {
@@ -90,7 +90,7 @@ namespace g3 {
       // be no thread that manages to add another sink after the call to clear the sinks above.
       //   i.e. this manages the extremely unlikely case of another thread calling
       // addWrappedSink after the sink clear above. Normally adding of sinks should be done in main.cpp
-      // and be closely coupled with the existance of the LogWorker. Sharing this adding of sinks to
+      // and be closely coupled with the existence of the LogWorker. Sharing this adding of sinks to
       // other threads that do not know the state of LogWorker is considered a bug but it is dealt with
       // nonetheless below.
       //

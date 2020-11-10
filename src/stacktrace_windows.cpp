@@ -67,7 +67,7 @@ namespace {
    // Which then later can be interpreted to human readable text
    void captureStackTrace(CONTEXT *context, std::vector<uint64_t> &frame_pointers) {
       DWORD machine_type = 0;
-      STACKFRAME64 frame = {}; // force zeroeing
+      STACKFRAME64 frame = {}; // force zeroing
       frame.AddrPC.Mode = AddrModeFlat;
       frame.AddrFrame.Mode = AddrModeFlat;
       frame.AddrStack.Mode = AddrModeFlat;
@@ -131,7 +131,7 @@ namespace {
    }
 
 
-   // Retrieves all the symbols for the stack frames, fills them witin a text representation and returns it
+   // Retrieves all the symbols for the stack frames, fills them within a text representation and returns it
    std::string convertFramesToText(std::vector<uint64_t> &frame_pointers) {
       std::string dump; // slightly more efficient than ostringstream
       const size_t kSize = frame_pointers.size();
@@ -185,7 +185,7 @@ namespace stacktrace {
    /// main stackdump function. retrieve stackdump, from the given context
    std::string stackdump(CONTEXT *context) {
 
-      if (g_thread_local_recursive_crash_check >= 2) { // In Debug scenarious we allow one extra pass
+      if (g_thread_local_recursive_crash_check >= 2) { // In Debug scenarios we allow one extra pass
          std::string recursive_crash = {"\n\n\n***** Recursive crash detected"};
          recursive_crash.append(", cannot continue stackdump traversal. *****\n\n\n");
          return recursive_crash;
@@ -217,6 +217,3 @@ namespace stacktrace {
    }
 
 } // stacktrace
-
-
-

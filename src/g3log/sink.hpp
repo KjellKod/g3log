@@ -27,7 +27,7 @@ namespace g3 {
       //
       // The Sink will wrap either
       //     a Sink with Message object receiving call
-      // or  a Sink with a LogEntry (string) receving call
+      // or  a Sink with a LogEntry (string) receiving call
       //
       // The Sink can also be used through the SinkHandler to call Sink specific function calls
       // Ref: send(Message) deals with incoming log entries (converted if necessary to string)
@@ -76,4 +76,3 @@ namespace g3 {
       };
    } // internal
 } // g3
-

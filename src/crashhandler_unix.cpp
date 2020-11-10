@@ -154,7 +154,7 @@ namespace g3 {
          std::ostringstream oss;
          for (size_t idx = 1; idx < size && messages != nullptr; ++idx) {
             char* mangled_name = 0, *offset_begin = 0, *offset_end = 0;
-            // find parantheses and +address offset surrounding mangled name
+            // find parentheses and +address offset surrounding mangled name
             for (char* p = messages[idx]; *p; ++p) {
                if (*p == '(') {
                   mangled_name = p;
@@ -299,4 +299,3 @@ namespace g3 {
       installSignalHandler();
    }
 } // end namespace g3
-
