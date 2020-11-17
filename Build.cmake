@@ -8,25 +8,25 @@
 #   and no restrictions or obligations.
 # ===================================================================
 
- # GENERIC STEPS
- SET(LOG_SRC ${g3log_SOURCE_DIR}/src)
+# GENERIC STEPS
+SET(LOG_SRC ${g3log_SOURCE_DIR}/src)
 
- file(GLOB SRC_FILES  ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
- file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp)
- 
- list( APPEND HEADER_FILES ${GENERATED_G3_DEFINITIONS} )
- list( APPEND SRC_FILES ${GENERATED_G3_DEFINITIONS} )
+file(GLOB SRC_FILES  ${LOG_SRC}/*.cpp ${LOG_SRC}/*.ipp)
+file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp)
 
- IF (MSVC OR MINGW)
-    list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
- ELSE()
-    list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
- ENDIF (MSVC OR MINGW)
+list( APPEND HEADER_FILES ${GENERATED_G3_DEFINITIONS} )
+list( APPEND SRC_FILES ${GENERATED_G3_DEFINITIONS} )
 
- set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
+IF (MSVC OR MINGW)
+   list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
+ELSE()
+   list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
+ENDIF (MSVC OR MINGW)
 
- # Create the g3log library
- SET(G3LOG_LIBRARY g3log)
+set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
+
+# Create the g3log library
+SET(G3LOG_LIBRARY g3log)
 
 
 IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -40,48 +40,48 @@ IF(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     message("Install rpath location: ${CMAKE_INSTALL_RPATH}")
 ENDIF()
 
- IF( G3_SHARED_LIB )
-    IF( WIN32 )
-       IF(NOT(${CMAKE_VERSION} VERSION_LESS "3.4"))
-          set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-       ELSE()
-          message( FATAL_ERROR "Need CMake version >=3.4 to build shared windows library!" )
-       ENDIF()
-    ENDIF()
-    ADD_LIBRARY(${G3LOG_LIBRARY} SHARED ${SRC_FILES})
- ELSE()
-    IF(MSVC)
-    	IF(NOT G3_SHARED_RUNTIME)
-            SET(CompilerFlags
-                  CMAKE_CXX_FLAGS
-                  CMAKE_CXX_FLAGS_DEBUG
-                  CMAKE_CXX_FLAGS_RELEASE
-                  CMAKE_C_FLAGS
-                  CMAKE_C_FLAGS_DEBUG
-                  CMAKE_C_FLAGS_RELEASE
-               )
-            foreach(CompilerFlag ${CompilerFlags})
-               string(REPLACE "/MDd" "/MTd" ${CompilerFlag} "${${CompilerFlag}}")
-               string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-            endforeach()
-         ENDIF()
-    ENDIF()
-    ADD_LIBRARY(${G3LOG_LIBRARY} STATIC ${SRC_FILES})
- ENDIF()
+IF( G3_SHARED_LIB )
+   IF( WIN32 )
+      IF(NOT(${CMAKE_VERSION} VERSION_LESS "3.4"))
+         set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+      ELSE()
+         message( FATAL_ERROR "Need CMake version >=3.4 to build shared windows library!" )
+      ENDIF()
+   ENDIF()
+   ADD_LIBRARY(${G3LOG_LIBRARY} SHARED ${SRC_FILES})
+ELSE()
+   IF(MSVC)
+   IF(NOT G3_SHARED_RUNTIME)
+         SET(CompilerFlags
+               CMAKE_CXX_FLAGS
+               CMAKE_CXX_FLAGS_DEBUG
+               CMAKE_CXX_FLAGS_RELEASE
+               CMAKE_C_FLAGS
+               CMAKE_C_FLAGS_DEBUG
+               CMAKE_C_FLAGS_RELEASE
+            )
+         foreach(CompilerFlag ${CompilerFlags})
+            string(REPLACE "/MDd" "/MTd" ${CompilerFlag} "${${CompilerFlag}}")
+            string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+         endforeach()
+      ENDIF()
+   ENDIF()
+   ADD_LIBRARY(${G3LOG_LIBRARY} STATIC ${SRC_FILES})
+ENDIF()
 
- SET(${G3LOG_LIBRARY}_VERSION_STRING ${VERSION})
- MESSAGE( STATUS "Creating ${G3LOG_LIBRARY} VERSION: ${VERSION}" )
+SET(${G3LOG_LIBRARY}_VERSION_STRING ${VERSION})
+MESSAGE( STATUS "Creating ${G3LOG_LIBRARY} VERSION: ${VERSION}" )
 
- SET_TARGET_PROPERTIES(${G3LOG_LIBRARY} PROPERTIES
-    LINKER_LANGUAGE CXX
-    OUTPUT_NAME g3log
-    CLEAN_DIRECT_OUTPUT 1
-    SOVERSION ${VERSION}
-    )
+SET_TARGET_PROPERTIES(${G3LOG_LIBRARY} PROPERTIES
+   LINKER_LANGUAGE CXX
+   OUTPUT_NAME g3log
+   CLEAN_DIRECT_OUTPUT 1
+   SOVERSION ${VERSION}
+   )
 
- IF(APPLE)
-   SET_TARGET_PROPERTIES(${G3LOG_LIBRARY} PROPERTIES MACOSX_RPATH TRUE)
- ENDIF()
+IF(APPLE)
+SET_TARGET_PROPERTIES(${G3LOG_LIBRARY} PROPERTIES MACOSX_RPATH TRUE)
+ENDIF()
 
 # require here some proxy for c++14 standard to avoid problems TARGET_PROPERTY CXX_STANDARD
 TARGET_COMPILE_FEATURES(${G3LOG_LIBRARY} PUBLIC cxx_variable_templates)
@@ -105,7 +105,7 @@ IF(NOT(MSVC OR MINGW))
 	if(Backtrace_FOUND)
 	  TARGET_INCLUDE_DIRECTORIES(${G3LOG_LIBRARY} PRIVATE ${Backtrace_INCLUDE_DIRS})
 	  TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} ${Backtrace_LIBRARIES})
-	 else() 
+	else()
 	  message( FATAL_ERROR "Could not find Library to create backtraces")
 	endif()
 
@@ -134,7 +134,7 @@ target_compile_options(${G3LOG_LIBRARY} PRIVATE
 # add GCC specific stuff
 target_compile_options(${G3LOG_LIBRARY} PRIVATE
    # clang/GCC warnings
-   $<$<CXX_COMPILER_ID:GNU>:-rdynamic>
+   $<$<AND:$<CXX_COMPILER_ID:GNU>,$<NOT:$<BOOL:${MINGW}>>>:-rdynamic>
 )
 
 #cmake -DCMAKE_CXX_COMPILER=clang++ ..
@@ -164,7 +164,7 @@ IF(MSVC OR MINGW)
    message( STATUS "" )
 ENDIF()
 
-TARGET_COMPILE_OPTIONS(${G3LOG_LIBRARY} PRIVATE 
+TARGET_COMPILE_OPTIONS(${G3LOG_LIBRARY} PRIVATE
    $<$<CXX_COMPILER_ID:MSVC>:/utf-8> # source code already in utf-8, force it for compilers in non-utf8_windows_locale
    $<$<CXX_COMPILER_ID:MSVC>:$<$<EQUAL:4,${CMAKE_SIZEOF_VOID_P}>:/arch:IA32>>
 )
