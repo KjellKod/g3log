@@ -66,7 +66,7 @@ namespace g3 {
     *
     * Set a function-hook before a fatal message will be sent to the logger
     * i.e. this is a great place to put a break point, either in your debugger
-    * or programatically to catch LOG(FATAL), CHECK(...) or an OS fatal event (exception or signal)
+    * or programmatically to catch LOG(FATAL), CHECK(...) or an OS fatal event (exception or signal)
     * This will be reset to default (does nothing) at initializeLogging(...);
     *
     * Example usage:

@@ -63,7 +63,7 @@ struct LEVELS {
 
 // If you want to add any extra logging level then please add to your own source file the logging level you need
 // 1. If the cmake option G3_DYNAMIC_LOGGING is enabled then you must use g3::only_change_at_initialization::addLogLevel(...).
-//    to give g3log a record of your logging level and if it is an enabled or disbled logging level. 
+//    to give g3log a record of your logging level and if it is an enabled or disbled logging level.
 //
 // 2. If the cmake dynamic logging option is turned OFF
 //    then giving g3log a record of your logging level with 'addLogLevel(...) is NOT needed since no "disbled/enabled"
@@ -81,7 +81,7 @@ struct LEVELS {
 //
 //  ... another example, when G3_DYNAMIC_LOGGING is enabled
 //  'addLogLevel' is NOT required
-//  LOG(MYFATL) << "this will just work, and it will be counted as a FATAL event";
+//  LOG(MYFATAL) << "this will just work, and it will be counted as a FATAL event";
 namespace g3 {
    static const int kDebugValue = 100;
    static const int kInfoValue = 300;
@@ -156,7 +156,7 @@ namespace g3 {
 
 
    namespace log_levels {
-      /// Enable log level >= log_level. 
+      /// Enable log level >= log_level.
       /// log levels below will be disabled
       /// log levels equal or higher will be enabled.
       void setHighest(LEVELS level);
@@ -182,7 +182,7 @@ namespace g3 {
       std::map<int, g3::LoggingLevel> getAll();
 
       enum class status {Absent, Enabled, Disabled};
-      status getStatus(LEVELS level);  
+      status getStatus(LEVELS level);
 } // log_levels
 
 #endif
@@ -190,4 +190,3 @@ namespace g3 {
    bool logLevel(LEVELS level);
 
 } // g3
-
