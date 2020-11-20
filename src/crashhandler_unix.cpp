@@ -59,7 +59,7 @@ namespace {
    // Dump of stack,. then exit through g3log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
    // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
-   void signalHandler(int signal_number, siginfo_t* info, void* unused_context) {
+   void signalHandler(int signal_number, siginfo_t* /*info*/, void* /*unused_context*/) {
 
       // Only one signal will be allowed past this point
       if (false == shouldDoExit()) {
