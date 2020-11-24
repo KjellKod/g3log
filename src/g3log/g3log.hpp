@@ -150,12 +150,12 @@ namespace g3 {
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
-   if (!g3::logLevel(level) || (boolean_expression) == false) {} else INTERNAL_LOG_MESSAGE(level).stream()
+   if (!g3::logLevel(level) || false == (boolean_expression)) {} else INTERNAL_LOG_MESSAGE(level).stream()
 
 // 'Design By Contract' stream API. Broken Contracts will exit the application by using fatal signal SIGABRT
 //  For unit testing, you can override the fatal handling using setFatalExitHandler(...). See tes_io.cpp for examples
 #define CHECK(boolean_expression)        \
-   if ((boolean_expression) == true) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
+   if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).stream()
 
 
 /** For details please see this
@@ -211,17 +211,17 @@ And here is possible output
 
 // Conditional log printf syntax
 #define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
-   if (!g3::logLevel(level) || (boolean_expression) == false) {} else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
+   if (!g3::logLevel(level) || false == (boolean_expression)) {} else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Calls the signal handler if the contract failed with the default exit for a failed contract. This is typically SIGABRT
 // See g3log, setFatalExitHandler(...) which can be overriden for unit tests (ref test_io.cpp)
 #define CHECKF(boolean_expression, printf_like_message, ...)    \
-   if ((boolean_expression) == true) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
+   if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Backwards compatible. The same as CHECKF.
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Calls the signal handler if the contract failed. See g3log, setFatalExitHandler(...) which can be overriden for unit tests
 // (ref test_io.cpp)
 #define CHECK_F(boolean_expression, printf_like_message, ...)    \
-   if ((boolean_expression) == true) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
+   if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
