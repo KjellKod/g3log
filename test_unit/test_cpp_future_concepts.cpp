@@ -2,7 +2,7 @@
 * 2012 by KjellKod.cc. This is PUBLIC DOMAIN to use at your own risk and comes
 * with no warranties. This code is yours to share, use and modify with no
 * strings attached and no restrictions or obligations.
- * 
+ *
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
 * ============================================================================*/
 
@@ -75,9 +75,9 @@ TEST(TestOf_CopyableLambdaCall, Expecting_AllFine)
 
 
 template<typename F>
-std::future<typename std::result_of<F()>::type> ObsoleteSpawnTask(F f)
+std::future<std::invoke_result_t<F()>> ObsoleteSpawnTask(F f)
 {
-  typedef typename std::result_of<F()>::type result_type;
+  typedef std::invoke_result_t<F()> result_type;
   typedef std::packaged_task<result_type()> task_type;
 
   task_type task(std::move(f));
@@ -119,9 +119,9 @@ namespace WORKING
   std::vector<std::function<void()>> vec;
 
   template<typename F>
-  std::future<typename std::result_of<F()>::type> spawn_task(F f)
+  std::future<std::invoke_result_t<F()>> spawn_task(F f)
   {
-    typedef typename std::result_of<F()>::type result_type;
+    typedef std::invoke_result_t<F()> result_type;
     typedef std::packaged_task<result_type()> task_type;
 
     task_type task(std::move(f));
