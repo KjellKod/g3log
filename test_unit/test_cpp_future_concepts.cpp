@@ -75,9 +75,9 @@ TEST(TestOf_CopyableLambdaCall, Expecting_AllFine)
 
 
 template<typename F>
-std::future<std::invoke_result_t<F()>> ObsoleteSpawnTask(F f)
+std::future<std::invoke_result_t<F>> ObsoleteSpawnTask(F f)
 {
-  typedef std::invoke_result_t<F()> result_type;
+  typedef std::invoke_result_t<F> result_type;
   typedef std::packaged_task<result_type()> task_type;
 
   task_type task(std::move(f));
@@ -119,9 +119,9 @@ namespace WORKING
   std::vector<std::function<void()>> vec;
 
   template<typename F>
-  std::future<std::invoke_result_t<F()>> spawn_task(F f)
+  std::future<std::invoke_result_t<F>> spawn_task(F f)
   {
-    typedef std::invoke_result_t<F()> result_type;
+    typedef std::invoke_result_t<F> result_type;
     typedef std::packaged_task<result_type()> task_type;
 
     task_type task(std::move(f));

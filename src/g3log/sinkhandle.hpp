@@ -37,12 +37,12 @@ namespace g3 {
       // the returned future will contain a bad_weak_ptr exception instead of the
       // call result.
       template<typename AsyncCall, typename... Args>
-      auto call(AsyncCall func , Args&& ... args) -> std::future<std::invoke_result_t<decltype(func)(T, Args...)>> {
+      auto call(AsyncCall func , Args&& ... args) -> std::future<std::invoke_result_t<decltype(func), T, Args...>> {
          try {
             std::shared_ptr<internal::Sink<T>> sink(_sink);
             return sink->async(func, std::forward<Args>(args)...);
          } catch (const std::bad_weak_ptr& e) {
-            typedef std::invoke_result_t<decltype(func)(T, Args...)> PromiseType;
+            typedef std::invoke_result_t<decltype(func), T, Args...> PromiseType;
             std::promise<PromiseType> promise;
             promise.set_exception(std::make_exception_ptr(e));
             return std::move(promise.get_future());
