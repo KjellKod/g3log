@@ -42,9 +42,9 @@ namespace g3 {
    //  auto msg_call=[=](){return ("Hello from the Background");};
    //  auto future_msg = g3::spawn_task(msg_lambda, bgWorker.get());
    template <typename Func, class BgWorker>
-   std::future<typename std::result_of<Func()>::type> spawn_task(Func func, BgWorker *worker)
+   std::future<std::invoke_result_t<Func>> spawn_task(Func func, BgWorker *worker)
    {
-      typedef typename std::result_of<Func()>::type result_type;
+      typedef std::invoke_result_t<Func> result_type;
       typedef std::packaged_task<result_type()> task_type;
 
       if (nullptr == worker) {

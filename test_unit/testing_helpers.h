@@ -86,7 +86,7 @@ namespace testing_helpers {
 
 
       template<typename Call, typename ... Args >
-      typename std::result_of<Call(Args...)>::type callToLogger(Call call, Args&& ... args) {
+      std::invoke_result_t<Call(Args...)> callToLogger(Call call, Args&& ... args) {
          auto func = std::bind(call, _scope->get(), std::forward<Args>(args)...);
          return func();
       }
