@@ -187,6 +187,6 @@ namespace g3 {
 
 #endif
    /// Enabled status for the given logging level
-   bool logLevel(LEVELS level);
+   bool logLevel(const LEVELS& level);
 
 } // g3
