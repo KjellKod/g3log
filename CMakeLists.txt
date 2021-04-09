@@ -65,7 +65,6 @@ else()
   message(STATUS "A 32-bit OS detected")
 endif()
 
-
 # Calculate the version number
 SET(MAJOR_VERSION 1)
 SET(MINOR_VERSION 3)
