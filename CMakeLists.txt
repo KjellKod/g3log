@@ -69,7 +69,7 @@ endif()
 # Calculate the version number
 SET(MAJOR_VERSION 1)
 SET(MINOR_VERSION 3)
-
+ 
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
       message("windows: Extracting git software version")
