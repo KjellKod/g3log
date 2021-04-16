@@ -629,6 +629,36 @@ TEST(CHECK, CHECK_runtimeError) {
 
    EXPECT_THROW(arr.at(3) = 1, std::runtime_error);
 }
+// verifying cross platform https://github.com/KjellKod/g3log/issues/407
+TEST(CHECK, CHECK_isalpha) {
+   RestoreFileLogger logger(log_directory);
+   std::string name = "a";
+   std::string fatal_message = {"isalpha name[0]:"};
+   CHECK(std::isalpha(name[0])) << fatal_message << "(1): " << name[0];
+   CHECK(static_cast<bool>(std::isalpha(name[0]))) << fatal_message << "(2)" <<name[0];
+
+   logger.reset();
+   EXPECT_FALSE(mockFatalWasCalled());
+
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_FALSE(verifyContent(file_content, fatal_message));
+   EXPECT_FALSE(verifyContent(mockFatalMessage(), fatal_message));
+} 
+// verifying cross platform https://github.com/KjellKod/g3log/issues/407
+TEST(CHECK, CHECK_not_isalpha) {
+   RestoreFileLogger logger(log_directory);
+   std::string name = "/";
+   std::string fatal_message = {"isalpha name[0]:"};
+   CHECK(std::isalpha(name[0])) << fatal_message << "(1): " << name[0];
+   CHECK(static_cast<bool>(std::isalpha(name[0]))) << fatal_message << "(2)" <<name[0];
+
+   logger.reset();
+   EXPECT_TRUE(mockFatalWasCalled());
+
+   std::string file_content = readFileToText(logger.logFile());
+   EXPECT_TRUE(verifyContent(file_content, fatal_message));
+   EXPECT_TRUE(verifyContent(mockFatalMessage(), fatal_message));
+} 
 
 TEST(CustomLogLevels, AddANonFatal) {
    RestoreFileLogger logger(log_directory);
