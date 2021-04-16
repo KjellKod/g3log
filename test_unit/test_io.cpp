@@ -20,7 +20,7 @@
 #include <chrono>
 #include <exception>
 #include <algorithm>
-#include <ios>
+#include <cctype>
 
 namespace {
    const std::string log_directory = "./";
