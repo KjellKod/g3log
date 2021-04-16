@@ -634,8 +634,8 @@ TEST(CHECK, CHECK_isalpha) {
    RestoreFileLogger logger(log_directory);
    std::string name = "a";
    std::string fatal_message = {"isalpha name[0]:"};
-   CHECK(std::isalpha(name[0])) << fatal_message << "(1): " << name[0];
-   CHECK(static_cast<bool>(std::isalpha(name[0]))) << fatal_message << "(2)" <<name[0];
+   CHECK(std::isalpha(static_cast<unsigned char>(name[0]))) << fatal_message << "(1): " << name[0];
+   CHECK(static_cast<bool>(std::isalpha(static_cast<unsigned char>(name[0])))) << fatal_message << "(2)" <<name[0];
 
    logger.reset();
    EXPECT_FALSE(mockFatalWasCalled());
