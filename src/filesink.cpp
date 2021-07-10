@@ -10,6 +10,7 @@
 #include "filesinkhelper.ipp"
 #include <cassert>
 #include <chrono>
+#include <filesystem>
 
 namespace g3 {
    using namespace internal;
@@ -30,12 +31,24 @@ namespace g3 {
 
       std::string file_name = createLogFileName(_log_prefix_backup, logger_id);
       _log_file_with_path = pathSanityFix(_log_file_with_path, file_name);
+ 
+      namespace fs = std::filesystem;
+      fs::path sym_path = fs::path(
+      _log_file_with_path.substr(0, _log_file_with_path.size() - 20) +
+             ".log");
+      if (fs::exists(sym_path)){
+        fs::remove(sym_path);
+      }
+      fs::create_symlink(fs::path(_log_file_with_path), sym_path);
+
       _outptr = createLogFile(_log_file_with_path);
 
       if (!_outptr) {
-         std::cerr << "Cannot write log file to location, attempting current directory" << std::endl;
-         _log_file_with_path = "./" + file_name;
-         _outptr = createLogFile(_log_file_with_path);
+        std::cerr << "Cannot write log file to location, attempting current "
+                     "directory"
+                  << std::endl;
+        _log_file_with_path = "./" + file_name;
+        _outptr = createLogFile(_log_file_with_path);
       }
       assert(_outptr && "cannot open log file at startup");
    }
