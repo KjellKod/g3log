@@ -66,7 +66,7 @@ namespace g3 {
     *
     * Set a function-hook before a fatal message will be sent to the logger
     * i.e. this is a great place to put a break point, either in your debugger
-    * or programatically to catch LOG(FATAL), CHECK(...) or an OS fatal event (exception or signal)
+    * or programmatically to catch LOG(FATAL), CHECK(...) or an OS fatal event (exception or signal)
     * This will be reset to default (does nothing) at initializeLogging(...);
     *
     * Example usage:
@@ -145,12 +145,12 @@ namespace g3 {
 
 
 // LOG(level) is the API for the stream log
-#define LOG(level) if(!g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).stream()
+#define LOG(level) if (!g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).stream()
 
 
 // 'Conditional' stream log
 #define LOG_IF(level, boolean_expression)  \
-   if (false == (boolean_expression) || !g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).stream()
+   if (!g3::logLevel(level) || false == (boolean_expression)) {} else INTERNAL_LOG_MESSAGE(level).stream()
 
 // 'Design By Contract' stream API. Broken Contracts will exit the application by using fatal signal SIGABRT
 //  For unit testing, you can override the fatal handling using setFatalExitHandler(...). See tes_io.cpp for examples
@@ -211,7 +211,7 @@ And here is possible output
 
 // Conditional log printf syntax
 #define LOGF_IF(level,boolean_expression, printf_like_message, ...) \
-   if (false == (boolean_expression) || !g3::logLevel(level)) {} else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
+   if (!g3::logLevel(level) || false == (boolean_expression)) {} else INTERNAL_LOG_MESSAGE(level).capturef(printf_like_message, ##__VA_ARGS__)
 
 // Design By Contract, printf-like API syntax with variadic input parameters.
 // Calls the signal handler if the contract failed with the default exit for a failed contract. This is typically SIGABRT

@@ -75,7 +75,7 @@ struct LEVELS {
 //
 //  ... another example, when G3_DYNAMIC_LOGGING is enabled
 //  'addLogLevel' is NOT required
-//  LOG(MYFATL) << "this will just work, and it will be counted as a FATAL event";
+//  LOG(MYFATAL) << "this will just work, and it will be counted as a FATAL event";
 namespace g3 {
    static const int kDebugValue = 100;
    static const int kInfoValue = 300;
@@ -175,4 +175,3 @@ namespace g3 {
    bool logLevel(LEVELS level);
 
 } // g3
-

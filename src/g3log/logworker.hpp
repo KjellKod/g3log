@@ -9,7 +9,7 @@
  * Filename:g3logworker.h  Framework for Logging and Design By Contract
  * Created: 2011 by Kjell Hedström
  *
- * PUBLIC DOMAIN and Not copywrited. First published at KjellKod.cc
+ * PUBLIC DOMAIN and Not copyrighted. First published at KjellKod.cc
  * ********************************************* */
 #include "g3log/g3log.hpp"
 #include "g3log/sinkwrapper.hpp"

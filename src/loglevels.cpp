@@ -174,7 +174,8 @@ namespace g3 {
           return false;
       }
       return it->second.status.value();
-#endif
+#else
       return true;
+#endif
    }
 } // g3
