@@ -9,7 +9,7 @@
  * Filename:g3log.cpp  Framework for Logging and Design By Contract
  * Created: 2011 by Kjell Hedström
  *
- * PUBLIC DOMAIN and Not copywrited since it was built on public-domain software and at least in "spirit" influenced
+ * PUBLIC DOMAIN and Not copyrighted since it was built on public-domain software and at least in "spirit" influenced
  * from the following sources
  * 1. kjellkod.cc ;)
  * 2. Dr.Dobbs, Petru Marginean:  http://drdobbs.com/article/printableArticle.jhtml?articleId=201804215&dept_url=/cpp/
@@ -38,9 +38,9 @@ namespace {
    g3::LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
    std::mutex g_logging_init_mutex;
 
-   std::unique_ptr<g3::LogMessage> g_first_unintialized_msg = {nullptr};
+   std::unique_ptr<g3::LogMessage> g_first_uninitialized_msg = {nullptr};
    std::once_flag g_set_first_uninitialized_flag;
-   std::once_flag g_save_first_unintialized_flag;
+   std::once_flag g_save_first_uninitialized_flag;
    const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = [] { /*does nothing */};
    std::function<void(void)> g_fatal_pre_logging_hook;
 
@@ -77,9 +77,9 @@ namespace g3 {
       }
 
       // Save the first uninitialized message, if any
-      std::call_once(g_save_first_unintialized_flag, [&bgworker] {
-         if (g_first_unintialized_msg) {
-            bgworker->save(LogMessagePtr {std::move(g_first_unintialized_msg)});
+      std::call_once(g_save_first_uninitialized_flag, [&bgworker] {
+         if (g_first_uninitialized_msg) {
+            bgworker->save(LogMessagePtr {std::move(g_first_uninitialized_msg)});
          }
       });
 
@@ -87,7 +87,7 @@ namespace g3 {
       // by default the pre fatal logging hook does nothing
       // if it WOULD do something it would happen in
       setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing);
-      // recurvise crash counter re-set to zero
+      // recursive crash counter re-set to zero
       g_fatal_hook_recursive_counter.store(0);
    }
 
@@ -156,7 +156,7 @@ namespace g3 {
 
 
 
-      /** explicits copy of all input. This is makes it possibly to use g3log across dynamically loaded libraries
+      /** explicitly copy of all input. This is makes it possibly to use g3log across dynamically loaded libraries
       * i.e. (dlopen + dlsym)  */
       void saveMessage(const char* entry, const char* file, int line, const char* function, const LEVELS& level,
                        const char* boolean_expression, int fatal_signal, const char* stack_trace) {
@@ -198,7 +198,7 @@ namespace g3 {
 
       /**
        * save the message to the logger. In case of called before the logger is instantiated
-       * the first message will be saved. Any following subsequent unitnialized log calls
+       * the first message will be saved. Any following subsequent uninitialized log calls
        * will be ignored.
        *
        * The first initialized log entry will also save the first uninitialized log message, if any
@@ -208,10 +208,10 @@ namespace g3 {
          // Uninitialized messages are ignored but does not CHECK/crash the logger
          if (!internal::isLoggingInitialized()) {
             std::call_once(g_set_first_uninitialized_flag, [&] {
-               g_first_unintialized_msg = incoming.release();
+               g_first_uninitialized_msg = incoming.release();
                std::string err = {"LOGGER NOT INITIALIZED:\n\t\t"};
-               err.append(g_first_unintialized_msg->message());
-               std::string& str = g_first_unintialized_msg->write();
+               err.append(g_first_uninitialized_msg->message());
+               std::string& str = g_first_uninitialized_msg->write();
                str.clear();
                str.append(err); // replace content
                std::cerr << str << std::endl;
@@ -255,6 +255,3 @@ namespace g3 {
 
    } // internal
 } // g3
-
-
-

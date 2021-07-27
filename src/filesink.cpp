@@ -19,7 +19,7 @@ namespace g3 {
       ,_log_file_with_path(log_directory)
       , _log_prefix_backup(log_prefix)
       , _outptr(new std::ofstream)
-      , _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] messagen\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n")
+      , _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message\n\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n")
       , _firstEntry(true)
    {
       _log_prefix_backup = prefixSanityFix(log_prefix);
@@ -38,7 +38,6 @@ namespace g3 {
          _outptr = createLogFile(_log_file_with_path);
       }
       assert(_outptr && "cannot open log file at startup");
-      
    }
 
 
@@ -91,6 +90,7 @@ namespace g3 {
       filestream() << now_formatted << ss_change.str();
       return _log_file_with_path;
    }
+
    std::string FileSink::fileName() {
       return _log_file_with_path;
    }
@@ -102,7 +102,6 @@ namespace g3 {
    void FileSink::overrideLogHeader(const std::string& change) {
       _header = change;
    }
-
 
    void FileSink::addLogFileHeader() {
       filestream() << header(_header);
