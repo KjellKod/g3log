@@ -1,4 +1,4 @@
-name: DiYbuildAndRunTest_with_verbose_test_output
+name: callScriptWithVerboseTestOut
 
 on:
   push:
