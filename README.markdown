@@ -499,13 +499,14 @@ For windows the repo is still relying on appveyor.  In case you want to look int
 ```
 1. appveyor --> g3log/appveyor.yml
 2. circleCI --> g3log/.circleci/config.yml
-3. github actions --> g3log/.github/workflows/cpp.yml
+3. github actions --> g3log/.github/workflows/cpp.yml: calls a script that does all heavy lifting, leaving the yml barebone. Verbose test output
+4. github actions -->g3log/.github/workflows/cmake.yml: does all lifting with cmake commands, including test. Test output is just summary. 
 
 2. and 3. are currently relying on scripts/buildAndRunTests.sh
 
 Files that are obsolete but not yet deleted (due to testing)
 g3log/scripts/.travis-bootstrap-ubuntu.sh
-g3log/.github/workflows/cmake.yml
+
 
 ```
 
