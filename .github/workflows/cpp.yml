@@ -1,4 +1,6 @@
 name: C/C++ CI
+# github actions CI ubuntu, C++. We could move the buildAndRunTests.sh but now that logic can be reused and tested
+# with circleCI or other CI approached. 
 
 on:
   push:
