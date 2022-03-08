@@ -5,6 +5,7 @@ executors: #(1)
       - image: dockerben/cpptemplate:latest
     # example, maybe setup my own image later
     # https://thoughts-on-coding.com/2020/04/20/a-cpp-github-template-repository-utilizing-circleci-cmake-docker-and-doxygen/
+    # should look into Windows, Ubuntu, OSX executions in parallell with CircleCI ref https://circleci.com/docs/2.0/parallelism-faster-jobs/
 jobs:
   build:
     executor: exectr #(1)
