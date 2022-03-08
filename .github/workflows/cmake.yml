@@ -1,6 +1,10 @@
-name: CMake
+name: CTest
 
-on: [push]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
       
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
