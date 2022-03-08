@@ -1,0 +1,16 @@
+version: 2.1
+executors: #(1)
+  exectr:
+    docker:
+      - image: dockerben/cpptemplate:latest
+    # example, maybe setup my own image later
+    # https://thoughts-on-coding.com/2020/04/20/a-cpp-github-template-repository-utilizing-circleci-cmake-docker-and-doxygen/
+jobs:
+  build:
+    executor: exectr #(1)
+    steps:
+      - checkout 
+      - run: 
+          name: build_and_run
+          command: |
+            ./scripts/buildAndRunTests.sh
