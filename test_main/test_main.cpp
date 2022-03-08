@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 {
    testing::InitGoogleTest(&argc, argv);
    int return_value = RUN_ALL_TESTS();
-   std::cout << "FINISHED WITH THE TESTING." << std::endl;
+   std::cout << "FINISHED WITH THE TESTING!" << std::endl;
    return return_value;
 }
 
