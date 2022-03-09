@@ -1,4 +1,4 @@
-name: scripts/buildAndRunTests.sh
+name: ci/action verbose script
 
 on:
   push:
