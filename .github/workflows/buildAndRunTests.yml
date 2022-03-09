@@ -1,4 +1,4 @@
-name: ci/action verbose script
+name: ci/action verbose ctest script
 
 on:
   push:
