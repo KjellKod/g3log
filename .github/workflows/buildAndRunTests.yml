@@ -1,4 +1,4 @@
-name: callScriptWithVerboseTestOut
+name: ci/action verbose ctest script
 
 on:
   push:

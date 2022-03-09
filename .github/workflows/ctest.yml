@@ -1,4 +1,4 @@
-name: CTest
+name: ci/action ctest
 
 on:
   push:
@@ -9,18 +9,41 @@ on:
 env:
   # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
   BUILD_TYPE: Release
-
+  
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#example-only-cancel-in-progress-jobs-or-runs-for-the-current-workflow
+# if you have to do a quick fix and the CI is already running your new commit will kill already 
+# going processes before starting new ones
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+  
+  
 jobs:
   build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    
     # The CMake configure and build commands are platform agnostic and should work equally
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
-    runs-on: ubuntu-latest
+    #runs-on: ubuntu-latest
+    #runs-on: ${{ matrix.os }}
 
     steps:
     - uses: actions/checkout@v2
 
+    - name: Run Linux Build
+      if: matrix.os == 'ubuntu-latest'
+      run: echo "Ubuntu Latest" > release_ubuntu
+      
+    - name: Run Mac Build
+      if: matrix.os == 'macos-latest'
+      run: echo "MacOS Latest" > release_mac
+        
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
       # We'll use this as our working directory for all subsequent commands
