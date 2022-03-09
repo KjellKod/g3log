@@ -1,4 +1,4 @@
-name: callScriptWithVerboseTestOut
+name: scripts/buildAndRunTests.sh
 
 on:
   push:
