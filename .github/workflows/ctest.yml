@@ -1,4 +1,4 @@
-name: ci/action: ctest
+name: ci/action ctest
 
 on:
   push:
