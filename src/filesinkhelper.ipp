@@ -117,7 +117,7 @@ namespace g3 {
          std::ofstream &stream(*(out.get()));
          bool success_with_open_file = openLogFile(file_with_full_path, stream);
          if (false == success_with_open_file) {
-            out.release();
+            out.reset();
          }
          return out;
       }

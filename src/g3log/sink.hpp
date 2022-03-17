@@ -70,7 +70,7 @@ namespace g3 {
          }
 
          template<typename Call, typename... Args>
-         auto async(Call call, Args &&... args)-> std::future< typename std::result_of<decltype(call)(T, Args...)>::type> {
+         auto async(Call call, Args &&... args)-> std::future<std::invoke_result_t<decltype(call), T, Args...>> {
             return g3::spawn_task(std::bind(call, _real_sink.get(), std::forward<Args>(args)...), _bg.get());
          }
       };

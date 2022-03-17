@@ -1,0 +1,22 @@
+version: 2.1
+executors: #(1)
+  exectr:
+      docker:
+      - image: cimg/base:edge-20.04
+    #docker:
+    #  - image: dockerben/cpptemplate:latest
+    # example, maybe setup my own image later
+    # https://thoughts-on-coding.com/2020/04/20/a-cpp-github-template-repository-utilizing-circleci-cmake-docker-and-doxygen/
+    # should look into Windows, Ubuntu, OSX executions in parallell with CircleCI ref https://circleci.com/docs/2.0/parallelism-faster-jobs/
+jobs:
+  build:
+    executor: exectr #(1)
+    steps:
+      - checkout 
+      - run: 
+          name: build_and_run
+          command: |
+            ./scripts/buildAndRunTests.sh
+      
+      
+      

@@ -33,6 +33,7 @@ LOGF(WARNING, "Printf-style syntax is also %s", "available");
   * [Testing](#testing)
   * [CMake Module](#cmake-module)
 * Overview of the [API description](#overview-api-description)
+* [Continuos_Integration](#continuos_integration)
 * [Performance](#performance)
 * [Feedback](#feedback)
 * [Say Thanks](#say-thanks)
@@ -491,6 +492,25 @@ G3log aims to keep all background logging to sinks with as little log overhead a
 The worst case latency is kept stable with no extreme peaks, in spite of any sudden extreme pressure.  I have a blog post regarding comparing worst case latency for g3log and other loggers which might be of interest.
 You can find it here: https://kjellkod.wordpress.com/2015/06/30/the-worlds-fastest-logger-vs-g3log/
 
+
+# <a name="continuos_integration">Continuos Integration</a>
+This repo has currently a few different CI setups. It might be that they are consolidated later. Currently it's trying out both github actions and circleCI. 
+For windows the repo is still relying on appveyor.  In case you want to look into change any of these setups the following files are the ones of interest. 
+```
+1. appveyor --> g3log/appveyor.yml
+2. circleCI --> g3log/.circleci/config.yml
+3. github actions --> g3log/.github/workflows/cpp.yml: calls a script that does all heavy lifting, leaving the yml barebone. Verbose test output
+4. github actions -->g3log/.github/workflows/cmake.yml: does all lifting with cmake commands, including test. Test output is just summary. 
+
+2. and 3. are currently relying on scripts/buildAndRunTests.sh
+
+Files that are obsolete but not yet deleted (due to testing)
+g3log/scripts/.travis-bootstrap-ubuntu.sh
+
+
+```
+
+
 # <a name="feedback">Feedback</a>
 If you like this logger (or not) it would be nice with some feedback. That way I can improve g3log and g2log and it is also nice to see if someone is using it.
 
@@ -504,11 +524,8 @@ This logger is available for free and all of its source code is public domain.  
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/g3log/25)
 
 * $5 for a cup of coffee
-* $10 for pizza
-* $25 for a lunch or two
-* $100 for a date night with my wife (which buys family credit for evening coding)
-* $$$ for upgrading my development environment
-* $$$$ :)
+* $25 for a late evening coding with takeout 
+
 
 Cheers
 

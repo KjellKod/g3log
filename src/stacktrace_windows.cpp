@@ -71,7 +71,17 @@ namespace {
       frame.AddrPC.Mode = AddrModeFlat;
       frame.AddrFrame.Mode = AddrModeFlat;
       frame.AddrStack.Mode = AddrModeFlat;
-#ifdef _M_X64
+#if defined(_M_ARM64)
+      frame.AddrPC.Offset = context->Pc;
+      frame.AddrFrame.Offset = context->Fp;
+      frame.AddrStack.Offset = context->Sp;
+      machine_type = IMAGE_FILE_MACHINE_ARM64;
+#elif defined(_M_ARM)
+      frame.AddrPC.Offset = context->Pc;
+      frame.AddrFrame.Offset = context->R11;
+      frame.AddrStack.Offset = context->Sp;
+      machine_type = IMAGE_FILE_MACHINE_ARM;
+#elif defined(_M_X64)
       frame.AddrPC.Offset = context->Rip;
       frame.AddrFrame.Offset = context->Rbp;
       frame.AddrStack.Offset = context->Rsp;

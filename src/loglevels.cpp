@@ -165,7 +165,7 @@ namespace g3 {
 #endif
 
 
-   bool logLevel(LEVELS log_level) {
+   bool logLevel(const LEVELS& log_level) {
 #ifdef G3_DYNAMIC_LOGGING
      auto it = std::find_if(internal::g_log_levels.begin(), internal::g_log_levels.end(), [log_level](const auto& a) {
                                 return a.first == log_level.value;

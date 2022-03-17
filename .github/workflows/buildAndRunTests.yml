@@ -1,0 +1,41 @@
+name: ci/action verbose ctest script
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Print env
+      run: |
+        echo github.event.action: ${{ github.event.action }}
+        echo github.event_name: ${{ github.event_name }}  
+        gcc --version
+        sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+        sudo apt-get update
+        sudo apt-get install ninja-build cmake gcc-9 g++-9
+        sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9 --slave /usr/bin/gcov gcov /usr/bin/gcov-9
+        echo gcc version after
+        gcc --version        
+        cmake --version
+        # example: https://gist.github.com/NickNaso/0d478f1481686d5bcc868cac06620a60
+    - name: configure
+      shell: bash
+      # run: ./configure
+      run: ./scripts/buildAndRunTests.sh
+      
+    
+    #- name: make
+    #  run: make
+    #- name: make check
+    #  run: make check
+    #- name: make distcheck
+    #  run: make distcheck

@@ -2,7 +2,7 @@ environment:
   P: "c:/projects/libs"
 
 # Operating system (build VM template)
-os: Visual Studio 2015
+os: Visual Studio 2017
 
 # scripts that are called at very beginning, before repo cloning
 #init:
@@ -21,12 +21,12 @@ install:
 before_build:
   - cd c:\projects\g3log\
   - mkdir build
-  - cd build 
+  - cd build
 
 build_script:
-  - cmake -G "Visual Studio 14 2015 Win64" -DADD_G3LOG_UNIT_TEST=ON -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON -DCMAKE_INSTALL_PREFIX=c:\g3log ..
+  - cmake -G "Visual Studio 15 2017 Win64" -DADD_G3LOG_UNIT_TEST=ON -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON -DCMAKE_INSTALL_PREFIX=c:\g3log ..
   - cmake --build . --config Release --target install
-  
+
 # scripts to run after build
 after_build:
   - cmd /c Release\g3log-FATAL-contract.exe || exit /B 0

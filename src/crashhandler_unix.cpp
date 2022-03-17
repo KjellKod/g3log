@@ -39,6 +39,8 @@
 
 namespace {
 
+   std::atomic<bool> gBlockForFatal {true};
+
    const std::map<int, std::string> kSignals = {
       {SIGABRT, "SIGABRT"},
       {SIGFPE, "SIGFPE"},
@@ -134,9 +136,8 @@ namespace g3 {
    namespace internal {
 
       bool shouldBlockForFatalHandling() {
-         return true;  // For windows we will after fatal processing change it to false
+         return gBlockForFatal;
       }
-
 
       /// Generate stackdump. Or in case a stackdump was pre-generated and non-empty just use that one
       /// i.e. the latter case is only for Windows and test purposes
@@ -230,6 +231,12 @@ namespace g3 {
 
 
          kill(getpid(), signal_number);
+
+         // When running as PID1 the above kill doesn't have any effect (execution simply passes through it, contrary
+         // to a non-PID1 process where execution stops at kill and switches over to signal handling). Also as PID1 
+         // we must unblock the thread that received the original signal otherwise the process will never terminate.
+         gBlockForFatal = false;
+
          exit(signal_number);
 
       }
