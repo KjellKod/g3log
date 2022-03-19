@@ -11,27 +11,29 @@
 
 #include <cassert>
 #include <chrono>
-
-
-// from https://github.com/KjellKod/g3log/pull/366/files
-#if defined(_WIN32)
-#   if _MSC_VER >= 1914
-#      include <filesystem>
-namespace fs = std::filesystem;
-
-#   else
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#   endif
-
-#elif defined(__GNUC__)
 #include <filesystem>
-namespace fs = std::filesystem;
 
-#elif defined(__clang__) 
-#include <filesystem>
-namespace fs = std::filesystem;
-#endif
+namespace fs = std::filesystem; 
+
+// // from https://github.com/KjellKod/g3log/pull/366/files
+// #if defined(_WIN32)
+// #   if _MSC_VER >= 1914
+// #      include <filesystem>
+// namespace fs = std::filesystem;
+
+// #   else
+// #include <experimental/filesystem>
+// namespace fs = std::experimental::filesystem;
+// #   endif
+
+// #elif defined(__GNUC__)
+// #include <filesystem>
+// namespace fs = std::filesystem;
+
+// #elif defined(__clang__) 
+// #include <filesystem>
+// namespace fs = std::filesystem;
+// #endif
 
 
 
@@ -141,7 +143,7 @@ namespace g3 {
    std::string FileSink::symLinkPath () {
       return _sym_link_file_name;
    }
-   
+
    std::string FileSink::fileName() {
       return _log_file_with_path;
    }
