@@ -14,7 +14,7 @@
 #include <memory>
 #include <future>
 #include <queue>
-
+#include <filesystem>
 
 #include <thread>
 #include "g3log/g3log.hpp"
@@ -22,7 +22,7 @@
 #include "testing_helpers.h"
 
 using namespace testing_helpers;
-
+namespace fs = std::filesystem;
 
 namespace { // anonymous
    const char* name_path_1 = "./(some_fake_DirectoryOrName_1_)";
@@ -42,6 +42,8 @@ namespace { // anonymous
          auto new_log = future_new_log.get();
          if (!new_log.empty()) {
             g_cleaner_ptr->addLogToClean(new_log);
+            g_cleaner_ptr->addLogToClean(g_filesink_handler->call(&g3::FileSink::symLinkPath).get());
+            
          } else {
             std::cout << "\nFailed to set filename: " << new_file_to_create << std::endl;
          }
@@ -53,7 +55,14 @@ namespace { // anonymous
    std::string setLogName(std::string new_file_to_create, std::string logger_id = "g3log") {
       auto future_new_log = g_filesink_handler->call(&g3::FileSink::changeLogFile, new_file_to_create, logger_id);
       auto new_log = future_new_log.get();
-      if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
+      if (!new_log.empty()) {
+         g_cleaner_ptr->addLogToClean(new_log);
+
+         auto symlink = g_filesink_handler->call(&g3::FileSink::symLinkPath).get();
+         if (fs::exists(symlink)) {
+            g_cleaner_ptr->addLogToClean(symlink);            
+         }
+      }
       return new_log;
    }
 
@@ -105,7 +114,8 @@ TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
 
    LOG(INFO) << "SoManyThreadsAllDoingChangeFileName";
    std::vector<std::thread> threads;
-   auto max = 2;
+   auto max = 4;
+   auto number_of_symlinks = max;
    auto size = g_cleaner_ptr->size();
    for (auto count = 0; count < max; ++count) {
       std::string drive = ((count % 2) == 0) ? "./_threadEven_" : "./_threaOdd_";
@@ -116,7 +126,7 @@ TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
       thread.join();
 
    // check that all logs were created
-   ASSERT_EQ(size + max, g_cleaner_ptr->size());
+   ASSERT_EQ(size + max + number_of_symlinks, g_cleaner_ptr->size());
 }
 
 TEST(TestOf_IllegalLogFileName, Expecting_NoChangeToOriginalFileName) {
@@ -132,6 +142,7 @@ TEST(TestOf_SinkHandleDifferentId, Expecting_DifferentId) {
    auto name = sink->fileName();
    ASSERT_STREQ( name.substr(0, 26).c_str(), "./AnotherLogFile.logger_id");
    g_cleaner_ptr->addLogToClean(name);
+   g_cleaner_ptr->addLogToClean(g_filesink_handler->call(&g3::FileSink::symLinkPath).get());
 }
 
 TEST(TestOf_LegalLogFileNam,  With_parenthesis) {
@@ -141,6 +152,23 @@ TEST(TestOf_LegalLogFileNam,  With_parenthesis) {
    std::string post_legal = getLogName();
    EXPECT_TRUE(std::string::npos != post_legal.find("(test)")) << "filename was: " << post_legal;
 }
+
+TEST(TestOf_SymLinkCreation, SymLinkCreated) {
+   std::string original = getLogName();
+   auto perhaps_a_name = setLogName("SymLinkCreated"); // does not exist
+   EXPECT_NE(original, perhaps_a_name);
+   std::string post_legal = getLogName();
+   EXPECT_TRUE(std::string::npos != post_legal.find("SymLinkCreated")) << "filename was: " << post_legal;
+   namespace fs = std::filesystem;
+   EXPECT_TRUE(fs::exists(post_legal));
+   EXPECT_FALSE(fs::is_symlink(post_legal)); 
+   auto symlink = g_filesink_handler->call(&g3::FileSink::symLinkPath).get();
+   EXPECT_TRUE(fs::is_symlink(symlink)) << symlink;
+   g_cleaner_ptr->addLogToClean(g_filesink_handler->call(&g3::FileSink::symLinkPath).get());
+   g_cleaner_ptr->addLogToClean(original);
+}
+
+
 
 
 int main(int argc, char* argv[]) {
@@ -161,6 +189,7 @@ int main(int argc, char* argv[]) {
       last_log_file = g_filesink_handler->call(&g3::FileSink::fileName).get();
       std::cout << "log file at: " << last_log_file << std::endl;
       cleaner.addLogToClean(last_log_file);
+      g_cleaner_ptr->addLogToClean(g_filesink_handler->call(&g3::FileSink::symLinkPath).get());
 
 
       g3::initializeLogging(g_logger_ptr);
@@ -176,5 +205,6 @@ int main(int argc, char* argv[]) {
    std::cout << "FINISHED WITH THE TESTING" << std::endl;
    // cleaning up
    cleaner.addLogToClean(last_log_file);
+
    return return_value;
 }

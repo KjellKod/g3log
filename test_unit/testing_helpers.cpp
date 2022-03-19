@@ -17,9 +17,11 @@
 #include <gtest/gtest.h>
 #include <iostream>
 #include <fstream>
+#include <filesystem>
 
 using namespace std;
 using namespace g3;
+namespace fs = std::filesystem;
 
 namespace testing_helpers {
 
@@ -54,7 +56,13 @@ namespace testing_helpers {
    }
 
    bool removeFile(std::string path_to_file) {
-      return (0 == std::remove(path_to_file.c_str()));
+      const std::error_condition ok;
+      std::error_code ec; 
+      auto check = fs::remove(fs::path(path_to_file), ec);
+      if (ok != ec) {
+         std::cerr << "error " << ec.message() << std::endl;
+      }
+      return check;;
    }
 
    bool verifyContent(const std::string &total_text, std::string msg_to_find) {
@@ -98,7 +106,9 @@ namespace testing_helpers {
       std::lock_guard<std::mutex> lock(g_mutex);
       {
          if (std::find(logs_to_clean_.begin(), logs_to_clean_.end(), path_to_log.c_str()) == logs_to_clean_.end())
-            logs_to_clean_.push_back(path_to_log);
+            if (fs::exists(path_to_log)) {                 
+               logs_to_clean_.push_back(path_to_log);
+            }
       }
    }
 

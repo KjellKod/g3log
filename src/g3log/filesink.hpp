@@ -9,8 +9,8 @@
 
 #include <string>
 #include <memory>
-
 #include "g3log/logmessage.hpp"
+
 namespace g3 {
 
    class FileSink {
@@ -18,12 +18,14 @@ namespace g3 {
       FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string &logger_id="g3log");
       virtual ~FileSink();
 
+      void createSymLink(const std::string& file_with_path);
+
       void fileWrite(LogMessageMover message);
       std::string changeLogFile(const std::string &directory, const std::string &logger_id);
       std::string fileName();
       void overrideLogDetails(LogMessage::LogDetailsFunc func);
       void overrideLogHeader(const std::string& change);
-
+      std::string symLinkPath();
 
    private:
       LogMessage::LogDetailsFunc _log_details_func;
@@ -33,6 +35,7 @@ namespace g3 {
       std::unique_ptr<std::ofstream> _outptr;
       std::string _header;
       bool _firstEntry;
+      std::string _sym_link_file_name;
 
       void addLogFileHeader();
       std::ofstream &filestream() {

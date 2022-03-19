@@ -8,8 +8,34 @@
 
 #include "g3log/filesink.hpp"
 #include "filesinkhelper.ipp"
+
 #include <cassert>
 #include <chrono>
+
+
+// from https://github.com/KjellKod/g3log/pull/366/files
+#if defined(_WIN32)
+#   if _MSC_VER >= 1914
+#      include <filesystem>
+namespace fs = std::filesystem;
+
+#   else
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+#   endif
+
+#elif defined(__GNUC__)
+#include <filesystem>
+namespace fs = std::filesystem;
+
+#elif defined(__clang__) 
+#include <filesystem>
+namespace fs = std::filesystem;
+#endif
+
+
+
+
 
 namespace g3 {
    using namespace internal;
@@ -21,6 +47,7 @@ namespace g3 {
       , _outptr(new std::ofstream)
       , _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message\n\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n")
       , _firstEntry(true)
+      , _sym_link_file_name("")
    {
       _log_prefix_backup = prefixSanityFix(log_prefix);
       if (!isValidFilename(_log_prefix_backup)) {
@@ -30,6 +57,10 @@ namespace g3 {
 
       std::string file_name = createLogFileName(_log_prefix_backup, logger_id);
       _log_file_with_path = pathSanityFix(_log_file_with_path, file_name);
+
+   
+      createSymLink(_log_file_with_path);
+  
       _outptr = createLogFile(_log_file_with_path);
 
       if (!_outptr) {
@@ -62,6 +93,21 @@ namespace g3 {
       out << message.get().toString(_log_details_func) << std::flush;
    }
 
+   void FileSink::createSymLink(const std::string& file_with_path) {
+
+      auto sympath =  fs::path(file_with_path.substr(0, file_with_path.size() - 20) + ".log");
+      if (fs::exists(sympath)){
+         fs::remove(sympath);
+      }
+      const std::error_condition ok;
+      std::error_code ec;
+      fs::create_symlink(fs::path(file_with_path), sympath, ec);
+      _sym_link_file_name = sympath.string();
+      if (ok != ec) {
+         std::cerr << "error creating symlink: " << file_with_path << " " << ec.message() << std::endl;
+      }
+   }
+
    std::string FileSink::changeLogFile(const std::string &directory, const std::string &logger_id) {
 
       auto now = std::chrono::system_clock::now();
@@ -88,9 +134,14 @@ namespace g3 {
       ss_change << "\n\tNew log file. The previous log file was at: ";
       ss_change << old_log << "\n";
       filestream() << now_formatted << ss_change.str();
+      createSymLink(_log_file_with_path);
       return _log_file_with_path;
    }
 
+   std::string FileSink::symLinkPath () {
+      return _sym_link_file_name;
+   }
+   
    std::string FileSink::fileName() {
       return _log_file_with_path;
    }
