@@ -4,14 +4,21 @@
 `ADD CONTENT HERE TO DESCRIBE THE PURPOSE OF THE PULL REQUEST`
 
 **Testing Advice**
+
+_step 1_
+
 ```bash 
 mkdir build; cd build; cmake -DADD_G3LOG_UNIT_TEST=ON ..
+
+// linux/osx alternative, simply run: ./scripts/buildAndRunTests.sh
 ```
-**Run Test Alternatives:** 
+
+_step 2: use one of these alternatives to run tests:_
+
 - Cross-Platform: `ctest`
 - or `ctest -V` for verbose output
 - Linux: `make test`
-- Linux/OSX: `./scripts/buildAndRunTests.sh`
+
 
 ***CHECKLIST TO COMPLETE***
 - [ ] **TDD**: New/modified code must be backed down with unit test - preferably _Test Driven Development_ style development)
