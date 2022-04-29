@@ -27,7 +27,7 @@ Most of the API that you need for using g3log is described in this readme. For m
 
 
 ## Logging API: LOG calls
-It is optional to use either streaming ```LOG(INFO) << "some text" ``` or printf-like syntax ```LOGF(WARNING, "some number %d", 123); ```
+LOG calls can follow streaming ```LOG(INFO) << "some text" ``` or printf-like syntax ```LOGF(WARNING, "some number %d", 123); ```
 
 Conditional logging is made with ```LOG_IF(INFO, <boolean-expression>) << " some text"  ``` or ```LOGF_IF(WARNING, <boolean-expression>) << " some text".```  Only if the expressions evaluates to ```true``` will the logging take place. 
 
