@@ -5,7 +5,7 @@ One more, finally. Or not? :)
 Now:
 
 ```
-$ some 
+$ some stuff
 ```
 
 Look what she said:
