@@ -2,7 +2,8 @@ name: ci/action verbose ctest script
 
 on:
   push:
-    - docs/**
+    paths:
+      - docs/**
     branches: [ master ]
   pull_request:
     branches: [ master ]
