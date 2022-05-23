@@ -2,6 +2,8 @@ name: ci/action ctest
 
 on:
   push:
+    paths:
+      - docs/**
     branches: [ master ]
   pull_request:
     branches: [ master ]
