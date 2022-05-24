@@ -1,4 +1,4 @@
-## Sample
+## Sample.
 
 One more, finally. Or not? :)
 
