@@ -6,6 +6,8 @@ on:
       - docs/**
     branches: [ master ]
   pull_request:
+    paths-ignore:
+      - docs/**
     branches: [ master ]
       
 env:
