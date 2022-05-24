@@ -2,7 +2,7 @@ name: ci/action ctest
 
 on:
   push:
-    paths-ignore::
+    paths-ignore:
       - docs/**
     branches: [ master ]
   pull_request:
