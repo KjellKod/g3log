@@ -1,4 +1,4 @@
-name: Publish docs via GitHub Pages
+name: Publish docs via GitHub Pages to https://kjellkod.github.io/g3log/
 on:
   push:
     branches:
