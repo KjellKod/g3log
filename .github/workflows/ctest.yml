@@ -4,10 +4,14 @@ on:
   push:
     paths-ignore:
       - docs/**
+      - '**.md'
+      - '**.markdown'
     branches: [ master ]
   pull_request:
     paths-ignore:
       - docs/**
+      - '**.md'
+      - '**.markdown'
     branches: [ master ]
       
 env:
