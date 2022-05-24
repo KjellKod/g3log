@@ -5,6 +5,7 @@ docs_dir: docs/
 repo_name: 'KjellKod/g3log'
 repo_url: 'https://github.com/KjellKod/g3log'
 nav:
-    - Home: index.md
+    - Home: docs/index.md
+    - API Guide: docs/API.md
 theme:
   name: 'material'
