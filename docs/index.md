@@ -1,4 +1,4 @@
-## Sample
+## A test file
 
 One more, finally. Or not? :)
 
