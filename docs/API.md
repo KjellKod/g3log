@@ -1,5 +1,6 @@
 # API description
-Most of the API that you need for using g3log is described in this readme. For more API documentation and examples please continue to read the [API readme](API.markdown). Examples of what you will find here are: 
+Please read this document to understand how to use the g3log API to integrate it with your code. 
+Examples of what you will find here are: 
 
 * Logging API: LOG calls
 * Contract API: CHECK calls
