@@ -5,15 +5,15 @@
 
 # Testing
 
-- [] This new/modified code was covered by unit tests. 
+- [ ] This new/modified code was covered by unit tests. 
 
-- [] (insight) Was all tests written using TDD (Test Driven Development) style?
+- [ ] (insight) Was all tests written using TDD (Test Driven Development) style?
 
-- [] The CI (Windows, Linux, OSX) are working without issues. 
+- [ ] The CI (Windows, Linux, OSX) are working without issues. 
 
-- [] Was new functionality documented? 
+- [ ] Was new functionality documented? 
 
-- [] The testing steps  1 - 2 below were followed
+- [ ] The testing steps  1 - 2 below were followed
 
 _step 1_
 

@@ -11,7 +11,7 @@ G3log is an asynchronous logger with three main features:
 
 The super quick introduction to g3log can be seen in the steps 1 - 9 below. 
 
-For more in-depth information please see the full usage description in [g3log.md](g3log.md). The internal API for more advanced integration with g3log can be accessed in [API.md](API.md)
+For more in-depth information please see the full usage description in [g3log.md](g3log.md). The internal API for more advanced integration with g3log can be accessed in [API.md](docs/API.md)
 
 
 ## 1. Easy usage in files
@@ -58,15 +58,15 @@ When a fatal event happens the not-yet written log activity will be flushed to t
 If `object` symbols are available the fatal handler will attempt to push the stacktrace up to the fatal reason to the logging sink. 
 
 #### 5b. Overriding and customization of fatal event handling
-For overriding fatal error handling to use your own, or to add code `hooks` that you want to execute please see the [API.md](API.md) doc. 
+For overriding fatal error handling to use your own, or to add code `hooks` that you want to execute please see the [API.md](docs/API.md) doc. 
 
 ## 6. Default and Custom logging levels
-The default logging levels are `DEBUG`, `INFO`, `WARNING` and `FATAL`. You can define your own logging levels or completely replace the logging levels. Ref: [API.md](API.md)
+The default logging levels are `DEBUG`, `INFO`, `WARNING` and `FATAL`. You can define your own logging levels or completely replace the logging levels. Ref: [API.md](docs/API.md)
 
 
 ### 7. Log filtering
 Log filtering is handled in g3log if dynamic logging levels are enabled
-in the configuration. See the [API.md](API.md) for information. Log filtering can also be handled through the sink as can be seen in [github/Kjellod/g3sinks](https://github.com/KjellKod/g3sinks)
+in the configuration. See the [API.md](docs/API.md) for information. Log filtering can also be handled through the sink as can be seen in [github/Kjellod/g3sinks](https://github.com/KjellKod/g3sinks)
 
 
 ## 8. 3rd party and custom logging sinks
@@ -77,7 +77,7 @@ The default logging sink has no external 3rd party dependencies. For more loggin
 - log to colored terminal output
 - log rotate with filter
 
-See the [API.md](API.md) for more information about the simple steps to creating your own logging sink.
+See the [API.md](docs/API.md) for more information about the simple steps to creating your own logging sink.
 
 
 ## 9. Log instantiation 
