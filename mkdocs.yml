@@ -1,8 +1,6 @@
 site_name: G3log, an asynchronous "crash-safe" logger
 site_author: 'Kjell Hedström'
 docs_dir: docs/
-repo_name: 'KjellKod/g3log'
-repo_url: 'https://github.com/KjellKod/g3log'
 theme: 
   name: material
 nav: 
