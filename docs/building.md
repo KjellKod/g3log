@@ -1,3 +1,5 @@
+[introduction](index.md) | [detailed information](g3log.md) | [**Configure & Build**](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+
 # <a name="building-g3log">Configure, build, package, install and test g3log</a>
 
 ## Example Project with g3log

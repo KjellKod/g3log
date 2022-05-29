@@ -1,3 +1,6 @@
+[introduction](index.md) | [detailed information](g3log.md) | [Configure & Build](building.md) | [API description](API.md) | [**Custom log formatting**](API_custom_formatting.md)
+
+
 # Custom LOG <a name="log_formatting">formatting</a>
 ### Overriding the Default File Sink's file header
 The default file header can be customized in the default file sink in calling 
