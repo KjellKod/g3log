@@ -1,7 +1,6 @@
 # Welcome to g3log
 
-G3log is an asynchronous logger with three main features.
-
+G3log is an asynchronous logger with three main features: 
 1. Intuitive `LOG(...)` API
 2. `Design-by-contract` `CHECK(...)` functionality
 3. Fatal crash handling for graceful shutdown of the logged process without loosing any log details up to the point of the crash.
