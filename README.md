@@ -1,3 +1,6 @@
+[**introduction**](docs/index.md) | [detailed information](docs/g3log.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)
+
+
 # Welcome to g3log
 ### Use [kjellkod.github.io/g3log/](https://kjellkod.github.io/g3log/) for best reading / searching / navigating of g3log's documentation. 
 

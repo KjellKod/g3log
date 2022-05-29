@@ -1,3 +1,5 @@
+[introduction](index.md) | [detailed information](g3log.md) | [Configure & Build](building.md) | [**API description**](API.md) | [Custom log formatting](API_custom_formatting.md)
+
 # API description
 Most of the API that you need for using g3log is described in this readme. For more API documentation and examples please continue to read the [API readme](API.md). Examples of what you will find here are: 
 

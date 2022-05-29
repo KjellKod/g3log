@@ -1,3 +1,6 @@
+[introduction](index.md) | [**detailed information**](g3log.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+
+
 # How to use g3log
 G3log is an asynchronous logger with dynamic sinks
 
