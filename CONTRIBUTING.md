@@ -10,4 +10,4 @@ this will improve things for the community going forward.
 
 
 # Community Driven: 
-g3log is community driven. Be respectful. Nobody is getting paid and being polite and helpful will get you further than having an attitude. 
+G3log is community driven. Be respectful. G3log is developed and maintained without financial support, being helpful and polite will move your request and input along faster. 
