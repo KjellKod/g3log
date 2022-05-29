@@ -3,6 +3,11 @@ on:
   push:
     branches:
       - master 
+      - main
+    paths: 
+      - "**.md"
+      - "mkdocs.yml"
+
       
 jobs:
   deploy:
