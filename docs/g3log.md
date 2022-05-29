@@ -1,4 +1,4 @@
-# How to use G3log
+# How to use g3log
 G3log is an asynchronous logger with dynamic sinks
 
 
@@ -10,7 +10,7 @@ LOG(INFO) << "streaming API is as easy as ABC or " << 123;
 LOGF(WARNING, "Printf-style syntax is also %s", "available");
 ```
 
-## <a name="what-g3log-is">What G3Log is</a>
+## <a name="what-g3log-is">What g3Log is</a>
 
 * ***G3log*** is the acting name for the third version of g2log and it stands for **g3log with dynamic sinks**
 * G3log is an asynchronous, "crash-safe" logger. You can read more about it here [[g2log version]](
@@ -44,7 +44,7 @@ CHECK(less > more) << "CHECK(false) triggers a FATAL message";
 Please look at [API.md](API.md) for detailed API documentation
 
 
-## <a name="benefits-with-g3log">Benefits you get when using G3log</a>
+## <a name="benefits-with-g3log">Benefits you get when using g3log</a>
 1. Easy to use, clean syntax and a blazing fast logger.
 
 2. All the slow log I/O disk access is done in a background thread. This ensures that the LOG caller can immediately continue with other tasks and do not have to wait for the LOG call to finish.
@@ -68,11 +68,11 @@ The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal 
 
 
 ## <a name="g3log-with-sinks">G3log with sinks</a>
-[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as G3log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either receive a LOG message as a  *std::string* **or** as a *g3::LogMessageMover*.
+[Sinks](http://en.wikipedia.org/wiki/Sink_(computing)) are receivers of LOG calls. G3log comes with a default sink (*the same as g3log uses*) that can be used to save log to file.  A sink can be of *any* class type without restrictions as long as it can either receive a LOG message as a  *std::string* **or** as a *g3::LogMessageMover*.
 
 The *std::string* comes pre-formatted. The *g3::LogMessageMover* is a wrapped struct that contains the raw data for custom handling in your own sink.
 
-A sink is *owned* by the G3log and is added to the logger inside a ```std::unique_ptr```.  The sink can be called though its public API through a *handler* which will asynchronously forward the call to the receiving sink.
+A sink is *owned* by the g3log and is added to the logger inside a ```std::unique_ptr```.  The sink can be called though its public API through a *handler* which will asynchronously forward the call to the receiving sink.
 
 It is <a name="crazy-simple">crazy simple to create a custom sink</a>. This example show what is needed to make a custom sink that is using custom log formatting but only using that
 for adding color to the default log formatting. The sink forwards the colored log to cout

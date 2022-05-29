@@ -1,9 +1,19 @@
 
-***PULL REQUEST DESCRIPTION***
+# PULL REQUEST DESCRIPTION
 
 `ADD CONTENT HERE TO DESCRIBE THE PURPOSE OF THE PULL REQUEST`
 
-**Testing Advice**
+# Testing
+
+- [] This new/modified code was covered by unit tests. 
+
+- [] (insight) Was all tests written using TDD (Test Driven Development) style?
+
+- [] The CI (Windows, Linux, OSX) are working without issues. 
+
+- [] Was new functionality documented? 
+
+- [] The testing steps  1 - 2 below were followed
 
 _step 1_
 
@@ -18,13 +28,3 @@ _step 2: use one of these alternatives to run tests:_
 - Cross-Platform: `ctest`
 - or `ctest -V` for verbose output
 - Linux: `make test`
-
-
-***CHECKLIST TO COMPLETE***
-- [ ] **TDD**: New/modified code must be backed down with unit test - preferably _Test Driven Development_ style development)
-- [ ] **Documentation**:  All new/modified functionality should be backed up with API documentation (API.markdown or README.markdown)
-
-
-**Cross-Platform Testing**
-- [ ] CI GitActions:  (Linux, OSX) + AppVeyor-CI (Windows)\
-- [ ] Local/VM testing, at least one of the following: Windows, Linux, OSX
