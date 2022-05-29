@@ -1,11 +1,16 @@
-site_name: Test docs
-site_description: 'A docs test'
+site_name: G3log, an asynchronous "crash-safe" logger
 site_author: 'Kjell Hedström'
 docs_dir: docs/
 repo_name: 'KjellKod/g3log'
 repo_url: 'https://github.com/KjellKod/g3log'
-nav:
-    - Home: index.md
-    - API Guide: API.md
-theme:
-  name: 'material'
+theme: 
+  name: material
+nav: 
+  - Introduction to G3log: index.md
+  - G3log usage: g3log.md 
+  - API description: API.md
+  - API for custom log formatting: API_custom_formatting.md
+  - Configure, Build, Package, Install and Test: building.md
+  - License and contribution: contributing.md
+
+
