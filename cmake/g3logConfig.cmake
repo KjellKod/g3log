@@ -47,7 +47,7 @@ if (NOT TARGET g3log)
    endif ()
 endif ()
 
-find_package_handle_standard_args(G3LOG REQUIRED_VARS G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
+find_package_handle_standard_args(g3log REQUIRED_VARS G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
 mark_as_advanced(G3LOG_INCLUDE_DIR G3LOG_LIBRARY)
 set(G3LOG_INCLUDE_DIRS ${G3LOG_INCLUDE_DIR})
 set(G3LOG_LIBRARIES ${G3LOG_LIBRARY})
