@@ -101,7 +101,7 @@ The worst case latency is kept stable with no extreme peaks, in spite of any sud
 You can find it here: https://kjellkod.wordpress.com/2015/06/30/the-worlds-fastest-logger-vs-g3log/
 
 
-## <a name="continuos_integration">Continuos Integration</a>
+## <a name="continuous_integration">Continuous Integration</a>
 The g3log repository is evaluating both github actions and CircleCI for executing test coverage, installation and document generation. For windows the repo is still relying on appveyor.  In case you want to look into change any of these setups the following files are the ones of interest. 
 ```
 1. appveyor --> g3log/appveyor.yml
