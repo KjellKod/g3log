@@ -48,7 +48,7 @@ namespace kjellkod {
 
    public:
       virtual ~Active() {
-         send([this] { done_ = true;});
+         send([this]() noexcept { done_ = true;});
          thd_.join();
       }
 
