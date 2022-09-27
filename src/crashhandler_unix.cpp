@@ -230,7 +230,7 @@ namespace g3 {
          std::cerr << "\n\n" << __FUNCTION__ << ":" << __LINE__ << ". Exiting due to " << level.text << ", " << signal_number << "   \n\n" << std::flush;
 
 
-         kill(getpid(), signal_number);
+         raise(signal_number);
 
          // When running as PID1 the above kill doesn't have any effect (execution simply passes through it, contrary
          // to a non-PID1 process where execution stops at kill and switches over to signal handling). Also as PID1 
