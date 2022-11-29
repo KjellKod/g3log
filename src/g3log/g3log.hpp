@@ -34,8 +34,8 @@
 #define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
 #elif defined(_MSC_VER) // Microsoft
 #define G3LOG_PRETTY_FUNCTION __FUNCSIG__
-#else                   // Fallback to c99 / c++11
-#define G3LOG_PRETTY_FUNCTION __func__
+#else                   // __func__ is fallback to c99 / c++11, where that doesn't matter so __FUNCTION__ is the choice
+#define G3LOG_PRETTY_FUNCTION __FUNCTION__
 #endif
 
 // thread_local doesn't exist before VS2013
