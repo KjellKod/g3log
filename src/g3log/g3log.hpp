@@ -29,12 +29,11 @@
 #include <string>
 #include <functional>
 
-
-#if defined(__GNUC__)   // GCC extension compatible
-#define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#elif defined(_MSC_VER) // Microsoft
+#if defined(_MSC_VER) && (defined(WINDOWS_FUNCSIG)) // Microsoft
 #define G3LOG_PRETTY_FUNCTION __FUNCSIG__
-#else                   // __func__ is fallback to c99 / c++11, where that doesn't matter so __FUNCTION__ is the choice
+#elif defined(__GNUC__) && defined(PRETTY_FUNCTION) // GCC compatible
+#define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#else 
 #define G3LOG_PRETTY_FUNCTION __FUNCTION__
 #endif
 

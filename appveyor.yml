@@ -24,7 +24,7 @@ before_build:
   - cd build
 
 build_script:
-  - cmake -G "Visual Studio 15 2017 Win64" -DADD_G3LOG_UNIT_TEST=ON -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON -DCMAKE_INSTALL_PREFIX=c:\g3log ..
+  - cmake -G "Visual Studio 15 2017 Win64" -DADD_G3LOG_UNIT_TEST=ON -DWINDOWS_FUNCSIG=ON -DUSE_DYNAMIC_LOGGING_LEVELS=ON -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON -DCMAKE_INSTALL_PREFIX=c:\g3log ..
   - cmake --build . --config Release --target install
 
 # scripts to run after build

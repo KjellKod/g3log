@@ -14,6 +14,8 @@
 # to the auto generated file src/g3log/generated_definitions.hpp
 #   add_definitions(-DG3_DYNAMIC_LOGGING)
 #   add_definitions(-DCHANGE_G3LOG_DEBUG_TO_DBUG)
+#   add_definitions(-DWINDOWS_FUNCSIG)
+#   add_definitions(-DPRETTY_FUNCTION)
 #   add_definitions(-DDISABLE_FATAL_SIGNALHANDLING)
 #   add_definitions(-DDISABLE_VECTORED_EXCEPTIONHANDLING)
 #   add_definitions(-DDEBUG_BREAK_AT_FATAL_SIGNAL)
@@ -59,6 +61,31 @@ ELSE()
    LIST(APPEND G3_DEFINITIONS "G3LOG_DEBUG DEBUG")
    message( STATUS "-DCHANGE_G3LOG_DEBUG_TO_DBUG=OFF \t(Debuggin logging level is 'DEBUG')" ) 
 ENDIF(CHANGE_G3LOG_DEBUG_TO_DBUG)
+
+
+# -DWINDOWS_USE_FUNCSIG=ON   : (Default OFF) Override the use of __FUNCTION__ for Windows platform and instead use __FUNCSIG__
+option (WINDOWS_FUNCSIG
+       "Windows __FUNCSIG__ to expand `Function` location of the LOG call instead of the default __FUNCTION__" OFF)
+IF(WINDOWS_FUNCSIG)
+   LIST(APPEND G3_DEFINITIONS WINDOWS_FUNCSIG)
+   message( STATUS "-DWINDOWS_FUNCSIG=ON\t\t__SIGFUNC__ is used instead of the default __FUNCTION__ for LOG call locations" )
+ELSE() 
+   message( STATUS "-DWINDOWS_FUNCSIG=OFF") 
+ENDIF(WINDOWS_FUNCSIG)
+
+
+# -DPRETTY_FUNCTION=ON   : (Default OFF) Override the use of __FUNCTION__ for Windows platform and instead use __FUNCSIG__
+# NOTE: heavy templated integrations such as boost log calls that shows the function name can cause function name expansion
+# to "spam" the LOG output with the now visible template arguments. 
+option (PRETTY_FUNCTION
+       "Windows __PRETTY_FUNCTION__ to expand `Function` location of the LOG call instead of the default __FUNCTION__" OFF)
+IF(PRETTY_FUNCTION)
+   LIST(APPEND G3_DEFINITIONS PRETTY_FUNCTION)
+   message( STATUS "-DPRETTY_FUNCTION=ON\t\t__PRETTY_FUNCTION__ is used instead of the default __FUNCTION__ for LOG call locations" )
+ELSE() 
+   message( STATUS "-DPRETTY_FUNCTION=OFF") 
+ENDIF(PRETTY_FUNCTION)
+
 
 
 # -DG3_DYNAMIC_MAX_MESSAGE_SIZE   : use dynamic memory for final_message in logcapture.cpp
