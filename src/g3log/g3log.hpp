@@ -30,15 +30,15 @@
 #include <functional>
 
 
-#if defined(__GNUC__)   // GCC extension compatible
-#define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#pragma message("Function printing using: __PRETTY__FUNCTION")
-#elif defined(_MSC_VER) // Microsoft
+#if defined(_MSC_VER) && (defined(WINDOWS_FUNCSIG)) // Microsoft
 #define G3LOG_PRETTY_FUNCTION __FUNCSIG__
-#pragma message("Function printing using: __FUNCSIG__")
-#else                   // Fallback to c99 / c++11
-#define G3LOG_PRETTY_FUNCTION __func__
-#pragma message("Function printing using: __func__")
+#pragma message("G3LOG_PRETTY_FUNCTION is set to __FUNCSIG__")
+#elif defined(__GNUC__) // GCC compatible
+#define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
+#pragma message("G3LOG_PRETTY_FUNCTION is set to __PRETTY_FUNCTION__")
+#else // unknown land, let's use basic __FUNCITON__
+#define G3LOG_PRETTY_FUNCTION __FUNCTION__
+#pragma message("G3LOG_PRETTY_FUNCTION is set to __FUNCTION__")
 #endif
 
 // thread_local doesn't exist before VS2013
