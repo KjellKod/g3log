@@ -6,7 +6,7 @@ set -x
 
 mkdir -p  build_travis
 cd build_travis
-cmake -DADD_G3LOG_BENCH_PERFORMANCE=ON -DADD_G3LOG_UNIT_TEST=ON -DCMAKE_INSTALL_PREFIX=./install -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/g3log ..
+cmake -DADD_G3LOG_BENCH_PERFORMANCE=ON -DPRETTY_FUNCTION=ON -DADD_G3LOG_UNIT_TEST=ON -DCMAKE_INSTALL_PREFIX=./install -DCPACK_PACKAGING_INSTALL_PREFIX=/opt/g3log ..
 cmake --build . --target install
 
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then

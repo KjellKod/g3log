@@ -33,7 +33,7 @@
 #define G3LOG_PRETTY_FUNCTION __FUNCSIG__
 #elif defined(__GNUC__) && defined(PRETTY_FUNCTION) // GCC compatible
 #define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#else // unknown land, let's use basic __FUNCITON__
+#else 
 #define G3LOG_PRETTY_FUNCTION __FUNCTION__
 #endif
 
