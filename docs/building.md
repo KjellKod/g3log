@@ -54,6 +54,14 @@ CHANGE_G3LOG_DEBUG_TO_DBUG:BOOL=OFF
 // the function name into massive size
 WINDOWS_FUNCSIG:BOOL=OFF
 
+
+// gcc/clang only: Use __PRETTY_FUNCTION__ instead of the default __FUNCTION__ 
+// to show LOG function location
+// WARNING: using this in heavily templated code, like boost can expand
+// the function name into massive size
+PRETTY_FUNCTION:BOOL=OFF
+
+
 // Specifies the build type on single-configuration generators.
 // Possible values are empty, Debug, Release, RelWithDebInfo, MinSizeRel, …
 CMAKE_BUILD_TYPE:STRING=

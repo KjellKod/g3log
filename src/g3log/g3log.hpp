@@ -31,13 +31,10 @@
 
 #if defined(_MSC_VER) && (defined(WINDOWS_FUNCSIG)) // Microsoft
 #define G3LOG_PRETTY_FUNCTION __FUNCSIG__
-#pragma message("G3LOG_PRETTY_FUNCTION is set to __FUNCSIG__")
-#elif defined(__GNUC__) // GCC compatible
+#elif defined(__GNUC__) && defined(PRETTY_FUNCTION) // GCC compatible
 #define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#pragma message("G3LOG_PRETTY_FUNCTION is set to __PRETTY_FUNCTION__")
 #else // unknown land, let's use basic __FUNCITON__
 #define G3LOG_PRETTY_FUNCTION __FUNCTION__
-#pragma message("G3LOG_PRETTY_FUNCTION is set to __FUNCTION__")
 #endif
 
 // thread_local doesn't exist before VS2013
