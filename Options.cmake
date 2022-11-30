@@ -70,7 +70,7 @@ IF(WINDOWS_FUNCSIG)
    LIST(APPEND G3_DEFINITIONS WINDOWS_FUNCSIG)
    message( STATUS "-DWINDOWS_FUNCSIG=ON\t\t__SIGFUNC__ is used instead of the default __FUNCTION__ for LOG call locations" )
 ELSE() 
-   message( STATUS "-DWINDOWS_FUNCSIG=OFF\t\t") 
+   message( STATUS "-DWINDOWS_FUNCSIG=OFF") 
 ENDIF(WINDOWS_FUNCSIG)
 
 
@@ -83,7 +83,7 @@ IF(PRETTY_FUNCTION)
    LIST(APPEND G3_DEFINITIONS PRETTY_FUNCTION)
    message( STATUS "-DPRETTY_FUNCTION=ON\t\t__PRETTY_FUNCTION__ is used instead of the default __FUNCTION__ for LOG call locations" )
 ELSE() 
-   message( STATUS "-DPRETTY_FUNCTION=OFF\t\t") 
+   message( STATUS "-DPRETTY_FUNCTION=OFF") 
 ENDIF(PRETTY_FUNCTION)
 
 
