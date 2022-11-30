@@ -47,6 +47,13 @@ ADD_G3LOG_UNIT_TEST:BOOL=OFF
 // By default DEBUG is the debugging level
 CHANGE_G3LOG_DEBUG_TO_DBUG:BOOL=OFF
 
+
+// Windows only: Use __FUNCSIG__ instead of the default __FUNCTION__ 
+// to show LOG function location
+// WARNING: using this in heavily templated code, like boost can expand
+// the function name into massive size
+WINDOWS_FUNCSIG:BOOL=OFF
+
 // Specifies the build type on single-configuration generators.
 // Possible values are empty, Debug, Release, RelWithDebInfo, MinSizeRel, …
 CMAKE_BUILD_TYPE:STRING=
