@@ -15,7 +15,7 @@ namespace g3 {
 
    class FileSink {
    public:
-      FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string &logger_id="g3log");
+      FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string &logger_id="g3log", size_t write_to_log_every_x_message = 100);
       virtual ~FileSink();
 
       void fileWrite(LogMessageMover message);
@@ -27,12 +27,14 @@ namespace g3 {
 
    private:
       LogMessage::LogDetailsFunc _log_details_func;
-
       std::string _log_file_with_path;
       std::string _log_prefix_backup; // needed in case of future log file changes of directory
       std::unique_ptr<std::ofstream> _outptr;
       std::string _header;
       bool _firstEntry;
+      std::string _write_buffer;
+      size_t _write_counter;
+      size_t _write_to_log_every_x_message;
 
       void addLogFileHeader();
       std::ofstream &filestream() {

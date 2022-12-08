@@ -14,13 +14,15 @@
 namespace g3 {
    using namespace internal;
 
-   FileSink::FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string& logger_id)
+   FileSink::FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string& logger_id, size_t write_to_log_every_x_message)
       : _log_details_func(&LogMessage::DefaultLogDetailsToString)
       ,_log_file_with_path(log_directory)
       , _log_prefix_backup(log_prefix)
       , _outptr(new std::ofstream)
       , _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message\n\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n")
       , _firstEntry(true)
+      , _write_counter(0)
+      , _write_to_log_every_x_message(write_to_log_every_x_message)
    {
       _log_prefix_backup = prefixSanityFix(log_prefix);
       if (!isValidFilename(_log_prefix_backup)) {
@@ -42,10 +44,12 @@ namespace g3 {
 
 
    FileSink::~FileSink() {
-      std::string exit_msg {"g3log g3FileSink shutdown at: "};
+      std::string exit_msg = {"g3log g3FileSink shutdown at: "};
       auto now = std::chrono::system_clock::now();
       exit_msg.append(localtime_formatted(now, internal::time_formatted)).append("\n");
-      filestream() << exit_msg << std::flush;
+
+      // write anything buffered up and then end with the exit msg
+      filestream() << _write_buffer << exit_msg << std::flush;
 
       exit_msg.append("Log file at: [").append(_log_file_with_path).append("]\n");
       std::cerr << exit_msg << std::flush;
@@ -59,7 +63,13 @@ namespace g3 {
       }
 
       std::ofstream &out(filestream());
-      out << message.get().toString(_log_details_func) << std::flush;
+      auto data =  message.get().toString(_log_details_func);
+
+      _write_buffer.append(data);
+      if (++_write_counter % _write_to_log_every_x_message == 0) {
+         out << message.get().toString(_log_details_func) << std::flush;
+         _write_buffer.clear();
+      }
    }
 
    std::string FileSink::changeLogFile(const std::string &directory, const std::string &logger_id) {
