@@ -199,7 +199,7 @@ namespace g3 {
             }
          } // END: for(size_t idx = 1; idx < size && messages != nullptr; ++idx)
          free(messages);
-         return oss.str()
+         return oss.str();
       }
 
 
