@@ -145,54 +145,61 @@ namespace g3 {
          if (nullptr != rawdump && !std::string(rawdump).empty()) {
             return {rawdump};
          }
-
          const size_t max_dump_size = 50;
          void* dump[max_dump_size];
-         size_t size = backtrace(dump, max_dump_size);
+         const size_t size = backtrace(dump, max_dump_size);
          char** messages = backtrace_symbols(dump, static_cast<int>(size)); // overwrite sigaction with caller's address
 
          // dump stack: skip first frame, since that is here
          std::ostringstream oss;
          for (size_t idx = 1; idx < size && messages != nullptr; ++idx) {
-            char* mangled_name = 0, *offset_begin = 0, *offset_end = 0;
-            // find parentheses and +address offset surrounding mangled name
-            for (char* p = messages[idx]; *p; ++p) {
-               if (*p == '(') {
-                  mangled_name = p;
-               } else if (*p == '+') {
-                  offset_begin = p;
-               } else if (*p == ')') {
-                  offset_end = p;
-                  break;
-               }
+            std::string strMessage{messages[idx]};
+            std::string mangled_name, offset;
+
+            /// first look for format that includes brackets "(mangled_name+offset)""
+            const auto firstBracket = strMessage.find_last_of('(');
+            const auto secondBracket = strMessage.find_last_of(')');
+            if (firstBracket != strMessage.npos && secondBracket != strMessage.npos)
+            {
+                const auto betweenBrackets = strMessage.substr(firstBracket + 1, secondBracket - firstBracket - 1);
+                const auto plusSign = betweenBrackets.find_first_of('+');
+                if (plusSign != betweenBrackets.npos)
+                {
+                    mangled_name = betweenBrackets.substr(0, plusSign);
+                    offset = betweenBrackets.substr(plusSign + 1, betweenBrackets.npos);
+                }
+            }
+            else
+            {
+                /// we did not found brackets, looking for "_mangled_name + offset"
+                const auto plusSign = strMessage.find_first_of('+');
+                const auto lastUnderscore = strMessage.rfind(" _");
+                if (plusSign != strMessage.npos && lastUnderscore != strMessage.npos)
+                {
+                    mangled_name = strMessage.substr(lastUnderscore + 1, plusSign - lastUnderscore - 2);
+                    offset = strMessage.substr(plusSign + 2, strMessage.npos);
+                }
             }
 
             // if the line could be processed, attempt to demangle the symbol
-            if (mangled_name && offset_begin && offset_end &&
-                  mangled_name < offset_begin) {
-               *mangled_name++ = '\0';
-               *offset_begin++ = '\0';
-               *offset_end++ = '\0';
-
+            if (!mangled_name.empty() && !offset.empty()) {
                int status;
-               char* real_name = abi::__cxa_demangle(mangled_name, 0, 0, &status);
+               char* real_name = abi::__cxa_demangle(mangled_name.c_str(), 0, 0, &status);
                // if demangling is successful, output the demangled function name
                if (status == 0) {
-                  oss << "\n\tstack dump [" << idx << "]  " << messages[idx] << " : " << real_name << "+";
-                  oss << offset_begin << offset_end << std::endl;
+                  oss << "\tstack dump [" << idx << "]  "  << real_name << " + " << offset<< std::endl;
                }// otherwise, output the mangled function name
                else {
-                  oss << "\tstack dump [" << idx << "]  " << messages[idx] << mangled_name << "+";
-                  oss << offset_begin << offset_end << std::endl;
+                  oss << "\tstack dump [" << idx << "]  " << mangled_name << " + " << offset<< std::endl;
                }
                free(real_name); // mallocated by abi::__cxa_demangle(...)
             } else {
                // no demangling done -- just dump the whole line
-               oss << "\tstack dump [" << idx << "]  " << messages[idx] << std::endl;
+               oss << "\tstack dump [" << idx << "]  " << strMessage << std::endl;
             }
          } // END: for(size_t idx = 1; idx < size && messages != nullptr; ++idx)
          free(messages);
-         return oss.str();
+         return oss.str()
       }
 
 
