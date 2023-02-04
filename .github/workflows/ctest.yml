@@ -78,4 +78,9 @@ jobs:
       shell: bash
       # Execute tests defined by the CMake configuration.  
       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
-      run: ctest -C $BUILD_TYPE
+      run: ctest -C $BUILD_TYP
+
+    - name: Fatal Exit Example
+      working-directory: ${{github.workspace}}/build
+      shell: bash
+      run: ./g3log-FATAL-sigsegv
