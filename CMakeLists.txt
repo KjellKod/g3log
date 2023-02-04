@@ -68,7 +68,7 @@ endif()
 
 # Calculate the version number
 SET(MAJOR_VERSION 2)
-SET(MINOR_VERSION 1)
+SET(MINOR_VERSION 2)
 
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
