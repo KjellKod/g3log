@@ -155,12 +155,16 @@ TEST(Basics, Shutdown) {
    std::string file_content;
    {
       RestoreFileLogger logger(log_directory);
+      LOG(INFO) << "First message buffered, then flushed";
+      LOG(INFO) << "Second message still in the buffer";
       LOG(INFO) << "Not yet shutdown. This message should make it";
       logger.reset(); // force flush of logger (which will trigger a shutdown)
       LOG(INFO) << "Logger is shutdown,. this message will not make it (but it's safe to try)";
       file_content = readFileToText(logger.logFile()); // logger is already reset
       SCOPED_TRACE("LOG_INFO"); // Scope exit be prepared for destructor failure
    }
+   EXPECT_TRUE(verifyContent(file_content, "First message buffered, then flushed"));
+   EXPECT_TRUE(verifyContent(file_content, "Second message still in the buffer"));
    EXPECT_TRUE(verifyContent(file_content, "Not yet shutdown. This message should make it"));
    EXPECT_FALSE(verifyContent(file_content, "Logger is shutdown,. this message will not make it (but it's safe to try)"));
 }

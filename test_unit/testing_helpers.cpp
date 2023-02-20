@@ -26,7 +26,8 @@ namespace testing_helpers {
    std::string g_mockFatal_message = {};
    int g_mockFatal_signal = -1;
    bool g_mockFatalWasCalled = false;
-
+   const size_t kFlushToDiskWithThisInterval = 2;
+   
    std::string mockFatalMessage() {
       return g_mockFatal_message;
    }
@@ -110,7 +111,8 @@ namespace testing_helpers {
    }
 
    RestoreFileLogger::RestoreFileLogger(std::string directory)
-   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std::make_unique<g3::FileSink>("UNIT_TEST_LOGGER", directory), &g3::FileSink::fileWrite)) {
+   : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std::make_unique<g3::FileSink>("UNIT_TEST_LOGGER", 
+         directory, "g3log", kFlushToDiskWithThisInterval), &g3::FileSink::fileWrite)) {
       using namespace g3;
       g3::initializeLogging(_scope->_currentWorker.get());
       clearMockFatal();
@@ -133,7 +135,7 @@ namespace testing_helpers {
       reset();
 
       if (!removeFile(_log_file))
-         ADD_FAILURE();
+        ADD_FAILURE();
    }
 
    std::string RestoreFileLogger::logFile() {
