@@ -62,12 +62,11 @@ namespace g3 {
          _firstEntry = false;
       }
 
-      std::ofstream &out(filestream());
       auto data =  message.get().toString(_log_details_func);
 
       _write_buffer.append(data);
       if (++_write_counter % _write_to_log_every_x_message == 0) {
-         out << message.get().toString(_log_details_func) << std::flush;
+         filestream() << _write_buffer << std::flush;
          _write_buffer.clear();
       }
    }
