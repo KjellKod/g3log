@@ -235,8 +235,8 @@ namespace g3 {
       void exitWithDefaultSignalHandler(const LEVELS& level, g3::SignalType fatal_signal_id) {
          const int signal_number = static_cast<int>(fatal_signal_id);
           
-         // Restore all signals to handle by the saved handlers. If handling a signal which causes exiting 
-         // then other signals are handled by the original signal handler.
+         // Restore all saved signal handlers. If handling a signal which causes exiting 
+         // than let the original signal handlers to handle other signals.
          for (const auto& sig : gSignals) {
             restoreSignalHandler(sig.first);
          }
