@@ -62,15 +62,16 @@ namespace {
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
    // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
    void signalHandler(int signal_number, siginfo_t* /*info*/, void* /*unused_context*/) {
-
+      
+      using namespace g3::internal;
+      
       // Only one signal will be allowed past this point
       if (false == shouldDoExit()) {
-         while (true) {
+         while (shouldBlockForFatalHandling()) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
          }
       }
 
-      using namespace g3::internal;
       {
          const auto dump = stackdump();
          std::ostringstream fatal_stream;
@@ -233,7 +234,13 @@ namespace g3 {
       // --- If LOG(FATAL) or CHECK(false) the signal_number will be SIGABRT
       void exitWithDefaultSignalHandler(const LEVELS& level, g3::SignalType fatal_signal_id) {
          const int signal_number = static_cast<int>(fatal_signal_id);
-         restoreSignalHandler(signal_number);
+          
+         // Restore all saved signal handlers. If handling a signal which causes exiting 
+         // than let the original signal handlers to handle other signals.
+         for (const auto& sig : gSignals) {
+            restoreSignalHandler(sig.first);
+         }
+         
          std::cerr << "\n\n" << __FUNCTION__ << ":" << __LINE__ << ". Exiting due to " << level.text << ", " << signal_number << "   \n\n" << std::flush;
 
 
