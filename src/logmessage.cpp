@@ -164,7 +164,7 @@ namespace g3 {
 #endif
       , _file_path(file)
       , _line(line)
-      , _function(function)
+      , _function(std::move(function))
       , _level(level) {
    }
 
