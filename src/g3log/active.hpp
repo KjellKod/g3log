@@ -27,13 +27,28 @@
 namespace kjellkod {
    typedef std::function<void() > Callback;
 
+#ifdef WIN32
+   typedef std::wstring native_thread_name;
+   const inline native_thread_name DefaultThreadNamePrefix{L"G3log_Worker#"};
+#else
+   typedef std::string native_thread_name;
+   const inline native_thread_name DefaultThreadNamePrefix{"G3log_Worker#"};
+#endif  // !WIN32
+
+   namespace internal {
+      native_thread_name getThreadName(std::thread::native_handle_type handle);
+      void setThreadName(const native_thread_name &threadNamePrefix);
+   }
+
    class Active {
    private:
       Active() : done_(false) {} // Construction ONLY through factory createActive();
       Active(const Active &) = delete;
       Active &operator=(const Active &) = delete;
 
-      void run() {
+      void run(const native_thread_name &threadNamePrefix) {
+         internal::setThreadName(threadNamePrefix);
+
          while (!done_) {
             Callback func;
             mq_.wait_and_pop(func);
@@ -57,9 +72,10 @@ namespace kjellkod {
       }
 
       /// Factory: safe construction of object before thread start
-      static std::unique_ptr<Active> createActive() {
+      static std::unique_ptr<Active> createActive(
+         const native_thread_name &threadNamePrefix = DefaultThreadNamePrefix) {
          std::unique_ptr<Active> aPtr(new Active());
-         aPtr->thd_ = std::thread(&Active::run, aPtr.get());
+         aPtr->thd_ = std::thread(&Active::run, aPtr.get(), threadNamePrefix);
          return aPtr;
       }
    };
