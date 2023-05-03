@@ -67,8 +67,8 @@ namespace g3 {
 
       std::string threadID() const;
 
-      void setExpression(const std::string expression) {
-         _expression = expression;
+      void setExpression(std::string expression) {
+         _expression = std::move(expression);
       }
 
 
