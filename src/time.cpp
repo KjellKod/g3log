@@ -129,7 +129,7 @@ namespace g3 {
 
 
 
-   tm localtime(const std::time_t& ts) {
+   tm localtime(std::time_t ts) {
       struct tm tm_snapshot;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
       localtime_s(&tm_snapshot, &ts); // windsows
