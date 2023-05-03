@@ -34,7 +34,7 @@ class shared_queue
    shared_queue(const shared_queue &other) = delete;
 
 public:
-   shared_queue() {}
+   shared_queue() = default;
 
    void push(T item) {
       {
