@@ -88,7 +88,7 @@ namespace g3 {
       std::string createLogFileName(const std::string &verified_prefix, const std::string &logger_id) {
          std::stringstream oss_name;
          oss_name << verified_prefix << ".";
-         if( logger_id != "" ) {
+         if( !logger_id.empty() ) {
             oss_name << logger_id << ".";
          }
          auto now = std::chrono::system_clock::now();
