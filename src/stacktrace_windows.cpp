@@ -216,7 +216,7 @@ namespace stacktrace {
          }); // Raii sym cleanup
 
 
-         const size_t kmax_frame_dump_size = 64;
+         constexpr size_t kmax_frame_dump_size = 64;
          std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size);
          // C++11: size set and values are zeroed
 
