@@ -34,6 +34,10 @@ struct LEVELS {
    // "dynamic, runtime loading of shared libraries"
 
    LEVELS(const LEVELS& other): value(other.value), text(other.text.c_str()) {}
+
+   #if __cplusplus >= 202002L
+      constexpr
+   #endif
    LEVELS(int id, const std::string& idtext) : value(id), text(idtext) {}
 
    bool operator==(const LEVELS& rhs)  const {
@@ -90,11 +94,15 @@ namespace g3 {
    static const int kInternalFatalValue = 2000;
 } // g3
 
-
-const LEVELS G3LOG_DEBUG{g3::kDebugValue, {"DEBUG"}},
-   INFO {g3::kInfoValue, {"INFO"}},
-   WARNING {g3::kWarningValue, {"WARNING"}},
-   FATAL {g3::kFatalValue, {"FATAL"}};
+#if __cplusplus >= 202002L
+   constexpr
+#else
+   const
+#endif
+LEVELS G3LOG_DEBUG{g3::kDebugValue, "DEBUG"},
+   INFO {g3::kInfoValue, "INFO"},
+   WARNING {g3::kWarningValue, "WARNING"},
+   FATAL {g3::kFatalValue, "FATAL"};
 
 
 
@@ -129,7 +137,12 @@ namespace g3 {
 
 namespace g3 {
    namespace internal {
-      const LEVELS CONTRACT {g3::kInternalFatalValue, {"CONTRACT"}},
+      #if __cplusplus >= 202002L
+         constexpr
+      #else
+         const
+      #endif
+      LEVELS CONTRACT {g3::kInternalFatalValue, {"CONTRACT"}},
             FATAL_SIGNAL {g3::kInternalFatalValue + 1, {"FATAL_SIGNAL"}},
             FATAL_EXCEPTION {kInternalFatalValue + 2, {"FATAL_EXCEPTION"}};
 
