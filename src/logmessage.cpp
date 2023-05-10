@@ -64,11 +64,11 @@ namespace g3 {
    std::string LogMessage::DefaultLogDetailsToString(const LogMessage& msg) {
       std::string out;
       out.append(msg.timestamp() + "\t"
-                 + msg.level() 
-                 + " [" 
-                 + msg.file() 
-                 + "->" 
-                 + msg.function() 
+                 + msg.level()
+                 + " ["
+                 + msg.file()
+                 + "->"
+                 + msg.function()
                  + ":" + msg.line() + "]\t");
       return out;
    }
@@ -77,22 +77,21 @@ namespace g3 {
    std::string LogMessage::FullLogDetailsToString(const LogMessage& msg) {
       std::string out;
       out.append(msg.timestamp() + "\t"
-                 + msg.level() 
-                 + " [" 
-                 + msg.threadID() 
+                 + msg.level()
+                 + " ["
+                 + msg.threadID()
                  + " "
-                 + msg.file() 
-                 + "->"+ msg.function() 
+                 + msg.file()
+                 + "->"+ msg.function()
                  + ":" + msg.line() + "]\t");
       return out;
    }
 
 
    // helper for normal
-   std::string LogMessage::normalToString(const LogMessage& msg) {
-      auto out = msg._logDetailsToStringFunc(msg);
-      out.append(msg.message() + '\n');
-      return out;
+   std::string LogMessage::normalToString(const LogMessage& msg)
+   {
+     return msg._logDetailsToStringFunc(msg);
    }
 
 
