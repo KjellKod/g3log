@@ -120,7 +120,7 @@ namespace {
 
       DWORD64 displacement64;
       DWORD displacement;
-      char symbol_buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
+      alignas(SYMBOL_INFO) char symbol_buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
       SYMBOL_INFO *symbol = reinterpret_cast<SYMBOL_INFO *>(symbol_buffer);
       symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
       symbol->MaxNameLen = MAX_SYM_NAME;
@@ -216,7 +216,7 @@ namespace stacktrace {
          }); // Raii sym cleanup
 
 
-         const size_t kmax_frame_dump_size = 64;
+         constexpr size_t kmax_frame_dump_size = 64;
          std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size);
          // C++11: size set and values are zeroed
 

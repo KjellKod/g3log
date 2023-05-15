@@ -18,7 +18,7 @@ namespace g3 {
       std::atomic<bool> value_;
     public:
       atomicbool(): value_ {false} {}
-      atomicbool(const bool& value): value_ {value} {}
+      atomicbool(bool value): value_ {value} {}
       atomicbool(const std::atomic<bool>& value) : value_ {value.load(std::memory_order_acquire)} {}
       atomicbool(const atomicbool& other): value_ {other.value_.load(std::memory_order_acquire)} {}
 
@@ -32,9 +32,9 @@ namespace g3 {
          return *this;
       }
 
-   bool operator==(const atomicbool& rhs)  const {
-      return (value_.load(std::memory_order_acquire) == rhs.value_.load(std::memory_order_acquire));
-   }
+      bool operator==(const atomicbool& rhs)  const {
+         return (value_.load(std::memory_order_acquire) == rhs.value_.load(std::memory_order_acquire));
+      }
 
       bool value() {return value_.load(std::memory_order_acquire);}
       std::atomic<bool>& get() {return value_;}

@@ -67,8 +67,8 @@ namespace g3 {
 
       std::string threadID() const;
 
-      void setExpression(const std::string expression) {
-         _expression = expression;
+      void setExpression(std::string expression) {
+         _expression = std::move(expression);
       }
 
 
@@ -149,6 +149,7 @@ namespace g3 {
    struct FatalMessage : public LogMessage {
       FatalMessage(const LogMessage& details, g3::SignalType signal_id);
       FatalMessage(const FatalMessage&);
+      FatalMessage& operator=(const FatalMessage&) = delete;
       virtual ~FatalMessage() {}
 
       LogMessage copyToLogMessage() const;

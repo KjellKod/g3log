@@ -30,7 +30,7 @@ namespace g3 {
       SinkHandle(std::shared_ptr<internal::Sink<T>> sink)
          : _sink(sink) {}
 
-      ~SinkHandle() {}
+      ~SinkHandle() = default;
 
 
       // Asynchronous call to the real sink. If the real sink is already deleted

@@ -92,7 +92,7 @@ namespace g3 {
       ss_change.str("");
 
       std::string old_log = _log_file_with_path;
-      _log_file_with_path = prospect_log;
+      _log_file_with_path = std::move(prospect_log);
       _outptr = std::move(log_stream);
       ss_change << "\n\tNew log file. The previous log file was at: ";
       ss_change << old_log << "\n";

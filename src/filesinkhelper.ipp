@@ -51,7 +51,7 @@ namespace g3 {
          return prefix;
       }
 
-      std::string pathSanityFix(std::string path, std::string file_name) {
+      std::string pathSanityFix(std::string path, const std::string &file_name) {
          // Unify the delimeters,. maybe sketchy solution but it seems to work
          // on at least win7 + ubuntu. All bets are off for older windows
          std::replace(path.begin(), path.end(), '\\', '/');
@@ -88,7 +88,7 @@ namespace g3 {
       std::string createLogFileName(const std::string &verified_prefix, const std::string &logger_id) {
          std::stringstream oss_name;
          oss_name << verified_prefix << ".";
-         if( logger_id != "" ) {
+         if( !logger_id.empty() ) {
             oss_name << logger_id << ".";
          }
          auto now = std::chrono::system_clock::now();
