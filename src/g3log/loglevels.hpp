@@ -91,8 +91,7 @@ namespace g3 {
    static const int kInternalFatalValue = 2000;
 } // g3
 
-const
-LEVELS G3LOG_DEBUG{g3::kDebugValue, "DEBUG"},
+const LEVELS G3LOG_DEBUG{g3::kDebugValue, "DEBUG"},
    INFO {g3::kInfoValue, "INFO"},
    WARNING {g3::kWarningValue, "WARNING"},
    FATAL {g3::kFatalValue, "FATAL"};
@@ -130,8 +129,7 @@ namespace g3 {
 
 namespace g3 {
    namespace internal {
-      const
-      LEVELS CONTRACT {g3::kInternalFatalValue, {"CONTRACT"}},
+      const LEVELS CONTRACT {g3::kInternalFatalValue, {"CONTRACT"}},
             FATAL_SIGNAL {g3::kInternalFatalValue + 1, {"FATAL_SIGNAL"}},
             FATAL_EXCEPTION {kInternalFatalValue + 2, {"FATAL_EXCEPTION"}};
 
