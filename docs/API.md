@@ -116,7 +116,9 @@ Please see[API_custom_formatting.md](API_custom_formatting.md)
 
 
 ## LOG <a name="log_flushing">flushing</a> 
-The default file sink will flush each log entry as it comes in. For different flushing policies please take a look at g3sinks [logrotate and LogRotateWithFilters](https://github.com/KjellKod/g3sinks/tree/master/sink_logrotate).
+The default file sink will flush each log entry at set intervals. The default buffer size for flushing is set to 100 entries. You can adjust this down to 1, or as high as makes sense for your system. Please see [FileSink](https://github.com/KjellKod/g3log/blob/master/src/g3log/filesink.hpp#L18) 
+
+Even more flushing policies and log rotations can be found at  g3sinks [logrotate and LogRotateWithFilters](https://github.com/KjellKod/g3sinks/tree/master/sink_logrotate).
 
 At shutdown all enqueued logs will be flushed to the sink.  
 At a discovered fatal event (SIGSEGV et.al) all enqueued logs will be flushed to the sink.
