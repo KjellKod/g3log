@@ -86,7 +86,7 @@ IF(APPLE)
 SET_TARGET_PROPERTIES(${G3LOG_LIBRARY} PROPERTIES MACOSX_RPATH TRUE)
 ENDIF()
 
-# require here some proxy for c++14 standard to avoid problems TARGET_PROPERTY CXX_STANDARD
+# require here some proxy for c++14/c++17? standard to avoid problems TARGET_PROPERTY CXX_STANDARD
 TARGET_COMPILE_FEATURES(${G3LOG_LIBRARY} PUBLIC cxx_variable_templates)
 
 TARGET_INCLUDE_DIRECTORIES(${G3LOG_LIBRARY}

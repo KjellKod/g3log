@@ -15,7 +15,7 @@ cd build
 ```
 
 ## <a name="prerequisites">Prerequisites</a>
-Assume you have got your shiny C++14 compiler installed, you also need these tools to build g3log from source:
+You also need these tools to build g3log from source:
 - CMake (*Required*)
 
   g3log uses CMake as a one-stop solution for configuring, building, installing, packaging and testing on Windows, Linux and OSX.
