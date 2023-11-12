@@ -67,7 +67,11 @@ The logger will catch certain fatal events *(Linux/OSX: signals, Windows: fatal 
 
 8. The code is given for free as public domain. This gives the option to change, use, and do whatever with it, no strings attached.
 
-9. *[g3log](https://github.com/KjellKod/g3log)* : is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with **Linux**(Clang/gcc), **Windows** (mingw, visual studio) and **OSX**. My recommendation is to go with g3log if you have full C++14 support (C++11 support up to version: https://github.com/KjellKod/g3log/releases/tag/1.3.1).
+9. *[g3log](https://github.com/KjellKod/g3log)* : is made to facilitate  easy adding of custom log receivers.  Its tested on at least the following platforms with **Linux**(Clang/gcc), **Windows** (mingw, visual studio) and **OSX**. My recommendation is to go with g3log if you have full C++17 support 
+
+C++11 support up to version: https://github.com/KjellKod/g3log/releases/tag/1.3.1).
+
+C++14 support up to version: https://github.com/KjellKod/g3log/releases/tag/1.3.4
 
 
 ## <a name="g3log-with-sinks">G3log with sinks</a>
