@@ -1,3 +1,17 @@
+# Open for Opportunities 🔍 November 2023
+
+Hello there! 
+
+My name is Kjell Hedstrom and I'm the author and primary maintainer of this project you've stumbled upon or maybe used for a long time. For over a decade, I’ve been dedicating my free time to this open-source initiative, while also refining my skills in various languages like **C++**, **Python** and Java - with some playful hobby endeavors in **Kotlin**, **Go**, and **Rust**.
+
+Given the current job market scenario, I'm actively seeking **Senior Engineering roles** as well as **contract opportunities**. If you or someone you know could benefit from my expertise and contributions – or if you'd be interested in supporting further development of this open-source project through a professional partnership – please don't hesitate to reach out!
+
+You can contact me directly at Kjell@TasteOfTheWoods.com or connect with me on [linkedin.com/in/kjellkod](https://www.linkedin.com/in/kjellkod/). If you wish to get a grasp of my capabilities, commitment, and what I could bring to your team, please do check out the recommendations on my [LinkedIn recommendations](https://www.linkedin.com/in/kjellkod/details/recommendations/) profile. These are from previous managers, colleagues, and direct reports - individuals who have worked alongside me and experienced first-hand the quality of my contributions.
+
+Thank you very much for your time and for considering me for opportunities. I look forward to possibly working together to create something great!
+# ___
+
+# Contents 
 [**introduction**](docs/index.md) | [detailed information](docs/g3log.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)
 
 
