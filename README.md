@@ -6,7 +6,7 @@ My name is Kjell Hedstrom and I'm the author and primary maintainer of this proj
 
 Given the current job market scenario, I'm actively seeking **Senior Engineering roles** as well as **contract opportunities**. If you or someone you know could benefit from my expertise and contributions – or if you'd be interested in supporting further development of this open-source project through a professional partnership – please don't hesitate to reach out!
 
-You can contact me directly at Kjell@TasteOfTheWoods.com or connect with me on [linkedin.com/in/kjellkod](https://www.linkedin.com/in/kjellkod/). If you wish to get a grasp of my capabilities, commitment, and what I could bring to your team, please do check out the recommendations on my [LinkedIn recommendations](https://www.linkedin.com/in/kjellkod/details/recommendations/) profile. These are from previous managers, colleagues, and direct reports - individuals who have worked alongside me and experienced first-hand the quality of my contributions.
+You can contact me directly at Kjell@TasteOfTheWoods.com or connect with me on [linkedin.com/in/kjellkod](https://www.linkedin.com/in/kjellkod/). If you wish to get a grasp of my capabilities, commitment, and what I could bring to your team, please check out the recommendations on my [LinkedIn recommendations](https://www.linkedin.com/in/kjellkod/details/recommendations/) profile. These are from previous managers, colleagues, and direct reports - individuals who have worked alongside me and experienced first-hand the quality of my contributions.
 
 Thank you very much for your time and for considering me for opportunities. I look forward to possibly working together to create something great!
 # ___
