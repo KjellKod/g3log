@@ -41,3 +41,45 @@ make -j
 1. performance test in the container `./g3log-performance-threaded_mean 4`
 2. unit tests `ctest -v`
 3. Try a fatal example with dumped stack trace `./g3log-FATAL-contract`
+
+
+### Example with Debugging. 
+Without any need to set up environment on your local machine you can also use Codespaces to debug examples, unit tests etc of g3log. 
+The pesky thing with VSCode, especially with cmake is to set up the launh.json. 
+It's a little bit easier if you open a VSCode terminal and do the cmake configuration and build there. Then the `launch.json` only needs to
+contain information about the pecific executable. 
+
+Here we try out the `g3log-FATAL-contract` after cmake configure with `-DCMAKE_BUILD_TYPE=Debug`
+```
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    // Remember to build the specific part of cmake with 
+    // "cmake -DCMAKE_BUILD_TYPE=Debug" if you want to be able to debug it. 
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(gdb) Start",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/g3log-FATAL-contract",
+            "MIMode": "gdb",
+            "cwd": "${workspaceFolder}/build"
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+
+    ]
+}
+```
