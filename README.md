@@ -28,6 +28,10 @@ The super quick introduction to g3log can be seen in the steps 1 - 9 below.
 For more in-depth information please see the full usage description in [g3log.md](docs/g3log.md). The internal API for more advanced integration with g3log can be accessed in [API.md](docs/API.md)
 
 
+## Experiment and try-out g3log in Github Codespaces 
+ref: [CodeSpsces.md](docs/codespaces.md)
+
+
 ## 1. Easy usage in files
 Avoid deep dependency injection complexity and instead get access to the logger as easy as 
 ```
