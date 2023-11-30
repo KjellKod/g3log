@@ -7,7 +7,11 @@
 # Formatting
 - [ ] I am following the formatting style of the existing codebase. 
 
-_a clang-format configuration file is available in the root of g3log_
+_a clang-format configuration file is available in the root of g3log._ 
+- _Use VSCode with clang-formatter or commandline:_
+`clang-format -i path_to_file` 
+- _or recursive throughout the whole repo:_ `find . -iname "*.hpp" -o -iname "*.cpp" | xargs clang-format -i`
+
 
 # Testing
 
