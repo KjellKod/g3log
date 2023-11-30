@@ -17,8 +17,8 @@
 
 namespace g3 {
 
-   LogWorkerImpl::LogWorkerImpl()
-       : _bg(kjellkod::Active::createActive()) {}
+   LogWorkerImpl::LogWorkerImpl() :
+       _bg(kjellkod::Active::createActive()) {}
 
    void LogWorkerImpl::bgSave(g3::LogMessagePtr msgPtr) {
       std::unique_ptr<LogMessage> uniqueMsg(std::move(msgPtr.get()));

@@ -20,8 +20,8 @@
 
 struct LogMessageCounter {
    std::vector<std::string>& bank;
-   LogMessageCounter(std::vector<std::string>& storeMessages)
-       : bank(storeMessages) {
+   LogMessageCounter(std::vector<std::string>& storeMessages) :
+       bank(storeMessages) {
    }
 
    void countMessages(std::string msg) {

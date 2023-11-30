@@ -29,8 +29,8 @@ class CoutSink {
    stringstream buffer;
    unique_ptr<ScopedOut> scope_ptr;
 
-   CoutSink()
-       : scope_ptr(std::make_unique<ScopedOut>(std::cout, &buffer)) {}
+   CoutSink() :
+       scope_ptr(std::make_unique<ScopedOut>(std::cout, &buffer)) {}
 
   public:
    void clear() { buffer.str(""); }
@@ -67,9 +67,9 @@ namespace g3 {
       }
 
      public:
-      Worker()
-          : _bg{
-               kjellkod::Active::createActive()} {
+      Worker() :
+          _bg{
+             kjellkod::Active::createActive()} {
       }
 
       ~Worker() {

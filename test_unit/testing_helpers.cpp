@@ -98,16 +98,16 @@ namespace testing_helpers {
       }
    }
 
-   ScopedLogger::ScopedLogger()
-       : _currentWorker(g3::LogWorker::createLogWorker()) {}
+   ScopedLogger::ScopedLogger() :
+       _currentWorker(g3::LogWorker::createLogWorker()) {}
    ScopedLogger::~ScopedLogger() {}
 
    g3::LogWorker* ScopedLogger::get() {
       return _currentWorker.get();
    }
 
-   RestoreFileLogger::RestoreFileLogger(std::string directory)
-       : _scope(new ScopedLogger), _handle(_scope->get()->addSink(std::make_unique<g3::FileSink>("UNIT_TEST_LOGGER", directory, "g3log", kFlushToDiskWithThisInterval), &g3::FileSink::fileWrite)) {
+   RestoreFileLogger::RestoreFileLogger(std::string directory) :
+       _scope(new ScopedLogger), _handle(_scope->get()->addSink(std::make_unique<g3::FileSink>("UNIT_TEST_LOGGER", directory, "g3log", kFlushToDiskWithThisInterval), &g3::FileSink::fileWrite)) {
       using namespace g3;
       g3::initializeLogging(_scope->_currentWorker.get());
       clearMockFatal();

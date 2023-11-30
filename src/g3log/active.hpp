@@ -29,8 +29,8 @@ namespace kjellkod {
 
    class Active {
      private:
-      Active()
-          : done_(false) {}  // Construction ONLY through factory createActive();
+      Active() :
+          done_(false) {}  // Construction ONLY through factory createActive();
       Active(const Active&) = delete;
       Active& operator=(const Active&) = delete;
 

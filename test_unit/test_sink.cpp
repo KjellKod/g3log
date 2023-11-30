@@ -227,8 +227,8 @@ TEST(ConceptSink, OneHundredRemoveAllSinks) {
 
 struct VoidReceiver {
    std::atomic<int>* _atomicCounter;
-   explicit VoidReceiver(std::atomic<int>* counter)
-       : _atomicCounter(counter) {}
+   explicit VoidReceiver(std::atomic<int>* counter) :
+       _atomicCounter(counter) {}
 
    void receiveMsg(std::string msg) { /*ignored*/
    }
@@ -271,8 +271,8 @@ TEST(ConceptSink, VoidCall__TwoCalls_ExpectingTwoAdd) {
 
 struct IntReceiver {
    std::atomic<int>* _atomicCounter;
-   explicit IntReceiver(std::atomic<int>* counter)
-       : _atomicCounter(counter) {}
+   explicit IntReceiver(std::atomic<int>* counter) :
+       _atomicCounter(counter) {}
 
    void receiveMsgDoNothing(std::string msg) { /*ignored*/
    }

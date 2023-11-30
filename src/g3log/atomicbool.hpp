@@ -17,14 +17,14 @@ namespace g3 {
       std::atomic<bool> value_;
 
      public:
-      atomicbool()
-          : value_{false} {}
-      atomicbool(bool value)
-          : value_{value} {}
-      atomicbool(const std::atomic<bool>& value)
-          : value_{value.load(std::memory_order_acquire)} {}
-      atomicbool(const atomicbool& other)
-          : value_{other.value_.load(std::memory_order_acquire)} {}
+      atomicbool() :
+          value_{false} {}
+      atomicbool(bool value) :
+          value_{value} {}
+      atomicbool(const std::atomic<bool>& value) :
+          value_{value.load(std::memory_order_acquire)} {}
+      atomicbool(const atomicbool& other) :
+          value_{other.value_.load(std::memory_order_acquire)} {}
 
       atomicbool& operator=(const atomicbool& other) {
          value_.store(other.value_.load(std::memory_order_acquire), std::memory_order_release);

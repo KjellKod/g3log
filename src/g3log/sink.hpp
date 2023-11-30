@@ -40,17 +40,17 @@ namespace g3 {
          AsyncMessageCall _default_log_call;
 
          template <typename DefaultLogCall>
-         Sink(std::unique_ptr<T> sink, DefaultLogCall call)
-             : SinkWrapper(),
-               _real_sink{std::move(sink)},
-               _bg(kjellkod::Active::createActive()),
-               _default_log_call(std::bind(call, _real_sink.get(), std::placeholders::_1)) {
+         Sink(std::unique_ptr<T> sink, DefaultLogCall call) :
+             SinkWrapper(),
+             _real_sink{std::move(sink)},
+             _bg(kjellkod::Active::createActive()),
+             _default_log_call(std::bind(call, _real_sink.get(), std::placeholders::_1)) {
          }
 
-         Sink(std::unique_ptr<T> sink, void (T::*Call)(std::string))
-             : SinkWrapper(),
-               _real_sink{std::move(sink)},
-               _bg(kjellkod::Active::createActive()) {
+         Sink(std::unique_ptr<T> sink, void (T::*Call)(std::string)) :
+             SinkWrapper(),
+             _real_sink{std::move(sink)},
+             _bg(kjellkod::Active::createActive()) {
             std::function<void(std::string)> adapter = std::bind(Call, _real_sink.get(), std::placeholders::_1);
             _default_log_call = [=](LogMessageMover m) {
                adapter(m.get().toString());

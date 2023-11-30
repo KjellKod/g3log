@@ -27,8 +27,8 @@ namespace g3 {
       std::weak_ptr<internal::Sink<T>> _sink;
 
      public:
-      SinkHandle(std::shared_ptr<internal::Sink<T>> sink)
-          : _sink(sink) {}
+      SinkHandle(std::shared_ptr<internal::Sink<T>> sink) :
+          _sink(sink) {}
 
       ~SinkHandle() = default;
 

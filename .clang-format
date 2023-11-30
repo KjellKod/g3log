@@ -39,7 +39,7 @@ BraceWrapping:
   SplitEmptyNamespace: false
 BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
-BreakConstructorInitializers: BeforeColon
+BreakConstructorInitializers: AfterColon
 BreakInheritanceList: BeforeColon
 ColumnLimit: 0
 CompactNamespaces: false

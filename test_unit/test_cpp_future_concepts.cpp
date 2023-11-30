@@ -34,8 +34,8 @@ TEST(Configuration, FutureSilly) {
 
 struct MsgType {
    std::string msg_;
-   MsgType(std::string m)
-       : msg_(m){};
+   MsgType(std::string m) :
+       msg_(m){};
    std::string msg() { return msg_; }
 };
 

@@ -14,8 +14,8 @@
 namespace g3 {
    using namespace internal;
 
-   FileSink::FileSink(const std::string& log_prefix, const std::string& log_directory, const std::string& logger_id, size_t write_to_log_every_x_message)
-       : _log_details_func(&LogMessage::DefaultLogDetailsToString), _log_file_with_path(log_directory), _log_prefix_backup(log_prefix), _outptr(new std::ofstream), _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message\n\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n"), _firstEntry(true), _write_counter(0), _write_to_log_every_x_message(write_to_log_every_x_message) {
+   FileSink::FileSink(const std::string& log_prefix, const std::string& log_directory, const std::string& logger_id, size_t write_to_log_every_x_message) :
+       _log_details_func(&LogMessage::DefaultLogDetailsToString), _log_file_with_path(log_directory), _log_prefix_backup(log_prefix), _outptr(new std::ofstream), _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message\n\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n"), _firstEntry(true), _write_counter(0), _write_to_log_every_x_message(write_to_log_every_x_message) {
       _log_prefix_backup = prefixSanityFix(log_prefix);
       if (!isValidFilename(_log_prefix_backup)) {
          std::cerr << "g3log: forced abort due to illegal log prefix [" << log_prefix << "]" << std::endl;

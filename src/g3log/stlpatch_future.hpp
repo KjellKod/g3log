@@ -25,13 +25,13 @@ namespace std {
       }
 
       template <class _Fty2>
-      explicit packaged_task(_Fty2&& _Fnarg)
-          : _my_func(_Fnarg) {
+      explicit packaged_task(_Fty2&& _Fnarg) :
+          _my_func(_Fnarg) {
       }
 
-      packaged_task(packaged_task&& _Other)
-          : _my_promise(move(_Other._my_promise)),
-            _my_func(move(_Other._my_func)) {
+      packaged_task(packaged_task&& _Other) :
+          _my_promise(move(_Other._my_promise)),
+          _my_func(move(_Other._my_func)) {
       }
 
       packaged_task& operator=(packaged_task&& _Other) {

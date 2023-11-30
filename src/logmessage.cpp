@@ -119,33 +119,33 @@ namespace g3 {
    }
 
    LogMessage::LogMessage(std::string file, const int line,
-                          std::string function, const LEVELS level)
-       : _logDetailsToStringFunc(LogMessage::DefaultLogDetailsToString), _timestamp(std::chrono::high_resolution_clock::now()), _call_thread_id(std::this_thread::get_id())
+                          std::string function, const LEVELS level) :
+       _logDetailsToStringFunc(LogMessage::DefaultLogDetailsToString), _timestamp(std::chrono::high_resolution_clock::now()), _call_thread_id(std::this_thread::get_id())
 #if defined(G3_LOG_FULL_FILENAME)
-         ,
-         _file(file)
+       ,
+       _file(file)
 #else
-         ,
-         _file(LogMessage::splitFileName(file))
+       ,
+       _file(LogMessage::splitFileName(file))
 #endif
-         ,
-         _file_path(file),
-         _line(line),
-         _function(std::move(function)),
-         _level(level) {
+       ,
+       _file_path(file),
+       _line(line),
+       _function(std::move(function)),
+       _level(level) {
    }
 
-   LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
-       : LogMessage({""}, 0, {""}, internal::FATAL_SIGNAL) {
+   LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage) :
+       LogMessage({""}, 0, {""}, internal::FATAL_SIGNAL) {
       _message.append(fatalOsSignalCrashMessage);
    }
 
-   LogMessage::LogMessage(const LogMessage& other)
-       : _logDetailsToStringFunc(other._logDetailsToStringFunc), _timestamp(other._timestamp), _call_thread_id(other._call_thread_id), _file(other._file), _file_path(other._file_path), _line(other._line), _function(other._function), _level(other._level), _expression(other._expression), _message(other._message) {
+   LogMessage::LogMessage(const LogMessage& other) :
+       _logDetailsToStringFunc(other._logDetailsToStringFunc), _timestamp(other._timestamp), _call_thread_id(other._call_thread_id), _file(other._file), _file_path(other._file_path), _line(other._line), _function(other._function), _level(other._level), _expression(other._expression), _message(other._message) {
    }
 
-   LogMessage::LogMessage(LogMessage&& other)
-       : _logDetailsToStringFunc(other._logDetailsToStringFunc), _timestamp(other._timestamp), _call_thread_id(other._call_thread_id), _file(std::move(other._file)), _file_path(std::move(other._file_path)), _line(other._line), _function(std::move(other._function)), _level(other._level), _expression(std::move(other._expression)), _message(std::move(other._message)) {
+   LogMessage::LogMessage(LogMessage&& other) :
+       _logDetailsToStringFunc(other._logDetailsToStringFunc), _timestamp(other._timestamp), _call_thread_id(other._call_thread_id), _file(std::move(other._file)), _file_path(std::move(other._file_path)), _line(other._line), _function(std::move(other._function)), _level(other._level), _expression(std::move(other._expression)), _message(std::move(other._message)) {
    }
 
    std::string LogMessage::threadID() const {
@@ -154,11 +154,11 @@ namespace g3 {
       return oss.str();
    }
 
-   FatalMessage::FatalMessage(const LogMessage& details, g3::SignalType signal_id)
-       : LogMessage(details), _signal_id(signal_id) {}
+   FatalMessage::FatalMessage(const LogMessage& details, g3::SignalType signal_id) :
+       LogMessage(details), _signal_id(signal_id) {}
 
-   FatalMessage::FatalMessage(const FatalMessage& other)
-       : LogMessage(other), _signal_id(other._signal_id) {}
+   FatalMessage::FatalMessage(const FatalMessage& other) :
+       LogMessage(other), _signal_id(other._signal_id) {}
 
    LogMessage FatalMessage::copyToLogMessage() const {
       return LogMessage(*this);

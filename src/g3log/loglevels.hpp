@@ -33,11 +33,11 @@ struct LEVELS {
    // force internal copy of the const char*. This is a simple safeguard for when g3log is used in a
    // "dynamic, runtime loading of shared libraries"
 
-   LEVELS(const LEVELS& other)
-       : value(other.value), text(other.text.c_str()) {}
+   LEVELS(const LEVELS& other) :
+       value(other.value), text(other.text.c_str()) {}
 
-   LEVELS(int id, const std::string& idtext)
-       : value(id), text(idtext) {}
+   LEVELS(int id, const std::string& idtext) :
+       value(id), text(idtext) {}
 
    bool operator==(const LEVELS& rhs) const {
       return (value == rhs.value && text == rhs.text);
@@ -103,14 +103,14 @@ namespace g3 {
       LEVELS level;
 
       // default operator needed for std::map compliance
-      LoggingLevel()
-          : status(false), level(INFO){};
-      LoggingLevel(const LoggingLevel& lvl)
-          : status(lvl.status), level(lvl.level) {}
-      LoggingLevel(const LEVELS& lvl)
-          : status(true), level(lvl){};
-      LoggingLevel(const LEVELS& lvl, bool enabled)
-          : status(enabled), level(lvl){};
+      LoggingLevel() :
+          status(false), level(INFO){};
+      LoggingLevel(const LoggingLevel& lvl) :
+          status(lvl.status), level(lvl.level) {}
+      LoggingLevel(const LEVELS& lvl) :
+          status(true), level(lvl){};
+      LoggingLevel(const LEVELS& lvl, bool enabled) :
+          status(enabled), level(lvl){};
       ~LoggingLevel() = default;
 
       LoggingLevel& operator=(const LoggingLevel& other) {

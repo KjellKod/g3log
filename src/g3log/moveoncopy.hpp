@@ -18,12 +18,12 @@ namespace g3 {
    struct MoveOnCopy {
       mutable Moveable _move_only;
 
-      explicit MoveOnCopy(Moveable&& m)
-          : _move_only(std::move(m)) {}
-      MoveOnCopy(MoveOnCopy const& t)
-          : _move_only(std::move(t._move_only)) {}
-      MoveOnCopy(MoveOnCopy&& t)
-          : _move_only(std::move(t._move_only)) {}
+      explicit MoveOnCopy(Moveable&& m) :
+          _move_only(std::move(m)) {}
+      MoveOnCopy(MoveOnCopy const& t) :
+          _move_only(std::move(t._move_only)) {}
+      MoveOnCopy(MoveOnCopy&& t) :
+          _move_only(std::move(t._move_only)) {}
 
       MoveOnCopy& operator=(MoveOnCopy const& other) {
          _move_only = std::move(other._move_only);
