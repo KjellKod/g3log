@@ -32,6 +32,7 @@
 #include <atomic>
 #include <cstdlib>
 #include <sstream>
+#include "g3log.hpp"
 
 namespace {
    std::once_flag g_initialize_flag;
@@ -162,8 +163,16 @@ namespace g3 {
          message.get()->write().append(entry);
          message.get()->setExpression(boolean_expression);
 
+         if (internal::wasFatal(level))
+         {
+            saveFatalMessage(level, stack_trace, message, fatal_signal);
+         } else {
+            pushMessageToLogger(message);
+         }
+      }
 
-         if (internal::wasFatal(level)) {
+      void saveFatalMessage(const LEVELS &level, const char *stack_trace, g3::LogMessagePtr &message, int &fatal_signal)
+      {
             auto fatalhook = g_fatal_pre_logging_hook;
             // In case the fatal_pre logging actually will cause a crash in its turn
             // let's not do recursive crashing!
@@ -176,79 +185,83 @@ namespace g3 {
             fatalhook();
             message.get()->write().append(stack_trace);
 
-            if (g_fatal_hook_recursive_counter.load() > 1) {
-               message.get()->write()
-               .append("\n\n\nWARNING\n"
-                       "A recursive crash detected. It is likely the hook set with 'setFatalPreLoggingHook(...)' is responsible\n\n")
-               .append("---First crash stacktrace: ").append(first_stack_trace).append("\n---End of first stacktrace\n");
+            if (g_fatal_hook_recursive_counter.load() > 1)
+            {
+               message.get()->write().append("\n\n\nWARNING\n"
+                                             "A recursive crash detected. It is likely the hook set with 'setFatalPreLoggingHook(...)' is responsible\n\n")
+                   .append("---First crash stacktrace: ")
+                   .append(first_stack_trace)
+                   .append("\n---End of first stacktrace\n");
             }
-            FatalMessagePtr fatal_message { std::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal) };
+            FatalMessagePtr fatal_message{std::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal)};
             // At destruction, flushes fatal message to g3LogWorker
             // either we will stay here until the background worker has received the fatal
             // message, flushed the crash message to the sinks and exits with the same fatal signal
             //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
             fatalCall(fatal_message);
-         } else {
-            pushMessageToLogger(message);
-         }
       }
-
-      /**
-       * save the message to the logger. In case of called before the logger is instantiated
-       * the first message will be saved. Any following subsequent uninitialized log calls
-       * will be ignored.
-       *
-       * The first initialized log entry will also save the first uninitialized log message, if any
-       * @param log_entry to save to logger
-       */
-      void pushMessageToLogger(LogMessagePtr incoming) { // todo rename to Push SavedMessage To Worker
-         // Uninitialized messages are ignored but does not CHECK/crash the logger
-         if (!internal::isLoggingInitialized()) {
-            std::call_once(g_set_first_uninitialized_flag, [&] {
+         /**
+            * save the message to the logger. In case of called before the logger is instantiated
+            * the first message will be saved. Any following subsequent uninitialized log calls
+            * will be ignored.
+            *
+            * The first initialized log entry will also save the first uninitialized log message, if any
+            * @param log_entry to save to logger
+            */
+         void pushMessageToLogger(LogMessagePtr incoming)
+         { // todo rename to Push SavedMessage To Worker
+            // Uninitialized messages are ignored but does not CHECK/crash the logger
+            if (!internal::isLoggingInitialized())
+            {
+               std::call_once(g_set_first_uninitialized_flag, [&]
+                              {
                g_first_uninitialized_msg = incoming.release();
                std::string err = {"LOGGER NOT INITIALIZED:\n\t\t"};
                err.append(g_first_uninitialized_msg->message());
                std::string& str = g_first_uninitialized_msg->write();
                str.clear();
                str.append(err); // replace content
-               std::cerr << str << std::endl;
-            });
-            return;
+               std::cerr << str << std::endl; });
+               return;
+            }
+
+            // logger is initialized
+            g_logger_instance->save(incoming);
          }
 
-         // logger is initialized
-         g_logger_instance->save(incoming);
-      }
-
-      /** Fatal call saved to logger. This will trigger SIGABRT or other fatal signal
-       * to exit the program. After saving the fatal message the calling thread
-       * will sleep forever (i.e. until the background thread catches up, saves the fatal
-       * message and kills the software with the fatal signal.
-       */
-      void pushFatalMessageToLogger(FatalMessagePtr message) {
-         if (!isLoggingInitialized()) {
-            std::ostringstream error;
-            error << "FATAL CALL but logger is NOT initialized\n"
-                  << "CAUSE: " << message.get()->reason()
-                  << "\nMessage: \n" << message.get()->toString() << std::flush;
-            std::cerr << error.str() << std::flush;
-            internal::exitWithDefaultSignalHandler(message.get()->_level, message.get()->_signal_id);
+         /** Fatal call saved to logger. This will trigger SIGABRT or other fatal signal
+          * to exit the program. After saving the fatal message the calling thread
+          * will sleep forever (i.e. until the background thread catches up, saves the fatal
+          * message and kills the software with the fatal signal.
+          */
+         void pushFatalMessageToLogger(FatalMessagePtr message)
+         {
+            if (!isLoggingInitialized())
+            {
+               std::ostringstream error;
+               error << "FATAL CALL but logger is NOT initialized\n"
+                     << "CAUSE: " << message.get()->reason()
+                     << "\nMessage: \n"
+                     << message.get()->toString() << std::flush;
+               std::cerr << error.str() << std::flush;
+               internal::exitWithDefaultSignalHandler(message.get()->_level, message.get()->_signal_id);
+            }
+            g_logger_instance->fatal(message);
+            while (shouldBlockForFatalHandling())
+            {
+               std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
          }
-         g_logger_instance->fatal(message);
-         while (shouldBlockForFatalHandling()) {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+
+         /** The default, initial, handling to send a 'fatal' event to g3logworker
+          *  the caller will stay here, eternally, until the software is aborted
+          * ... in the case of unit testing it is the given "Mock" fatalCall that will
+          * define the behaviour.
+          */
+         void fatalCall(FatalMessagePtr message)
+         {
+            g_fatal_to_g3logworker_function_ptr(FatalMessagePtr{std::move(message)});
          }
-      }
 
-      /** The default, initial, handling to send a 'fatal' event to g3logworker
-       *  the caller will stay here, eternally, until the software is aborted
-       * ... in the case of unit testing it is the given "Mock" fatalCall that will
-       * define the behaviour.
-       */
-      void fatalCall(FatalMessagePtr message) {
-         g_fatal_to_g3logworker_function_ptr(FatalMessagePtr {std::move(message)});
-      }
-
-
-   } // internal
+      } // internal
 } // g3

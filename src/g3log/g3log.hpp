@@ -110,6 +110,8 @@ namespace g3 {
       void saveMessage(const char *message, const char *file, int line, const char *function, const LEVELS &level,
                        const char *boolean_expression, int fatal_signal, const char *stack_trace);
 
+void saveFatalMessage(const LEVELS & level, const char * stack_trace, g3::LogMessagePtr &message, int &fatal_signal);
+
       // forwards the message to all sinks
       void pushMessageToLogger(LogMessagePtr log_entry);
 
