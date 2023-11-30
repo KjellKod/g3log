@@ -59,7 +59,12 @@ LogCapture::LogCapture(const LEVELS& level, g3::SignalType fatal_signal, const c
  */
 LogCapture::LogCapture(const char* file, const int line, const char* function, const LEVELS& level,
                        const char* expression, g3::SignalType fatal_signal, const char* dump) :
-    _file(file), _line(line), _function(function), _level(level), _expression(expression), _fatal_signal(fatal_signal) {
+    _file(file),
+    _line(line),
+    _function(function),
+    _level(level),
+    _expression(expression),
+    _fatal_signal(fatal_signal) {
 
    if (g3::internal::wasFatal(level)) {
       _stack_trace = std::string{"\n*******\tSTACKDUMP *******\n"};

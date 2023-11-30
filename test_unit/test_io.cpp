@@ -594,7 +594,8 @@ TEST(CHECK, CHECK_runtimeError) {
 
      public:
       explicit dynamic_int_array(int size) :
-          data_{std::make_unique<int[]>(size)}, size_(size) {}
+          data_{std::make_unique<int[]>(size)},
+          size_(size) {}
 
       int& at(int i) {
          CHECK(i < size_);
