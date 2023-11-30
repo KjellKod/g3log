@@ -19,15 +19,14 @@ namespace g3 {
 
 #ifdef G3_DYNAMIC_LOGGING
       const std::map<int, LoggingLevel> g_log_level_defaults = {
-	     {G3LOG_DEBUG.value,{G3LOG_DEBUG}},
+         {G3LOG_DEBUG.value, {G3LOG_DEBUG}},
          {INFO.value, {INFO}},
          {WARNING.value, {WARNING}},
-         {FATAL.value, {FATAL}}
-      };
+         {FATAL.value, {FATAL}}};
 
       std::map<int, g3::LoggingLevel> g_log_levels = g_log_level_defaults;
 #endif
-   } // internal
+   }  // namespace internal
 
 #ifdef G3_DYNAMIC_LOGGING
    namespace only_change_at_initialization {
@@ -37,7 +36,6 @@ namespace g3 {
          internal::g_log_levels[value] = {lvl, enabled};
       }
 
-
       void addLogLevel(LEVELS level) {
          addLogLevel(level, true);
       }
@@ -45,8 +43,7 @@ namespace g3 {
       void reset() {
          g3::internal::g_log_levels = g3::internal::g_log_level_defaults;
       }
-   } // only_change_at_initialization
-
+   }  // namespace only_change_at_initialization
 
    namespace log_levels {
 
@@ -59,11 +56,9 @@ namespace g3 {
                } else {
                   enable(v.second.level);
                }
-
             }
          }
       }
-
 
       void set(LEVELS level, bool enabled) {
          auto it = internal::g_log_levels.find(level.value);
@@ -72,7 +67,6 @@ namespace g3 {
          }
       }
 
-
       void disable(LEVELS level) {
          set(level, false);
       }
@@ -80,7 +74,6 @@ namespace g3 {
       void enable(LEVELS level) {
          set(level, true);
       }
-
 
       void disableAll() {
          for (auto& v : internal::g_log_levels) {
@@ -94,7 +87,6 @@ namespace g3 {
          }
       }
 
-
       std::string to_string(std::map<int, g3::LoggingLevel> levelsToPrint) {
          std::string levels;
          for (auto& v : levelsToPrint) {
@@ -106,7 +98,6 @@ namespace g3 {
       std::string to_string() {
          return to_string(internal::g_log_levels);
       }
-
 
       std::map<int, g3::LoggingLevel> getAll() {
          return internal::g_log_levels;
@@ -120,12 +111,10 @@ namespace g3 {
          }
 
          return (it->second.status.get().load() ? status::Enabled : status::Disabled);
-
       }
-   } // log_levels
+   }  // namespace log_levels
 
 #endif
-
 
    bool logLevel(const LEVELS& log_level) {
 #ifdef G3_DYNAMIC_LOGGING
@@ -136,4 +125,4 @@ namespace g3 {
       return true;
 #endif
    }
-} // g3
+}  // namespace g3

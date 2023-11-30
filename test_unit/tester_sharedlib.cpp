@@ -6,10 +6,9 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
-
+#include "tester_sharedlib.h"
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
-#include "tester_sharedlib.h"
 
 struct RuntimeLoadedLib : public SomeLibrary {
 
@@ -34,4 +33,3 @@ struct RealLibraryFactory : public LibraryFactory {
 };
 
 RealLibraryFactory testRealFactory;
-

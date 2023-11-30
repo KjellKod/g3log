@@ -14,60 +14,37 @@
 
 #include "g3log/stacktrace_windows.hpp"
 
-#include <windows.h>
 #include <dbghelp.h>
+#include <windows.h>
+#include <cassert>
+#include <g3log/g3log.hpp>
 #include <map>
 #include <memory>
-#include <cassert>
-#include <vector>
 #include <mutex>
-#include <g3log/g3log.hpp>
+#include <vector>
 
 #pragma comment(lib, "dbghelp.lib")
-
 
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "stacktrace_win.cpp used but not on a windows system"
 #endif
 
-
-
-#define g3_MAP_PAIR_STRINGIFY(x) {x, #x}
+#define g3_MAP_PAIR_STRINGIFY(x) \
+   { x, #x }
 
 namespace {
    thread_local size_t g_thread_local_recursive_crash_check = 0;
 
    const std::map<g3::SignalType, std::string> kExceptionsAsText = {
-      g3_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_ARRAY_BOUNDS_EXCEEDED)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_DATATYPE_MISALIGNMENT)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DENORMAL_OPERAND)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DIVIDE_BY_ZERO)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INVALID_OPERATION)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_OVERFLOW)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_STACK_CHECK)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_UNDERFLOW)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_ILLEGAL_INSTRUCTION)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_IN_PAGE_ERROR)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_INT_DIVIDE_BY_ZERO)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_INT_OVERFLOW)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_INVALID_DISPOSITION)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_NONCONTINUABLE_EXCEPTION)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_PRIV_INSTRUCTION)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_STACK_OVERFLOW)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_BREAKPOINT)
-      , g3_MAP_PAIR_STRINGIFY(EXCEPTION_SINGLE_STEP)
+      g3_MAP_PAIR_STRINGIFY(EXCEPTION_ACCESS_VIOLATION), g3_MAP_PAIR_STRINGIFY(EXCEPTION_ARRAY_BOUNDS_EXCEEDED), g3_MAP_PAIR_STRINGIFY(EXCEPTION_DATATYPE_MISALIGNMENT), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DENORMAL_OPERAND), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_DIVIDE_BY_ZERO), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INEXACT_RESULT), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_INVALID_OPERATION), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_OVERFLOW), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_STACK_CHECK), g3_MAP_PAIR_STRINGIFY(EXCEPTION_FLT_UNDERFLOW), g3_MAP_PAIR_STRINGIFY(EXCEPTION_ILLEGAL_INSTRUCTION), g3_MAP_PAIR_STRINGIFY(EXCEPTION_IN_PAGE_ERROR), g3_MAP_PAIR_STRINGIFY(EXCEPTION_INT_DIVIDE_BY_ZERO), g3_MAP_PAIR_STRINGIFY(EXCEPTION_INT_OVERFLOW), g3_MAP_PAIR_STRINGIFY(EXCEPTION_INVALID_DISPOSITION), g3_MAP_PAIR_STRINGIFY(EXCEPTION_NONCONTINUABLE_EXCEPTION), g3_MAP_PAIR_STRINGIFY(EXCEPTION_PRIV_INSTRUCTION), g3_MAP_PAIR_STRINGIFY(EXCEPTION_STACK_OVERFLOW), g3_MAP_PAIR_STRINGIFY(EXCEPTION_BREAKPOINT), g3_MAP_PAIR_STRINGIFY(EXCEPTION_SINGLE_STEP)
 
    };
 
-
    // Using the given context, fill in all the stack frames.
    // Which then later can be interpreted to human readable text
-   void captureStackTrace(CONTEXT *context, std::vector<uint64_t> &frame_pointers) {
+   void captureStackTrace(CONTEXT* context, std::vector<uint64_t>& frame_pointers) {
       DWORD machine_type = 0;
-      STACKFRAME64 frame = {}; // force zeroing
+      STACKFRAME64 frame = {};  // force zeroing
       frame.AddrPC.Mode = AddrModeFlat;
       frame.AddrFrame.Mode = AddrModeFlat;
       frame.AddrStack.Mode = AddrModeFlat;
@@ -92,8 +69,7 @@ namespace {
       frame.AddrPC.Offset = context->Esp;
       machine_type = IMAGE_FILE_MACHINE_I386;
 #endif
-      for (size_t index = 0; index < frame_pointers.size(); ++index)
-      {
+      for (size_t index = 0; index < frame_pointers.size(); ++index) {
          if (StackWalk64(machine_type,
                          GetCurrentProcess(),
                          GetCurrentThread(),
@@ -110,18 +86,16 @@ namespace {
       }
    }
 
-
-
    // extract readable text from a given stack frame. All thanks to
    // using SymFromAddr and SymGetLineFromAddr64 with the stack pointer
-   std::string getSymbolInformation(const size_t index, const std::vector<uint64_t> &frame_pointers) {
+   std::string getSymbolInformation(const size_t index, const std::vector<uint64_t>& frame_pointers) {
       auto addr = frame_pointers[index];
       std::string frame_dump = "stack dump [" + std::to_string(index) + "]\t";
 
       DWORD64 displacement64;
       DWORD displacement;
       alignas(SYMBOL_INFO) char symbol_buffer[sizeof(SYMBOL_INFO) + MAX_SYM_NAME];
-      SYMBOL_INFO *symbol = reinterpret_cast<SYMBOL_INFO *>(symbol_buffer);
+      SYMBOL_INFO* symbol = reinterpret_cast<SYMBOL_INFO*>(symbol_buffer);
       symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
       symbol->MaxNameLen = MAX_SYM_NAME;
 
@@ -140,10 +114,9 @@ namespace {
       return frame_dump;
    }
 
-
    // Retrieves all the symbols for the stack frames, fills them within a text representation and returns it
-   std::string convertFramesToText(std::vector<uint64_t> &frame_pointers) {
-      std::string dump; // slightly more efficient than ostringstream
+   std::string convertFramesToText(std::vector<uint64_t>& frame_pointers) {
+      std::string dump;  // slightly more efficient than ostringstream
       const size_t kSize = frame_pointers.size();
       for (size_t index = 0; index < kSize && frame_pointers[index]; ++index) {
          dump += getSymbolInformation(index, frame_pointers);
@@ -151,10 +124,7 @@ namespace {
       }
       return dump;
    }
-} // anonymous
-
-
-
+}  // namespace
 
 namespace stacktrace {
    const std::string kUnknown = {"UNKNOWN EXCEPTION"};
@@ -162,7 +132,7 @@ namespace stacktrace {
    /// From MSDN GetExceptionCode http://msdn.microsoft.com/en-us/library/windows/desktop/ms679356(v=vs.85).aspx
    std::string exceptionIdToText(g3::SignalType id) {
       const auto iter = kExceptionsAsText.find(id);
-      if ( iter == kExceptionsAsText.end()) {
+      if (iter == kExceptionsAsText.end()) {
          std::string unknown = {kUnknown + ":" + std::to_string(id)};
          return unknown;
       }
@@ -185,17 +155,15 @@ namespace stacktrace {
    }
 
    /// helper function: retrieve stackdump, starting from an exception pointer
-   std::string stackdump(EXCEPTION_POINTERS *info) {
+   std::string stackdump(EXCEPTION_POINTERS* info) {
       auto context = info->ContextRecord;
       return stackdump(context);
-
    }
 
-
    /// main stackdump function. retrieve stackdump, from the given context
-   std::string stackdump(CONTEXT *context) {
+   std::string stackdump(CONTEXT* context) {
 
-      if (g_thread_local_recursive_crash_check >= 2) { // In Debug scenarios we allow one extra pass
+      if (g_thread_local_recursive_crash_check >= 2) {  // In Debug scenarios we allow one extra pass
          std::string recursive_crash = {"\n\n\n***** Recursive crash detected"};
          recursive_crash.append(", cannot continue stackdump traversal. *****\n\n\n");
          return recursive_crash;
@@ -208,16 +176,15 @@ namespace stacktrace {
          const BOOL kLoadSymModules = TRUE;
          const auto initialized = SymInitialize(GetCurrentProcess(), nullptr, kLoadSymModules);
          if (TRUE != initialized) {
-            return { "Error: Cannot call SymInitialize(...) for retrieving symbols in stack" };
+            return {"Error: Cannot call SymInitialize(...) for retrieving symbols in stack"};
          }
 
-         std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void *) {
+         std::shared_ptr<void> RaiiSymCleaner(nullptr, [&](void*) {
             SymCleanup(GetCurrentProcess());
-         }); // Raii sym cleanup
-
+         });  // Raii sym cleanup
 
          constexpr size_t kmax_frame_dump_size = 64;
-         std::vector<uint64_t>  frame_pointers(kmax_frame_dump_size);
+         std::vector<uint64_t> frame_pointers(kmax_frame_dump_size);
          // C++11: size set and values are zeroed
 
          assert(frame_pointers.size() == kmax_frame_dump_size);
@@ -226,4 +193,4 @@ namespace stacktrace {
       }
    }
 
-} // stacktrace
+}  // namespace stacktrace

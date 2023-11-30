@@ -8,19 +8,19 @@
 
 #include <gtest/gtest.h>
 
+#include <atomic>
+#include <chrono>
 #include <memory>
 #include <string>
-#include <vector>
 #include <thread>
-#include <chrono>
-#include <atomic>
+#include <vector>
 
-#include "testing_helpers.h"
-#include "g3log/sink.hpp"
-#include "g3log/sinkwrapper.hpp"
-#include "g3log/sinkhandle.hpp"
-#include "g3log/logmessage.hpp"
 #include "g3log/generated_definitions.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/sink.hpp"
+#include "g3log/sinkhandle.hpp"
+#include "g3log/sinkwrapper.hpp"
+#include "testing_helpers.h"
 
 using namespace std;
 using namespace testing_helpers;
@@ -29,23 +29,24 @@ class CoutSink {
    stringstream buffer;
    unique_ptr<ScopedOut> scope_ptr;
 
-   CoutSink() : scope_ptr(std::make_unique<ScopedOut>(std::cout, &buffer)) {}
- public:
+   CoutSink() :
+       scope_ptr(std::make_unique<ScopedOut>(std::cout, &buffer)) {}
+
+  public:
    void clear() { buffer.str(""); }
    std::string string() { return buffer.str(); }
    void save(g3::LogMessageMover msg) { std::cout << msg.get().message(); }
    virtual ~CoutSink() final {}
-   static std::unique_ptr<CoutSink> createSink() { return std::unique_ptr<CoutSink>(new CoutSink);}
+   static std::unique_ptr<CoutSink> createSink() { return std::unique_ptr<CoutSink>(new CoutSink); }
 };
 
 struct StringSink {
    std::string raw;
-   void append(g3::LogMessageMover entry) { raw.append(entry.get().message());}
+   void append(g3::LogMessageMover entry) { raw.append(entry.get().message()); }
    std::string string() {
       return raw;
    }
 };
-
 
 namespace {
    typedef std::shared_ptr<g3::internal::SinkWrapper> SinkWrapperPtr;
@@ -54,7 +55,7 @@ namespace {
 namespace g3 {
 
    class Worker {
-      std::vector<SinkWrapperPtr> _container; // should be hidden in a pimple with a bg active object
+      std::vector<SinkWrapperPtr> _container;  // should be hidden in a pimple with a bg active object
       std::unique_ptr<kjellkod::Active> _bg;
 
       void bgSave(std::string msg) {
@@ -65,11 +66,10 @@ namespace g3 {
          }
       }
 
-    public:
-
-      Worker() : _bg {
-         kjellkod::Active::createActive()
-      } {
+     public:
+      Worker() :
+          _bg{
+             kjellkod::Active::createActive()} {
       }
 
       ~Worker() {
@@ -82,34 +82,30 @@ namespace g3 {
          _bg->send([this, msg] { bgSave(msg); });
       }
 
-
-      template<typename T, typename DefaultLogCall>
-      std::unique_ptr< SinkHandle<T> > addSink(std::unique_ptr<T> unique, DefaultLogCall call) {
-         auto sink = std::make_shared < internal::Sink<T> > (std::move(unique), call);
-         auto add_sink_call = [this, sink] { _container.push_back(sink); };
+      template <typename T, typename DefaultLogCall>
+      std::unique_ptr<SinkHandle<T>> addSink(std::unique_ptr<T> unique, DefaultLogCall call) {
+         auto sink = std::make_shared<internal::Sink<T>>(std::move(unique), call);
+         auto add_sink_call = [this, sink] {
+            _container.push_back(sink);
+         };
          auto wait_result = g3::spawn_task(add_sink_call, _bg.get());
          wait_result.wait();
 
-         auto handle = std::make_unique< SinkHandle<T> >(sink);
+         auto handle = std::make_unique<SinkHandle<T>>(sink);
          return handle;
       }
    };
 
-} // g3
-
-
-
+}  // namespace g3
 
 using namespace g3;
 using namespace g3::internal;
-
 
 TEST(ConceptSink, CreateHandle) {
    Worker worker;
    auto handle = worker.addSink(CoutSink::createSink(), &CoutSink::save);
    ASSERT_NE(nullptr, handle.get());
 }
-
 
 TEST(ConceptSink, OneSink__VerifyMsgIn) {
    Worker worker;
@@ -122,18 +118,15 @@ TEST(ConceptSink, OneSink__VerifyMsgIn) {
    ASSERT_NE(pos, std::string::npos);
 }
 
-
 TEST(ConceptSink, DualSink__VerifyMsgIn) {
    Worker worker;
    auto h1 = worker.addSink(CoutSink::createSink(), &CoutSink::save);
    auto h2 = worker.addSink(std::make_unique<StringSink>(), &StringSink::append);
    worker.save("Hello World!");
 
-
    std::this_thread::sleep_for(std::chrono::milliseconds(100));
    auto first = h1->call(&CoutSink::string);
    auto second = h2->call(&StringSink::string);
-
 
    ASSERT_EQ("Hello World!", first.get());
    ASSERT_EQ("Hello World!", second.get());
@@ -151,10 +144,10 @@ TEST(ConceptSink, DeletedSink__Exptect_badweak_ptr___exception) {
 
 namespace {
    using AtomicBooleanPtr = std::shared_ptr<std::atomic<bool>>;
-   using AtomicIntegerPtr =  std::shared_ptr<std::atomic<int>> ;
-   using BoolList = std::vector<AtomicBooleanPtr> ;
+   using AtomicIntegerPtr = std::shared_ptr<std::atomic<int>>;
+   using BoolList = std::vector<AtomicBooleanPtr>;
    using IntVector = std::vector<AtomicIntegerPtr>;
-}
+}  // namespace
 
 TEST(ConceptSink, OneHundredSinks_part1) {
    BoolList flags;
@@ -162,8 +155,8 @@ TEST(ConceptSink, OneHundredSinks_part1) {
 
    size_t NumberOfItems = 100;
    for (size_t index = 0; index < NumberOfItems; ++index) {
-      flags.push_back(make_shared < atomic<bool >> (false));
-      counts.push_back(make_shared < atomic<int >> (0));
+      flags.push_back(make_shared<atomic<bool>>(false));
+      counts.push_back(make_shared<atomic<int>>(0));
    }
 
    {
@@ -190,10 +183,9 @@ TEST(ConceptSink, OneHundredSinks_part1) {
    cout << "test one hundred sinks is finished\n";
 }
 
-
 TEST(ConceptSink, OneHundredSinks_part2) {
-   using BoolPtrVector = std::vector<AtomicBooleanPtr> ;
-   using IntPtrVector = vector<AtomicIntegerPtr> ;
+   using BoolPtrVector = std::vector<AtomicBooleanPtr>;
+   using IntPtrVector = vector<AtomicIntegerPtr>;
    BoolPtrVector flags;
    IntPtrVector counts;
 
@@ -207,18 +199,18 @@ TEST(ConceptSink, OneHundredSinks_part2) {
       auto worker = g3::LogWorker::createLogWorker();
       size_t index = 0;
       for (auto& flag : flags) {
-         auto& count = counts[index++]; 
+         auto& count = counts[index++];
          // ignore the handle
          worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
 
       // 100 logs
-   for (int index = 0; index < NumberOfItems; ++index) {
-      LogMessagePtr message{std::make_unique<LogMessage>("test", 0, "test", DEBUG)};
-      message.get()->write().append("Hello to 100 receivers :)");
-      worker->save(message);
-    }
-   } // RAII exit 
+      for (int index = 0; index < NumberOfItems; ++index) {
+         LogMessagePtr message{std::make_unique<LogMessage>("test", 0, "test", DEBUG)};
+         message.get()->write().append("Hello to 100 receivers :)");
+         worker->save(message);
+      }
+   }  // RAII exit
 
    // at the curly brace above the ScopedLogger will go out of scope and all the
    // 100 logging receivers will get their message to exit after all messages are
@@ -229,10 +221,9 @@ TEST(ConceptSink, OneHundredSinks_part2) {
    for (auto& flag : flags) {
       auto& count = counts[index++];
       EXPECT_TRUE(flag->load());
-      EXPECT_EQ(NumberOfItems, count->load()); 
+      EXPECT_EQ(NumberOfItems, count->load());
    }
 }
-
 
 TEST(ConceptSink, OneSinkWithHandleOutOfScope) {
    AtomicBooleanPtr flag = make_shared<atomic<bool>>(false);
@@ -240,7 +231,7 @@ TEST(ConceptSink, OneSinkWithHandleOutOfScope) {
    {
       auto worker = g3::LogWorker::createLogWorker();
       {
-         auto handle =   worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
+         auto handle = worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
       }
       EXPECT_FALSE(flag->load());
       EXPECT_TRUE(0 == count->load());

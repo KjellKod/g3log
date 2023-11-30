@@ -18,22 +18,21 @@
  * 5. Various Q&A at StackOverflow
  * ********************************************* */
 
-
 #pragma once
 
-#include "g3log/loglevels.hpp"
-#include "g3log/logcapture.hpp"
-#include "g3log/logmessage.hpp"
 #include "g3log/generated_definitions.hpp"
+#include "g3log/logcapture.hpp"
+#include "g3log/loglevels.hpp"
+#include "g3log/logmessage.hpp"
 
-#include <string>
 #include <functional>
+#include <string>
 
-#if defined(_MSC_VER) && (defined(WINDOWS_FUNCSIG)) // Microsoft
+#if defined(_MSC_VER) && (defined(WINDOWS_FUNCSIG))  // Microsoft
 #define G3LOG_PRETTY_FUNCTION __FUNCSIG__
-#elif defined(__GNUC__) && defined(PRETTY_FUNCTION) // GCC compatible
+#elif defined(__GNUC__) && defined(PRETTY_FUNCTION)  // GCC compatible
 #define G3LOG_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#else 
+#else
 #define G3LOG_PRETTY_FUNCTION __FUNCTION__
 #endif
 
@@ -42,7 +41,6 @@
 #if !(defined(thread_local)) && defined(_MSC_VER) && _MSC_VER < 1900
 #define thread_local __declspec(thread)
 #endif
-
 
 /** namespace for LOG() and CHECK() frameworks
  * History lesson:   Why the names 'g3' and 'g3log'?:
@@ -62,8 +60,7 @@ namespace g3 {
 
    /** Should be called at very first startup of the software with \ref g3LogWorker
     *  pointer. Ownership of the \ref g3LogWorker is the responsibility of the caller */
-   void initializeLogging(LogWorker *logger);
-
+   void initializeLogging(LogWorker* logger);
 
    /** setFatalPreLoggingHook() provides an optional extra step before the fatalExitHandler is called
     *
@@ -80,7 +77,7 @@ namespace g3 {
     *
     * Linux:   g3::setFatalPreLoggingHook([]{ raise(SIGTRAP); });
     */
-   void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook);
+   void setFatalPreLoggingHook(std::function<void(void)> pre_fatal_hook);
 
    /** If the @ref setFatalPreLoggingHook is not enough and full fatal exit handling is needed then
     * use "setFatalExithandler".  Please see g3log.cpp and crashhandler_windows.cpp or crashhandler_unix for
@@ -88,16 +85,15 @@ namespace g3 {
     */
    void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call);
 
-
 #ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
-  // only_change_at_initialization namespace is for changes to be done only during initialization. More specifically
-  // items here would be called prior to calling other parts of g3log
-  namespace only_change_at_initialization {
-    // Sets the MaxMessageSize to be used when capturing log messages. Currently this value is set to 2KB. Messages
-    // Longer than this are bound to 2KB with the string "[...truncated...]" at the end. This function allows
-    // this limit to be changed.
-    void setMaxMessageSize(size_t max_size);
-  }
+   // only_change_at_initialization namespace is for changes to be done only during initialization. More specifically
+   // items here would be called prior to calling other parts of g3log
+   namespace only_change_at_initialization {
+      // Sets the MaxMessageSize to be used when capturing log messages. Currently this value is set to 2KB. Messages
+      // Longer than this are bound to 2KB with the string "[...truncated...]" at the end. This function allows
+      // this limit to be changed.
+      void setMaxMessageSize(size_t max_size);
+   }   // namespace only_change_at_initialization
 #endif /* G3_DYNAMIC_MAX_MESSAGE_SIZE */
 
    // internal namespace is for completely internal or semi-hidden from the g3 namespace due to that it is unlikely
@@ -107,12 +103,11 @@ namespace g3 {
       bool isLoggingInitialized();
 
       // Save the created LogMessage to any existing sinks
-      void saveMessage(const char *message, const char *file, int line, const char *function, const LEVELS &level,
-                       const char *boolean_expression, int fatal_signal, const char *stack_trace);
+      void saveMessage(const char* message, const char* file, int line, const char* function, const LEVELS& level,
+                       const char* boolean_expression, int fatal_signal, const char* stack_trace);
 
       // forwards the message to all sinks
       void pushMessageToLogger(LogMessagePtr log_entry);
-
 
       // forwards a FATAL message to all sinks,. after which the g3logworker
       // will trigger crashhandler / g3::internal::exitWithDefaultSignalHandler
@@ -121,7 +116,6 @@ namespace g3 {
       // this behavior can be changed if you set a different fatal handler through
       // "setFatalExitHandler"
       void pushFatalMessageToLogger(FatalMessagePtr message);
-
 
       // Saves the created FatalMessage to any existing sinks and exits with
       // the originating fatal signal,. or SIGABRT if it originated from a broken contract.
@@ -136,11 +130,11 @@ namespace g3 {
       void shutDownLogging();
 
       // Shutdown logging, but ONLY if the active logger corresponds to the one currently initialized
-      bool shutDownLoggingForActiveOnly(LogWorker *active);
+      bool shutDownLoggingForActiveOnly(LogWorker* active);
 
-   } // internal
-} // g3
-
+   }  // namespace internal
+}  // namespace g3
+   // clang-format off
 #define INTERNAL_LOG_MESSAGE(level) LogCapture(__FILE__, __LINE__, static_cast<const char*>(G3LOG_PRETTY_FUNCTION), level)
 
 #define INTERNAL_CONTRACT_MESSAGE(boolean_expression)  \
@@ -228,3 +222,4 @@ And here is possible output
 // (ref test_io.cpp)
 #define CHECK_F(boolean_expression, printf_like_message, ...)    \
    if (true == (boolean_expression)) {} else INTERNAL_CONTRACT_MESSAGE(#boolean_expression).capturef(printf_like_message, ##__VA_ARGS__)
+   // clang-format on

@@ -8,10 +8,10 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 #include <cstdio>
-#include <string>
 #include <map>
-#include "g3log/loglevels.hpp"
+#include <string>
 #include "g3log/generated_definitions.hpp"
+#include "g3log/loglevels.hpp"
 
 // kjell. Separera på crashhandler.hpp och crashhanlder_internal.hpp
 // implementationsfilen kan vara den samma
@@ -28,7 +28,6 @@ namespace g3 {
      SIGTERM  TERMINATION (ANSI)  */
    void installCrashHandler();
 
-
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    typedef unsigned long SignalType;
    /// SIGFPE, SIGILL, and SIGSEGV handling must be installed per thread
@@ -43,7 +42,6 @@ namespace g3 {
    // restore to whatever signal handler was used before signal handler installation
    void restoreSignalHandler(int signal_number);
 
-
    /// Overrides the existing signal handling for custom signals
    /// For example: usage of zcmq relies on its own signal handler for SIGTERM
    ///     so users of g3log with zcmq should then use the @ref overrideSetupSignals
@@ -55,13 +53,11 @@ namespace g3 {
    void overrideSetupSignals(const std::map<int, std::string> overrideSignals);
 #endif
 
-
    namespace internal {
       /// Resets the fatal signal/exception handling back to default
       /// which might be needed in case it was previously overridden
       /// The default signals are: SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM
       void restoreFatalHandlingToDefault();
-
 
       /** return whether or any fatal handling is still ongoing
        *  this is used by g3log::fatalCallToLogger
@@ -81,5 +77,5 @@ namespace g3 {
        * This is an internal only function. Do not use it elsewhere. It is triggered
        * from g3log, g3LogWorker after flushing messages to file */
       void exitWithDefaultSignalHandler(const LEVELS& level, g3::SignalType signal_number);
-   } // end g3::internal
-} // g3
+   }  // namespace internal
+}  // namespace g3

@@ -11,45 +11,42 @@
 * Ref: workarounds at http://connect.microsoft.com/VisualStudio/feedback/details/791185/std-packaged-task-t-where-t-is-void-or-a-reference-class-are-not-movable
 * ============================================================================*/
 
-
-
 #pragma once
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__) && (_MSC_VER <= 1800)
 namespace std {
 
-   template<class... _ArgTypes>
-   class packaged_task<void(_ArgTypes...)>
-   {
+   template <class... _ArgTypes>
+   class packaged_task<void(_ArgTypes...)> {
       promise<void> _my_promise;
       function<void(_ArgTypes...)> _my_func;
 
-   public:
+     public:
       packaged_task() {
       }
 
-      template<class _Fty2>
-      explicit packaged_task(_Fty2 &&_Fnarg)
-         : _my_func(_Fnarg) {
+      template <class _Fty2>
+      explicit packaged_task(_Fty2&& _Fnarg) :
+          _my_func(_Fnarg) {
       }
 
-      packaged_task(packaged_task &&_Other)
-         : _my_promise(move(_Other._my_promise)),
-           _my_func(move(_Other._my_func)) {
+      packaged_task(packaged_task&& _Other) :
+          _my_promise(move(_Other._my_promise)),
+          _my_func(move(_Other._my_func)) {
       }
 
-      packaged_task &operator=(packaged_task && _Other) {
+      packaged_task& operator=(packaged_task&& _Other) {
          _my_promise = move(_Other._my_promise);
          _my_func = move(_Other._my_func);
          return (*this);
       }
 
-      packaged_task(const packaged_task &) = delete;
-      packaged_task &operator=(const packaged_task &) = delete;
+      packaged_task(const packaged_task&) = delete;
+      packaged_task& operator=(const packaged_task&) = delete;
 
       ~packaged_task() {
       }
 
-      void swap(packaged_task &_Other) {
+      void swap(packaged_task& _Other) {
          swap(_my_promise, _Other._my_promise);
          swap(_my_func, _Other._my_func);
       }
@@ -77,5 +74,5 @@ namespace std {
       }
    };
 
-}; // namespace std
-#endif // defined(WIN32) ...
+};      // namespace std
+#endif  // defined(WIN32) ...

@@ -7,12 +7,9 @@
 * ============================================================================*/
 
 #include "g3log/logmessage.hpp"
+#include <mutex>
 #include "g3log/crashhandler.hpp"
 #include "g3log/time.hpp"
-#include <mutex>
-
-
-
 
 namespace g3 {
 
@@ -22,26 +19,19 @@ namespace g3 {
       return str.substr(found + 1);
    }
 
-
    // helper for fatal signal
-   std::string  LogMessage::fatalSignalToString(const LogMessage& msg) {
-      std::string out; // clear any previous text and formatting
-      out.append(msg.timestamp()
-                 + "\n\n***** FATAL SIGNAL RECEIVED ******* \n"
-                 + msg.message() + '\n');
+   std::string LogMessage::fatalSignalToString(const LogMessage& msg) {
+      std::string out;  // clear any previous text and formatting
+      out.append(msg.timestamp() + "\n\n***** FATAL SIGNAL RECEIVED ******* \n" + msg.message() + '\n');
       return out;
    }
-
 
    // helper for fatal exception (windows only)
-   std::string  LogMessage::fatalExceptionToString(const LogMessage& msg) {
-      std::string out; // clear any previous text and formatting
-      out.append(msg.timestamp()
-                 + "\n\n***** FATAL EXCEPTION RECEIVED ******* \n"
-                 + msg.message() + '\n');
+   std::string LogMessage::fatalExceptionToString(const LogMessage& msg) {
+      std::string out;  // clear any previous text and formatting
+      out.append(msg.timestamp() + "\n\n***** FATAL EXCEPTION RECEIVED ******* \n" + msg.message() + '\n');
       return out;
    }
-
 
    // helper for fatal LOG
    std::string LogMessage::fatalLogToString(const LogMessage& msg) {
@@ -55,38 +45,22 @@ namespace g3 {
    std::string LogMessage::fatalCheckToString(const LogMessage& msg) {
       auto out = msg._logDetailsToStringFunc(msg);
       static const std::string contractExitReason = {"EXIT trigger caused by broken Contract:"};
-      out.append("\n\t*******\t " + contractExitReason + " CHECK(" + msg.expression() + ")\n\t"
-                 + '"' + msg. message() + '"');
+      out.append("\n\t*******\t " + contractExitReason + " CHECK(" + msg.expression() + ")\n\t" + '"' + msg.message() + '"');
       return out;
    }
 
    // helper for setting the normal log details in an entry
    std::string LogMessage::DefaultLogDetailsToString(const LogMessage& msg) {
       std::string out;
-      out.append(msg.timestamp() + "\t"
-                 + msg.level() 
-                 + " [" 
-                 + msg.file() 
-                 + "->" 
-                 + msg.function() 
-                 + ":" + msg.line() + "]\t");
+      out.append(msg.timestamp() + "\t" + msg.level() + " [" + msg.file() + "->" + msg.function() + ":" + msg.line() + "]\t");
       return out;
    }
-
 
    std::string LogMessage::FullLogDetailsToString(const LogMessage& msg) {
       std::string out;
-      out.append(msg.timestamp() + "\t"
-                 + msg.level() 
-                 + " [" 
-                 + msg.threadID() 
-                 + " "
-                 + msg.file() 
-                 + "->"+ msg.function() 
-                 + ":" + msg.line() + "]\t");
+      out.append(msg.timestamp() + "\t" + msg.level() + " [" + msg.threadID() + " " + msg.file() + "->" + msg.function() + ":" + msg.line() + "]\t");
       return out;
    }
-
 
    // helper for normal
    std::string LogMessage::normalToString(const LogMessage& msg) {
@@ -95,15 +69,11 @@ namespace g3 {
       return out;
    }
 
+   // end static functions section
 
-
- // end static functions section
-
-   void LogMessage::overrideLogDetailsFunc(LogDetailsFunc func) const{
+   void LogMessage::overrideLogDetailsFunc(LogDetailsFunc func) const {
       _logDetailsToStringFunc = func;
    }
-
-
 
    // Format the log message according to it's type
    std::string LogMessage::toString(LogDetailsFunc formattingFunc) const {
@@ -137,70 +107,66 @@ namespace g3 {
       return out;
    }
 
-
-
    std::string LogMessage::timestamp(const std::string& time_look) const {
       return g3::localtime_formatted(to_system_time(_timestamp), time_look);
    }
 
-
-// By copy, not by reference. See this explanation for details:
-// http://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
+   // By copy, not by reference. See this explanation for details:
+   // http://stackoverflow.com/questions/3279543/what-is-the-copy-and-swap-idiom
    LogMessage& LogMessage::operator=(LogMessage other) {
       swap(*this, other);
       return *this;
    }
 
-
    LogMessage::LogMessage(std::string file, const int line,
-                          std::string function, const LEVELS level)
-      : _logDetailsToStringFunc(LogMessage::DefaultLogDetailsToString)
-      , _timestamp(std::chrono::high_resolution_clock::now())
-      , _call_thread_id(std::this_thread::get_id())
+                          std::string function, const LEVELS level) :
+       _logDetailsToStringFunc(LogMessage::DefaultLogDetailsToString),
+       _timestamp(std::chrono::high_resolution_clock::now()),
+       _call_thread_id(std::this_thread::get_id())
 #if defined(G3_LOG_FULL_FILENAME)
-      , _file(file)
+       ,
+       _file(file)
 #else
-	   , _file(LogMessage::splitFileName(file))
+       ,
+       _file(LogMessage::splitFileName(file))
 #endif
-      , _file_path(file)
-      , _line(line)
-      , _function(std::move(function))
-      , _level(level) {
+       ,
+       _file_path(file),
+       _line(line),
+       _function(std::move(function)),
+       _level(level) {
    }
 
-
-   LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage)
-      : LogMessage( {""}, 0, {""}, internal::FATAL_SIGNAL) {
+   LogMessage::LogMessage(const std::string& fatalOsSignalCrashMessage) :
+       LogMessage({""}, 0, {""}, internal::FATAL_SIGNAL) {
       _message.append(fatalOsSignalCrashMessage);
    }
 
-   LogMessage::LogMessage(const LogMessage& other)
-      : _logDetailsToStringFunc(other._logDetailsToStringFunc)
-      , _timestamp(other._timestamp)
-      , _call_thread_id(other._call_thread_id)
-      , _file(other._file)
-      , _file_path(other._file_path)
-      , _line(other._line)
-      , _function(other._function)
-      , _level(other._level)
-      , _expression(other._expression)
-      , _message(other._message) {
+   LogMessage::LogMessage(const LogMessage& other) :
+       _logDetailsToStringFunc(other._logDetailsToStringFunc),
+       _timestamp(other._timestamp),
+       _call_thread_id(other._call_thread_id),
+       _file(other._file),
+       _file_path(other._file_path),
+       _line(other._line),
+       _function(other._function),
+       _level(other._level),
+       _expression(other._expression),
+       _message(other._message) {
    }
 
-   LogMessage::LogMessage(LogMessage&& other)
-      : _logDetailsToStringFunc(other._logDetailsToStringFunc)
-      , _timestamp(other._timestamp)
-      , _call_thread_id(other._call_thread_id)
-      , _file(std::move(other._file))
-      , _file_path(std::move(other._file_path))
-      , _line(other._line)
-      , _function(std::move(other._function))
-      , _level(other._level)
-      , _expression(std::move(other._expression))
-      , _message(std::move(other._message)) {
+   LogMessage::LogMessage(LogMessage&& other) :
+       _logDetailsToStringFunc(other._logDetailsToStringFunc),
+       _timestamp(other._timestamp),
+       _call_thread_id(other._call_thread_id),
+       _file(std::move(other._file)),
+       _file_path(std::move(other._file_path)),
+       _line(other._line),
+       _function(std::move(other._function)),
+       _level(other._level),
+       _expression(std::move(other._expression)),
+       _message(std::move(other._message)) {
    }
-
-
 
    std::string LogMessage::threadID() const {
       std::ostringstream oss;
@@ -208,18 +174,15 @@ namespace g3 {
       return oss.str();
    }
 
+   FatalMessage::FatalMessage(const LogMessage& details, g3::SignalType signal_id) :
+       LogMessage(details),
+       _signal_id(signal_id) {}
 
+   FatalMessage::FatalMessage(const FatalMessage& other) :
+       LogMessage(other),
+       _signal_id(other._signal_id) {}
 
-   FatalMessage::FatalMessage(const LogMessage& details, g3::SignalType signal_id)
-      : LogMessage(details), _signal_id(signal_id) { }
-
-
-
-   FatalMessage::FatalMessage(const FatalMessage& other)
-      : LogMessage(other), _signal_id(other._signal_id) {}
-
-
-   LogMessage  FatalMessage::copyToLogMessage() const {
+   LogMessage FatalMessage::copyToLogMessage() const {
       return LogMessage(*this);
    }
 
@@ -227,5 +190,4 @@ namespace g3 {
       return internal::exitReasonName(_level, _signal_id);
    }
 
-
-} // g3
+}  // namespace g3

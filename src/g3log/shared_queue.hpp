@@ -16,24 +16,23 @@
 
 #pragma once
 
-#include <queue>
-#include <mutex>
-#include <exception>
 #include <condition_variable>
+#include <exception>
+#include <mutex>
+#include <queue>
 
 /** Multiple producer, multiple consumer thread safe queue
 * Since 'return by reference' is used this queue won't throw */
-template<typename T>
-class shared_queue
-{
+template <typename T>
+class shared_queue {
    std::queue<T> queue_;
    mutable std::mutex m_;
    std::condition_variable data_cond_;
 
-   shared_queue &operator=(const shared_queue &) = delete;
-   shared_queue(const shared_queue &other) = delete;
+   shared_queue& operator=(const shared_queue&) = delete;
+   shared_queue(const shared_queue& other) = delete;
 
-public:
+  public:
    shared_queue() = default;
 
    void push(T item) {
@@ -45,7 +44,7 @@ public:
    }
 
    /// \return immediately, with true if successful retrieval
-   bool try_and_pop(T &popped_item) {
+   bool try_and_pop(T& popped_item) {
       std::lock_guard<std::mutex> lock(m_);
       if (queue_.empty()) {
          return false;
@@ -56,10 +55,9 @@ public:
    }
 
    /// Try to retrieve, if no items, wait till an item is available and try again
-   void wait_and_pop(T &popped_item) {
+   void wait_and_pop(T& popped_item) {
       std::unique_lock<std::mutex> lock(m_);
-      while (queue_.empty())
-      {
+      while (queue_.empty()) {
          data_cond_.wait(lock);
          //  This 'while' loop is equal to
          //  data_cond_.wait(lock, [](bool result){return !queue_.empty();});
