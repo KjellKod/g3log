@@ -683,8 +683,9 @@ TEST(CustomLogLevels, AddANonFatal__ThenReset) {
 TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue1) {
    RestoreFileLogger logger(log_directory);
    const LEVELS MYINFO{WARNING.value + 2, {"MY_INFO_LEVEL"}};
-   LOG(MYINFO) << "Testing my own custom level";
-   auto line = __LINE__;
+   // clang-format off
+   LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
+   // clang-format on
    logger.reset();
 
    std::string file_content = readFileToText(logger.logFile());
@@ -700,8 +701,9 @@ TEST(CustomLogLevels, AddANonFatal__DidNotAddItToEnabledValue2) {
    RestoreFileLogger logger(log_directory);
    const LEVELS MYINFO{WARNING.value + 2, {"MY_INFO_LEVEL"}};
    EXPECT_FALSE(g3::logLevel(MYINFO));
-   LOG(MYINFO) << "Testing my own custom level";
-   auto line = __LINE__;
+   // clang-format off
+   LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
+   // clang-format on
    logger.reset();
 
    std::string file_content = readFileToText(logger.logFile());
@@ -717,8 +719,9 @@ TEST(CustomLogLevels, AddANonFatal__DidtAddItToEnabledValue) {
    RestoreFileLogger logger(log_directory);
    const LEVELS MYINFO{WARNING.value + 3, {"MY_INFO_LEVEL"}};
    g3::only_change_at_initialization::addLogLevel(MYINFO, true);
-   LOG(MYINFO) << "Testing my own custom level";
-   auto line = __LINE__;
+   // clang-format off
+   LOG(MYINFO) << "Testing my own custom level"; auto line = __LINE__;
+   // clang-format on
    logger.reset();
    std::string file_content = readFileToText(logger.logFile());
    std::string expected;
