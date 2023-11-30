@@ -11,17 +11,16 @@
  *
  * PUBLIC DOMAIN and Not copyrighted. First published at KjellKod.cc
  * ********************************************* */
-#include "g3log/g3log.hpp"
-#include "g3log/sinkwrapper.hpp"
-#include "g3log/sinkhandle.hpp"
-#include "g3log/filesink.hpp"
-#include "g3log/logmessage.hpp"
 #include <memory>
+#include "g3log/filesink.hpp"
+#include "g3log/g3log.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/sinkhandle.hpp"
+#include "g3log/sinkwrapper.hpp"
 
 #include <memory>
 #include <string>
 #include <vector>
-
 
 namespace g3 {
    class LogWorker;
@@ -32,7 +31,7 @@ namespace g3 {
    struct LogWorkerImpl final {
       typedef std::shared_ptr<g3::internal::SinkWrapper> SinkWrapperPtr;
       std::vector<SinkWrapperPtr> _sinks;
-      std::unique_ptr<kjellkod::Active> _bg; // do not change declaration order. _bg must be destroyed before sinks
+      std::unique_ptr<kjellkod::Active> _bg;  // do not change declaration order. _bg must be destroyed before sinks
 
       LogWorkerImpl();
       ~LogWorkerImpl() = default;
@@ -43,7 +42,6 @@ namespace g3 {
       LogWorkerImpl(const LogWorkerImpl&) = delete;
       LogWorkerImpl& operator=(const LogWorkerImpl&) = delete;
    };
-
 
    /// Front end of the LogWorker.  API that is useful is
    /// addSink( sink, default_call ) which returns a handle to the sink. See below and README for usage example
@@ -57,14 +55,12 @@ namespace g3 {
       LogWorker(const LogWorker&) = delete;
       LogWorker& operator=(const LogWorker&) = delete;
 
-
-    public:
+     public:
       ~LogWorker();
 
       /// Creates the LogWorker with no sinks. See example below on @ref addSink for how to use it
       /// if you want to use the default file logger then see below for @ref addDefaultLogger
       static std::unique_ptr<LogWorker> createLogWorker();
-
 
       /**
       A convenience function to add the default g3::FileSink to the log worker
@@ -89,26 +85,26 @@ namespace g3 {
       /// @param real_sink unique_ptr ownership is passed to the log worker
       /// @param call the default call that should receive either a std::string or a LogMessageMover message
       /// @return handle to the sink for API access. See usage example below at @ref addDefaultLogger
-      template<typename T, typename DefaultLogCall>
+      template <typename T, typename DefaultLogCall>
       std::unique_ptr<g3::SinkHandle<T>> addSink(std::unique_ptr<T> real_sink, DefaultLogCall call) {
          using namespace g3;
          using namespace g3::internal;
-         auto sink = std::make_shared<Sink<T>> (std::move(real_sink), call);
+         auto sink = std::make_shared<Sink<T>>(std::move(real_sink), call);
          addWrappedSink(sink);
-         return std::make_unique<SinkHandle<T>> (sink);
+         return std::make_unique<SinkHandle<T>>(sink);
       }
-
 
       /// Removes a sink. This is a synchronous call.
       /// You are guaranteed that the sink is removed by the time the call returns
       /// @param sink_handle the ownership of the sink handle is given
-      template<typename T>
+      template <typename T>
       void removeSink(std::unique_ptr<SinkHandle<T>> sink_handle) {
          if (sink_handle) {
             // sink_handle->sink().use_count() is 1 at this point
             // i.e. this would be safe as long as no other weak_ptr to shared_ptr conversion
             // was made by the client: assert(sink_handle->sink().use_count()  == 0);
-            auto weak_ptr_sink = sink_handle->sink(); {
+            auto weak_ptr_sink = sink_handle->sink();
+            {
                auto bg_removesink_call = [this, weak_ptr_sink] {
                   auto shared_sink = weak_ptr_sink.lock();
                   if (shared_sink) {
@@ -127,12 +123,12 @@ namespace g3 {
       /// This will clear/remove all the sinks. If a sink shared_ptr was retrieved via the sink
       /// handle then the sink will be removed internally but will live on in the client's instance
       void removeAllSinks() {
-         auto bg_clear_sink_call = [this]() noexcept { _impl._sinks.clear(); };
+         auto bg_clear_sink_call = [this]() noexcept {
+            _impl._sinks.clear();
+         };
          auto token_cleared = g3::spawn_task(bg_clear_sink_call, _impl._bg.get());
          token_cleared.wait();
       }
-
-
 
       /// internal:
       /// pushes in background thread (asynchronously) input messages to log file
@@ -143,7 +139,5 @@ namespace g3 {
       /// this way it's ensured that all existing entries were flushed before 'fatal'
       /// Will abort the application!
       void fatal(FatalMessagePtr fatal_message);
-
-
    };
-} // g3
+}  // namespace g3

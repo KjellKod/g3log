@@ -19,19 +19,20 @@
 
 #pragma once
 
-#include <thread>
 #include <functional>
 #include <memory>
+#include <thread>
 #include "g3log/shared_queue.hpp"
 
 namespace kjellkod {
-   typedef std::function<void() > Callback;
+   typedef std::function<void()> Callback;
 
    class Active {
-   private:
-      Active() : done_(false) {} // Construction ONLY through factory createActive();
-      Active(const Active &) = delete;
-      Active &operator=(const Active &) = delete;
+     private:
+      Active()
+          : done_(false) {}  // Construction ONLY through factory createActive();
+      Active(const Active&) = delete;
+      Active& operator=(const Active&) = delete;
 
       void run() {
          while (!done_) {
@@ -45,10 +46,9 @@ namespace kjellkod {
       std::thread thd_;
       bool done_;
 
-
-   public:
+     public:
       virtual ~Active() {
-         send([this]() noexcept { done_ = true;});
+         send([this]() noexcept { done_ = true; });
          thd_.join();
       }
 
@@ -64,6 +64,4 @@ namespace kjellkod {
       }
    };
 
-
-
-} // kjellkod
+}  // namespace kjellkod

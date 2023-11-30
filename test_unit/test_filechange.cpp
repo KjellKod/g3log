@@ -6,15 +6,12 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
-
 #include <gtest/gtest.h>
-#include <memory>
 #include <fstream>
-#include <string>
-#include <memory>
 #include <future>
+#include <memory>
 #include <queue>
-
+#include <string>
 
 #include <thread>
 #include "g3log/g3log.hpp"
@@ -23,8 +20,7 @@
 
 using namespace testing_helpers;
 
-
-namespace { // anonymous
+namespace {  // anonymous
    const char* name_path_1 = "./(some_fake_DirectoryOrName_1_)";
    const std::string kReplaceFileName = "(ReplaceLogFile)";
    g3::LogWorker* g_logger_ptr = nullptr;
@@ -53,7 +49,8 @@ namespace { // anonymous
    std::string setLogName(std::string new_file_to_create, std::string logger_id = "g3log") {
       auto future_new_log = g_filesink_handler->call(&g3::FileSink::changeLogFile, new_file_to_create, logger_id);
       auto new_log = future_new_log.get();
-      if (!new_log.empty()) g_cleaner_ptr->addLogToClean(new_log);
+      if (!new_log.empty())
+         g_cleaner_ptr->addLogToClean(new_log);
       return new_log;
    }
 
@@ -61,7 +58,7 @@ namespace { // anonymous
       return g_filesink_handler->call(&g3::FileSink::fileName).get();
    }
 
-} // anonymous
+}  // namespace
 
 TEST(TestOf_GetFileName, Expecting_ValidLogFile) {
 
@@ -101,7 +98,8 @@ TEST(TestOf_ChangingLogFile_NoId, Expecting_NewLogFileUsed2) {
 
 TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
    auto old_log = g_filesink_handler->call(&g3::FileSink::fileName).get();
-   if (!old_log.empty()) g_cleaner_ptr->addLogToClean(old_log);
+   if (!old_log.empty())
+      g_cleaner_ptr->addLogToClean(old_log);
 
    LOG(INFO) << "SoManyThreadsAllDoingChangeFileName";
    std::vector<std::thread> threads;
@@ -121,7 +119,7 @@ TEST(TestOf_ManyThreadsChangingLogFileName, Expecting_EqualNumberLogsCreated) {
 
 TEST(TestOf_IllegalLogFileName, Expecting_NoChangeToOriginalFileName) {
    std::string original = getLogName();
-   auto perhaps_a_name = setLogName("XY:/"); // does not exist
+   auto perhaps_a_name = setLogName("XY:/");  // does not exist
    ASSERT_TRUE(perhaps_a_name.empty());
    std::string post_illegal = getLogName();
    ASSERT_STREQ(original.c_str(), post_illegal.c_str());
@@ -130,18 +128,17 @@ TEST(TestOf_IllegalLogFileName, Expecting_NoChangeToOriginalFileName) {
 TEST(TestOf_SinkHandleDifferentId, Expecting_DifferentId) {
    auto sink = std::make_unique<g3::FileSink>("AnotherLogFile", name_path_1, "logger_id");
    auto name = sink->fileName();
-   ASSERT_STREQ( name.substr(0, 26).c_str(), "./AnotherLogFile.logger_id");
+   ASSERT_STREQ(name.substr(0, 26).c_str(), "./AnotherLogFile.logger_id");
    g_cleaner_ptr->addLogToClean(name);
 }
 
-TEST(TestOf_LegalLogFileNam,  With_parenthesis) {
+TEST(TestOf_LegalLogFileNam, With_parenthesis) {
    std::string original = getLogName();
-   auto perhaps_a_name = setLogName("(test)"); // does not exist
+   auto perhaps_a_name = setLogName("(test)");  // does not exist
    EXPECT_NE(original, perhaps_a_name);
    std::string post_legal = getLogName();
    EXPECT_TRUE(std::string::npos != post_legal.find("(test)")) << "filename was: " << post_legal;
 }
-
 
 int main(int argc, char* argv[]) {
    LogFileCleaner cleaner;
@@ -161,7 +158,6 @@ int main(int argc, char* argv[]) {
       last_log_file = g_filesink_handler->call(&g3::FileSink::fileName).get();
       std::cout << "log file at: " << last_log_file << std::endl;
       cleaner.addLogToClean(last_log_file);
-
 
       g3::initializeLogging(g_logger_ptr);
       LOG(INFO) << "test_filechange demo*" << std::endl;

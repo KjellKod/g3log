@@ -14,20 +14,23 @@ namespace g3 {
    //  not CopyConstructible or CopyAssignable. To put them in a std container they need
    //  to be wrapped and their internals "moved" when tried to be copied.
 
-   template<typename Moveable>
+   template <typename Moveable>
    struct MoveOnCopy {
       mutable Moveable _move_only;
 
-      explicit MoveOnCopy(Moveable &&m) : _move_only(std::move(m)) {}
-      MoveOnCopy(MoveOnCopy const &t) : _move_only(std::move(t._move_only)) {}
-      MoveOnCopy(MoveOnCopy &&t) : _move_only(std::move(t._move_only)) {}
+      explicit MoveOnCopy(Moveable&& m)
+          : _move_only(std::move(m)) {}
+      MoveOnCopy(MoveOnCopy const& t)
+          : _move_only(std::move(t._move_only)) {}
+      MoveOnCopy(MoveOnCopy&& t)
+          : _move_only(std::move(t._move_only)) {}
 
-      MoveOnCopy &operator=(MoveOnCopy const &other) {
+      MoveOnCopy& operator=(MoveOnCopy const& other) {
          _move_only = std::move(other._move_only);
          return *this;
       }
 
-      MoveOnCopy &operator=(MoveOnCopy && other) {
+      MoveOnCopy& operator=(MoveOnCopy&& other) {
          _move_only = std::move(other._move_only);
          return *this;
       }
@@ -36,13 +39,13 @@ namespace g3 {
          _move_only();
       }
 
-      Moveable &get() {
+      Moveable& get() {
          return _move_only;
       }
-      
+
       Moveable release() {
          return std::move(_move_only);
       }
    };
 
-} // g3
+}  // namespace g3

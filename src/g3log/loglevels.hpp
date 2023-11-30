@@ -22,22 +22,24 @@
 #endif
 #endif
 
-#include <string>
 #include <algorithm>
-#include <map>
 #include <atomic>
 #include <g3log/atomicbool.hpp>
+#include <map>
+#include <string>
 
 // Levels for logging, made so that it would be easy to change, remove, add levels -- KjellKod
 struct LEVELS {
    // force internal copy of the const char*. This is a simple safeguard for when g3log is used in a
    // "dynamic, runtime loading of shared libraries"
 
-   LEVELS(const LEVELS& other): value(other.value), text(other.text.c_str()) {}
+   LEVELS(const LEVELS& other)
+       : value(other.value), text(other.text.c_str()) {}
 
-   LEVELS(int id, const std::string& idtext) : value(id), text(idtext) {}
+   LEVELS(int id, const std::string& idtext)
+       : value(id), text(idtext) {}
 
-   bool operator==(const LEVELS& rhs)  const {
+   bool operator==(const LEVELS& rhs) const {
       return (value == rhs.value && text == rhs.text);
    }
 
@@ -51,12 +53,10 @@ struct LEVELS {
       swap(first.text, second.text);
    }
 
-
    LEVELS& operator=(LEVELS other) {
       swap(*this, other);
       return *this;
    }
-
 
    int value;
    std::string text;
@@ -89,14 +89,12 @@ namespace g3 {
    static const int kWarningValue = 500;
    static const int kFatalValue = 1000;
    static const int kInternalFatalValue = 2000;
-} // g3
+}  // namespace g3
 
 const LEVELS G3LOG_DEBUG{g3::kDebugValue, "DEBUG"},
-   INFO {g3::kInfoValue, "INFO"},
-   WARNING {g3::kWarningValue, "WARNING"},
-   FATAL {g3::kFatalValue, "FATAL"};
-
-
+   INFO{g3::kInfoValue, "INFO"},
+   WARNING{g3::kWarningValue, "WARNING"},
+   FATAL{g3::kFatalValue, "FATAL"};
 
 namespace g3 {
    // Logging level and atomic status collection struct
@@ -105,10 +103,14 @@ namespace g3 {
       LEVELS level;
 
       // default operator needed for std::map compliance
-      LoggingLevel(): status(false), level(INFO) {};
-      LoggingLevel(const LoggingLevel& lvl) : status(lvl.status), level(lvl.level) {}
-      LoggingLevel(const LEVELS& lvl): status(true), level(lvl) {};
-      LoggingLevel(const LEVELS& lvl, bool enabled): status(enabled), level(lvl) {};
+      LoggingLevel()
+          : status(false), level(INFO){};
+      LoggingLevel(const LoggingLevel& lvl)
+          : status(lvl.status), level(lvl.level) {}
+      LoggingLevel(const LEVELS& lvl)
+          : status(true), level(lvl){};
+      LoggingLevel(const LEVELS& lvl, bool enabled)
+          : status(enabled), level(lvl){};
       ~LoggingLevel() = default;
 
       LoggingLevel& operator=(const LoggingLevel& other) {
@@ -117,26 +119,22 @@ namespace g3 {
          return *this;
       }
 
-      bool operator==(const LoggingLevel& rhs)  const {
+      bool operator==(const LoggingLevel& rhs) const {
          return (status == rhs.status && level == rhs.level);
       }
-
    };
-} // g3
-
-
-
+}  // namespace g3
 
 namespace g3 {
    namespace internal {
-      const LEVELS CONTRACT {g3::kInternalFatalValue, {"CONTRACT"}},
-            FATAL_SIGNAL {g3::kInternalFatalValue + 1, {"FATAL_SIGNAL"}},
-            FATAL_EXCEPTION {kInternalFatalValue + 2, {"FATAL_EXCEPTION"}};
+      const LEVELS CONTRACT{g3::kInternalFatalValue, {"CONTRACT"}},
+         FATAL_SIGNAL{g3::kInternalFatalValue + 1, {"FATAL_SIGNAL"}},
+         FATAL_EXCEPTION{kInternalFatalValue + 2, {"FATAL_EXCEPTION"}};
 
       /// helper function to tell the logger if a log message was fatal. If it is it will force
       /// a shutdown after all log entries are saved to the sinks
       bool wasFatal(const LEVELS& level);
-   }
+   }  // namespace internal
 
 #ifdef G3_DYNAMIC_LOGGING
    // Only safe if done at initialization in a single-thread context
@@ -152,8 +150,7 @@ namespace g3 {
       /// remove any added logging levels so that the only ones left are
       ///  {DEBUG,INFO,WARNING,FATAL}
       void reset();
-   } // only_change_at_initialization
-
+   }  // namespace only_change_at_initialization
 
    namespace log_levels {
       /// Enable log level >= log_level.
@@ -169,24 +166,24 @@ namespace g3 {
       void disableAll();
       void enableAll();
 
-
-     /// print all levels with their disabled or enabled status
-     std::string to_string(std::map<int, g3::LoggingLevel> levelsToPrint);
+      /// print all levels with their disabled or enabled status
+      std::string to_string(std::map<int, g3::LoggingLevel> levelsToPrint);
 
       /// print snapshot of system levels with their
       /// disabled or enabled status
       std::string to_string();
 
-
       /// Snapshot view of the current logging levels' status
       std::map<int, g3::LoggingLevel> getAll();
 
-      enum class status {Absent, Enabled, Disabled};
+      enum class status { Absent,
+                          Enabled,
+                          Disabled };
       status getStatus(LEVELS level);
-} // log_levels
+   }  // namespace log_levels
 
 #endif
    /// Enabled status for the given logging level
    bool logLevel(const LEVELS& level);
 
-} // g3
+}  // namespace g3

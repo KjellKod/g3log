@@ -7,23 +7,15 @@
  * ============================================================================*/
 
 #include "g3log/filesink.hpp"
-#include "filesinkhelper.ipp"
 #include <cassert>
 #include <chrono>
+#include "filesinkhelper.ipp"
 
 namespace g3 {
    using namespace internal;
 
-   FileSink::FileSink(const std::string &log_prefix, const std::string &log_directory, const std::string& logger_id, size_t write_to_log_every_x_message)
-      : _log_details_func(&LogMessage::DefaultLogDetailsToString)
-      ,_log_file_with_path(log_directory)
-      , _log_prefix_backup(log_prefix)
-      , _outptr(new std::ofstream)
-      , _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message\n\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n")
-      , _firstEntry(true)
-      , _write_counter(0)
-      , _write_to_log_every_x_message(write_to_log_every_x_message)
-   {
+   FileSink::FileSink(const std::string& log_prefix, const std::string& log_directory, const std::string& logger_id, size_t write_to_log_every_x_message)
+       : _log_details_func(&LogMessage::DefaultLogDetailsToString), _log_file_with_path(log_directory), _log_prefix_backup(log_prefix), _outptr(new std::ofstream), _header("\t\tLOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message\n\n\t\t(uuu*: microseconds fractions of the seconds value)\n\n"), _firstEntry(true), _write_counter(0), _write_to_log_every_x_message(write_to_log_every_x_message) {
       _log_prefix_backup = prefixSanityFix(log_prefix);
       if (!isValidFilename(_log_prefix_backup)) {
          std::cerr << "g3log: forced abort due to illegal log prefix [" << log_prefix << "]" << std::endl;
@@ -42,7 +34,6 @@ namespace g3 {
       assert(_outptr && "cannot open log file at startup");
    }
 
-
    FileSink::~FileSink() {
       std::string exit_msg = {"g3log g3FileSink shutdown at: "};
       auto now = std::chrono::system_clock::now();
@@ -57,12 +48,12 @@ namespace g3 {
 
    // The actual log receiving function
    void FileSink::fileWrite(LogMessageMover message) {
-      if (_firstEntry ) {
-          addLogFileHeader();
+      if (_firstEntry) {
+         addLogFileHeader();
          _firstEntry = false;
       }
 
-      auto data =  message.get().toString(_log_details_func);
+      auto data = message.get().toString(_log_details_func);
 
       _write_buffer.append(data);
       if (++_write_counter % _write_to_log_every_x_message == 0) {
@@ -71,7 +62,7 @@ namespace g3 {
       }
    }
 
-   std::string FileSink::changeLogFile(const std::string &directory, const std::string &logger_id) {
+   std::string FileSink::changeLogFile(const std::string& directory, const std::string& logger_id) {
 
       auto now = std::chrono::system_clock::now();
       auto now_formatted = g3::localtime_formatted(now, {internal::date_formatted + " " + internal::time_formatted});
@@ -80,8 +71,9 @@ namespace g3 {
       std::string prospect_log = directory + file_name;
       std::unique_ptr<std::ofstream> log_stream = createLogFile(prospect_log);
       if (nullptr == log_stream) {
-         filestream() << "\n" << now_formatted << " Unable to change log file. Illegal filename or busy? Unsuccessful log name was: " << prospect_log;
-         return {}; // no success
+         filestream() << "\n"
+                      << now_formatted << " Unable to change log file. Illegal filename or busy? Unsuccessful log name was: " << prospect_log;
+         return {};  // no success
       }
 
       addLogFileHeader();
@@ -115,4 +107,4 @@ namespace g3 {
    void FileSink::addLogFileHeader() {
       filestream() << header(_header);
    }
-} // g3
+}  // namespace g3

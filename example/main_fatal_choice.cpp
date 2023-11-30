@@ -9,14 +9,14 @@
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
 
-#include <iostream>
 #include <cctype>
-#include <future>
-#include <vector>
-#include <string>
 #include <chrono>
-#include <thread>
 #include <exception>
+#include <future>
+#include <iostream>
+#include <string>
+#include <thread>
+#include <vector>
 
 #ifndef _MSC_VER
 #define NOEXCEPT noexcept
@@ -24,17 +24,15 @@
 #define NOEXCEPT throw()
 #endif
 
-namespace
-{
+namespace {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    const std::string path_to_log_file = "./";
 #else
    const std::string path_to_log_file = "/tmp/";
 #endif
 
-   void ToLower(std::string &str)
-   {
-      for (auto &character : str) {
+   void ToLower(std::string& str) {
+      for (auto& character : str) {
          character = std::tolower(character);
       }
    }
@@ -75,7 +73,7 @@ namespace
 
    int gShouldBeZero = 1;
    void DivisionByZero() {
-      LOG(G3LOG_DEBUG) << " trigger exit   Executing DivisionByZero: gShouldBeZero: "  << gShouldBeZero;
+      LOG(G3LOG_DEBUG) << " trigger exit   Executing DivisionByZero: gShouldBeZero: " << gShouldBeZero;
       LOG(INFO) << "Division by zero is a big no-no";
       int value = 3;
       auto test = value / gShouldBeZero;
@@ -96,10 +94,9 @@ namespace
       LOG(WARNING) << "Expected to have died by now...";
    }
 
-
    void AccessViolation() {
       LOG(G3LOG_DEBUG) << " trigger exit";
-      char *ptr = 0;
+      char* ptr = 0;
       LOG(INFO) << "Death by access violation is imminent";
       *ptr = 0;
       LOG(WARNING) << "Expected to have died by now...";
@@ -119,8 +116,7 @@ namespace
       f2.wait();
    }
 
-
-   using deathfunc =  void (*) (void);
+   using deathfunc = void (*)(void);
    void Death_x10000(deathfunc func, std::string funcname) NOEXCEPT {
       LOG(G3LOG_DEBUG) << " trigger exit";
       std::vector<std::future<void>> asyncs;
@@ -136,19 +132,20 @@ namespace
       std::cout << __FUNCTION__ << " unexpected result. Death by " << funcname << " did not crash and exit the system" << std::endl;
    }
 
-
    void Throw() NOEXCEPT {
       LOG(G3LOG_DEBUG) << " trigger exit";
       std::future<int> empty;
-      empty.get(); 
+      empty.get();
       // --> thows future_error http://en.cppreference.com/w/cpp/thread/future_error
       // example of std::exceptions can be found here: http://en.cppreference.com/w/cpp/error/exception
    }
 
-
    void SegFaultAttempt_x10000() NOEXCEPT {
-      
-      deathfunc f = []{char* ptr = 0; *ptr = 1; };
+
+      deathfunc f = [] {
+         char* ptr = 0;
+         *ptr = 1;
+      };
       Death_x10000(f, "throw uncaught exception... and then some sigsegv calls");
    }
 
@@ -169,28 +166,57 @@ namespace
       CallActualExitFunction(fatal_function);
    }
 
-
-
    void ExecuteDeathFunction(const bool runInNewThread, int fatalChoice) {
       LOG(G3LOG_DEBUG) << "trigger exit";
 
       auto exitFunction = &NoExitFunction;
       switch (fatalChoice) {
-      case 1: exitFunction = &RaiseSIGABRT;  break;
-      case 2: exitFunction = &RaiseSIGFPE;  break;
-      case 3: exitFunction = &RaiseSIGSEGV;  break;
-      case 4: exitFunction = &RaiseSIGILL;  break;
-      case 5: exitFunction = &RAiseSIGTERM;  break;
-      case 6: exitFunction = &DivisionByZero;  gShouldBeZero = 0; DivisionByZero();  break;
-      case 7: exitFunction = &IllegalPrintf;  break;
-      case 8: exitFunction = &OutOfBoundsArrayIndexing;  break;
-      case 9: exitFunction = &AccessViolation;  break;
-      case 10: exitFunction = &RaiseSIGABRTAndAccessViolation; break;
-      case 11: exitFunction = &Throw; break;
-      case 12: exitFunction = &FailedCHECK; break;
-      case 13: exitFunction = &AccessViolation_x10000; break;
-      case 14: exitFunction = &SegFaultAttempt_x10000; break;
-      default: break;
+      case 1:
+         exitFunction = &RaiseSIGABRT;
+         break;
+      case 2:
+         exitFunction = &RaiseSIGFPE;
+         break;
+      case 3:
+         exitFunction = &RaiseSIGSEGV;
+         break;
+      case 4:
+         exitFunction = &RaiseSIGILL;
+         break;
+      case 5:
+         exitFunction = &RAiseSIGTERM;
+         break;
+      case 6:
+         exitFunction = &DivisionByZero;
+         gShouldBeZero = 0;
+         DivisionByZero();
+         break;
+      case 7:
+         exitFunction = &IllegalPrintf;
+         break;
+      case 8:
+         exitFunction = &OutOfBoundsArrayIndexing;
+         break;
+      case 9:
+         exitFunction = &AccessViolation;
+         break;
+      case 10:
+         exitFunction = &RaiseSIGABRTAndAccessViolation;
+         break;
+      case 11:
+         exitFunction = &Throw;
+         break;
+      case 12:
+         exitFunction = &FailedCHECK;
+         break;
+      case 13:
+         exitFunction = &AccessViolation_x10000;
+         break;
+      case 14:
+         exitFunction = &SegFaultAttempt_x10000;
+         break;
+      default:
+         break;
       }
       if (runInNewThread) {
          auto dieInNearFuture = std::async(std::launch::async, CallExitFunction, exitFunction);
@@ -200,12 +226,10 @@ namespace
       }
 
       std::string unexpected = "Expected to exit by FATAL event. That did not happen (printf choice in Windows?).";
-      unexpected.append("Choice was: ").append(std::to_string(fatalChoice)).append(", async?: ")
-      .append(std::to_string(runInNewThread)).append("\n\n***** TEST WILL RUN AGAIN *****\n\n");
+      unexpected.append("Choice was: ").append(std::to_string(fatalChoice)).append(", async?: ").append(std::to_string(runInNewThread)).append("\n\n***** TEST WILL RUN AGAIN *****\n\n");
 
-      std::cerr << unexpected  << std::endl;
+      std::cerr << unexpected << std::endl;
       LOG(WARNING) << unexpected;
-
    }
 
    bool AskForAsyncDeath() {
@@ -223,8 +247,6 @@ namespace
       }
       return ("yes" == option);
    }
-
-
 
    int ChoiceOfFatalExit() {
       std::string option;
@@ -257,7 +279,7 @@ namespace
             choice = std::stoi(option);
             if (choice <= 0 || choice > 14) {
                std::cout << "Invalid choice: [" << option << "\n\n";
-            }  else {
+            } else {
                return choice;
             }
          } catch (...) {
@@ -275,11 +297,11 @@ namespace
       const int exitChoice = ChoiceOfFatalExit();
       ForwardChoiceForFatalExit(runInNewThread, exitChoice);
    }
-} // namespace
+}  // namespace
 
 void breakHere() {
    std::ostringstream oss;
-   oss  << "Fatal hook function: " << __FUNCTION__ << ":" << __LINE__  << " was called";
+   oss << "Fatal hook function: " << __FUNCTION__ << ":" << __LINE__ << " was called";
    oss << " through g3::setFatalPreLoggingHook(). setFatalPreLoggingHook should be called AFTER g3::initializeLogging()" << std::endl;
    LOG(G3LOG_DEBUG) << oss.str();
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
@@ -287,10 +309,9 @@ void breakHere() {
 #endif
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
    auto worker = g3::LogWorker::createLogWorker();
-   auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
+   auto handle = worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
    g3::setFatalPreLoggingHook(&breakHere);
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
@@ -298,8 +319,8 @@ int main(int argc, char **argv)
    std::cout << "**** G3LOG FATAL EXAMPLE ***\n\n"
              << "Choose your type of fatal exit, then "
              << " read the generated log and backtrace.\n"
-             << "The logfile is generated at:  [" << log_file_name.get() << "]\n\n" << std::endl;
-
+             << "The logfile is generated at:  [" << log_file_name.get() << "]\n\n"
+             << std::endl;
 
    LOGF(G3LOG_DEBUG, "Fatal exit example starts now, it's as easy as  %d", 123);
    LOG(INFO) << "Feel free to read the source code also in g3log/example/main_fatal_choice.cpp";
@@ -311,6 +332,4 @@ int main(int argc, char **argv)
    LOG(WARNING) << "Expected to exit by fatal event, this code line should never be reached";
    CHECK(false) << "Forced death";
    return 0;
-
 }
-

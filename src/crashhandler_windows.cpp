@@ -10,20 +10,20 @@
 #error "crashhandler_windows.cpp used but not on a windows system"
 #endif
 
+#include <process.h>  // getpid
 #include <windows.h>
+#include <atomic>
 #include <csignal>
 #include <sstream>
-#include <atomic>
-#include <process.h> // getpid
-#include "g3log/g3log.hpp"
 #include "g3log/crashhandler.hpp"
-#include "g3log/stacktrace_windows.hpp"
+#include "g3log/g3log.hpp"
 #include "g3log/logcapture.hpp"
+#include "g3log/stacktrace_windows.hpp"
 
 #define getpid _getpid
 
 namespace {
-   std::atomic<bool> gBlockForFatal {true};
+   std::atomic<bool> gBlockForFatal{true};
    LPTOP_LEVEL_EXCEPTION_FILTER g_previous_unexpected_exception_handler = nullptr;
 
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
@@ -34,8 +34,6 @@ namespace {
    void* g_vector_exception_handler = nullptr;
 #endif
 
-
-
    // called for fatal signals SIGABRT, SIGFPE, SIGSEGV, SIGILL, SIGTERM
    void signalHandler(int signal_number) {
       using namespace g3::internal;
@@ -44,7 +42,6 @@ namespace {
       std::ostringstream fatal_stream;
       fatal_stream << "\n***** Received fatal signal " << g3::internal::exitReasonName(g3::internal::FATAL_SIGNAL, signal_number);
       fatal_stream << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
-
 
       LogCapture trigger(FATAL_SIGNAL, static_cast<g3::SignalType>(signal_number), dump.c_str());
       trigger.stream() << fatal_stream.str();
@@ -59,9 +56,7 @@ namespace {
 #if (!defined(NDEBUG) && defined(DEBUG_BREAK_AT_FATAL_SIGNAL))
       __debugbreak();
 #endif
-   } // scope exit - message sent to LogWorker, wait to die...
-
-
+   }  // scope exit - message sent to LogWorker, wait to die...
 
    // Unhandled exception catching
    LONG WINAPI exceptionHandling(EXCEPTION_POINTERS* info, const std::string& handler) {
@@ -84,13 +79,11 @@ namespace {
       return EXCEPTION_CONTINUE_SEARCH;
    }
 
-
    // Unhandled exception catching
    LONG WINAPI unexpectedExceptionHandling(EXCEPTION_POINTERS* info) {
       g3::internal::restoreFatalHandlingToDefault();
       return exceptionHandling(info, "Unexpected Exception Handler");
    }
-
 
    /// Setup through (Windows API) AddVectoredExceptionHandler
    /// Ref: http://blogs.msdn.com/b/zhanli/archive/2010/06/25/c-tips-addvectoredexceptionhandler-addvectoredcontinuehandler-and-setunhandledexceptionfilter.aspx
@@ -108,8 +101,7 @@ namespace {
       }
    }
 #endif
-} // end anonymous namespace
-
+}  // end anonymous namespace
 
 namespace g3 {
    namespace internal {
@@ -118,7 +110,6 @@ namespace g3 {
       bool shouldBlockForFatalHandling() {
          return gBlockForFatal;
       }
-
 
       /// Generate stackdump. Or in case a stackdump was pre-generated and
       /// non-empty just use that one.   i.e. the latter case is only for
@@ -131,8 +122,6 @@ namespace g3 {
          return stacktrace::stackdump();
       }
 
-
-
       /// string representation of signal ID or Windows exception id
       std::string exitReasonName(const LEVELS& level, g3::SignalType fatal_id) {
          if (level == g3::internal::FATAL_EXCEPTION) {
@@ -140,18 +129,27 @@ namespace g3 {
          }
 
          switch (fatal_id) {
-            case SIGABRT: return "SIGABRT"; break;
-            case SIGFPE: return "SIGFPE"; break;
-            case SIGSEGV: return "SIGSEGV"; break;
-            case SIGILL: return "SIGILL"; break;
-            case SIGTERM: return "SIGTERM"; break;
-            default:
-               std::ostringstream oss;
-               oss << "UNKNOWN SIGNAL(" << fatal_id << ")";
-               return oss.str();
+         case SIGABRT:
+            return "SIGABRT";
+            break;
+         case SIGFPE:
+            return "SIGFPE";
+            break;
+         case SIGSEGV:
+            return "SIGSEGV";
+            break;
+         case SIGILL:
+            return "SIGILL";
+            break;
+         case SIGTERM:
+            return "SIGTERM";
+            break;
+         default:
+            std::ostringstream oss;
+            oss << "UNKNOWN SIGNAL(" << fatal_id << ")";
+            return oss.str();
          }
       }
-
 
       // Triggered by g3log::LogWorker after receiving a FATAL trigger
       // which is LOG(FATAL), CHECK(false) or a fatal signal our signalhandler caught.
@@ -173,16 +171,14 @@ namespace g3 {
          raise(signal_number);
       }
 
-
       // Restore back to default fatal event handling
       void restoreFatalHandlingToDefault() {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
-         SetUnhandledExceptionFilter (g_previous_unexpected_exception_handler);
+         SetUnhandledExceptionFilter(g_previous_unexpected_exception_handler);
 
 #if !(defined(DISABLE_VECTORED_EXCEPTIONHANDLING))
-         RemoveVectoredExceptionHandler (g_vector_exception_handler);
+         RemoveVectoredExceptionHandler(g_vector_exception_handler);
 #endif
-
 
          if (SIG_ERR == signal(SIGABRT, SIG_DFL))
             perror("signal - SIGABRT");
@@ -201,14 +197,11 @@ namespace g3 {
 #endif
       }
 
-
       void installSignalHandler() {
          g3::installSignalHandlerForThread();
       }
 
-
-   } // end g3::internal
-
+   }  // namespace internal
 
    ///  SIGFPE, SIGILL, and SIGSEGV handling must be installed per thread
    /// on Windows. This is automatically done if you do at least one LOG(...) call
@@ -245,4 +238,4 @@ namespace g3 {
 #endif
    }
 
-} // end namespace g3
+}  // end namespace g3

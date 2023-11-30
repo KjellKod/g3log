@@ -8,15 +8,15 @@
 
 #pragma once
 
-#include "g3log/loglevels.hpp"
 #include "g3log/crashhandler.hpp"
+#include "g3log/loglevels.hpp"
 
-#include <string>
-#include <sstream>
-#include <cstdarg>
 #include <csignal>
+#include <cstdarg>
+#include <sstream>
+#include <string>
 #ifdef _MSC_VER
-# include <sal.h>
+#include <sal.h>
 #endif
 
 /**
@@ -27,8 +27,7 @@
 */
 struct LogCapture {
    /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-   LogCapture(const LEVELS &level, g3::SignalType fatal_signal, const char *dump = nullptr);
-
+   LogCapture(const LEVELS& level, g3::SignalType fatal_signal, const char* dump = nullptr);
 
    /**
     * @file, line, function are given in g3log.hpp from macros
@@ -36,48 +35,41 @@ struct LogCapture {
     * @expression for CHECK calls
     * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
     */
-   LogCapture(const char *file, const int line, const char *function, const LEVELS &level, const char *expression = "", g3::SignalType fatal_signal = SIGABRT, const char *dump = nullptr);
-
+   LogCapture(const char* file, const int line, const char* function, const LEVELS& level, const char* expression = "", g3::SignalType fatal_signal = SIGABRT, const char* dump = nullptr);
 
    // At destruction the message will be forwarded to the g3log worker.
    // In the case of dynamically (at runtime) loaded libraries, the important thing to know is that
    // all strings are copied, so the original are not destroyed at the receiving end, only the copy
-   virtual ~LogCapture() noexcept (false);
+   virtual ~LogCapture() noexcept(false);
 
-
-
-
-#ifdef _MSC_VER 
-#	if _MSC_VER >= 1400
-#		define G3LOG_FORMAT_STRING _Printf_format_string_
-#	else
-#		define G3LOG_FORMAT_STRING __format_string
-#	endif
-   
-    void capturef(G3LOG_FORMAT_STRING const char *printf_like_message, ...);
+#ifdef _MSC_VER
+#if _MSC_VER >= 1400
+#define G3LOG_FORMAT_STRING _Printf_format_string_
 #else
-#	define G3LOG_FORMAT_STRING
+#define G3LOG_FORMAT_STRING __format_string
+#endif
+
+   void capturef(G3LOG_FORMAT_STRING const char* printf_like_message, ...);
+#else
+#define G3LOG_FORMAT_STRING
 
    // Use "-Wall" to generate warnings in case of illegal printf format.
    //      Ref:  http://www.unixwiz.net/techtips/gnu-c-attributes.html
-   [[gnu::format(printf, 2, 3)]] void capturef(G3LOG_FORMAT_STRING const char *printf_like_message, ...); // 2,3 ref:  http://www.codemaestro.com/reviews/18
+   [[gnu::format(printf, 2, 3)]] void capturef(G3LOG_FORMAT_STRING const char* printf_like_message, ...);  // 2,3 ref:  http://www.codemaestro.com/reviews/18
 #endif
 
    /// prettifying API for this completely open struct
-   std::ostringstream &stream() {
+   std::ostringstream& stream() {
       return _stream;
    }
-
-
 
    std::ostringstream _stream;
    std::string _stack_trace;
    const char* _file;
    const int _line;
    const char* _function;
-   const LEVELS &_level;
+   const LEVELS& _level;
    const char* _expression;
    const g3::SignalType _fatal_signal;
-
 };
 //} // g3

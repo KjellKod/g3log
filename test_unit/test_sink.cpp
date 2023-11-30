@@ -7,26 +7,25 @@
 * ============================================================================*/
 
 #include <gtest/gtest.h>
-#include <iostream>
 #include <atomic>
-#include <vector>
-#include <memory>
-#include <thread>
 #include <chrono>
-#include <string>
 #include <future>
 #include <g3log/generated_definitions.hpp>
-#include "testing_helpers.h"
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <vector>
 #include "g3log/logmessage.hpp"
 #include "g3log/logworker.hpp"
-
+#include "testing_helpers.h"
 
 using namespace testing_helpers;
 using namespace std;
 TEST(Sink, OneSink) {
    using namespace g3;
-   AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
-   AtomicIntPtr count = make_shared < atomic<int >> (0);
+   AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
+   AtomicIntPtr count = make_shared<atomic<int>>(0);
    {
       auto worker = g3::LogWorker::createLogWorker();
       auto handle = worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
@@ -40,12 +39,10 @@ TEST(Sink, OneSink) {
    EXPECT_TRUE(1 == count->load());
 }
 
-
-
 TEST(Sink, OneSinkRemove) {
    using namespace g3;
-   AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
-   AtomicIntPtr count = make_shared < atomic<int >> (0);
+   AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
+   AtomicIntPtr count = make_shared<atomic<int>>(0);
    {
       auto worker = g3::LogWorker::createLogWorker();
       auto handle = worker->addSink(std::make_unique<ScopedSetTrue>(flag, count), &ScopedSetTrue::ReceiveMsg);
@@ -67,14 +64,14 @@ TEST(Sink, OneSinkRemove) {
 }
 
 // just compile test
-TEST(Sink, DefaultSinkRemove){
+TEST(Sink, DefaultSinkRemove) {
    using namespace g3;
-   AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
-   AtomicIntPtr count = make_shared < atomic<int >> (0);
+   AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
+   AtomicIntPtr count = make_shared<atomic<int>>(0);
    {
       auto worker = g3::LogWorker::createLogWorker();
-      auto handle1 = worker->addDefaultLogger("test1",  "./");
-      auto handle2 = worker->addDefaultLogger("test2",  "./");
+      auto handle1 = worker->addDefaultLogger("test1", "./");
+      auto handle2 = worker->addDefaultLogger("test2", "./");
       worker->removeSink(std::move(handle1));
       worker->removeAllSinks();
    }
@@ -82,8 +79,8 @@ TEST(Sink, DefaultSinkRemove){
 
 TEST(Sink, NullSinkRemove) {
    using namespace g3;
-   AtomicBoolPtr flag = make_shared < atomic<bool >> (false);
-   AtomicIntPtr count = make_shared < atomic<int >> (0);
+   AtomicBoolPtr flag = make_shared<atomic<bool>>(false);
+   AtomicIntPtr count = make_shared<atomic<int>>(0);
    {
       auto worker = g3::LogWorker::createLogWorker();
       std::unique_ptr<g3::SinkHandle<ScopedSetTrue>> nullsink;
@@ -91,13 +88,11 @@ TEST(Sink, NullSinkRemove) {
    }
 }
 
-
-
 namespace {
-   using AtomicBoolPtr =  std::shared_ptr<std::atomic<bool>>;
-   using AtomicIntPtr =  std::shared_ptr<std::atomic<int>>;
-   using BoolList =  vector<AtomicBoolPtr>;
-   using IntVector =  vector<AtomicIntPtr>;
+   using AtomicBoolPtr = std::shared_ptr<std::atomic<bool>>;
+   using AtomicIntPtr = std::shared_ptr<std::atomic<int>>;
+   using BoolList = vector<AtomicBoolPtr>;
+   using IntVector = vector<AtomicIntPtr>;
 
    size_t countDestroyedFlags(BoolList& flags) {
       size_t destroyed_count = 0;
@@ -125,8 +120,7 @@ namespace {
       return total_count;
    }
 
-
-}
+}  // namespace
 
 TEST(ConceptSink, OneHundredSinks) {
    using namespace g3;
@@ -135,13 +129,13 @@ TEST(ConceptSink, OneHundredSinks) {
 
    size_t kNumberOfItems = 100;
    for (size_t index = 0; index < kNumberOfItems; ++index) {
-      flags.push_back(make_shared < atomic<bool >> (false));
-      counts.push_back(make_shared < atomic<int >> (0));
+      flags.push_back(make_shared<atomic<bool>>(false));
+      counts.push_back(make_shared<atomic<int>>(0));
    }
 
    {
       RestoreFileLogger logger{"./"};
-      g3::LogWorker* worker = logger._scope->get(); //g3LogWorker::createLogWorker();
+      g3::LogWorker* worker = logger._scope->get();  //g3LogWorker::createLogWorker();
       size_t index = 0;
       for (auto& flag : flags) {
          auto& count = counts[index++];
@@ -180,7 +174,6 @@ void AddManySinks(size_t kNumberOfSinks, BoolList& flags, IntVector& counts,
       flags.push_back(make_shared<atomic<bool>>(false));
       counts.push_back(make_shared<atomic<int>>(0));
       sink_handles.push_back(worker->addSink(std::make_unique<ScopedSetTrue>(flags[idx], counts[idx]), &ScopedSetTrue::ReceiveMsg));
-
    }
 }
 
@@ -192,7 +185,7 @@ TEST(ConceptSink, OneHundredSinksRemoved) {
    std::vector<SinkHandleT> sink_handles;
    {
       RestoreFileLogger logger{"./"};
-      g3::LogWorker* worker = logger._scope->get(); //think: g3LogWorker::createLogWorker();
+      g3::LogWorker* worker = logger._scope->get();  //think: g3LogWorker::createLogWorker();
       AddManySinks(kNumberOfItems, flags, counts, sink_handles, worker);
       LogMessagePtr message{std::make_unique<LogMessage>("test", 0, "test", DEBUG)};
       auto& write = message.get()->write();
@@ -217,7 +210,7 @@ TEST(ConceptSink, OneHundredRemoveAllSinks) {
    std::vector<SinkHandleT> sink_handles;
    {
       RestoreFileLogger logger{"./"};
-      g3::LogWorker* worker = logger._scope->get(); //think: g3LogWorker::createLogWorker();
+      g3::LogWorker* worker = logger._scope->get();  //think: g3LogWorker::createLogWorker();
       AddManySinks(kNumberOfItems, flags, counts, sink_handles, worker);
 
       LogMessagePtr message{std::make_unique<LogMessage>("test", 0, "test", DEBUG)};
@@ -232,12 +225,13 @@ TEST(ConceptSink, OneHundredRemoveAllSinks) {
    }
 }
 
-
 struct VoidReceiver {
    std::atomic<int>* _atomicCounter;
-   explicit VoidReceiver(std::atomic<int>* counter) : _atomicCounter(counter) {}
+   explicit VoidReceiver(std::atomic<int>* counter)
+       : _atomicCounter(counter) {}
 
-   void receiveMsg(std::string msg) { /*ignored*/}
+   void receiveMsg(std::string msg) { /*ignored*/
+   }
    void incrementAtomic() {
       (*_atomicCounter)++;
    }
@@ -267,20 +261,21 @@ TEST(ConceptSink, VoidCall__TwoCalls_ExpectingTwoAdd) {
    {
       std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createLogWorker()};
       auto handle = worker->addSink(std::make_unique<VoidReceiver>(&counter), &VoidReceiver::receiveMsg);
-      auto  voidFuture1 = handle->call(&VoidReceiver::incrementAtomic);
-      auto  voidFuture2 = handle->call(&VoidReceiver::incrementAtomic);
+      auto voidFuture1 = handle->call(&VoidReceiver::incrementAtomic);
+      auto voidFuture2 = handle->call(&VoidReceiver::incrementAtomic);
       voidFuture1.wait();
       EXPECT_TRUE(counter >= 1);
    }
    EXPECT_EQ(counter, 2);
 }
 
-
 struct IntReceiver {
    std::atomic<int>* _atomicCounter;
-   explicit IntReceiver(std::atomic<int>* counter) : _atomicCounter(counter) {}
+   explicit IntReceiver(std::atomic<int>* counter)
+       : _atomicCounter(counter) {}
 
-   void receiveMsgDoNothing(std::string msg) { /*ignored*/}
+   void receiveMsgDoNothing(std::string msg) { /*ignored*/
+   }
    void receiveMsgIncrementAtomic(std::string msg) { incrementAtomic(); }
    int incrementAtomic() {
       (*_atomicCounter)++;
@@ -300,14 +295,11 @@ TEST(ConceptSink, IntCall__TwoCalls_ExpectingTwoAdd) {
 
       auto intFuture2 = handle->call(&IntReceiver::incrementAtomic);
       EXPECT_EQ(intFuture2.get(), 2);
-
    }
    EXPECT_EQ(counter, 2);
 }
 
-
-
-void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
+void DoLogCalls(std::atomic<bool>* doWhileTrue, size_t counter) {
    while (doWhileTrue->load()) {
       LOG(INFO) << "Calling from #" << counter;
       std::cout << "-";
@@ -315,12 +307,12 @@ void DoLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
    }
 }
 
-void DoSlowLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
+void DoSlowLogCalls(std::atomic<bool>* doWhileTrue, size_t counter) {
    size_t messages = 0;
    while (doWhileTrue->load()) {
       LOG(INFO) << "Calling from #" << counter;
       ++messages;
-      int random = rand() % 10 + 1; // Range 1-10
+      int random = rand() % 10 + 1;  // Range 1-10
       std::this_thread::sleep_for(std::chrono::microseconds(random));
    }
 
@@ -328,11 +320,10 @@ void DoSlowLogCalls(std::atomic<bool>*  doWhileTrue, size_t counter) {
    std::cout << out;
 }
 
-
-
-
 TEST(ConceptSink, CannotCallSpawnTaskOnNullptrWorker) {
-   auto FailedHelloWorld = [] { std::cout << "Hello World" << std::endl; };
+   auto FailedHelloWorld = [] {
+      std::cout << "Hello World" << std::endl;
+   };
    kjellkod::Active* active = nullptr;
    auto failed = g3::spawn_task(FailedHelloWorld, active);
    EXPECT_ANY_THROW(failed.get());
@@ -364,7 +355,7 @@ TEST(ConceptSink, AggressiveThreadCallsDuringAddAndRemoveSink) {
 
    std::atomic<int> atomicCounter{0};
 
-   std::cout << "Add sinks, remove sinks, " << numberOfCycles  << " times\n\tWhile " << numberOfThreads << " threads are continously doing LOG calls" << std::endl;
+   std::cout << "Add sinks, remove sinks, " << numberOfCycles << " times\n\tWhile " << numberOfThreads << " threads are continously doing LOG calls" << std::endl;
    for (size_t create = 0; create < numberOfCycles; ++create) {
       worker->removeAllSinks();
       sink_handles.clear();
@@ -380,7 +371,7 @@ TEST(ConceptSink, AggressiveThreadCallsDuringAddAndRemoveSink) {
          std::this_thread::yield();
       }
 
-   } // g3log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
+   }  // g3log worker exists:  1) shutdownlogging 2) flush of queues and shutdown of sinks
    worker.reset();
    // exit the threads
    keepRunning = false;
@@ -389,7 +380,6 @@ TEST(ConceptSink, AggressiveThreadCallsDuringAddAndRemoveSink) {
    }
    std::cout << "\nAll threads are joined " << std::endl;
 }
-
 
 // This test is commented out but kept here for documentation purposes.
 // Actually shutting down and re-initializing the logger is not the intention of g3log.
@@ -423,7 +413,6 @@ TEST(ConceptSink, AggressiveThreadCallsDuringAddAndRemoveSink) {
 //    std::cout << "Initialize logger / Shutdown logging #";
 //    for (size_t create = 0; create < numberOfCycles; ++create) {
 //       std::cout << ".";
-
 
 //       std::unique_ptr<g3::LogWorker> worker{g3::LogWorker::createLogWorker()};
 //       auto handle = worker->addSink(std::make_unique<IntReceiver>(&atomicCounter), &IntReceiver::receiveMsgIncrementAtomic);

@@ -8,30 +8,38 @@
 
 #include "g3log/time.hpp"
 
+#include <cassert>
+#include <chrono>
+#include <cmath>
+#include <cstring>
+#include <iomanip>
 #include <sstream>
 #include <string>
-#include <cstring>
-#include <cmath>
-#include <chrono>
-#include <cassert>
-#include <iomanip>
 #ifdef __MACH__
 #include <sys/time.h>
 #endif
 
 namespace g3 {
    namespace internal {
-      const std::string kFractionalIdentier   = "%f";
+      const std::string kFractionalIdentier = "%f";
       const size_t kFractionalIdentierSize = 2;
 
       Fractional getFractional(const std::string& format_buffer, size_t pos) {
-         char  ch  = (format_buffer.size() > pos + kFractionalIdentierSize ? format_buffer.at(pos + kFractionalIdentierSize) : '\0');
+         char ch = (format_buffer.size() > pos + kFractionalIdentierSize ? format_buffer.at(pos + kFractionalIdentierSize) : '\0');
          Fractional type = Fractional::NanosecondDefault;
          switch (ch) {
-            case '3': type = Fractional::Millisecond; break;
-            case '6': type = Fractional::Microsecond; break;
-            case '9': type = Fractional::Nanosecond; break;
-            default: type = Fractional::NanosecondDefault; break;
+         case '3':
+            type = Fractional::Millisecond;
+            break;
+         case '6':
+            type = Fractional::Microsecond;
+            break;
+         case '9':
+            type = Fractional::Nanosecond;
+            break;
+         default:
+            type = Fractional::NanosecondDefault;
+            break;
          }
          return type;
       }
@@ -46,25 +54,24 @@ namespace g3 {
          duration -= sec_duration;
          auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count();
 
-         auto zeroes = 9; // default ns
-         auto digitsToCut = 1; // default ns, divide by 1 makes no change
+         auto zeroes = 9;       // default ns
+         auto digitsToCut = 1;  // default ns, divide by 1 makes no change
          switch (fractional) {
-            case Fractional::Millisecond : {
-               zeroes = 3;
-               digitsToCut = 1000000;
-               break;
-            }
-            case Fractional::Microsecond : {
-               zeroes = 6;
-               digitsToCut = 1000;
-               break;
-            }
-            case Fractional::Nanosecond :
-            case Fractional::NanosecondDefault:
-            default:
-               zeroes = 9;
-               digitsToCut = 1;
-
+         case Fractional::Millisecond: {
+            zeroes = 3;
+            digitsToCut = 1000000;
+            break;
+         }
+         case Fractional::Microsecond: {
+            zeroes = 6;
+            digitsToCut = 1000;
+            break;
+         }
+         case Fractional::Nanosecond:
+         case Fractional::NanosecondDefault:
+         default:
+            zeroes = 9;
+            digitsToCut = 1;
          }
 
          ns /= digitsToCut;
@@ -76,8 +83,8 @@ namespace g3 {
          // iterating through every "%f" instance in the format string
          auto identifierExtraSize = 0;
          for (size_t pos = 0;
-               (pos = format_buffer.find(g3::internal::kFractionalIdentier, pos)) != std::string::npos;
-               pos += g3::internal::kFractionalIdentierSize + identifierExtraSize) {
+              (pos = format_buffer.find(g3::internal::kFractionalIdentier, pos)) != std::string::npos;
+              pos += g3::internal::kFractionalIdentierSize + identifierExtraSize) {
             // figuring out whether this is nano, micro or milli identifier
             auto type = g3::internal::getFractional(format_buffer, pos);
             auto value = g3::internal::to_string(ts, type);
@@ -92,10 +99,8 @@ namespace g3 {
          return format_buffer;
       }
 
-   } // internal
-} // g3
-
-
+   }  // namespace internal
+}  // namespace g3
 
 namespace g3 {
    // This mimics the original "std::put_time(const std::tm* tmb, const charT* fmt)"
@@ -106,11 +111,11 @@ namespace g3 {
       std::ostringstream oss;
       oss.fill('0');
       // BOGUS hack done for VS2012: C++11 non-conformant since it SHOULD take a "const struct tm*  "
-      oss << std::put_time(const_cast<struct tm*> (tmb), c_time_format);
+      oss << std::put_time(const_cast<struct tm*>(tmb), c_time_format);
       return oss.str();
-#else    // LINUX
+#else  // LINUX
       const size_t size = 1024;
-      char buffer[size]; // IMPORTANT: check now and then for when gcc will implement std::put_time.
+      char buffer[size];  // IMPORTANT: check now and then for when gcc will implement std::put_time.
       //                    ... also ... This is way more buffer space then we need
 
       auto success = std::strftime(buffer, size, c_time_format, tmb);
@@ -127,23 +132,20 @@ namespace g3 {
 #endif
    }
 
-
-
    tm localtime(std::time_t ts) {
       struct tm tm_snapshot;
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-      localtime_s(&tm_snapshot, &ts); // windsows
+      localtime_s(&tm_snapshot, &ts);  // windsows
 #else
-      localtime_r(&ts, &tm_snapshot); // POSIX
+      localtime_r(&ts, &tm_snapshot);  // POSIX
 #endif
       return tm_snapshot;
    }
-
 
    std::string localtime_formatted(const g3::system_time_point& ts, const std::string& time_format) {
       auto format_buffer = internal::localtime_formatted_fractions(ts, time_format);
       auto time_point = std::chrono::system_clock::to_time_t(ts);
       std::tm t = localtime(time_point);
-      return g3::put_time(&t, format_buffer.c_str()); // format example: //"%Y/%m/%d %H:%M:%S");
+      return g3::put_time(&t, format_buffer.c_str());  // format example: //"%Y/%m/%d %H:%M:%S");
    }
-} // g3
+}  // namespace g3
