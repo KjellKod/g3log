@@ -7,7 +7,7 @@
 # Formatting
 - [ ] I am following the formatting style of the existing codebase. 
 
-_AStyleFormat or clang-format configuration files are available in the root of g3log_
+_a clang-format configuration file is available in the root of g3log_
 
 # Testing
 
