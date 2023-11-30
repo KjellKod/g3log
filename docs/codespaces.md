@@ -11,8 +11,8 @@ For an introduction to codespaces you can check out [example c++ codespace](http
 1. List all your codespaces `gh codespace list`
 2.  Create a new codespace `gh codespace create -r OWNER/REPO_NAME [-b BRANCH]`. Ref [docs/github: Creating a codespace for a repository](https://docs.github.com/en/codespaces/developing-in-a-codespace/creating-a-codespace-for-a-repository)
 3. View codebase details `gh codespace view`
-4. Stop `gh codespace stop -c CODESPACE-NAME`
-5. Delete `gh codespace delete -c CODESPACE-NAME`
+4. Stop `gh codespace stop`
+5. Delete `gh codespace delete`
 6. Rebuild `gh codespace rebuild`
 7. Rename `gh codespace edit -c CODESPACE-NAME -d DISPLAY-NAME`
 8. SSH into REMOTE codespace `gh codespace ssh -c CODESPACE-NAME`
