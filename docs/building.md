@@ -213,7 +213,7 @@ will install the g3log library to `CPACK_PACKAGING_INSTALL_PREFIX`.
 
 ## <a name="testing">Testing</a>
 
-By default, tests will not be built. To enable unit testing, you should turn on `ADD_G3LOG_UNIT_TEST`.
+By default, tests will be built. To disable unit testing, you should turn off `ADD_G3LOG_UNIT_TEST`.
 
 Suppose the build process has completed, then you can run the tests with:
 ```

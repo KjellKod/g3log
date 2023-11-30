@@ -11,17 +11,13 @@
 
    # ============================================================================
    # TEST OPTIONS: Turn OFF the ones that is of no interest to you
-   # ---- by default all is OFF: except 'g3log-FATAL-example -----
-   # ---- the reason for this is that
-   # ----- 1) the performance tests were only thoroughly tested on Ubuntu, not windows-
-   #           (g3log windows/linux, but Google's glog only on linux)
-   #
-   #       2) The unit test were tested windows/linux
+   # ---- by default unit tests and g3log-FATAL-example are enabled.
+   #      Performance tests are turned off by default since they were not tested on Windows. 
    # ============================================================================
 
 
    # Unit test for g3log  (cmake -DUSE_G3LOG_UNIT_TEST=ON ..)
-   option (ADD_G3LOG_UNIT_TEST "g3log unit tests" OFF)
+   option (ADD_G3LOG_UNIT_TEST "g3log unit tests" ON)
 
 
    # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
