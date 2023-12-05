@@ -274,7 +274,10 @@ namespace g3 {
 
       if (sigaction(signal_number, &(old_action_it->second), nullptr) < 0) {
          auto signalname = std::string("sigaction - ") + signalToStr(signal_number);
-         perror(signalname.c_str());
+                  // https://man7.org/linux/man-pages/man7/signal-safety.7.html (see signal-safety)
+                  // perror is not async-signal-safe 
+         perror(signalname.c_str()); 
+
       }
 
       gSavedSigActions.erase(old_action_it);
