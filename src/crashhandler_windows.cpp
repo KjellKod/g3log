@@ -213,7 +213,7 @@ namespace g3 {
    /// on Windows. This is automatically done if you do at least one LOG(...) call
    /// you can also use this function call, per thread so make sure these three
    /// fatal signals are covered in your thread (even if you don't do a LOG(...) call
-   size_t installSignalHandlerForThread() {
+   void installSignalHandlerForThread() {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
       if (!g_installed_thread_signal_handler) {
          g_installed_thread_signal_handler = true;
