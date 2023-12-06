@@ -147,42 +147,40 @@ namespace g3 {
          message.get()->write().append(entry);
          message.get()->setExpression(boolean_expression);
 
-         if (internal::wasFatal(level))
-         {
+         if (internal::wasFatal(level)) {
             saveFatalMessage(level, stack_trace, message, fatal_signal);
          } else {
             pushMessageToLogger(message);
          }
       }
 
-      void saveFatalMessage(const LEVELS &level, const char *stack_trace, g3::LogMessagePtr &message, int &fatal_signal)
-      {
-            auto fatalhook = g_fatal_pre_logging_hook;
-            // In case the fatal_pre logging actually will cause a crash in its turn
-            // let's not do recursive crashing!
-            setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing);
-            ++g_fatal_hook_recursive_counter;  // thread safe counter
-            // "benign" race here. If two threads crashes, with recursive crashes
-            // then it's possible that the "other" fatal stack trace will be shown
-            // that's OK since it was anyhow the first crash detected
-            static const std::string first_stack_trace = stack_trace;
-            fatalhook();
-            message.get()->write().append(stack_trace);
+      void saveFatalMessage(const LEVELS& level, const char* stack_trace, g3::LogMessagePtr& message, int& fatal_signal) {
+         auto fatalhook = g_fatal_pre_logging_hook;
+         // In case the fatal_pre logging actually will cause a crash in its turn
+         // let's not do recursive crashing!
+         setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing);
+         ++g_fatal_hook_recursive_counter;  // thread safe counter
+         // "benign" race here. If two threads crashes, with recursive crashes
+         // then it's possible that the "other" fatal stack trace will be shown
+         // that's OK since it was anyhow the first crash detected
+         static const std::string first_stack_trace = stack_trace;
+         fatalhook();
+         message.get()->write().append(stack_trace);
 
-            if (g_fatal_hook_recursive_counter.load() > 1)
-            {
-               message.get()->write().append("\n\n\nWARNING\n"
-                                             "A recursive crash detected. It is likely the hook set with 'setFatalPreLoggingHook(...)' is responsible\n\n")
-                   .append("---First crash stacktrace: ")
-                   .append(first_stack_trace)
-                   .append("\n---End of first stacktrace\n");
-            }
-            FatalMessagePtr fatal_message{std::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal)};
-            // At destruction, flushes fatal message to g3LogWorker
-            // either we will stay here until the background worker has received the fatal
-            // message, flushed the crash message to the sinks and exits with the same fatal signal
-            //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
-            fatalCall(fatal_message);
+         if (g_fatal_hook_recursive_counter.load() > 1) {
+            message.get()->write().append(
+                                     "\n\n\nWARNING\n"
+                                     "A recursive crash detected. It is likely the hook set with 'setFatalPreLoggingHook(...)' is responsible\n\n")
+               .append("---First crash stacktrace: ")
+               .append(first_stack_trace)
+               .append("\n---End of first stacktrace\n");
+         }
+         FatalMessagePtr fatal_message{std::make_unique<FatalMessage>(*(message._move_only.get()), fatal_signal)};
+         // At destruction, flushes fatal message to g3LogWorker
+         // either we will stay here until the background worker has received the fatal
+         // message, flushed the crash message to the sinks and exits with the same fatal signal
+         //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
+         fatalCall(fatal_message);
       }
          /**
             * save the message to the logger. In case of called before the logger is instantiated
@@ -236,16 +234,20 @@ namespace g3 {
                std::this_thread::sleep_for(std::chrono::seconds(1));
             }
          }
+         g_logger_instance->fatal(message);
+         while (shouldBlockForFatalHandling()) {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+         }
+      }
 
-         /** The default, initial, handling to send a 'fatal' event to g3logworker
+      /** The default, initial, handling to send a 'fatal' event to g3logworker
           *  the caller will stay here, eternally, until the software is aborted
           * ... in the case of unit testing it is the given "Mock" fatalCall that will
           * define the behaviour.
           */
-         void fatalCall(FatalMessagePtr message)
-         {
-            g_fatal_to_g3logworker_function_ptr(FatalMessagePtr{std::move(message)});
-         }
+      void fatalCall(FatalMessagePtr message) {
+         g_fatal_to_g3logworker_function_ptr(FatalMessagePtr{std::move(message)});
+      }
 
-      } // internal
-} // g3
+   }  // namespace internal
+}  // namespace g3
