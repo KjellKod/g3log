@@ -1,8 +1,7 @@
-#include "g3log/crashhandler.hpp"
 #include <fcntl.h>
 #include <gtest/gtest.h>
 #include <unistd.h>
-
+#include "g3log/crashhandler.hpp"
 
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 
@@ -53,7 +52,6 @@ TEST_F(SignalHandlingTest, WriteErrorMessage_WritesToStderr) {
    std::string output = ReadStderr();
    ASSERT_EQ(output, test_message);
 }
-
 
 TEST_F(SignalHandlingTest, WriteErrorMessage_Nullptr_DoesNotWriteToStderr) {
    g3::internal::writeErrorMessage(nullptr);
