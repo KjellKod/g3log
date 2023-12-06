@@ -58,7 +58,7 @@ The contract API follows closely the logging API with ```CHECK(<boolean-expressi
 If the ```<boolean-expression>``` evaluates to false then the the message for the failed contract will be logged in FIFO order with previously made messages. The process will then shut down after the message is sent to the sinks and the sinks have dealt with the fatal contract message. 
 
 
-(\* * ```CHECK_F(<boolean-expression>, ...);``` was the the previous API for printf-like CHECK. It is still kept for backwards compatability but is exactly the same as ```CHECKF``` *)
+```CHECK_F(<boolean-expression>, ...);``` was the the previous API for printf-like CHECK. It is still kept for backwards compatability but is exactly the same as ```CHECKF```
 
 # LOG(fATAL) or CHECK(false)
 Fatal logging or failed `CHECK  calls follows the same handling. 
