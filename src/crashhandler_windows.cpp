@@ -174,7 +174,7 @@ namespace g3 {
       // FYI: Concept of async-signal-safe operations does not exist on windows
       // we stick to perror for lack of better alternatives.
       size_t writeErrorMessage(const char* message) {
-         perror(message)
+         perror(message);
       }
 
       // Restore back to default fatal event handling
@@ -226,7 +226,7 @@ namespace g3 {
          if (SIG_ERR == signal(SIGSEGV, signalHandler))
             internal::writeErrorMessage("signal - SIGSEGV");
          if (SIG_ERR == signal(SIGILL, signalHandler))
-            internal::writeErrorMessag("signal - SIGILL");
+            internal::writeErrorMessage("signal - SIGILL");
       }
 #endif
    }
