@@ -29,7 +29,7 @@ For more in-depth information please see the full usage description in [g3log.md
 
 
 ## Experiment and try-out g3log in Github Codespaces 
-ref: [CodeSpsces.md](docs/codespaces.md)
+ref: [codespaces.md](docs/codespaces.md)
 
 
 ## 1. Easy usage in files
