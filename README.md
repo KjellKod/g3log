@@ -12,7 +12,7 @@ Thank you very much for your time and for considering me for opportunities. I lo
 # ___
 
 # Contents 
-[**introduction**](docs/index.md) | [detailed information](docs/g3log.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)
+[**introduction**](docs/index.md) | [detailed information](docs/g3log_usage.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)
 
 
 # Welcome to g3log
@@ -25,7 +25,7 @@ G3log is an asynchronous logger with three main features:
 
 The super quick introduction to g3log can be seen in the steps 1 - 9 below. 
 
-For more in-depth information please see the full usage description in [g3log.md](docs/g3log.md). The internal API for more advanced integration with g3log can be accessed in [API.md](docs/API.md)
+For more in-depth information please see the full usage description in [g3log_usage.md](docs/g3log_usage.md).If you want to understand better the internals of g3log, then plase look at the [API.md](docs/API.md) for both high-level and deep-dive insights. 
 
 
 ## Experiment and try-out g3log in Github Codespaces 
@@ -149,4 +149,4 @@ Cheers
 
 Kjell *(a.k.a. KjellKod)*
 
-[**introduction**](docs/index.md) | [detailed information](docs/g3log.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)
+[**introduction**](docs/index.md) | [detailed information](docs/g3log_usage.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)

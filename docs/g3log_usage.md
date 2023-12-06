@@ -1,4 +1,4 @@
-[introduction](index.md) | [**detailed information**](g3log.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+[introduction](index.md) | [**detailed information**](g3log_usage.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
 
 
 # How to use g3log
@@ -218,4 +218,4 @@ int main(int argc, char**argv) {
 }
 ```
 
-[introduction](index.md) | [**detailed information**](g3log.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+[introduction](index.md) | [**detailed information**](g3log_usage.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
