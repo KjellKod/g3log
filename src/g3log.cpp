@@ -19,39 +19,32 @@
  * ********************************************* */
 
 #include "g3log/g3log.hpp"
-#include "g3log/logworker.hpp"
 #include "g3log/crashhandler.hpp"
-#include "g3log/logmessage.hpp"
 #include "g3log/loglevels.hpp"
+#include "g3log/logmessage.hpp"
+#include "g3log/logworker.hpp"
 
-
-#include <mutex>
-#include <memory>
-#include <iostream>
-#include <thread>
 #include <atomic>
 #include <cstdlib>
+#include <iostream>
+#include <memory>
+#include <mutex>
 #include <sstream>
-#include "g3log.hpp"
+#include <thread>
 
 namespace {
    std::once_flag g_initialize_flag;
-   g3::LogWorker* g_logger_instance = nullptr; // instantiated and OWNED somewhere else (main)
+   g3::LogWorker* g_logger_instance = nullptr;  // instantiated and OWNED somewhere else (main)
    std::mutex g_logging_init_mutex;
 
    std::unique_ptr<g3::LogMessage> g_first_uninitialized_msg = {nullptr};
    std::once_flag g_set_first_uninitialized_flag;
    std::once_flag g_save_first_uninitialized_flag;
-   const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = [] { /*does nothing */};
+   const std::function<void(void)> g_pre_fatal_hook_that_does_nothing = [] { /*does nothing */ };
    std::function<void(void)> g_fatal_pre_logging_hook;
 
-
    std::atomic<size_t> g_fatal_hook_recursive_counter = {0};
-}
-
-
-
-
+}  // namespace
 
 namespace g3 {
    // signalhandler and internal clock is only needed to install once
@@ -77,7 +70,7 @@ namespace g3 {
       // Save the first uninitialized message, if any
       std::call_once(g_save_first_uninitialized_flag, [&bgworker] {
          if (g_first_uninitialized_msg) {
-            bgworker->save(LogMessagePtr {std::move(g_first_uninitialized_msg)});
+            bgworker->save(LogMessagePtr{std::move(g_first_uninitialized_msg)});
          }
       });
 
@@ -89,33 +82,28 @@ namespace g3 {
       g_fatal_hook_recursive_counter.store(0);
    }
 
-
    /**
    *  default does nothing, @ref ::g_pre_fatal_hook_that_does_nothing
    *  It will be called just before sending the fatal message, @ref pushFatalmessageToLogger
    *  It will be reset to do nothing in ::initializeLogging(...)
    *     so please call this function, if you ever need to, after initializeLogging(...)
    */
-   void setFatalPreLoggingHook(std::function<void(void)>  pre_fatal_hook) {
+   void setFatalPreLoggingHook(std::function<void(void)> pre_fatal_hook) {
       static std::mutex m;
       std::lock_guard<std::mutex> lock(m);
       g_fatal_pre_logging_hook = pre_fatal_hook;
    }
 
-
-
-
    // By default this function pointer goes to \ref pushFatalMessageToLogger;
-   std::function<void(FatalMessagePtr) > g_fatal_to_g3logworker_function_ptr = internal::pushFatalMessageToLogger;
+   std::function<void(FatalMessagePtr)> g_fatal_to_g3logworker_function_ptr = internal::pushFatalMessageToLogger;
 
    /** REPLACE fatalCallToLogger for fatalCallForUnitTest
     * This function switches the function pointer so that only
     * 'unitTest' mock-fatal calls are made.
     * */
-   void setFatalExitHandler(std::function<void(FatalMessagePtr) > fatal_call) {
+   void setFatalExitHandler(std::function<void(FatalMessagePtr)> fatal_call) {
       g_fatal_to_g3logworker_function_ptr = fatal_call;
    }
-
 
    namespace internal {
 
@@ -130,7 +118,6 @@ namespace g3 {
       void shutDownLogging() {
          std::lock_guard<std::mutex> lock(g_logging_init_mutex);
          g_logger_instance = nullptr;
-
       }
 
       /** Same as the Shutdown above but called by the destructor of the LogWorker, thus ensuring that no further
@@ -151,15 +138,12 @@ namespace g3 {
          return true;
       }
 
-
-
-
       /** explicitly copy of all input. This is makes it possibly to use g3log across dynamically loaded libraries
       * i.e. (dlopen + dlsym)  */
       void saveMessage(const char* entry, const char* file, int line, const char* function, const LEVELS& level,
                        const char* boolean_expression, int fatal_signal, const char* stack_trace) {
-         LEVELS msgLevel {level};
-         LogMessagePtr message {std::make_unique<LogMessage>(file, line, function, msgLevel)};
+         LEVELS msgLevel{level};
+         LogMessagePtr message{std::make_unique<LogMessage>(file, line, function, msgLevel)};
          message.get()->write().append(entry);
          message.get()->setExpression(boolean_expression);
 
@@ -177,7 +161,7 @@ namespace g3 {
             // In case the fatal_pre logging actually will cause a crash in its turn
             // let's not do recursive crashing!
             setFatalPreLoggingHook(g_pre_fatal_hook_that_does_nothing);
-            ++g_fatal_hook_recursive_counter; // thread safe counter
+            ++g_fatal_hook_recursive_counter;  // thread safe counter
             // "benign" race here. If two threads crashes, with recursive crashes
             // then it's possible that the "other" fatal stack trace will be shown
             // that's OK since it was anyhow the first crash detected

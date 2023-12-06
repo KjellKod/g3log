@@ -9,34 +9,29 @@
 #include <g3log/g3log.hpp>
 #include <g3log/logworker.hpp>
 #include <iomanip>
-#include <thread>
 #include <iostream>
+#include <thread>
 
-
-namespace
-{
+namespace {
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
    const std::string path_to_log_file = "./";
 #else
    const std::string path_to_log_file = "/tmp/";
 #endif
-}
+}  // namespace
 
-namespace example_fatal
-{
-   void killWithContractIfNonEqual(int first, int second)
-   {
+namespace example_fatal {
+   void killWithContractIfNonEqual(int first, int second) {
       CHECK(first == second) << "Test to see if contract works: onetwothree: " << 123 << ". This should be at the end of the log, and will exit this example";
    }
-} // example fatal
+}  // namespace example_fatal
 
-int main(int argc, char **argv)
-{
+int main(int argc, char** argv) {
    double pi_d = 3.1415926535897932384626433832795;
    float pi_f = 3.1415926535897932384626433832795f;
 
    auto worker = g3::LogWorker::createLogWorker();
-   auto handle= worker->addDefaultLogger(argv[0], path_to_log_file);
+   auto handle = worker->addDefaultLogger(argv[0], path_to_log_file);
    g3::initializeLogging(worker.get());
    std::future<std::string> log_file_name = handle->call(&g3::FileSink::fileName);
 
@@ -49,11 +44,11 @@ int main(int argc, char **argv)
    changeFormatting.wait();
    changeHeader.wait();
 
-
    std::cout << "*   This is an example of g3log. It WILL exit by a failed CHECK(...)" << std::endl;
    std::cout << "*   that acts as a FATAL trigger. Please see the generated log and " << std::endl;
    std::cout << "*   compare to the code at:\n*  \t g3log/test_example/main_contract.cpp" << std::endl;
-   std::cout << "*\n*   Log file: [" << log_file_name.get() << "]\n\n" << std::endl;
+   std::cout << "*\n*   Log file: [" << log_file_name.get() << "]\n\n"
+             << std::endl;
 
    LOGF(INFO, "Hi log %d", 123);
    LOG(INFO) << "Test SLOG INFO";
@@ -72,4 +67,3 @@ int main(int argc, char **argv)
    int larger = 2;
    example_fatal::killWithContractIfNonEqual(smaller, larger);
 }
-

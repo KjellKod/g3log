@@ -7,8 +7,8 @@
  * ============================================================================*/
 
 #include "g3log/logcapture.hpp"
-#include "g3log/g3log.hpp"
 #include "g3log/crashhandler.hpp"
+#include "g3log/g3log.hpp"
 
 #ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
 #include <vector>
@@ -21,7 +21,9 @@
 #define SIGNAL_HANDLER_VERIFY() g3::installSignalHandlerForThread()
 #else
 // Does nothing  --- enforces that semicolon must be written
-#define SIGNAL_HANDLER_VERIFY() do {} while(0)
+#define SIGNAL_HANDLER_VERIFY() \
+   do {                         \
+   } while (0)
 #endif
 
 #ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
@@ -30,7 +32,7 @@ static int MaxMessageSize = 2048;
 
 void g3::only_change_at_initialization::setMaxMessageSize(size_t max_size) {
    MaxMessageSize = max_size;
- }
+}
 #endif /* G3_DYNAMIC_MAX_MESSAGE_SIZE */
 
 /** logCapture is a simple struct for capturing log/fatal entries. At destruction the
@@ -38,15 +40,15 @@ void g3::only_change_at_initialization::setMaxMessageSize(size_t max_size) {
 * As a safety precaution: No memory allocated here will be moved into the background
 * worker in case of dynamic loaded library reasons instead the arguments are copied
 * inside of g3log.cpp::saveMessage*/
-LogCapture::~LogCapture() noexcept (false) {
+LogCapture::~LogCapture() noexcept(false) {
    using namespace g3::internal;
    SIGNAL_HANDLER_VERIFY();
    saveMessage(_stream.str().c_str(), _file, _line, _function, _level, _expression, _fatal_signal, _stack_trace.c_str());
 }
 
-
 /// Called from crash handler when a fatal signal has occurred (SIGSEGV etc)
-LogCapture::LogCapture(const LEVELS &level, g3::SignalType fatal_signal, const char *dump) : LogCapture("", 0, "", level, "", fatal_signal, dump) {
+LogCapture::LogCapture(const LEVELS& level, g3::SignalType fatal_signal, const char* dump) :
+    LogCapture("", 0, "", level, "", fatal_signal, dump) {
 }
 
 /**
@@ -55,9 +57,14 @@ LogCapture::LogCapture(const LEVELS &level, g3::SignalType fatal_signal, const c
  * @expression for CHECK calls
  * @fatal_signal for failed CHECK:SIGABRT or fatal signal caught in the signal handler
  */
-LogCapture::LogCapture(const char *file, const int line, const char *function, const LEVELS &level,
-                       const char *expression, g3::SignalType fatal_signal, const char *dump)
-   : _file(file), _line(line), _function(function), _level(level), _expression(expression), _fatal_signal(fatal_signal) {
+LogCapture::LogCapture(const char* file, const int line, const char* function, const LEVELS& level,
+                       const char* expression, g3::SignalType fatal_signal, const char* dump) :
+    _file(file),
+    _line(line),
+    _function(function),
+    _level(level),
+    _expression(expression),
+    _fatal_signal(fatal_signal) {
 
    if (g3::internal::wasFatal(level)) {
       _stack_trace = std::string{"\n*******\tSTACKDUMP *******\n"};
@@ -65,17 +72,15 @@ LogCapture::LogCapture(const char *file, const int line, const char *function, c
    }
 }
 
-
-
 /**
 * capturef, used for "printf" like API in CHECKF, LOGF, LOGF_IF
 * See also for the attribute formatting ref:  http://www.codemaestro.com/reviews/18
 */
-void LogCapture::capturef(const char *printf_like_message, ...) {
+void LogCapture::capturef(const char* printf_like_message, ...) {
    static const std::string kTruncatedWarningText = "[...truncated...]";
 #ifdef G3_DYNAMIC_MAX_MESSAGE_SIZE
    std::vector<char> finished_message_backing(MaxMessageSize);
-   char *finished_message = finished_message_backing.data();
+   char* finished_message = finished_message_backing.data();
    auto finished_message_len = MaxMessageSize;
 #else
    static const int kMaxMessageSize = 2048;
@@ -106,5 +111,3 @@ void LogCapture::capturef(const char *printf_like_message, ...) {
       stream() << finished_message;
    }
 }
-
-

@@ -23,8 +23,6 @@
 * PUBLIC DOMAIN and NOT under copywrite protection.
 * ********************************************* */
 
-
-
 #include <future>
 #include "g3log/active.hpp"
 #include "g3log/moveoncopy.hpp"
@@ -42,8 +40,7 @@ namespace g3 {
    //  auto msg_call=[=](){return ("Hello from the Background");};
    //  auto future_msg = g3::spawn_task(msg_lambda, bgWorker.get());
    template <typename Func, class BgWorker>
-   std::future<std::invoke_result_t<Func>> spawn_task(Func func, BgWorker *worker)
-   {
+   std::future<std::invoke_result_t<Func>> spawn_task(Func func, BgWorker* worker) {
       typedef std::invoke_result_t<Func> result_type;
       typedef std::packaged_task<result_type()> task_type;
 
@@ -60,4 +57,4 @@ namespace g3 {
       worker->send(MoveOnCopy<task_type>(std::move(task)));
       return result;
    }
-} // end namespace g3
+}  // end namespace g3

@@ -6,13 +6,11 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
-
 #include <gtest/gtest.h>
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-#include "g3log/stacktrace_windows.hpp"
 #include <windows.h>
-
+#include "g3log/stacktrace_windows.hpp"
 
 TEST(CrashHandler_Windows, ExceptionType) {
    EXPECT_EQ(stacktrace::exceptionIdToText(123), "UNKNOWN EXCEPTION:123");

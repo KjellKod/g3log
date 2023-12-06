@@ -22,22 +22,21 @@ namespace g3 {
    // The real sink will be owned by g3log. If the real sink is deleted
    // calls to sink's API through the SinkHandle will return an exception embedded
    // in the resulting future. Ref: SinkHandle::call
-   template<class T>
+   template <class T>
    class SinkHandle {
       std::weak_ptr<internal::Sink<T>> _sink;
 
-    public:
-      SinkHandle(std::shared_ptr<internal::Sink<T>> sink)
-         : _sink(sink) {}
+     public:
+      SinkHandle(std::shared_ptr<internal::Sink<T>> sink) :
+          _sink(sink) {}
 
       ~SinkHandle() = default;
-
 
       // Asynchronous call to the real sink. If the real sink is already deleted
       // the returned future will contain a bad_weak_ptr exception instead of the
       // call result.
-      template<typename AsyncCall, typename... Args>
-      auto call(AsyncCall func , Args&& ... args) -> std::future<std::invoke_result_t<decltype(func), T, Args...>> {
+      template <typename AsyncCall, typename... Args>
+      auto call(AsyncCall func, Args&&... args) -> std::future<std::invoke_result_t<decltype(func), T, Args...>> {
          try {
             std::shared_ptr<internal::Sink<T>> sink(_sink);
             return sink->async(func, std::forward<Args>(args)...);
@@ -57,6 +56,4 @@ namespace g3 {
       }
    };
 
-} // g3
-
-
+}  // namespace g3

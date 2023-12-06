@@ -11,7 +11,6 @@
  * For more information see g3log/LICENSE or refer refer to http://unlicense.org
  * ============================================================================*/
 
-
 #pragma once
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #error "stacktrace_win.cpp used but not on a windows system"
@@ -19,8 +18,8 @@
 
 #include "g3log/crashhandler.hpp"
 
-#include <string>
 #include <windows.h>
+#include <string>
 
 namespace stacktrace {
    /// return the text description of a Windows exception code
@@ -34,9 +33,9 @@ namespace stacktrace {
    std::string stackdump();
 
    /// helper function: retrieve stackdump, starting from an exception pointer
-   std::string stackdump(EXCEPTION_POINTERS *info);
+   std::string stackdump(EXCEPTION_POINTERS* info);
 
    /// main stackdump function. retrieve stackdump, from the given context
-   std::string stackdump(CONTEXT *context);
+   std::string stackdump(CONTEXT* context);
 
-} // stacktrace
+}  // namespace stacktrace

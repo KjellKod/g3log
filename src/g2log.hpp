@@ -16,8 +16,7 @@
 // Btw: replacing g2log for g3log include is easy on Linux
 //  find . -name "*.cpp*" -print | xargs sed -i -e 's/\g2log\.hpp/\g3log\/g3log\.hpp/g'
 
-#include <g3log/g3log.hpp>
-#include <g3log/logworker.hpp>
-#include <g3log/loglevels.hpp>
 #include <g3log/filesink.hpp>
-
+#include <g3log/g3log.hpp>
+#include <g3log/loglevels.hpp>
+#include <g3log/logworker.hpp>

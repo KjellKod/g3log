@@ -8,19 +8,18 @@
 
 #pragma once
 
-
-#include "g3log/sinkwrapper.hpp"
 #include "g3log/active.hpp"
 #include "g3log/future.hpp"
 #include "g3log/logmessage.hpp"
+#include "g3log/sinkwrapper.hpp"
 
-#include <memory>
 #include <functional>
+#include <memory>
 #include <type_traits>
 
 namespace g3 {
    namespace internal {
-      typedef std::function<void(LogMessageMover) > AsyncMessageCall;
+      typedef std::function<void(LogMessageMover)> AsyncMessageCall;
 
       /// The asynchronous Sink has an active object, incoming requests for actions
       //  will be processed in the background by the specific object the Sink represents.
@@ -34,33 +33,32 @@ namespace g3 {
       // Ref: send(Call call, Args... args) deals with calls
       //           to the real sink's API
 
-      template<class T>
+      template <class T>
       struct Sink : public SinkWrapper {
          std::unique_ptr<T> _real_sink;
          std::unique_ptr<kjellkod::Active> _bg;
          AsyncMessageCall _default_log_call;
 
-         template<typename DefaultLogCall >
-         Sink(std::unique_ptr<T> sink, DefaultLogCall call)
-            : SinkWrapper(),
-         _real_sink {std::move(sink)},
-         _bg(kjellkod::Active::createActive()),
-         _default_log_call(std::bind(call, _real_sink.get(), std::placeholders::_1)) {
+         template <typename DefaultLogCall>
+         Sink(std::unique_ptr<T> sink, DefaultLogCall call) :
+             SinkWrapper(),
+             _real_sink{std::move(sink)},
+             _bg(kjellkod::Active::createActive()),
+             _default_log_call(std::bind(call, _real_sink.get(), std::placeholders::_1)) {
          }
 
-
-         Sink(std::unique_ptr<T> sink, void(T::*Call)(std::string) )
-            : SinkWrapper(),
-         _real_sink {std::move(sink)},
-         _bg(kjellkod::Active::createActive()) {
+         Sink(std::unique_ptr<T> sink, void (T::*Call)(std::string)) :
+             SinkWrapper(),
+             _real_sink{std::move(sink)},
+             _bg(kjellkod::Active::createActive()) {
             std::function<void(std::string)> adapter = std::bind(Call, _real_sink.get(), std::placeholders::_1);
-            _default_log_call = [ = ](LogMessageMover m) {
+            _default_log_call = [=](LogMessageMover m) {
                adapter(m.get().toString());
             };
          }
 
          virtual ~Sink() {
-            _bg.reset(); // TODO: to remove
+            _bg.reset();  // TODO: to remove
          }
 
          void send(LogMessageMover msg) override {
@@ -69,10 +67,10 @@ namespace g3 {
             });
          }
 
-         template<typename Call, typename... Args>
-         auto async(Call call, Args &&... args)-> std::future<std::invoke_result_t<decltype(call), T, Args...>> {
+         template <typename Call, typename... Args>
+         auto async(Call call, Args&&... args) -> std::future<std::invoke_result_t<decltype(call), T, Args...>> {
             return g3::spawn_task(std::bind(call, _real_sink.get(), std::forward<Args>(args)...), _bg.get());
          }
       };
-   } // internal
-} // g3
+   }  // namespace internal
+}  // namespace g3
