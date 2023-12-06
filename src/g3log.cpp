@@ -148,13 +148,13 @@ namespace g3 {
          message.get()->setExpression(boolean_expression);
 
          if (internal::wasFatal(level)) {
-            saveFatalMessage(level, stack_trace, message, fatal_signal);
+            saveFatalMessage(stack_trace, message, fatal_signal);
          } else {
             pushMessageToLogger(message);
          }
       }
 
-      void saveFatalMessage(const LEVELS& level, const char* stack_trace, g3::LogMessagePtr& message, int& fatal_signal) {
+      void saveFatalMessage(const char* stack_trace, g3::LogMessagePtr& message, int& fatal_signal) {
          auto fatalhook = g_fatal_pre_logging_hook;
          // In case the fatal_pre logging actually will cause a crash in its turn
          // let's not do recursive crashing!
