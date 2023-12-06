@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <atomic>
 #include <csignal>
+#include <cstring>
 #include <sstream>
 #include "g3log/crashhandler.hpp"
 #include "g3log/g3log.hpp"
@@ -175,6 +176,7 @@ namespace g3 {
       // we stick to perror for lack of better alternatives.
       size_t writeErrorMessage(const char* message) {
          perror(message);
+         return std::strlen(message);
       }
 
       // Restore back to default fatal event handling
