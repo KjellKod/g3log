@@ -1,4 +1,4 @@
-[introduction](index.md) | [detailed information](g3log.md) | [**Configure & Build**](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+[introduction](index.md) | [detailed information](g3log_usage.md) | [**Configure & Build**](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
 
 # <a name="building-g3log">Configure, build, package, install and test g3log</a>
 
@@ -249,4 +249,4 @@ cmake .. -DCMAKE_PREFIX_PATH=<g3log's install prefix>
 
   build options are generated and saved to a header file. This avoid having to set the define options in the client source code
 
-[introduction](index.md) | [detailed information](g3log.md) | [**Configure & Build**](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+[introduction](index.md) | [detailed information](g3log_usage.md) | [**Configure & Build**](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)

@@ -1,4 +1,4 @@
-[**introduction**](index.md) | [detailed information](g3log.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+[**introduction**](index.md) | [detailed information](g3log_usage.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
 
 
 # Welcome to g3log
@@ -10,7 +10,7 @@ G3log is an asynchronous logger with three main features:
 
 The super quick introduction to g3log can be seen in the steps 1 - 9 below. 
 
-For more in-depth information please see the full usage description in [g3log.md](g3log.md). The internal API for more advanced integration with g3log can be accessed in [API.md](API.md)
+For more in-depth information please see the full usage description in [g3log_usage.md](g3log_usage.md). The internal API for more advanced integration with g3log can be accessed in [API.md](API.md)
 
 ## 1. Easy usage in files
 Avoid deep dependency injection complexity and instead get access to the logger as easy as 
@@ -129,4 +129,4 @@ Cheers
 
 Kjell *(a.k.a. KjellKod)*
 
-[**introduction**](index.md) | [detailed information](g3log.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)
+[**introduction**](index.md) | [detailed information](g3log_usage.md) | [Configure & Build](building.md) | [API description](API.md) | [Custom log formatting](API_custom_formatting.md)

@@ -1,4 +1,41 @@
-[introduction](index.md) | [detailed information](g3log.md) | [Configure & Build](building.md) | [**API description**](API.md) | [Custom log formatting](API_custom_formatting.md)
+[introduction](index.md) | [detailed information](g3log_usage.md) | [Configure & Build](building.md) | [**API description**](API.md) | [Custom log formatting](API_custom_formatting.md)
+
+# High Level Description of g3log
+The `g3log` logger is an asynchronous, crash-safe logging library designed for C++ applications. It allows for logging messages to various sinks without blocking the main application thread. Below is a high-level overview of how the `g3log` logger works:
+
+## Asynchronous Logging
+The logger operates on a separate thread, ensuring that the main application thread is not blocked by I/O operations when logging messages. This is achieved by using a background worker ([`LogWorker`](../src/g3log/logworker.hpp)) that queues log messages and processes them asynchronously.
+
+## LogWorker and Sinks
+The `LogWorker` is responsible for managing the logging sinks. A sink is an object that defines where and how log messages are outputted (e.g., to a file, console, or over the network). Users can add custom sinks to the `LogWorker` using the `addSink` method, which takes a unique pointer to a sink object and a function pointer to the method that will save the log message.
+
+## Signal Handling
+The logger includes a signal handler for Unix-like systems that captures fatal signals (e.g., `SIGSEGV`, `SIGABRT`) and ensures that all pending log messages are flushed to the sinks before the application exits. The signal handler function ([`signalHandler`](../src/crashhandler_unix.cpp)) is registered to handle these signals and will attempt to generate a stack trace when a fatal signal is received. This stack trace is then logged, providing valuable debugging information.
+
+## Stack Trace Generation
+Upon receiving a fatal signal, the `signalHandler` function will call [`stackdump`](../src/crashhandler_unix.cpp) to generate a stack trace. This function uses platform-specific calls to retrieve the stack frames and attempts to demangle the function names to make the stack trace more readable.
+
+## Log Message Formatting
+Log messages can be formatted using either a streaming API (e.g., `LOG(INFO) << "message";`) or a printf-like syntax (e.g., `LOGF(INFO, "message %d", value);`). This provides flexibility in how messages are constructed.
+
+## Log Levels
+The library supports various log levels (e.g., `DEBUG`, `INFO`, `WARNING`, `FATAL`). Users can define custom log levels or modify the existing ones. The log levels can be dynamically enabled or disabled at runtime if the `G3_DYNAMIC_LOGGING` preprocessor definition is set.
+
+## Crash Safety
+In the event of a crash, the logger is designed to be crash-safe by catching fatal events and ensuring that all log messages are flushed to the sinks before the process exits.
+
+## Customization
+The library allows for extensive customization, including adding custom log levels, creating custom sinks, and overriding the default signal handling behavior.
+
+## Thread Safety
+The `g3log` logger is thread-safe, meaning it can be used from multiple threads without the need for additional synchronization.
+
+## Public Domain Software
+The `g3log` code is released into the public domain, allowing users to use, modify, and distribute it freely without restrictions.
+
+## Logging and Fatal Events Explained
+![G3Log sequence view](event_sequence.png)
+
 
 # API description
 Most of the API that you need for using g3log is described in this readme. For more API documentation and examples please continue to read the [API readme](API.md). Examples of what you will find here are: 
@@ -21,10 +58,15 @@ The contract API follows closely the logging API with ```CHECK(<boolean-expressi
 If the ```<boolean-expression>``` evaluates to false then the the message for the failed contract will be logged in FIFO order with previously made messages. The process will then shut down after the message is sent to the sinks and the sinks have dealt with the fatal contract message. 
 
 
-(\* * ```CHECK_F(<boolean-expression>, ...);``` was the the previous API for printf-like CHECK. It is still kept for backwards compatability but is exactly the same as ```CHECKF``` *)
+```CHECK_F(<boolean-expression>, ...);``` was the the previous API for printf-like CHECK. It is still kept for backwards compatability but is exactly the same as ```CHECKF```
+
+# LOG(fATAL) or CHECK(false)
+Fatal logging or failed `CHECK  calls follows the same handling. 
+![CHECK(false) or LOG(FATAL)](fatal_log_sequence.png)
 
 
-## Logging levels 
+
+## Logging levels
  The default logging levels are ```DEBUG```, ```INFO```, ```WARNING``` and ```FATAL``` (see FATAL usage [above](#fatal_logging)). The logging levels are defined in [loglevels.hpp](https://github.com/KjellKod/g3log/tree/master/src/g3log/loglevels.hpp).
 
  For some windows framework there is a clash with the ```DEBUG``` logging level. One of the CMake [Build options](#build_options) can be used to then change offending default level from ```DEBUG``` TO ```DBUG```.
@@ -125,6 +167,10 @@ At a discovered fatal event (SIGSEGV et.al) all enqueued logs will be flushed to
 
 A programmatically triggered abrupt process exit such as a call to   ```exit(0)``` will of course not get the enqueued log entries flushed. Similary  a bug that does not trigger a fatal signal but a process exit will also not get the enqueued log entries flushed.  G3log can catch several fatal crashes and it deals well with RAII exits but magic is so far out of its' reach.
 
+
+![log sequence](log_sequence.png)
+
+
 ## G3log and Sink Usage Code Example
 Example usage where a [logrotate sink (g3sinks)](https://github.com/KjellKod/g3sinks) is added. In the example it is shown how the logrotate API is called. The logrotate limit is changed from the default to instead be 10MB. The limit is changed by calling the sink handler which passes the function call through to the actual logrotate sink object.
 ```cpp
@@ -182,6 +228,8 @@ The following is an example of changing the size for the message.
 
 ## Fatal handling
 The default behaviour for G3log is to catch several fatal events before they force the process to exit. After <i>catching</i> a fatal event a stack dump is generated and all log entries, up to the point of the stack dump are together with the dump flushed to the sink(s).
+
+![fatal signal](fatal_signal_sequence.png)
 
 
 ### <a name="fatal_handling_linux">Linux/*nix</a> 
@@ -255,4 +303,4 @@ The default behaviour for G3log is to catch several fatal events before they for
  
   An example of a Windows stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>. 
 
-[introduction](index.md) | [detailed information](g3log.md) | [Configure & Build](building.md) | [**API description**](API.md) | [Custom log formatting](API_custom_formatting.md)
+[introduction](index.md) | [detailed information](g3log_usage.md) | [Configure & Build](building.md) | [**API description**](API.md) | [Custom log formatting](API_custom_formatting.md)
