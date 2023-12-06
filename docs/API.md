@@ -34,7 +34,7 @@ The `g3log` logger is thread-safe, meaning it can be used from multiple threads 
 The `g3log` code is released into the public domain, allowing users to use, modify, and distribute it freely without restrictions.
 
 ## Logging and Fatal Events Explained
-![G3Log sequence view](event_sequence.svg)
+![G3Log sequence view](event_sequence.png)
 
 
 # API description
@@ -62,7 +62,7 @@ If the ```<boolean-expression>``` evaluates to false then the the message for th
 
 # LOG(fATAL) or CHECK(false)
 Fatal logging or failed `CHECK  calls follows the same handling. 
-![CHECK(false) or LOG(FATAL)](fatal_log_sequence.svg)
+![CHECK(false) or LOG(FATAL)](fatal_log_sequence.png)
 
 
 
@@ -168,7 +168,7 @@ At a discovered fatal event (SIGSEGV et.al) all enqueued logs will be flushed to
 A programmatically triggered abrupt process exit such as a call to   ```exit(0)``` will of course not get the enqueued log entries flushed. Similary  a bug that does not trigger a fatal signal but a process exit will also not get the enqueued log entries flushed.  G3log can catch several fatal crashes and it deals well with RAII exits but magic is so far out of its' reach.
 
 
-![log sequence](log_sequence.svg)
+![log sequence](log_sequence.png)
 
 
 ## G3log and Sink Usage Code Example
@@ -229,7 +229,7 @@ The following is an example of changing the size for the message.
 ## Fatal handling
 The default behaviour for G3log is to catch several fatal events before they force the process to exit. After <i>catching</i> a fatal event a stack dump is generated and all log entries, up to the point of the stack dump are together with the dump flushed to the sink(s).
 
-![fatal signal](fatal_signal_sequence.svg)
+![fatal signal](fatal_signal_sequence.png)
 
 
 ### <a name="fatal_handling_linux">Linux/*nix</a> 
