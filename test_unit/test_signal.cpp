@@ -60,7 +60,3 @@ TEST_F(SignalHandlingTest, WriteErrorMessage_Nullptr_DoesNotWriteToStderr) {
 }
 
 #endif  // #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
-
-TEST(SignalHandlingTest, DummyForWindows){
-   ASSERT_TRUE(true);
-}
