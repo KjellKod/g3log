@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <atomic>
 #include <csignal>
+#include <cstring>
 #include <sstream>
 #include "g3log/crashhandler.hpp"
 #include "g3log/g3log.hpp"
@@ -171,6 +172,13 @@ namespace g3 {
          raise(signal_number);
       }
 
+      // FYI: Concept of async-signal-safe operations does not exist on windows
+      // we stick to perror for lack of better alternatives.
+      size_t writeErrorMessage(const char* message) {
+         perror(message);
+         return std::strlen(message);
+      }
+
       // Restore back to default fatal event handling
       void restoreFatalHandlingToDefault() {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
@@ -181,19 +189,19 @@ namespace g3 {
 #endif
 
          if (SIG_ERR == signal(SIGABRT, SIG_DFL))
-            perror("signal - SIGABRT");
+            internal::writeErrorMessage("signal - SIGABRT");
 
          if (SIG_ERR == signal(SIGFPE, SIG_DFL))
-            perror("signal - SIGABRT");
+            internal::writeErrorMessage("signal - SIGABRT");
 
          if (SIG_ERR == signal(SIGSEGV, SIG_DFL))
-            perror("signal - SIGABRT");
+            internal::writeErrorMessage("signal - SIGABRT");
 
          if (SIG_ERR == signal(SIGILL, SIG_DFL))
-            perror("signal - SIGABRT");
+            internal::writeErrorMessage("signal - SIGABRT");
 
          if (SIG_ERR == signal(SIGTERM, SIG_DFL))
-            perror("signal - SIGABRT");
+            internal::writeErrorMessage("signal - SIGABRT");
 #endif
       }
 
@@ -212,15 +220,15 @@ namespace g3 {
       if (!g_installed_thread_signal_handler) {
          g_installed_thread_signal_handler = true;
          if (SIG_ERR == signal(SIGTERM, signalHandler))
-            perror("signal - SIGTERM");
+            internal::writeErrorMessage("signal - SIGTERM");
          if (SIG_ERR == signal(SIGABRT, signalHandler))
-            perror("signal - SIGABRT");
+            internal::writeErrorMessage("signal - SIGABRT");
          if (SIG_ERR == signal(SIGFPE, signalHandler))
-            perror("signal - SIGFPE");
+            internal::writeErrorMessage("signal - SIGFPE");
          if (SIG_ERR == signal(SIGSEGV, signalHandler))
-            perror("signal - SIGSEGV");
+            internal::writeErrorMessage("signal - SIGSEGV");
          if (SIG_ERR == signal(SIGILL, signalHandler))
-            perror("signal - SIGILL");
+            internal::writeErrorMessage("signal - SIGILL");
       }
 #endif
    }

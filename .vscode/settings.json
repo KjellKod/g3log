@@ -1,4 +1,7 @@
 {
     "cmake.configureOnOpen": false,
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "files.associations": {
+        "ostream": "cpp"
+    }
 }

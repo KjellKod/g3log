@@ -77,5 +77,6 @@ namespace g3 {
        * This is an internal only function. Do not use it elsewhere. It is triggered
        * from g3log, g3LogWorker after flushing messages to file */
       void exitWithDefaultSignalHandler(const LEVELS& level, g3::SignalType signal_number);
+      size_t writeErrorMessage(const char* message);
    }  // namespace internal
 }  // namespace g3
