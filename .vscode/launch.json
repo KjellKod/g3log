@@ -12,10 +12,9 @@
             "name": "(gdb) Start",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/g3log-FATAL-contract",
+            "program": "${workspaceFolder}/build/test_signal",
             "MIMode": "gdb",
-            "cwd": "${workspaceFolder}/build"
-            "setupCommands": [
+            "cwd": "${workspaceFolder}/build""setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
@@ -28,6 +27,5 @@
                 }
             ]
         }
-
     ]
 }
