@@ -1,9 +1,9 @@
-#include <fcntl.h>
 #include <gtest/gtest.h>
-#include <unistd.h>
 #include "g3log/crashhandler.hpp"
 
 #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#include <fcntl.h>
+#include <unistd.h>
 
 class SignalHandlingTest : public ::testing::Test {
   protected:
@@ -60,3 +60,7 @@ TEST_F(SignalHandlingTest, WriteErrorMessage_Nullptr_DoesNotWriteToStderr) {
 }
 
 #endif  // #if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+
+TEST(SignalHandlingTest, DummyForWindows){
+   ASSERT_TRUE(true);
+}
