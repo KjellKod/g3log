@@ -10,7 +10,7 @@ The logger operates on a separate thread, ensuring that the main application thr
 The `LogWorker` is responsible for managing the logging sinks. A sink is an object that defines where and how log messages are outputted (e.g., to a file, console, or over the network). Users can add custom sinks to the `LogWorker` using the `addSink` method, which takes a unique pointer to a sink object and a function pointer to the method that will save the log message.
 
 ## Signal Handling
-The logger includes a signal handler for Unix-like systems that captures fatal signals (e.g., `SIGSEGV`, `SIGABRT`) and ensures that all pending log messages are flushed to the sinks before the application exits. The signal handler function ([`signalHandler`](src/crashhandler_unix.cpp)) is registered to handle these signals and will attempt to generate a stack trace when a fatal signal is received. This stack trace is then logged, providing valuable debugging information.
+The logger includes a signal handler for Unix-like systems that captures fatal signals (e.g., `SIGSEGV`, `SIGABRT`) and ensures that all pending log messages are flushed to the sinks before the application exits. The signal handler function ([`signalHandler`](../src/crashhandler_unix.cpp)) is registered to handle these signals and will attempt to generate a stack trace when a fatal signal is received. This stack trace is then logged, providing valuable debugging information.
 
 ## Stack Trace Generation
 Upon receiving a fatal signal, the `signalHandler` function will call [`stackdump`](src/crashhandler_unix.cpp) to generate a stack trace. This function uses platform-specific calls to retrieve the stack frames and attempts to demangle the function names to make the stack trace more readable.
