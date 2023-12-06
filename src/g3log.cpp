@@ -182,7 +182,7 @@ namespace g3 {
          //..... OR it's in unit-test mode then we throw a std::runtime_error (and never hit sleep)
          fatalCall(fatal_message);
       }
-         /**
+      /**
             * save the message to the logger. In case of called before the logger is instantiated
             * the first message will be saved. Any following subsequent uninitialized log calls
             * will be ignored.
@@ -190,13 +190,10 @@ namespace g3 {
             * The first initialized log entry will also save the first uninitialized log message, if any
             * @param log_entry to save to logger
             */
-         void pushMessageToLogger(LogMessagePtr incoming)
-         { // todo rename to Push SavedMessage To Worker
-            // Uninitialized messages are ignored but does not CHECK/crash the logger
-            if (!internal::isLoggingInitialized())
-            {
-               std::call_once(g_set_first_uninitialized_flag, [&]
-                              {
+      void pushMessageToLogger(LogMessagePtr incoming) {  // todo rename to Push SavedMessage To Worker
+         // Uninitialized messages are ignored but does not CHECK/crash the logger
+         if (!internal::isLoggingInitialized()) {
+            std::call_once(g_set_first_uninitialized_flag, [&] {
                g_first_uninitialized_msg = incoming.release();
                std::string err = {"LOGGER NOT INITIALIZED:\n\t\t"};
                err.append(g_first_uninitialized_msg->message());
@@ -204,35 +201,27 @@ namespace g3 {
                str.clear();
                str.append(err); // replace content
                std::cerr << str << std::endl; });
-               return;
-            }
-
-            // logger is initialized
-            g_logger_instance->save(incoming);
+            return;
          }
 
-         /** Fatal call saved to logger. This will trigger SIGABRT or other fatal signal
+         // logger is initialized
+         g_logger_instance->save(incoming);
+      }
+
+      /** Fatal call saved to logger. This will trigger SIGABRT or other fatal signal
           * to exit the program. After saving the fatal message the calling thread
           * will sleep forever (i.e. until the background thread catches up, saves the fatal
           * message and kills the software with the fatal signal.
           */
-         void pushFatalMessageToLogger(FatalMessagePtr message)
-         {
-            if (!isLoggingInitialized())
-            {
-               std::ostringstream error;
-               error << "FATAL CALL but logger is NOT initialized\n"
-                     << "CAUSE: " << message.get()->reason()
-                     << "\nMessage: \n"
-                     << message.get()->toString() << std::flush;
-               std::cerr << error.str() << std::flush;
-               internal::exitWithDefaultSignalHandler(message.get()->_level, message.get()->_signal_id);
-            }
-            g_logger_instance->fatal(message);
-            while (shouldBlockForFatalHandling())
-            {
-               std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
+      void pushFatalMessageToLogger(FatalMessagePtr message) {
+         if (!isLoggingInitialized()) {
+            std::ostringstream error;
+            error << "FATAL CALL but logger is NOT initialized\n"
+                  << "CAUSE: " << message.get()->reason()
+                  << "\nMessage: \n"
+                  << message.get()->toString() << std::flush;
+            std::cerr << error.str() << std::flush;
+            internal::exitWithDefaultSignalHandler(message.get()->_level, message.get()->_signal_id);
          }
          g_logger_instance->fatal(message);
          while (shouldBlockForFatalHandling()) {
