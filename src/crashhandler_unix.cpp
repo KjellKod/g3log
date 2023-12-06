@@ -242,6 +242,30 @@ namespace g3 {
          exit(signal_number);
       }
 
+      // This function is intended to be async-signal-safe. Using write and STDERR_FILENO should be
+      // safe in a signal handler. ref: http://pubs.opengroup.org/onlinepubs/009695399/functions/write.html
+
+      // This function is intended to be async-signal-safe.
+      // It writes an error message to stderr using the write system call,
+      // which is listed as async-signal-safe by POSIX.
+      size_t writeErrorMessage(const char* message) {
+         if (message == nullptr) {
+            return 0;
+         }
+
+         // Calculate the length of the message without using std library strlen or similar
+         // this is to ensure async-signal-safe by POSIX
+         size_t length = 0;
+         for (const char* p = message; *p != '\0'; ++p) {
+            ++length;
+         }
+
+         // Write the message to STDERR_FILENO in a single call.
+         // This assumes that the message is not too large for a single write.
+         auto bytes_written = write(STDERR_FILENO, message, length);
+         return bytes_written;
+      }
+
       // restores the signal handler back to default
       void restoreFatalHandlingToDefault() {
 #if !(defined(DISABLE_FATAL_SIGNALHANDLING))
@@ -274,10 +298,8 @@ namespace g3 {
 
       if (sigaction(signal_number, &(old_action_it->second), nullptr) < 0) {
          auto signalname = std::string("sigaction - ") + signalToStr(signal_number);
-                  // https://man7.org/linux/man-pages/man7/signal-safety.7.html (see signal-safety)
-                  // perror is not async-signal-safe 
-         perror(signalname.c_str()); 
-
+         // https://man7.org/linux/man-pages/man7/signal-safety.7.html (see signal-safety)
+         internal::writeErrorMessage(signalname.c_str());
       }
 
       gSavedSigActions.erase(old_action_it);
