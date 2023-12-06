@@ -173,7 +173,7 @@ namespace g3 {
 
       // FYI: Concept of async-signal-safe operations does not exist on windows
       // we stick to perror for lack of better alternatives.
-      void writeErrorMessage(const char* message) {
+      size_t writeErrorMessage(const char* message) {
          perror(message)
       }
 
