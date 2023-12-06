@@ -15,7 +15,10 @@
 		"vscode": {
 			"settings": {},
 			"extensions": [
-				"streetsidesoftware.code-spell-checker"
+				"streetsidesoftware.code-spell-checker",
+                                "genieai.chatgpt-vscode",
+                                "ms-vscode.cpptools-extension-pack",
+                                "ms-vscode.cpptools"                                
 			]
 		}
 	}
