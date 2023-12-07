@@ -106,31 +106,31 @@ namespace g3 {
    // This mimics the original "std::put_time(const std::tm* tmb, const charT* fmt)"
    // This is needed since latest version (at time of writing) of gcc4.7 does not implement this library function yet.
    // return value is SIMPLIFIED to only return a std::string
-   std::string put_time(const struct tm* tmb, const char* c_time_format) {
-#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
-      std::ostringstream oss;
-      oss.fill('0');
-      // BOGUS hack done for VS2012: C++11 non-conformant since it SHOULD take a "const struct tm*  "
-      oss << std::put_time(const_cast<struct tm*>(tmb), c_time_format);
-      return oss.str();
-#else  // LINUX
-      const size_t size = 1024;
-      char buffer[size];  // IMPORTANT: check now and then for when gcc will implement std::put_time.
-      //                    ... also ... This is way more buffer space then we need
+//    std::string put_time(const struct tm* tmb, const char* c_time_format) {
+// //#if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__)) && !defined(__MINGW32__)
+//       std::ostringstream oss;
+//       oss.fill('0');
+//       // BOGUS hack done for VS2012: C++11 non-conformant since it SHOULD take a "const struct tm*  "
+//       oss << std::put_time(tmb, c_time_format);
+//       return oss.str();
+// //#else  // LINUX
+//       // const size_t size = 1024;
+//       // char buffer[size];  // IMPORTANT: check now and then for when gcc will implement std::put_time.
+//       // //                    ... also ... This is way more buffer space then we need
 
-      auto success = std::strftime(buffer, size, c_time_format, tmb);
-      // In DEBUG the assert will trigger a process exit. Once inside the if-statement
-      // the 'always true' expression will be displayed as reason for the exit
-      //
-      // In Production mode
-      // the assert will do nothing but the format string will instead be returned
-      if (0 == success) {
-         assert((0 != success) && "strftime fails with illegal formatting");
-         return c_time_format;
-      }
-      return buffer;
-#endif
-   }
+//       // auto success = std::strftime(buffer, size, c_time_format, tmb);
+//       // // In DEBUG the assert will trigger a process exit. Once inside the if-statement
+//       // // the 'always true' expression will be displayed as reason for the exit
+//       // //
+//       // // In Production mode
+//       // // the assert will do nothing but the format string will instead be returned
+//       // if (0 == success) {
+//       //    assert((0 != success) && "strftime fails with illegal formatting");
+//       //    return c_time_format;
+//       // }
+//       // return buffer;
+// //#endif
+//    }
 
    tm localtime(std::time_t ts) {
       struct tm tm_snapshot;
@@ -146,6 +146,8 @@ namespace g3 {
       auto format_buffer = internal::localtime_formatted_fractions(ts, time_format);
       auto time_point = std::chrono::system_clock::to_time_t(ts);
       std::tm t = localtime(time_point);
-      return g3::put_time(&t, format_buffer.c_str());  // format example: //"%Y/%m/%d %H:%M:%S");
+      std::ostringstream oss;
+      oss <<  std::put_time(&t, format_buffer.c_str());  // format example: //"%Y/%m/%d %H:%M:%S");
+      return oss.str();
    }
 }  // namespace g3
