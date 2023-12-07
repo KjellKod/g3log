@@ -68,28 +68,28 @@ endif()
 
 # Calculate the version number
 SET(MAJOR_VERSION 2)
-SET(MINOR_VERSION 3)
-# patch will be number of commits since this ^ tag. 
+SET(MINOR_VERSION 4)
 
-# HOW TO UPDATE NEXT VERSION NUMBER
-# 1. set the values above for major, and minor. 
-# 2. The last number, the patch number will be number of commits since the last tag. 
 IF ( NOT VERSION )
    IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
       message("windows: Extracting git software version")
-      execute_process(COMMAND cmd /c "git rev-list ${MAJOR_VERSION}.${MINOR_VERSION}..HEAD | find /v " " /c" OUTPUT_VARIABLE COMMITS WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+      execute_process(COMMAND cmd /c "git rev-list ${MAJOR_VERSION}.${MINOR_VERSION}..HEAD | find /v " " /c" OUTPUT_VARIABLE GIT_RELEASE_COMMITS WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ELSE()
       IF(UNIX OR ${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
          message( STATUS "nix: Extracting git software version" )
       ELSE()
          message( STATUS "unknown platform: extracting git software version" )
       ENDIF()
-      execute_process(COMMAND bash "-c" "git rev-list ${MAJOR_VERSION}.${MINOR_VERSION}..HEAD | wc -l | tr -d ' '" OUTPUT_VARIABLE COMMITS WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+      execute_process(COMMAND bash "-c" "git rev-list ${MAJOR_VERSION}.${MINOR_VERSION}..HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE GIT_RELEASE_COMMITS WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ENDIF()
-   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}.${COMMITS})
+
+   message( STATUS "git build version: ${GIT_VERSION}" )
+   message( STATUS "version base: ${VERSION-BASE}" )
+   message( STATUS "version remainder: ${VERSION-REMAINDER}" )
+   SET(BUILD_NUMBER ${VERSION-BASE})
+   SET(VERSION ${MAJOR_VERSION}.${MINOR_VERSION}-${GIT_RELEASE_COMMITS}) #-${VERSION-REMAINDER})
 ENDIF()
-message( STATUS "[Build.cmake --> Software Version: ${VERSION}]" )
-message( STATUS "[MAJOR_VERSION: ${MAJOR_VERSION}. MINOR_VERSION: ${MINOR_VERSION}, BUILD_COMMITS: ${COMMITS}]" )
+message( STATUS "Software Version: ${VERSION}" )
 
 # ============================================================================
 # G3LOG OPTIONAL FEATURES
