@@ -82,6 +82,8 @@ jobs:
 
     - name: Fatal Exit Example
       working-directory: ${{github.workspace}}/build
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
       shell: bash
       # hacky / crude and effective
-      run: ./g3log-FATAL-sigsegv || true && echo -e "\n\n=======================\n\nverifying SIGSEGV existed in stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep  "SIGSEGV"
+      run: |
+      ./g3log-FATAL-sigsegv || true && echo -e "\n\n=======================\n\nverifying SIGSEGV existed in stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep  "SIGSEGV"
