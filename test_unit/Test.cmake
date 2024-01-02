@@ -18,6 +18,7 @@
 
    # Unit test for g3log  (cmake -DUSE_G3LOG_UNIT_TEST=ON ..)
    option (ADD_G3LOG_UNIT_TEST "g3log unit tests" ON)
+   message( STATUS "-DADD_G3LOG_UNIT_TEST=OFF" )  
 
 
    # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
@@ -52,7 +53,7 @@
       enable_testing()
 
       set(DIR_UNIT_TEST ${g3log_SOURCE_DIR}/test_unit)
-      message( STATUS "-DADD_G3LOG_UNIT_TEST=ON" )  
+
 
      # obs see this: http://stackoverflow.com/questions/9589192/how-do-i-change-the-number-of-template-arguments-supported-by-msvcs-stdtupl
      # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
