@@ -1,4 +1,4 @@
-# Open for Opportunities 🔍 December 2023
+# Open for Opportunities 🔍 January 2024
 
 Hello there! 
 
