@@ -34,6 +34,7 @@ The `g3log` logger is thread-safe, meaning it can be used from multiple threads 
 The `g3log` code is released into the public domain, allowing users to use, modify, and distribute it freely without restrictions.
 
 ## Logging and Fatal Events Explained
+_diagrams created with https://mermaid.live_
 ![G3Log sequence view](event_sequence.png)
 
 
