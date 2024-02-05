@@ -10,7 +10,8 @@
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #include <windows.h>
-#include "g3log/stacktrace_windows.hpp"
+#include "g3log/stacktrace_windows.hpp" 
+
 
 TEST(CrashHandler_Windows, ExceptionType) {
    EXPECT_EQ(stacktrace::exceptionIdToText(123), "UNKNOWN EXCEPTION:123");
