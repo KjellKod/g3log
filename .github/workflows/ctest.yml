@@ -25,8 +25,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
   
-  
-  
 jobs:
   build:
     strategy:
@@ -42,7 +40,7 @@ jobs:
     #runs-on: ${{ matrix.os }}
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     - name: Run Linux Build
       if: matrix.os == 'ubuntu-latest'
@@ -51,6 +49,10 @@ jobs:
     - name: Run Mac Build
       if: matrix.os == 'macos-latest'
       run: echo "MacOS Latest" > release_mac
+
+   - name: Run Windows Build
+      if: matrix.os == 'windows-latest'
+      run: echo "Windows Latest" > release_windows
         
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
@@ -82,8 +84,7 @@ jobs:
 
     - name: Fatal Exit Example
       working-directory: ${{github.workspace}}/build
-      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
+      if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' || matrix.os == 'windows-latest'
       shell: bash
       # hacky / crude and effective
-      run: |
-      ./g3log-FATAL-sigsegv || true && echo -e "\n\n=======================\n\nverifying SIGSEGV existed in stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep  "SIGSEGV"
+      run: ./g3log-FATAL-sigsegv || true && echo -e "\n\n=======================\n\nverifying SIGSEGV existed in stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
