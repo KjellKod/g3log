@@ -6,26 +6,18 @@
     // mkdir build; cd build
     // "cmake -DCMAKE_BUILD_TYPE=Debug .. " if you want to be able to debug it. 
     // don't forget to inspect the cmake output for more configuration options
-    "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Start",
+            "name": "(lldb) Launch",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/test_signal",
-            "MIMode": "gdb",
-            "cwd": "${workspaceFolder}/build""setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                },
-                {
-                    "description": "Set Disassembly Flavor to Intel",
-                    "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
-                }
-            ]
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "lldb"
         }
     ]
 }
