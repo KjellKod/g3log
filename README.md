@@ -1,4 +1,4 @@
-# Open for Opportunities 🔍 January 2024
+
 # Contents 
 [**introduction**](docs/index.md) | [detailed information](docs/g3log_usage.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)
 
