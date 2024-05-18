@@ -1,5 +1,7 @@
 site_name: G3log, an asynchronous "crash-safe" logger
 site_author: 'Kjell Hedström'
+plugins:
+  - search
 docs_dir: docs/
 theme: 
   name: material
