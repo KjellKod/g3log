@@ -50,7 +50,7 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: echo "MacOS Latest" > release_mac
 
-   - name: Run Windows Build
+    - name: Run Windows Build
       if: matrix.os == 'windows-latest'
       run: echo "Windows Latest" > release_windows
         
