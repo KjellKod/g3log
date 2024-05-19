@@ -59,8 +59,13 @@ jobs:
         working-directory: ${{github.workspace}}/build
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
-        run: 
-        if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
-        ./g3log-FATAL-sigsegv || true && echo -e
+        run: ./g3log-FATAL-sigsegv || true && echo -e
+          "\n\n=======================\n\nverifying SIGSEGV existed in
+          stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
+      - name: Fatal Exit Example Windows
+        working-directory: ${{github.workspace}}/build
+        if: matrix.os == 'windows-latest' 
+        shell: bash
+        run: ./g3log-FATAL-sigsegv.exe || true && echo -e
           "\n\n=======================\n\nverifying SIGSEGV existed in
           stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
