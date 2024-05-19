@@ -1,5 +1,4 @@
----
-name: ci/action ctest
+name: matrix (ubuntu, macos, windows) ctes
 on:
   push:
     paths-ignore:
@@ -31,30 +30,38 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+      
       - name: Run Linux Build
         if: matrix.os == 'ubuntu-latest'
         run: echo "Ubuntu Latest" > release_ubuntu
+        
       - name: Run Mac Build
         if: matrix.os == 'macos-latest'
         run: echo "MacOS Latest" > release_mac
+        
       - name: Run Windows Build
         if: matrix.os == 'windows-latest'
         run: echo "Windows Latest" > release_windows
+        
       - name: Create Build Environment
         run: cmake -E make_directory ${{github.workspace}}/build
+        
       - name: Configure CMake
         shell: bash
         working-directory: ${{github.workspace}}/build
         run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
           -DADD_G3LOG_UNIT_TEST=ON
+          
       - name: Build
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
+        
       - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: ctest -C $BUILD_TYP
+        
       - name: Fatal Exit Example Linux/OSX
         working-directory: ${{github.workspace}}/build
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
@@ -62,6 +69,7 @@ jobs:
         run: ./g3log-FATAL-sigsegv || true && echo -e
           "\n\n=======================\n\nverifying SIGSEGV existed in
           stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
+          
       - name: Fatal Exit Example Windows
         working-directory: ${{github.workspace}}/build
         if: matrix.os == 'windows-latest' 
