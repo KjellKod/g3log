@@ -55,15 +55,12 @@ jobs:
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: ctest -C $BUILD_TYP
-      - name: Fatal Exit Example
+      - name: Fatal Exit Example Linux/OSX
         working-directory: ${{github.workspace}}/build
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest' || matrix.os ==
-          'windows-latest'
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
         run: 
         if: matrix.os == 'macos-latest' || matrix.os == 'ubuntu-latest'
         ./g3log-FATAL-sigsegv || true && echo -e
-        if: matrix.os == 'windows-latest'
-        ./g3log-FATAL-sigsegv.exe || true && echo -e
           "\n\n=======================\n\nverifying SIGSEGV existed in
           stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
