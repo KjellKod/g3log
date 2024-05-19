@@ -1,4 +1,4 @@
-name: ci/action ctest
+name: matrix (ubuntu, macos, windows) ctest
 
 on:
   push:
