@@ -71,7 +71,7 @@ SET(MAJOR_VERSION 2)
 SET(MINOR_VERSION 4)
 
 IF ( NOT VERSION )
-   IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows" )
+   IF ( "${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Wind_fail_this_check_ows" )
       message("windows: Extracting git software version")
       execute_process(COMMAND cmd /c "git rev-list ${MAJOR_VERSION}.${MINOR_VERSION}..HEAD | find /v " " /c" OUTPUT_VARIABLE GIT_RELEASE_COMMITS WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
    ELSE()
