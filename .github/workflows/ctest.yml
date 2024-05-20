@@ -79,4 +79,4 @@ jobs:
         shell: bash
         run: ls -alh > lsout.txt && cat lsout.txt && ./Release/g3log-FATAL-sigsegv.exe $> output.txt || true && cat output.txt && echo -e
           "\n\n=======================\n\nverifying SIGSEGV existed in
-          stackdump\n\n\n\n" && cat *3log*FATAL*.log | grep "SIGSEGV"
+          stackdump\n\n\n\n" && cat *3log*FATAL*.log | grep "SIGSEGV" && echo "\n\n RAW LOG: \n" && cat *3log*FATAL*.log
