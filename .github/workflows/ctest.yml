@@ -49,22 +49,23 @@ jobs:
       - name: Create Build Environment
         run: cmake -E make_directory ${{github.workspace}}/build
         
-      - name: Configure CMake
+      - name: Configure Linux/OSX CMake
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
+        working-directory: ${{github.workspace}}/build
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
+          -DADD_G3LOG_UNIT_TEST=ON
+
+      - name: Configure Windows CMake
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
         working-directory: ${{github.workspace}}/build
         run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
           -DADD_G3LOG_UNIT_TEST=ON
           
       - name: Build Linux/OSx
         working-directory: ${{github.workspace}}/build
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
-        run: cmake --build . --config $BUILD_TYPE
-
-      - name: Build Windows
-        working-directory: ${{github.workspace}}/build
-        if: matrix.os == 'windows-latest' 
-        shell: pwsh
         run: cmake --build . --config $BUILD_TYPE
 
       - name: Test
