@@ -77,8 +77,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
         run: ./g3log-FATAL-sigsegv || true && echo -e
-          "\n\nverifying SIGSEGV existed in
-          stackdump\n\n\n\n" && && cat /tmp/*3log*FATAL*.log && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
+          "\n\nverifying SIGSEGV existed in stackdump\n\n\n\n" && cat /tmp/*3log*FATAL*.log && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
           
       - name: Fatal Exit Example Windows
         working-directory: ${{github.workspace}}/build
