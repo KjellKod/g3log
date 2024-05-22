@@ -55,11 +55,18 @@ jobs:
         run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
           -DADD_G3LOG_UNIT_TEST=ON
           
-      - name: Build
+      - name: Build Linux/OSx
         working-directory: ${{github.workspace}}/build
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
-        
+
+      - name: Build Windows
+        working-directory: ${{github.workspace}}/build
+        if: matrix.os == 'windows-latest' 
+        shell: pwsh
+        run: cmake --build . --config $BUILD_TYPE
+
       - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash
@@ -70,12 +77,12 @@ jobs:
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
         run: ./g3log-FATAL-sigsegv || true && echo -e
-          "\n\n=======================\n\nverifying SIGSEGV existed in
-          stackdump\n\n\n\n" && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
+          "\n\nverifying SIGSEGV existed in
+          stackdump\n\n\n\n" && && cat /tmp/*3log*FATAL*.log && cat /tmp/g3log*FATAL*.log | grep "SIGSEGV"
           
       - name: Fatal Exit Example Windows
         working-directory: ${{github.workspace}}/build
         if: matrix.os == 'windows-latest' 
         shell: bash
-        run: ./Release/g3log-FATAL-sigsegv.exe $> output.txt || true && cat output.txt && echo -e "\n\n=======================\n\nverifying SIGSEGV existed in
-          stackdump\n\n\n\n" && cat *3log*FATAL*.log && cat *3log*FATAL*.log | grep "SIGSEGV"
+        run: ./Release/g3log-FATAL-sigsegv.exe && echo -e "\n\nverifying SIGSEGV - EXCEPTION_ACCESS_VIOLATION existed in
+          stackdump\n\n\n\n" && cat *3log*FATAL*.log && cat *3log*FATAL*.log | grep "EXCEPTION_ACCESS_VIOLATION"
