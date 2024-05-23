@@ -83,5 +83,5 @@ jobs:
         working-directory: ${{github.workspace}}/build
         if: matrix.os == 'windows-latest' 
         shell: bash
-        run: ./Release/g3log-FATAL-sigsegv.exe && echo -e "\n\nverifying SIGSEGV - EXCEPTION_ACCESS_VIOLATION existed in
+        run: ./Release/g3log-FATAL-sigsegv.exe || true && echo -e "\n\nverifying SIGSEGV - EXCEPTION_ACCESS_VIOLATION existed in
           stackdump\n\n\n\n" && cat *3log*FATAL*.log && cat *3log*FATAL*.log | grep "EXCEPTION_ACCESS_VIOLATION"
