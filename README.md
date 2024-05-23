@@ -28,7 +28,7 @@ Avoid deep dependency injection complexity and instead get access to the logger 
 
 
 ## 2. Access to streaming and print_f log call syntax
-Both streaming syntax `LOG` and print_f `LOGF` syntax are available. 
+Both streaming syntax `LOG` and print_f `LOGF` syntax are available
 
 ```
 LOGF(INFO, "Hi log %d", 123);
