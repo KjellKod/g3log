@@ -1,4 +1,5 @@
-name: Publish docs via GitHub Pages to https://kjellkod.github.io/g3log/
+name: doc_publish
+# Publish docs via GitHub Pages to https://kjellkod.github.io/g3log/
 on:
   push:
     branches:
@@ -17,7 +18,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
-      - run: pip install mkdocs-material 
+      - run: pip install mkdocs && pip install mkdocs-material 
       - name: Build site
         run: mkdocs build
       - name: Deploy 
