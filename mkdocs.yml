@@ -1,10 +1,11 @@
 site_name: G3log, an asynchronous "crash-safe" logger
 site_author: 'Kjell Hedström'
+theme: 
+  name: material
 plugins:
   - search
 docs_dir: docs/
-#theme: 
-#  name: material
+
 nav: 
   - Introduction to G3log: index.md
   - G3log usage: g3log.md 
