@@ -60,8 +60,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: cmd
         working-directory: ${{github.workspace}}/build
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          -DADD_G3LOG_UNIT_TEST=ON
+        run: ls && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DADD_G3LOG_UNIT_TEST=ON .. 
           
       - name: Build Linux/OSx
         working-directory: ${{github.workspace}}/build
