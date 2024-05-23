@@ -36,7 +36,7 @@ namespace example_fatal {
       LOGF(G3LOG_DEBUG, "ILLEGAL PRINTF_SYNTAX EXAMPLE. WILL GENERATE compiler warning.\n\nbadly formatted message:[Printf-type %s is the number 1 for many %s]", logging.c_str());
    }
 
-   // The function above 'tryToKillWithIllegalPrintout' IS system / compiler dependent. Older compilers sometimes did NOT generate a SIGSEGV
+   // The function above 'tryToKillWithIllegalPrintout' IS system / compiler dependent. Older compilers sometimes did NOT generate a segmentation
    // fault as expected by the illegal printf-format usage. just in case we exit by zero division"
    void killByZeroDivision(int value) {
       int zero = 0;  // trying to fool the compiler to automatically warn
@@ -45,7 +45,7 @@ namespace example_fatal {
 
    void tryToKillWithAccessingIllegalPointer(std::unique_ptr<std::string> badStringPtr) {
       auto badPtr = std::move(badStringPtr);
-      LOG(INFO) << "Function calls through a nullptr object will trigger SIGSEGV";
+      LOG(INFO) << "Function calls through a nullptr object will trigger segmentation fault";
       badStringPtr->append("crashing");
    }
 

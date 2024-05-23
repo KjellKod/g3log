@@ -1,7 +1,7 @@
 [introduction](index.md) | [detailed information](g3log_usage.md) | [Configure & Build](building.md) | [**API description**](API.md) | [Custom log formatting](API_custom_formatting.md)
 
 # High Level Description of g3log
-The `g3log` logger is an asynchronous, crash-safe logging library designed for C++ applications. It allows for logging messages to various sinks without blocking the main application thread. Below is a high-level overview of how the `g3log` logger works:
+The `g3log` logger is an asynchronous, crash-safe logging library designed for C++ applications. It allows for logging messages to various sinks without blocking the main application thread. Below is a high-level overview of how the `g3log` logger works.
 
 ## Asynchronous Logging
 The logger operates on a separate thread, ensuring that the main application thread is not blocked by I/O operations when logging messages. This is achieved by using a background worker ([`LogWorker`](../src/g3log/logworker.hpp)) that queues log messages and processes them asynchronously.

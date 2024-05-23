@@ -4,7 +4,7 @@
 
 
 # Welcome to g3log
-### Use [kjellkod.github.io/g3log/](https://kjellkod.github.io/g3log/) for best reading / searching / navigating of g3log's documentation. 
+### Use [kjellkod.github.io/g3log/](https://kjellkod.github.io/g3log/) for best reading / searching / navigating of g3log's documentation
 
 G3log is an asynchronous logger with three main features: 
 1. Intuitive `LOG(...)` API
@@ -13,7 +13,7 @@ G3log is an asynchronous logger with three main features:
 
 The super quick introduction to g3log can be seen in the steps 1 - 9 below. 
 
-For more in-depth information please see the full usage description in [g3log_usage.md](docs/g3log_usage.md).If you want to understand better the internals of g3log, then plase look at the [API.md](docs/API.md) for both high-level and deep-dive insights. 
+For more in-depth information please see the full usage description in [g3log_usage.md](docs/g3log_usage.md). If you want to understand better the internals of g3log, then plase look at the [API.md](docs/API.md) for both high-level and deep-dive insights. 
 
 
 ## Experiment and try-out g3log in Github Codespaces 
@@ -21,14 +21,14 @@ ref: [codespaces.md](docs/codespaces.md)
 
 
 ## 1. Easy usage in files
-Avoid deep dependency injection complexity and instead get access to the logger as easy as 
+Avoid deep dependency injection complexity and instead get access to the logger as easy as:
 ```
 #include <g3log/g3log.hpp>
 ``` 
 
 
 ## 2. Access to streaming and print_f log call syntax
-Both streaming syntax `LOG` and print_f `LOGF` syntax are available. 
+Both streaming syntax `LOG` and print_f `LOGF` syntax are available:
 
 ```
 LOGF(INFO, "Hi log %d", 123);

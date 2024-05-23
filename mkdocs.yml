@@ -1,8 +1,11 @@
-site_name: G3log, an asynchronous "crash-safe" logger
-site_author: 'Kjell Hedström'
-docs_dir: docs/
-theme: 
+site_name: TEST G3log, an asynchronous "crash-safe" logger
+site_author: 'Kjell Hedstrom'
+site_url: https://kjellkod.github.io/g3log/
+theme:
   name: material
+  
+docs_dir: docs/
+  
 nav: 
   - Introduction to G3log: index.md
   - G3log usage: g3log.md 
