@@ -3,8 +3,8 @@ site_author: 'Kjell Hedström'
 plugins:
   - search
 docs_dir: docs/
-theme: 
-  name: material
+#theme: 
+#  name: material
 nav: 
   - Introduction to G3log: index.md
   - G3log usage: g3log.md 
