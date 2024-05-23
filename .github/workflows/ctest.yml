@@ -12,6 +12,7 @@ on:
       - docs/**
       - "**.md"
       - "**.markdown"
+      - '**.yml'
     branches:
       - master
 env:
