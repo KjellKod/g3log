@@ -1,6 +1,5 @@
 # This file is based off of the Platform/Darwin.cmake and Platform/UnixPaths.cmake
-# files which are included with CMake 2.8.4
-# It has been altered for iOS development
+# files which are included with CMake 2.8.4. It has been altered for iOS development
 
 # Options:
 #
