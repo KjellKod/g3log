@@ -71,7 +71,7 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash
-        run: ctest -verbose -C $BUILD_TYP
+        run: ctest --verbose -C $BUILD_TYP
         
       - name: Fatal Exit Example Linux/OSX
         working-directory: ${{github.workspace}}/build
