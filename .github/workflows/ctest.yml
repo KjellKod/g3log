@@ -63,7 +63,7 @@ jobs:
         working-directory: ${{github.workspace}}/build
         run: ls && cmake -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DADD_G3LOG_UNIT_TEST=ON .. 
           
-      - name: Build Linux/OSx
+      - name: CMake build step
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
@@ -71,7 +71,7 @@ jobs:
       - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash
-        run: ctest -output-on-failure -C $BUILD_TYP
+        run: ctest -verbose -C $BUILD_TYP
         
       - name: Fatal Exit Example Linux/OSX
         working-directory: ${{github.workspace}}/build
