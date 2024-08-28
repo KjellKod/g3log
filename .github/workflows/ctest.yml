@@ -54,8 +54,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest' || matrix.os == 'macos-latest'
         shell: bash
         working-directory: ${{github.workspace}}/build
-        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE
-          -DADD_G3LOG_UNIT_TEST=ON
+        run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DADD_G3LOG_UNIT_TEST=ON
 
       - name: Configure Windows CMake
         if: matrix.os == 'windows-latest'
@@ -68,10 +67,17 @@ jobs:
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
 
-      - name: Test
+      - name: Test-Linux/Windows
+        if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: ctest -C $BUILD_TYP
+
+      - name: Test-Linux/Windows
+        if: matrix.os == 'macos-latest' 
+        working-directory: ${{github.workspace}}/build
+        shell: bash
+        run: ctest -V
         
       - name: Fatal Exit Example Linux/OSX
         working-directory: ${{github.workspace}}/build
