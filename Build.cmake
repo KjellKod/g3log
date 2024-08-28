@@ -5,7 +5,7 @@
 #    risk and comes  with no warranties.
 #
 # This code is yours to share, use and modify with no strings attached
-#   and no restrictions or obligations.
+#   and no restrictions or obligations
 # ===================================================================
 
 # GENERIC STEPS
