@@ -108,14 +108,8 @@ You can find it here: https://kjellkod.wordpress.com/2015/06/30/the-worlds-faste
 
 
 ## <a name="continuous_integration">Continuous Integration</a>
-The g3log repository is evaluating both github actions and CircleCI for executing test coverage, installation and document generation. For windows the repo is still relying on appveyor.  In case you want to look into change any of these setups the following files are the ones of interest. 
-```
-1. appveyor --> g3log/appveyor.yml
-2. circleCI --> g3log/.circleci/config.yml
-3. github actions --> g3log/.github/workflows/*.yml
-
-
-```
+The g3log repository is evaluating github actions for executing test coverage, installation and document generation. In case you want to look into change any of these setups the following files are the ones of interest. 
+See `Actions` for matrix (ubuntu, macos, windows) testing as well as other actions for doc publishing. 
 
 
 ## <a name="feedback">Feedback</a>
