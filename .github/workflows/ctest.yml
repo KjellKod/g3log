@@ -67,14 +67,7 @@ jobs:
         shell: bash
         run: cmake --build . --config $BUILD_TYPE
 
-      - name: Test-Linux/Windows
-        if: matrix.os == 'ubuntu-latest' || matrix.os == 'windows-latest'
-        working-directory: ${{github.workspace}}/build
-        shell: bash
-        run: ctest -C $BUILD_TYP
-
-      - name: Test-Linux/Windows
-        if: matrix.os == 'macos-latest' 
+      - name: Test
         working-directory: ${{github.workspace}}/build
         shell: bash
         run: ctest -V
