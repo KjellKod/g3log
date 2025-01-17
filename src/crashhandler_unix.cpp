@@ -59,7 +59,7 @@ namespace {
    // Dump of stack,. then exit through g3log background worker
    // ALL thanks to this thread at StackOverflow. Pretty much borrowed from:
    // Ref: http://stackoverflow.com/questions/77005/how-to-generate-a-stacktrace-when-my-gcc-c-app-crashes
-   void signalHandler(int signal_number, siginfo_t* /*info*/, void* /*unused_context*/) {
+   void signalHandler(int signal_number, siginfo_t* info, void* /*unused_context*/) {
 
       using namespace g3::internal;
 
@@ -76,7 +76,7 @@ namespace {
          const auto fatal_reason = exitReasonName(g3::internal::FATAL_SIGNAL, signal_number);
          fatal_stream << "Received fatal signal: " << fatal_reason;
          fatal_stream << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
-         fatal_stream << "\n***** SIGNAL " << fatal_reason << "(" << signal_number << ")" << std::endl;
+         fatal_stream << "\n***** SIGNAL " << fatal_reason << "(signo= " << signal_number << " si_errno= " << info->si_errno << " si_code = " << info->si_code << ")" << std::endl;
          LogCapture trigger(FATAL_SIGNAL, static_cast<g3::SignalType>(signal_number), dump.c_str());
          trigger.stream() << fatal_stream.str();
       }  // message sent to g3LogWorker
