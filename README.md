@@ -1,3 +1,5 @@
+**Scanning Update**: [![ci/action CodeQL](https://github.com/KjellKod/g3log/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/KjellKod/g3log/actions/workflows/codeql-analysis.yml)
+
 
 # Contents 
 [**introduction**](docs/index.md) | [detailed information](docs/g3log_usage.md) | [Configure & Build](docs/building.md) | [API description](docs/API.md) | [Custom log formatting](docs/API_custom_formatting.md)
