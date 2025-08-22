@@ -24,39 +24,29 @@
    # =========================
    IF (ADD_G3LOG_UNIT_TEST)
       # Download and unpack googletest at configure time
-      configure_file(CMakeLists.txt.in
-            googletest-download/CMakeLists.txt)
-      execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
-      execute_process(COMMAND ${CMAKE_COMMAND} --build .
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+     include(FetchContent)
 
-      # Prevent GoogleTest from overriding our compiler/linker options
-      # when building with Visual Studio
-      set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+if(IS_QNX)
+  message(STATUS "Fetching GoogleTest for QNX...")
+  FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
+  )
+  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
+  FetchContent_MakeAvailable(googletest)
+endif()
 
-      # Add googletest directly to our build. This adds
-      # the following targets: gtest, gtest_main, gmock
-      # and gmock_main
-      add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
-            ${CMAKE_BINARY_DIR}/googletest-build)
+# Prevent GoogleTest from overriding our compiler/linker options
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
-      # The gtest/gmock targets carry header search path
-      # dependencies automatically when using CMake 2.8.11 or
-      # later. Otherwise we have to add them here ourselves.
-      if (CMAKE_VERSION VERSION_LESS 2.8.11)
-         include_directories("${gtest_SOURCE_DIR}/include"
-                  "${gmock_SOURCE_DIR}/include")
-      endif()
+enable_testing()
 
-      enable_testing()
 
       set(DIR_UNIT_TEST ${g3log_SOURCE_DIR}/test_unit)
       message( STATUS "-DADD_G3LOG_UNIT_TEST=ON" )  
 
      # obs see this: http://stackoverflow.com/questions/9589192/how-do-i-change-the-number-of-template-arguments-supported-by-msvcs-stdtupl
      # and this: http://stackoverflow.com/questions/2257464/google-test-and-visual-studio-2010-rc
-  
 
      IF (MSVC OR MINGW)  
         SET(OS_SPECIFIC_TEST test_crashhandler_windows)
@@ -76,24 +66,42 @@
 
         set_target_properties(${test} PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
         set_target_properties(${test} PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
-        IF( NOT(MSVC))
+        if(NOT MSVC AND NOT CMAKE_SYSTEM_NAME STREQUAL "QNX")
            set_target_properties(${test} PROPERTIES COMPILE_FLAGS "-isystem -pthread ")
-        ENDIF( NOT(MSVC)) 
+        ENDIF()
+
+       # Link g3log, gtest_main, and regex for QNX
+      
+      if(IS_QNX)
+       target_link_libraries(${test}
+    PRIVATE
+        g3log
+        regex
+        gtest
+        gtest_main
+)
+
+      ELSE()
         target_link_libraries(${test} g3log gtest_main)
+      ENDIF()
+
+     
+
 		add_test( ${test} ${test} )
       ENDFOREACH(test)
    
     #
     # Test for Linux, runtime loading of dynamic libraries
     #     
-    IF (NOT WIN32 AND NOT ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang") AND G3_SHARED_LIB)
+    IF (NOT WIN32 AND NOT ("${CMAKE_CXX_COMPILER_ID}" MATCHES ".*Clang") AND G3_SHARED_LIB AND NOT QNX_PLATFORM)
        add_library(tester_sharedlib SHARED ${DIR_UNIT_TEST}/tester_sharedlib.h ${DIR_UNIT_TEST}/tester_sharedlib.cpp)
        target_link_libraries(tester_sharedlib ${G3LOG_LIBRARY})
 
        add_executable(test_dynamic_loaded_shared_lib ${g3log_SOURCE_DIR}/test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
-       target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} -ldl gtest_main)
+       target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} -ldl gtest_main) 
+
     ENDIF()
 ELSE() 
   message( STATUS "-DADD_G3LOG_UNIT_TEST=OFF" ) 

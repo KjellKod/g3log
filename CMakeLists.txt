@@ -43,8 +43,27 @@ cmake_minimum_required(VERSION 3.5)
 
 project(g3log CXX)
 
+if(QNX)
+    add_compile_definitions(QNX_PLATFORM)
+endif()
+
+set(QNX_PLATFORM TRUE CACHE BOOL "Building for QNX platform")
+
+
+if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
+    message(STATUS "QNX detected: removing pthread from link flags")
+    set(THREADS_PREFER_PTHREAD_FLAG OFF)
+    set(PLATFORM_LINK_LIBRARIES regex) # or regex m if math is used
+    set(IS_QNX TRUE)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
+
+
+
 
 if(NOT CMAKE_BUILD_TYPE AND NOT (MSVC_IDE OR XCODE))
   set(CMAKE_BUILD_TYPE

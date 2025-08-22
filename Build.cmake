@@ -102,7 +102,7 @@ FIND_PACKAGE(Threads REQUIRED)
 TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} Threads::Threads )
 
 # check for backtrace and cxa_demangle only in non-Windows dev environments
-IF(NOT(MSVC OR MINGW))
+IF(NOT(MSVC OR MINGW OR QNX ))
 	# the backtrace module does not provide a modern cmake target
 	FIND_PACKAGE(Backtrace REQUIRED)
 	if(Backtrace_FOUND)
