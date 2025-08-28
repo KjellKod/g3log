@@ -97,9 +97,28 @@ TARGET_INCLUDE_DIRECTORIES(${G3LOG_LIBRARY}
 
 SET(ACTIVE_CPP0xx_DIR "Release")
 
+if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
+    message(STATUS "QNX detected: disabling THREADS_PREFER_PTHREAD_FLAG and removing -pthread from flags")
+
+    # Tell CMake not to add -pthread automatically
+    set(THREADS_PREFER_PTHREAD_FLAG OFF)
+
+    # Remove -pthread from C and C++ flags forcibly
+    string(REPLACE "-pthread" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    string(REPLACE "-pthread" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+endif()
+
+
+
 # find corresponding thread lib (e.g. whether -lpthread is needed or not)
 FIND_PACKAGE(Threads REQUIRED)
-TARGET_LINK_LIBRARIES(${G3LOG_LIBRARY} Threads::Threads )
+if(CMAKE_SYSTEM_NAME STREQUAL "QNX")
+    target_compile_definitions(${G3LOG_LIBRARY} PRIVATE _REENTRANT)
+   # target_link_libraries(${G3LOG_LIBRARY} PRIVATE pthread)
+else()
+    target_link_libraries(${G3LOG_LIBRARY} PRIVATE Threads::Threads)
+endif()
+
 
 # check for backtrace and cxa_demangle only in non-Windows dev environments
 IF(NOT(MSVC OR MINGW OR QNX ))

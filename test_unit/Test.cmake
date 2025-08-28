@@ -23,18 +23,9 @@
    # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
    # =========================
    IF (ADD_G3LOG_UNIT_TEST)
-      # Download and unpack googletest at configure time
-     include(FetchContent)
+    
 
-if(IS_QNX)
-  message(STATUS "Fetching GoogleTest for QNX...")
-  FetchContent_Declare(
-    googletest
-    URL https://github.com/google/googletest/archive/refs/tags/v1.14.0.zip
-  )
-  set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
-  FetchContent_MakeAvailable(googletest)
-endif()
+
 
 # Prevent GoogleTest from overriding our compiler/linker options
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
