@@ -17,11 +17,27 @@ file(GLOB HEADER_FILES ${LOG_SRC}/g3log/*.hpp)
 list( APPEND HEADER_FILES ${GENERATED_G3_DEFINITIONS} )
 list( APPEND SRC_FILES ${GENERATED_G3_DEFINITIONS} )
 
-IF (MSVC OR MINGW)
-   list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_unix.cpp)
-ELSE()
-   list(REMOVE_ITEM SRC_FILES  ${LOG_SRC}/crashhandler_windows.cpp ${LOG_SRC}/g3log/stacktrace_windows.hpp ${LOG_SRC}/stacktrace_windows.cpp)
-ENDIF (MSVC OR MINGW)
+if (MSVC OR MINGW)
+    list(REMOVE_ITEM SRC_FILES
+        ${LOG_SRC}/crashhandler_unix.cpp
+    )
+elseif (CMAKE_SYSTEM_NAME STREQUAL "QNX")
+    list(REMOVE_ITEM SRC_FILES
+        ${LOG_SRC}/crashhandler_unix.cpp
+        ${LOG_SRC}/crashhandler_windows.cpp
+        ${LOG_SRC}/stacktrace_windows.cpp
+        ${LOG_SRC}/g3log/stacktrace_windows.hpp
+        ${LOG_SRC}/stacktrace_unix.cpp
+        ${LOG_SRC}/g3log/stacktrace_unix.hpp
+    )
+else()
+    list(REMOVE_ITEM SRC_FILES
+        ${LOG_SRC}/crashhandler_windows.cpp
+        ${LOG_SRC}/stacktrace_windows.cpp
+        ${LOG_SRC}/g3log/stacktrace_windows.hpp
+    )
+endif()
+
 
 set(SRC_FILES ${SRC_FILES} ${SRC_PLATFORM_SPECIFIC})
 

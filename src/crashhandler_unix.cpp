@@ -16,11 +16,7 @@
 #endif
 
 #include <cxxabi.h>
-#ifdef QNX_PLATFORM
-    #include<execmock.h> // Mocked  QNX header
-#else
-    #include <execinfo.h>   // normal Linux header
-#endif
+#include <execinfo.h>
 
 #include <unistd.h>
 #include <atomic>
