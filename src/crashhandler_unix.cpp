@@ -17,7 +17,6 @@
 
 #include <cxxabi.h>
 #include <execinfo.h>
-
 #include <unistd.h>
 #include <atomic>
 #include <csignal>

@@ -64,7 +64,7 @@ TEST(LogTest, FatalSIGTERM__UsingDefaultHandler) {
    EXPECT_EQ(g_fatal_counter.load(), size_t{1});
 }
 
-#if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
+#if !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(QNX_PLATFORM) )
 namespace {
    std::atomic<size_t> customFatalCounter = {0};
    std::atomic<int> lastEncounteredSignal = {0};
@@ -120,44 +120,44 @@ namespace {
 //	ASSERT_TRUE(SIG_ERR != signal(SIGTERM, customSignalHandler));
 //}
 
-// TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
-//    RestoreFileLogger logger(log_directory);
-//    g_fatal_counter.store(0);
-//    g3::setFatalPreLoggingHook(fatalCounter);
-//    installCustomSIGTERM();
-//    g3::overrideSetupSignals({{SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}});
+TEST(LogTest, FatalSIGTERM__UsingCustomHandler) {
+   RestoreFileLogger logger(log_directory);
+   g_fatal_counter.store(0);
+   g3::setFatalPreLoggingHook(fatalCounter);
+   installCustomSIGTERM();
+   g3::overrideSetupSignals({{SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}});
 
-//    installCustomSIGTERM();
-//    EXPECT_EQ(customFatalCounter.load(), size_t{0});
-//    EXPECT_EQ(lastEncounteredSignal.load(), 0);
+   installCustomSIGTERM();
+   EXPECT_EQ(customFatalCounter.load(), size_t{0});
+   EXPECT_EQ(lastEncounteredSignal.load(), 0);
 
-//    raise(SIGTERM);
-//    logger.reset();
-//    EXPECT_EQ(g_fatal_counter.load(), size_t{0});
-//    EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
-//    EXPECT_EQ(customFatalCounter.load(), size_t{1});
-// }
+   raise(SIGTERM);
+   logger.reset();
+   EXPECT_EQ(g_fatal_counter.load(), size_t{0});
+   EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
+   EXPECT_EQ(customFatalCounter.load(), size_t{1});
+}
 
-// TEST(LogTest, FatalSIGTERM__VerifyingOldCustomHandler) {
-//    RestoreFileLogger logger(log_directory);
-//    g_fatal_counter.store(0);
-//    customFatalCounter.store(0);
-//    lastEncounteredSignal.store(0);
+TEST(LogTest, FatalSIGTERM__VerifyingOldCustomHandler) {
+   RestoreFileLogger logger(log_directory);
+   g_fatal_counter.store(0);
+   customFatalCounter.store(0);
+   lastEncounteredSignal.store(0);
 
-//    g3::setFatalPreLoggingHook(fatalCounter);
-//    installCustomOldSIGTERM();
-//    g3::overrideSetupSignals({{SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}, {SIGTERM, "SIGTERM"}});
-//    g3::restoreSignalHandler(SIGTERM);  // revert SIGTERM installation
+   g3::setFatalPreLoggingHook(fatalCounter);
+   installCustomOldSIGTERM();
+   g3::overrideSetupSignals({{SIGABRT, "SIGABRT"}, {SIGFPE, "SIGFPE"}, {SIGILL, "SIGILL"}, {SIGTERM, "SIGTERM"}});
+   g3::restoreSignalHandler(SIGTERM);  // revert SIGTERM installation
 
-//    EXPECT_EQ(customFatalCounter.load(), size_t{0});
-//    EXPECT_EQ(lastEncounteredSignal.load(), 0);
-//    EXPECT_FALSE(oldSigTermCheck.load());
-//    raise(SIGTERM);
-//    logger.reset();
-//    EXPECT_EQ(g_fatal_counter.load(), size_t{0});
-//    EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
-//    EXPECT_TRUE(oldSigTermCheck.load());
-// }
+   EXPECT_EQ(customFatalCounter.load(), size_t{0});
+   EXPECT_EQ(lastEncounteredSignal.load(), 0);
+   EXPECT_FALSE(oldSigTermCheck.load());
+   raise(SIGTERM);
+   logger.reset();
+   EXPECT_EQ(g_fatal_counter.load(), size_t{0});
+   EXPECT_EQ(lastEncounteredSignal.load(), SIGTERM);
+   EXPECT_TRUE(oldSigTermCheck.load());
+}
 
 #endif  // DISABLE_FATAL_SIGNALHANDLING
 #endif  // !(defined(WIN32) || defined(_WIN32) || defined(__WIN32__))

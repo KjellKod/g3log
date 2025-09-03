@@ -23,9 +23,6 @@
    # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
    # =========================
    IF (ADD_G3LOG_UNIT_TEST)
-    
-
-
 
 # Prevent GoogleTest from overriding our compiler/linker options
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
@@ -49,8 +46,6 @@ enable_testing()
            SET(tests_to_run test_message test_filechange test_io test_fatal test_signal test_cpp_future_concepts test_concept_sink test_sink ${OS_SPECIFIC_TEST})
          ENDIF()
 
-
-
       SET(helper ${DIR_UNIT_TEST}/testing_helpers.h ${DIR_UNIT_TEST}/testing_helpers.cpp)
       include_directories(${DIR_UNIT_TEST})
 
@@ -69,23 +64,19 @@ enable_testing()
         ENDIF()
 
        # Link g3log, gtest_main, and regex for QNX
-      
       if(IS_QNX)
        target_link_libraries(${test}
-    PRIVATE
+        PRIVATE
         g3log
         regex
         gtest
         gtest_main
-)
-
+        )
       ELSE()
         target_link_libraries(${test} g3log gtest_main)
       ENDIF()
 
-     
-
-		add_test( ${test} ${test} )
+		  add_test( ${test} ${test} )
       ENDFOREACH(test)
    
     #
