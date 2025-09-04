@@ -64,7 +64,7 @@ enable_testing()
         ENDIF()
 
        # Link g3log, gtest_main, and regex for QNX
-      if(IS_QNX)
+      if(QNX)
        target_link_libraries(${test}
         PRIVATE
         g3log
