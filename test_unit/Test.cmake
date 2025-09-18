@@ -23,6 +23,7 @@
    # 4. create the unit tests for g3log --- ONLY TESTED THE UNIT TEST ON LINUX
    # =========================
    IF (ADD_G3LOG_UNIT_TEST)
+      IF (NOT QNX)
       # Download and unpack googletest at configure time
       configure_file(CMakeLists.txt.in
             googletest-download/CMakeLists.txt)
@@ -40,6 +41,7 @@
       # and gmock_main
       add_subdirectory(${CMAKE_BINARY_DIR}/googletest-src
             ${CMAKE_BINARY_DIR}/googletest-build)
+      ENDIF(NOT QNX)
 
       # The gtest/gmock targets carry header search path
       # dependencies automatically when using CMake 2.8.11 or
@@ -79,7 +81,11 @@
         IF( NOT(MSVC))
            set_target_properties(${test} PROPERTIES COMPILE_FLAGS "-isystem -pthread ")
         ENDIF( NOT(MSVC)) 
+        IF (QNX)
+        target_link_libraries(${test} g3log gtest gtest_main)
+        ELSE()
         target_link_libraries(${test} g3log gtest_main)
+        ENDIF(QNX)
 		add_test( ${test} ${test} )
       ENDFOREACH(test)
    
@@ -93,7 +99,11 @@
        add_executable(test_dynamic_loaded_shared_lib ${g3log_SOURCE_DIR}/test_main/test_main.cpp ${DIR_UNIT_TEST}/test_linux_dynamic_loaded_sharedlib.cpp)
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_TR1_TUPLE=0")
        set_target_properties(test_dynamic_loaded_shared_lib PROPERTIES COMPILE_DEFINITIONS "GTEST_HAS_RTTI=0")
+       IF (NOT QNX)
        target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} -ldl gtest_main)
+       ELSE()
+       target_link_libraries(test_dynamic_loaded_shared_lib  ${G3LOG_LIBRARY} gtest gtest_main)
+       ENDIF (NOT QNX)
     ENDIF()
 ELSE() 
   message( STATUS "-DADD_G3LOG_UNIT_TEST=OFF" ) 

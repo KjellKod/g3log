@@ -16,7 +16,9 @@
 #endif
 
 #include <cxxabi.h>
+#if !defined(__QNX__)
 #include <execinfo.h>
+#endif
 #include <unistd.h>
 #include <atomic>
 #include <csignal>
@@ -77,7 +79,11 @@ namespace {
          fatal_stream << "Received fatal signal: " << fatal_reason;
          fatal_stream << "(" << signal_number << ")\tPID: " << getpid() << std::endl;
          fatal_stream << "\n***** SIGNAL " << fatal_reason << "(signo= " << signal_number << " si_errno= " << info->si_errno << " si_code = " << info->si_code << ")" << std::endl;
+#if defined(__QNX__)
+         LogCapture trigger(FATAL_SIGNAL, static_cast<g3::SignalType>(signal_number));
+#else
          LogCapture trigger(FATAL_SIGNAL, static_cast<g3::SignalType>(signal_number), dump.c_str());
+#endif
          trigger.stream() << fatal_stream.str();
       }  // message sent to g3LogWorker
       // wait to die
@@ -137,6 +143,9 @@ namespace g3 {
          if (nullptr != rawdump && !std::string(rawdump).empty()) {
             return {rawdump};
          }
+#if defined(__QNX__) // backtrace() and backtrace_symbols() are unavailable on QNX systems
+         return "";
+#else
          const size_t max_dump_size = 50;
          void* dump[max_dump_size];
          const size_t size = backtrace(dump, max_dump_size);
@@ -187,6 +196,7 @@ namespace g3 {
          }  // END: for(size_t idx = 1; idx < size && messages != nullptr; ++idx)
          free(messages);
          return oss.str();
+#endif
       }
 
       /// string representation of signal ID
