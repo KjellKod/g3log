@@ -21,7 +21,15 @@
 #   add_definitions(-DDEBUG_BREAK_AT_FATAL_SIGNAL)
 #   add_definitions(-DG3_DYNAMIC_MAX_MESSAGE_SIZE)
 
+option (INSTALL_G3LOG_TESTS "install g3log test executable to  QNX SDP " OFF)
 
+# -DINSTALL_G3LOG_TESTS=ON : installs test binaries (into <prefix>/bin/g3log_tests)
+
+IF(INSTALL_G3LOG_TESTS)
+   message(STATUS "-DINSTALL_G3LOG_TESTS=ON\tInstalling g3log test executables")
+ELSE()
+   message(STATUS "-DINSTALL_G3LOG_TESTS=OFF\tNot installing test executables")
+ENDIF()
 
 # Used for generating a macro definitions file  that is to be included
 # that way you do not have to re-state the Options.cmake definitions when 
