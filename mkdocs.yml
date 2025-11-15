@@ -8,7 +8,7 @@ docs_dir: docs/
   
 nav: 
   - Introduction to G3log: index.md
-  - G3log usage: g3log.md 
+  - G3log usage: g3log_usage.md
   - API description: API.md
   - API for custom log formatting: API_custom_formatting.md
   - Configure, Build, Package, Install and Test: building.md
