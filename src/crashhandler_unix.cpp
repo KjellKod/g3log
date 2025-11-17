@@ -16,7 +16,9 @@
 #endif
 
 #include <cxxabi.h>
+#if !defined(__QNX__)
 #include <execinfo.h>
+#endif
 #include <unistd.h>
 #include <atomic>
 #include <csignal>
@@ -137,6 +139,15 @@ namespace g3 {
          if (nullptr != rawdump && !std::string(rawdump).empty()) {
             return {rawdump};
          }
+         return stackdump_platform();
+      }
+#if defined(__QNX__)
+      // backtrace() and backtrace_symbols() are unavailable on QNX systems
+      std::string stackdump_platform() {
+         return "";
+      }
+#else
+      std::string stackdump_platform() {
          const size_t max_dump_size = 50;
          void* dump[max_dump_size];
          const size_t size = backtrace(dump, max_dump_size);
@@ -188,7 +199,7 @@ namespace g3 {
          free(messages);
          return oss.str();
       }
-
+#endif
       /// string representation of signal ID
       std::string exitReasonName(const LEVELS& level, g3::SignalType fatal_id) {
 
