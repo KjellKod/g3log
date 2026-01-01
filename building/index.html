@@ -1,0 +1,920 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Kjell Hedstrom">
+      
+      
+        <link rel="canonical" href="https://kjellkod.github.io/g3log/building/">
+      
+      
+        <link rel="prev" href="../API_custom_formatting/">
+      
+      
+        <link rel="next" href="../contributing/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Configure, Build, Package, Install and Test - G3log, an asynchronous "crash-safe" logger</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#configure-build-package-install-and-test-g3log" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="G3log, an asynchronous &#34;crash-safe&#34; logger" class="md-header__button md-logo" aria-label="G3log, an asynchronous "crash-safe" logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            G3log, an asynchronous "crash-safe" logger
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Configure, Build, Package, Install and Test
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="G3log, an asynchronous &#34;crash-safe&#34; logger" class="md-nav__button md-logo" aria-label="G3log, an asynchronous "crash-safe" logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    G3log, an asynchronous "crash-safe" logger
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction to G3log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../g3log_usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G3log usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API description
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_custom_formatting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API for custom log formatting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure, Build, Package, Install and Test
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure, Build, Package, Install and Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example-project-with-g3log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Project with g3log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-it-standalone-to-try-out-is-as-easy-as" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building it standalone to try out is as easy as:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packaging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Packaging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmake-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CMake module
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License and contribution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#example-project-with-g3log" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example Project with g3log
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#building-it-standalone-to-try-out-is-as-easy-as" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building it standalone to try out is as easy as:
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#prerequisites" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Prerequisites
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Commands
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#packaging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Packaging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cmake-module" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CMake module
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#build-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Build Options
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<p><a href="../">introduction</a> | <a href="../g3log_usage/">detailed information</a> | <a href="./"><strong>Configure &amp; Build</strong></a> | <a href="../API/">API description</a> | <a href="../API_custom_formatting/">Custom log formatting</a></p>
+<h1 id="configure-build-package-install-and-test-g3log"><a name="building-g3log">Configure, build, package, install and test g3log</a></h1>
+<h2 id="example-project-with-g3log">Example Project with g3log</h2>
+<p>An example project integration of g3log, both statially and dynamically built can be found at <a href="https://github.com/KjellKod/g3log_example_integration/blob/master/README.md">g3log_example_integration</a></p>
+<h2 id="building-it-standalone-to-try-out-is-as-easy-as">Building it standalone to try out is as easy as:</h2>
+<pre><code>git clone https://github.com/KjellKod/g3log
+cd g3log
+mkdir build
+cd build
+</code></pre>
+<h2 id="prerequisites"><a name="prerequisites">Prerequisites</a></h2>
+<p>You also need these tools to build g3log from source:
+- CMake (<em>Required</em>)</p>
+<p>g3log uses CMake as a one-stop solution for configuring, building, installing, packaging and testing on Windows, Linux and OSX.</p>
+<ul>
+<li>Git (<em>Optional but Recommended</em>)</li>
+</ul>
+<p>When building g3log it uses git to calculate the software version from the commit history of this repository. If you don't want that, or your setup does not have access to git, or you download g3log source archive from the GitHub Releases page so that you do not have the commit history downloaded, you can instead pass in the version as part of the CMake build arguments. See this <a href="https://github.com/KjellKod/g3log/issues/311#issuecomment-488829282"><em>issue</em></a> for more information.
+  <code>cmake -DVERSION=1.3.2  ..</code></p>
+<h2 id="configuration-options"><a name="configuration">Configuration Options</a></h2>
+<p>g3log provides following CMake options (and default values):</p>
+<pre><code>$ cmake -LAH # List non-advanced cached variables. See `cmake --help` for more details.
+
+...
+
+// Fatal (fatal-crashes/contract) examples
+ADD_FATAL_EXAMPLE:BOOL=ON
+
+// g3log performance test
+ADD_G3LOG_BENCH_PERFORMANCE:BOOL=OFF
+
+// g3log unit tests
+ADD_G3LOG_UNIT_TEST:BOOL=OFF
+
+// Use DBUG logging level instead of DEBUG.
+// By default DEBUG is the debugging level
+CHANGE_G3LOG_DEBUG_TO_DBUG:BOOL=OFF
+
+
+// Windows only: Use __FUNCSIG__ instead of the default __FUNCTION__ 
+// to show LOG function location
+// WARNING: using this in heavily templated code, like boost can expand
+// the function name into massive size
+WINDOWS_FUNCSIG:BOOL=OFF
+
+
+// gcc/clang only: Use __PRETTY_FUNCTION__ instead of the default __FUNCTION__ 
+// to show LOG function location
+// WARNING: using this in heavily templated code, like boost can expand
+// the function name into massive size
+PRETTY_FUNCTION:BOOL=OFF
+
+
+// Specifies the build type on single-configuration generators.
+// Possible values are empty, Debug, Release, RelWithDebInfo, MinSizeRel, …
+CMAKE_BUILD_TYPE:STRING=
+
+// Install path prefix, prepended onto install directories.
+// This variable defaults to /usr/local on UNIX
+// and c:/Program Files/${PROJECT_NAME} on Windows.
+CMAKE_INSTALL_PREFIX:PATH=
+
+// The prefix used in the built package.
+// On Linux, if this option is not set:
+// 1) If CMAKE_INSTALL_PREFIX is given, then it will be
+//    set with the value of CMAKE_INSTALL_PREFIX by g3log.
+// 2) Otherwise, it will be set as /usr/local by g3log.
+CPACK_PACKAGING_INSTALL_PREFIX:PATH=
+
+// Enable Visual Studio break point when receiving a fatal exception.
+// In __DEBUG mode only
+DEBUG_BREAK_AT_FATAL_SIGNAL:BOOL=OFF
+
+// Vectored exception / crash handling with improved stack trace
+ENABLE_FATAL_SIGNALHANDLING:BOOL=ON
+
+// Vectored exception / crash handling with improved stack trace
+ENABLE_VECTORED_EXCEPTIONHANDLING:BOOL=ON
+
+// iOS version of library.
+G3_IOS_LIB:BOOL=OFF
+
+// Log full filename
+G3_LOG_FULL_FILENAME:BOOL=OFF
+
+// Build shared library
+G3_SHARED_LIB:BOOL=ON
+
+// Build shared runtime library MSVC
+G3_SHARED_RUNTIME:BOOL=ON
+
+// Turn ON/OFF log levels.
+// An disabled level will not push logs of that level to the sink.
+// By default dynamic logging is disabled
+USE_DYNAMIC_LOGGING_LEVELS:BOOL=OFF
+
+// Use dynamic memory for message buffer during log capturing
+USE_G3_DYNAMIC_MAX_MESSAGE_SIZE:BOOL=OFF
+
+...
+</code></pre>
+<p>For additional option context and comments please also see <a href="https://github.com/KjellKod/g3log/blob/master/Options.cmake">Options.cmake</a></p>
+<p>If you want to leave everything as it was, then you should:</p>
+<pre><code>cmake ..
+</code></pre>
+<p>You may also specify one or more of those options listed above from the command line.
+For example, on Windows:</p>
+<pre><code>cmake .. -G &quot;Visual Studio 15 2017&quot;
+         -DG3_SHARED_LIB=OFF
+         -DCMAKE_INSTALL_PREFIX=C:/g3log
+         -DADD_G3LOG_UNIT_TEST=ON
+         -DADD_FATAL_EXAMPLE=OFF
+</code></pre>
+<p>will use a Visual Studio 2017 solution generator, build g3log as a static library, headers and libraries will be installed to <code>C:\g3log</code> when installed from source, enable unit testing, but do not build fatal example.</p>
+<p>MinGW users on Windows may find they should use a different generator:</p>
+<pre><code>cmake .. -G &quot;MinGW Makefiles&quot;
+</code></pre>
+<p>By default, headers and libraries will be installed to <code>/usr/local</code> on Linux when installed from build tree via <code>make install</code>. You may overwrite it by:</p>
+<pre><code>cmake .. -DCMAKE_INSTALL_PREFIX=/usr
+</code></pre>
+<p>This will install g3log to <code>/usr</code> instead of <code>/usr/local</code>.</p>
+<p>Linux/OSX package maintainers may be interested in the <code>CPACK_PACKAGING_INSTALL_PREFIX</code>. For example:</p>
+<pre><code>cmake .. -DCPACK_PACKAGING_INSTALL_PREFIX=/usr/local
+</code></pre>
+<h2 id="build-commands"><a name="build-commands">Build Commands</a></h2>
+<p>Once the configuration is done, you may build g3log with:</p>
+<pre><code># Suppose you are still in the `build` directory. I won't repeat it anymore!
+cmake --build . --config Release
+</code></pre>
+<p>You may also build it with a system-specific way.</p>
+<p>On Linux, OSX and MinGW:</p>
+<pre><code>make
+</code></pre>
+<p>On Windows:</p>
+<pre><code>msbuild g3log.sln /p:Configuration=Release
+</code></pre>
+<p>Windows users can also open the generated Visual Studio solution file and build it happily.</p>
+<h2 id="installation"><a name="installing">Installation</a></h2>
+<p>Install from source in a CMake way:</p>
+<pre><code>cmake --build . --target install
+</code></pre>
+<p>Linux users may also use:</p>
+<pre><code>sudo make install
+</code></pre>
+<p>You may also create a package first and install g3log with it. See the next section.</p>
+<h2 id="packaging"><a name=packaging>Packaging</a></h2>
+<p>A CMake way:</p>
+<pre><code>cmake --build . --config Release --target package
+</code></pre>
+<p>or</p>
+<pre><code>cpack -C Release
+</code></pre>
+<p>if the whole library has been built in the previous step.
+It will generate a ZIP package on Windows, and a DEB package on Linux.</p>
+<p>Linux users may also use a Linux way:</p>
+<pre><code>make package
+</code></pre>
+<p>If you want to use a different package generator, you should specify a <code>-G</code> option.</p>
+<p>On Windows:</p>
+<pre><code>cpack -C Release -G NSIS;7Z
+</code></pre>
+<p>this will create a installable NSIS package and a 7z package.</p>
+<p><em>Note:</em> To use the NSIS generator, you should install <a href="https://nsis.sourceforge.io/Download"><code>NSIS</code></a> first.</p>
+<p>On Linux:</p>
+<pre><code>cpack -C Release -G TGZ
+</code></pre>
+<p>this will create a .tar.gz archive for you.</p>
+<p>Once done, you may install or uncompress the package file to the target machine. For example, on Debian or Ubuntu:</p>
+<pre><code>sudo dpkg -i g3log-&lt;version&gt;-Linux.deb
+</code></pre>
+<p>will install the g3log library to <code>CPACK_PACKAGING_INSTALL_PREFIX</code>.</p>
+<h2 id="testing"><a name="testing">Testing</a></h2>
+<p>By default, tests will be built. To disable unit testing, you should turn off <code>ADD_G3LOG_UNIT_TEST</code>.</p>
+<p>Suppose the build process has completed, then you can run the tests with:</p>
+<pre><code>ctest -C Release
+</code></pre>
+<p>or:</p>
+<pre><code>make test
+</code></pre>
+<p>for Linux users.
+or for a detailed gtest output of all the tests:</p>
+<pre><code>cd build;
+../scripts/runAllTests.sh
+</code></pre>
+<h2 id="cmake-module"><a name="cmake-module">CMake module</a></h2>
+<p>g3log comes with a CMake module. Once installed, it can be found under <code>${CMAKE_INSTALL_PREFIX}/lib/cmake/g3log</code>. Users can use g3log in a CMake-based project this way:</p>
+<pre><code>find_package(g3log CONFIG REQUIRED)
+target_link_libraries(main PRIVATE g3log)
+</code></pre>
+<p>To make sure that CMake can find g3log, you also need to tell CMake where to search for it:</p>
+<pre><code>cmake .. -DCMAKE_PREFIX_PATH=&lt;g3log's install prefix&gt;
+</code></pre>
+<h2 id="build-options"><a name="build_options">Build Options</a></h2>
+<p>The build options are defined in the file <a href="https://github.com/KjellKod/g3log/blob/master/Build.cmake">Options.cmake</a></p>
+<p>build options are generated and saved to a header file. This avoid having to set the define options in the client source code</p>
+<p><a href="../">introduction</a> | <a href="../g3log_usage/">detailed information</a> | <a href="./"><strong>Configure &amp; Build</strong></a> | <a href="../API/">API description</a> | <a href="../API_custom_formatting/">Custom log formatting</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

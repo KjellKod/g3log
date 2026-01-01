@@ -1,0 +1,955 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Kjell Hedstrom">
+      
+      
+        <link rel="canonical" href="https://kjellkod.github.io/g3log/API/">
+      
+      
+        <link rel="prev" href="../g3log_usage/">
+      
+      
+        <link rel="next" href="../API_custom_formatting/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>API description - G3log, an asynchronous "crash-safe" logger</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#high-level-description-of-g3log" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="G3log, an asynchronous &#34;crash-safe&#34; logger" class="md-header__button md-logo" aria-label="G3log, an asynchronous "crash-safe" logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            G3log, an asynchronous "crash-safe" logger
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API description
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="G3log, an asynchronous &#34;crash-safe&#34; logger" class="md-nav__button md-logo" aria-label="G3log, an asynchronous "crash-safe" logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    G3log, an asynchronous "crash-safe" logger
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction to G3log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../g3log_usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G3log usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API description
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API description
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#asynchronous-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asynchronous Logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logworker-and-sinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LogWorker and Sinks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#signal-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signal Handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stack-trace-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stack Trace Generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-message-formatting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Message Formatting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Levels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#crash-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Crash Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#thread-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#public-domain-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public Domain Software
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging-and-fatal-events-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging and Fatal Events Explained
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../API_custom_formatting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API for custom log formatting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure, Build, Package, Install and Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License and contribution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#asynchronous-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Asynchronous Logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logworker-and-sinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        LogWorker and Sinks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#signal-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Signal Handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#stack-trace-generation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Stack Trace Generation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-message-formatting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Message Formatting
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#log-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log Levels
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#crash-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Crash Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#customization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Customization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#thread-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Thread Safety
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#public-domain-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Public Domain Software
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#logging-and-fatal-events-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Logging and Fatal Events Explained
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<p><a href="../">introduction</a> | <a href="../g3log_usage/">detailed information</a> | <a href="../building/">Configure &amp; Build</a> | <a href="./"><strong>API description</strong></a> | <a href="../API_custom_formatting/">Custom log formatting</a></p>
+<h1 id="high-level-description-of-g3log">High Level Description of g3log</h1>
+<p>The <code>g3log</code> logger is an asynchronous, crash-safe logging library designed for C++ applications. It allows for logging messages to various sinks without blocking the main application thread. Below is a high-level overview of how the <code>g3log</code> logger works.</p>
+<h2 id="asynchronous-logging">Asynchronous Logging</h2>
+<p>The logger operates on a separate thread, ensuring that the main application thread is not blocked by I/O operations when logging messages. This is achieved by using a background worker (<a href="../src/g3log/logworker.hpp"><code>LogWorker</code></a>) that queues log messages and processes them asynchronously.</p>
+<h2 id="logworker-and-sinks">LogWorker and Sinks</h2>
+<p>The <code>LogWorker</code> is responsible for managing the logging sinks. A sink is an object that defines where and how log messages are outputted (e.g., to a file, console, or over the network). Users can add custom sinks to the <code>LogWorker</code> using the <code>addSink</code> method, which takes a unique pointer to a sink object and a function pointer to the method that will save the log message.</p>
+<h2 id="signal-handling">Signal Handling</h2>
+<p>The logger includes a signal handler for Unix-like systems that captures fatal signals (e.g., <code>SIGSEGV</code>, <code>SIGABRT</code>) and ensures that all pending log messages are flushed to the sinks before the application exits. The signal handler function (<a href="../src/crashhandler_unix.cpp"><code>signalHandler</code></a>) is registered to handle these signals and will attempt to generate a stack trace when a fatal signal is received. This stack trace is then logged, providing valuable debugging information.</p>
+<h2 id="stack-trace-generation">Stack Trace Generation</h2>
+<p>Upon receiving a fatal signal, the <code>signalHandler</code> function will call <a href="../src/crashhandler_unix.cpp"><code>stackdump</code></a> to generate a stack trace. This function uses platform-specific calls to retrieve the stack frames and attempts to demangle the function names to make the stack trace more readable.</p>
+<h2 id="log-message-formatting">Log Message Formatting</h2>
+<p>Log messages can be formatted using either a streaming API (e.g., <code>LOG(INFO) &lt;&lt; "message";</code>) or a printf-like syntax (e.g., <code>LOGF(INFO, "message %d", value);</code>). This provides flexibility in how messages are constructed.</p>
+<h2 id="log-levels">Log Levels</h2>
+<p>The library supports various log levels (e.g., <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code>, <code>FATAL</code>). Users can define custom log levels or modify the existing ones. The log levels can be dynamically enabled or disabled at runtime if the <code>G3_DYNAMIC_LOGGING</code> preprocessor definition is set.</p>
+<h2 id="crash-safety">Crash Safety</h2>
+<p>In the event of a crash, the logger is designed to be crash-safe by catching fatal events and ensuring that all log messages are flushed to the sinks before the process exits.</p>
+<h2 id="customization">Customization</h2>
+<p>The library allows for extensive customization, including adding custom log levels, creating custom sinks, and overriding the default signal handling behavior.</p>
+<h2 id="thread-safety">Thread Safety</h2>
+<p>The <code>g3log</code> logger is thread-safe, meaning it can be used from multiple threads without the need for additional synchronization.</p>
+<h2 id="public-domain-software">Public Domain Software</h2>
+<p>The <code>g3log</code> code is released into the public domain, allowing users to use, modify, and distribute it freely without restrictions.</p>
+<h2 id="logging-and-fatal-events-explained">Logging and Fatal Events Explained</h2>
+<p><em>diagrams created with https://mermaid.live</em>
+<img alt="G3Log sequence view" src="../event_sequence.png" /></p>
+<h1 id="api-description">API description</h1>
+<p>Most of the API that you need for using g3log is described in this readme. For more API documentation and examples please continue to read the <a href="./">API readme</a>. Examples of what you will find here are: </p>
+<h2 id="logging-api-log-calls">Logging API: LOG calls</h2>
+<p>LOG calls can follow streaming <code>LOG(INFO) &lt;&lt; "some text"</code> or printf-like syntax <code>LOGF(WARNING, "some number %d", 123);</code></p>
+<p>Conditional logging is made with <code>LOG_IF(INFO, &lt;boolean-expression&gt;) &lt;&lt; " some text"</code> or <code>LOGF_IF(WARNING, &lt;boolean-expression&gt;) &lt;&lt; " some text".</code>  Only if the expressions evaluates to <code>true</code> will the logging take place. </p>
+<p>Example:
+<code>LOG_IF(INFO, 1 != 200) &lt;&lt; " some text";</code>   or <code>LOG_IF(FATAL, SomeFunctionCall()) &lt;&lt; " some text";</code></p>
+<p><em><a name="fatal_logging">A call using FATAL</a>  logging level, such as the <code>LOG_IF(FATAL,...)</code> example above, will after logging the message at <code>FATAL</code>level also kill the process.  It is essentially the same as a <code>CHECK(&lt;boolea-expression&gt;) &lt;&lt; ...</code> with the difference that the <code>CHECK(&lt;boolean-expression)</code> triggers when the expression evaluates to <code>false</code>.</em></p>
+<h2 id="contract-api-check-calls">Contract API: CHECK calls</h2>
+<p>The contract API follows closely the logging API with <code>CHECK(&lt;boolean-expression&gt;) &lt;&lt; ...</code> for streaming  or  (*) <code>CHECKF(&lt;boolean-expression&gt;, ...);</code> for printf-style.</p>
+<p>If the <code>&lt;boolean-expression&gt;</code> evaluates to false then the the message for the failed contract will be logged in FIFO order with previously made messages. The process will then shut down after the message is sent to the sinks and the sinks have dealt with the fatal contract message. </p>
+<p><code>CHECK_F(&lt;boolean-expression&gt;, ...);</code> was the the previous API for printf-like CHECK. It is still kept for backwards compatability but is exactly the same as <code>CHECKF</code></p>
+<h1 id="logfatal-or-checkfalse">LOG(fATAL) or CHECK(false)</h1>
+<p>Fatal logging or failed `CHECK  calls follows the same handling. 
+<img alt="CHECK(false) or LOG(FATAL)" src="../fatal_log_sequence.png" /></p>
+<h2 id="logging-levels">Logging levels</h2>
+<p>The default logging levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code> and <code>FATAL</code> (see FATAL usage <a href="#fatal_logging">above</a>). The logging levels are defined in <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/loglevels.hpp">loglevels.hpp</a>.</p>
+<p>For some windows framework there is a clash with the <code>DEBUG</code> logging level. One of the CMake <a href="#build_options">Build options</a> can be used to then change offending default level from <code>DEBUG</code> TO <code>DBUG</code>.</p>
+<p>**CMake option: (default OFF) ** <code>cmake -DCHANGE_G3LOG_DEBUG_TO_DBUG=ON ..</code> </p>
+<p>### disable/enabled levels at runtime
+  Logging levels can be disabled at runtime. The logic for this happens in
+  <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/loglevels.hpp">loglevels.hpp</a>, <a href="https://github.com/KjellKod/g3log/tree/master/src/loglevels.cpp">loglevels.cpp</a> and <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/g3log.hpp">g3log.hpp</a>.</p>
+<p>There is a cmake option to enable the dynamic enable/disable of levels. 
+  When the option is enabled there will be a slight runtime overhead for each <code>LOG</code> call when the enable/disable status is checked. For most intent and purposes this runtime overhead is negligable. </p>
+<p>There is <strong>no</strong> runtime overhead for internally checking if a level is enabled//disabled if the cmake option is turned off. If the dynamic logging cmake option is turned off then all logging levels are enabled.</p>
+<p><strong>CMake option: (default OFF)</strong> <code>cmake -DUSE_DYNAMIC_LOGGING_LEVELS=ON  ..</code> </p>
+<p>### custom logging levels
+  Custom logging levels can be created and used. When defining a custom logging level you set the value for it as well as the text for it. You can re-use values for other levels such as <em>INFO</em>, <em>WARNING</em> etc or have your own values. Any value with equal or higher value than the <em>FATAL</em> value will be considered a <em>FATAL</em> logging level. </p>
+<p><strong>To keep in mind when adding your own custom levels.</strong> 
+1. If the cmake option <code>G3_DYNAMIC_LOGGING</code> is enabled then you must use <code>g3::only_change_at_initialization::addLogLevel(...)</code> to give g3log a record of your logging level and if it is an enabled or disbled logging level. 
+1. If the cmake <code>G3_DYNAMIC_LOGGING</code> is turned OFF, then giving g3log a record of your logging level with 'addLogLevel(...) is <strong>not needed</strong> since no <code>"disbled/enabled"</code> check will happen - all logging levels will be considered enabled.</p>
+<p>Example:
+  ```cpp
+  // In CustomLoggingLevels.hpp
+  #include <g3log/loglevels.hpp></p>
+<p>// all values with a + 1 higher than their closest equivalet
+  // they could really have the same value as well.</p>
+<p>const LEVELS FYI {DEBUG.value + 1, {"For Your Information"}}; 
+  const LEVELS CUSTOM {INFO.value + 1, {"CUSTOM"}}; 
+  const LEVELS SEVERE {WARNING.value +1, {"SEVERE"}};
+  const LEVELS DEADLY {FATAL.value + 1, {"DEADLY"}}; 
+  ```</p>
+<p>More examples can be viwed in the <a href="https://github.com/KjellKod/g3log/blob/master/test_unit/test_io.cpp">unit tests</a>. </p>
+<h2 id="sink-creation-and-utilization">Sink <a name="sink_creation">creation</a> and utilization</h2>
+<p>The default sink for g3log is the one as used in g2log. It is a simple file sink with a limited API. The details for the default file sink can be found in <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/filesink.hpp">filesink.hpp</a>, <a href="https://github.com/KjellKod/g3log/tree/master/src/filesink.cpp">filesink.cpp</a>, <a href="https://github.com/KjellKod/g3log/tree/master/src/filesinkhelper.ipp">filesinkhelper.ipp</a></p>
+<p>More sinks can be found at <a href="http://www.github.com/KjellKod/g3sinks">g3sinks</a> (log rotate, log rotate with filtering on levels)</p>
+<p>A logging sink is not required to be a subclass of a specific type. The only requirement of a logging sink is that it can receive a logging message of </p>
+<h3 id="using-the-default-sink">Using the default sink</h3>
+<p>Sink creation is defined in <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/logworker.hpp">logworker.hpp</a> and used in <a href="https://github.com/KjellKod/g3log/tree/master/src/logworker.cpp">logworker.cpp</a>. For in-depth knowlege regarding sink implementation details you can look at <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/sinkhandle.hpp">sinkhandle.hpp</a> and <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/sinkwrapper.hpp">sinkwrapper.hpp</a></p>
+<pre><code class="language-cpp">  std::unique_ptr&lt;FileSinkHandle&gt; addDefaultLogger(
+            const std::string&amp; log_prefix
+            , const std::string&amp; log_directory
+            , const std::string&amp; default_id = &quot;g3log&quot;);
+</code></pre>
+<p>With the default id left as is (i.e. "g3log") a creation of the logger in the unit test "test_filechange" would look like this</p>
+<pre><code class="language-cpp">  const std::string directory = &quot;./&quot;;
+  const std::string name = &quot;(ReplaceLogFile)&quot;;
+  auto worker = g3::LogWorker::createLogWorker();
+  auto handle = worker-&gt;addDefaultLogger(name, directory);
+</code></pre>
+<p>The resulting filename would be something like: </p>
+<pre><code>   ./(ReplaceLogFile).g3log.20160217-001406.log
+</code></pre>
+<h2 id="designate-the-sink-functions-log-entry-receving-function">Designate the sink function's log entry receving function</h2>
+<p>The default log formatting look can be overriden by any sink. 
+If the sink receiving function calls <code>toString()</code> then the default log formatting will be used.
+If the sink receiving function calls <code>toString(&amp;XFunc)</code> then the <code>XFunc</code>will be used instead (see <code>LogMessage.h/cpp</code> for code details if it is not clear). (<code>XFunc</code> is a place holder for <em>your</em> formatting function of choice). </p>
+<p>The API for the function-ptr to pass in is </p>
+<pre><code class="language-cpp">std::string (*) (const LogMessage&amp;)
+</code></pre>
+<p>or for short as defined in <code>LogMessage.h</code></p>
+<pre><code class="language-cpp">using LogDetailsFunc = std::string (*) (const LogMessage&amp;);
+</code></pre>
+<h2 id="log-format-customization">Log format customization</h2>
+<p>Please see<a href="../API_custom_formatting/">API_custom_formatting.md</a></p>
+<h2 id="log-flushing">LOG <a name="log_flushing">flushing</a></h2>
+<p>The default file sink will flush each log entry at set intervals. The default buffer size for flushing is set to 100 entries. You can adjust this down to 1, or as high as makes sense for your system. Please see <a href="https://github.com/KjellKod/g3log/blob/master/src/g3log/filesink.hpp#L18">FileSink</a> </p>
+<p>Even more flushing policies and log rotations can be found at  g3sinks <a href="https://github.com/KjellKod/g3sinks/tree/master/sink_logrotate">logrotate and LogRotateWithFilters</a>.</p>
+<p>At shutdown all enqueued logs will be flushed to the sink.<br />
+At a discovered fatal event (SIGSEGV et.al) all enqueued logs will be flushed to the sink.</p>
+<p>A programmatically triggered abrupt process exit such as a call to   <code>exit(0)</code> will of course not get the enqueued log entries flushed. Similary  a bug that does not trigger a fatal signal but a process exit will also not get the enqueued log entries flushed.  G3log can catch several fatal crashes and it deals well with RAII exits but magic is so far out of its' reach.</p>
+<p><img alt="log sequence" src="../log_sequence.png" /></p>
+<h2 id="g3log-and-sink-usage-code-example">G3log and Sink Usage Code Example</h2>
+<p>Example usage where a <a href="https://github.com/KjellKod/g3sinks">logrotate sink (g3sinks)</a> is added. In the example it is shown how the logrotate API is called. The logrotate limit is changed from the default to instead be 10MB. The limit is changed by calling the sink handler which passes the function call through to the actual logrotate sink object.</p>
+<pre><code class="language-cpp">
+// main.cpp
+#include &lt;g3log/g3log.hpp&gt;
+#include &lt;g3log/logworker.h&gt;
+#include &lt;g3sinks/LogRotate.h&gt;
+#include &lt;memory&gt;
+
+int main(int argc, char**argv) {
+   using namespace g3;
+   std::unique_ptr&lt;LogWorker&gt; logworker{ LogWorker::createLogWorker() };
+   auto sinkHandle = logworker-&gt;addSink(std::make_unique&lt;LogRotate&gt;(),
+                                          &amp;LogRotate::save);
+
+   // initialize the logger before it can receive LOG calls
+   initializeLogging(logworker.get());            
+
+   // You can call in a thread safe manner public functions on the logrotate sink
+   // The call is asynchronously executed on your custom sink.
+   const int k10MBInBytes = 10 * 1024 * 1024;
+   std::future&lt;void&gt; received = sinkHandle-&gt;call(&amp;LogRotate::setMaxLogSize, k10MBInBytes);
+
+   // Run the main part of the application. This can be anything of course, in this example
+   // we'll call it &quot;RunApplication&quot;. Once this call exits we are in shutdown mode
+   RunApplication();
+
+   // If the LogWorker is initialized then at scope exit the g3::shutDownLogging() will be 
+   // called automatically. 
+   //  
+   // This is important since it protects from LOG calls from static or other entities that will go out of
+   // scope at a later time. 
+   //
+   // It can also be called manually if for some reason your setup is different then the one highlighted in
+   // this example
+   g3::shutDownLogging();
+}
+</code></pre>
+<h2 id="dynamic-message-sizing">Dynamic Message Sizing <a name="dynamic_message_sizing"></a></h2>
+<p>The default build uses a fixed size buffer for formatting messages. The size of this buffer is 2048 bytes. If an incoming message results in a formatted message that is greater than 2048 bytes, it will be bound to 2048 bytes and will have the string <code>[...truncated...]</code> appended to the end of the bound message. There are cases where one would like to dynamically change the size at runtime. For example, when debugging payloads for a server, it may be desirable to handle larger message sizes in order to examine the whole payload. Rather than forcing the developer to rebuild the server, dynamic message sizing could be used along with a config file which defines the message size at runtime.</p>
+<p>This feature supported as a CMake option:</p>
+<p><strong>CMake option: (default OFF)</strong> <code>cmake -DUSE_G3_DYNAMIC_MAX_MESSAGE_SIZE=ON ..</code></p>
+<p>The following is an example of changing the size for the message.</p>
+<pre><code class="language-cpp">    g3::only_change_at_initialization::setMaxMessageSize(10000);
+</code></pre>
+<h2 id="fatal-handling">Fatal handling</h2>
+<p>The default behaviour for G3log is to catch several fatal events before they force the process to exit. After <i>catching</i> a fatal event a stack dump is generated and all log entries, up to the point of the stack dump are together with the dump flushed to the sink(s).</p>
+<p><img alt="fatal signal" src="../fatal_signal_sequence.png" /></p>
+<h3 id="linuxnix"><a name="fatal_handling_linux">Linux/*nix</a></h3>
+<p>The default fatal handling on Linux deals with fatal signals. At the time of writing these signals were   <code>SIGABRT, SIGFPE, SIGILL, SIGSEGV, SIGTERM</code>.  The Linux fatal handling is handled in <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/crashhandler.hpp">crashhandler.hpp</a> and <a href="https://github.com/KjellKod/g3log/tree/master/src/crashhandler_unix.cpp">crashhandler_unix.cpp</a></p>
+<p>A signal that commonly is associated with voluntarily process exit is <code>SIGINT</code> (ctrl + c) G3log does not deal with it. </p>
+<p>The fatal signals can be <a href="#fatal_handling_disabled">disabled</a> or  <a href="#fatal_signalhandler_override">changed/added </a>. </p>
+<p>An example of a Linux stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>.
+    ```
+    <strong><em>*</em> FATAL SIGNAL RECEIVED </strong><strong>*</strong> 
+    "Received fatal signal: SIGSEGV(11)     PID: 6571</p>
+<pre><code>***** SIGNAL SIGSEGV(11)
+
+******* STACKDUMP *******
+        stack dump [1]  ./g3log-FATAL-sigsegv() [0x42a500]
+        stack dump [2]  /lib/x86_64-linux-gnu/libpthread.so.0+0x10340 [0x7f83636d5340]
+
+        stack dump [3]  ./g3log-FATAL-sigsegv : example_fatal::tryToKillWithAccessingIllegalPointer(std::unique_ptr&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt;, std::default_delete&lt;std::__cxx11::basic_string&lt;char, std::char_traits&lt;char&gt;, std::allocator&lt;char&gt; &gt; &gt; &gt;)+0x119 [0x4107b9]
+        stack dump [4]  ./g3log-FATAL-sigsegvmain+0xdec [0x40e51c]
+        stack dump [5]  /lib/x86_64-linux-gnu/libc.so.6__libc_start_main+0xf5 [0x7f8363321ec5]
+        stack dump [6]  ./g3log-FATAL-sigsegv() [0x40ffa2]
+
+Exiting after fatal event  (FATAL_SIGNAL). Fatal type:  SIGSEGV
+Log content flushed sucessfully to sink
+
+"
+g3log g3FileSink shutdown at: 16:33:18
+
+```
+</code></pre>
+<h3 id="custom-fatal-handling-override-defaults"><a name="fatal_custom_handling">Custom fatal handling - override defaults</a></h3>
+<p>By <a name="fatal_signalhandler_override">default</a> the fatal signals are defined in <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log.cpp">https://github.com/KjellKod/g3log/tree/master/src/g3log.cpp</a> as 
+   <code>SIGABRT
+   SIGFPE
+   SIGILL
+   SIGSEGV
+   SIGTERM</code>
+   If you want to define your own set of fatal signals, override the default ones, then this can be done as shown in <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/crashhandler.hpp">src/g3log/crashhandler.hpp</a>
+   <code>cpp
+   // Example when SIGTERM is skipped due to ZMQ usage
+   g3::overrideSetupSignals({ {SIGABRT, "SIGABRT"}, 
+                              {SIGFPE, "SIGFPE"},
+                              {SIGILL, "SIGILL"},
+                              {SIGSEGV, "SIGSEGV"}});</code></p>
+<h3 id="pre-fatal-hook"><a name="fatal_pre_hook">Pre fatal hook</a></h3>
+<p>You can define a custom call back function that will be called before the fatal signal handling re-emits the <code>fatal</code> signal. See <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/g3log.hpp">src/g3log/g3log.hpp</a> for details. 
+   <code>// Example of how to enforce important shutdown cleanup even in the event of a fatal crash: 
+   g3::setFatalPreLoggingHook([]{ cleanup(); });</code></p>
+<h3 id="disable-fatal-handling"><a name="fatal_handling_disabled">Disable fatal handling</a></h3>
+<p>Fatal signal handling can be disabled with a CMake option: <code>ENABLE_FATAL_SIGNALHANDLING</code>. See <a href="https://github.com/KjellKod/g3log/Options.cmake">Options.cmake</a> for more details</p>
+<h3 id="pid1-fatal-signal-recommendations"><a name="PID1">PID1 Fatal Signal Recommendations</a></h3>
+<p>If you are using g3log on a PID1 process then you absolutely should provide your own signal handling  (ref: <a href="https://github.com/KjellKod/g3log/issues/269">issue 269</a>) as g3log re-emits the fatal signal after it has restored the previous signal handler for that signal.  PID1 processed do <em>not</em> shutdown the process for a normal fatal signal so the choice  to exit the PID1 process after such a signal must be taken by the coder - not by g3log.</p>
+<h2 id="windows"><a name="fatal_handling_windows">Windows</a></h2>
+<p>Windows fatal handling also deals with fatal signals just like Linux. In addition to fatal signals it also deals with unhandled exceptions, vectored exceptions.  Windows fatal handling is handled in <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/crashhandler.hpp">crashhandler.hpp</a>, <a href="https://github.com/KjellKod/g3log/tree/master/src/crashhandler_windows.cpp">crashhandler_windows.cpp</a>, <a href="https://github.com/KjellKod/g3log/tree/master/src/g3log/stacktrace_windows.hpp">stacktrace_windows.hpp</a>, <a href="https://github.com/KjellKod/g3log/tree/master/src/stacktrace_windows.cpp">stacktrace_windows.cpp</a></p>
+<p>An example of a Windows stackdump as shown in the output from the fatal example <i>g3log-FATAL-sigsegv</i>. </p>
+<p><a href="../">introduction</a> | <a href="../g3log_usage/">detailed information</a> | <a href="../building/">Configure &amp; Build</a> | <a href="./"><strong>API description</strong></a> | <a href="../API_custom_formatting/">Custom log formatting</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>

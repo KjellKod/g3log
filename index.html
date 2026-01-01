@@ -1,0 +1,900 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+        <meta name="author" content="Kjell Hedstrom">
+      
+      
+        <link rel="canonical" href="https://kjellkod.github.io/g3log/">
+      
+      
+      
+        <link rel="next" href="g3log_usage/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>G3log, an asynchronous "crash-safe" logger</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#welcome-to-g3log" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="." title="G3log, an asynchronous &#34;crash-safe&#34; logger" class="md-header__button md-logo" aria-label="G3log, an asynchronous "crash-safe" logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            G3log, an asynchronous "crash-safe" logger
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Introduction to G3log
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="." title="G3log, an asynchronous &#34;crash-safe&#34; logger" class="md-nav__button md-logo" aria-label="G3log, an asynchronous "crash-safe" logger" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    G3log, an asynchronous "crash-safe" logger
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction to G3log
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="." class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Introduction to G3log
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-easy-usage-in-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Easy usage in files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-access-to-streaming-and-print_f-log-call-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Access to streaming and print_f log call syntax
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-conditional-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Conditional logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-design-by-contract-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Design-by-contract framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-handling-of-fatal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Handling of fatal
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Handling of fatal">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5b-overriding-and-customization-of-fatal-event-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5b. Overriding and customization of fatal event handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-default-and-custom-logging-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Default and Custom logging levels
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Default and Custom logging levels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-log-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Log filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-3rd-party-and-custom-logging-sinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 3rd party and custom logging sinks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-log-instantiation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Log instantiation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuos-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuos Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feedback
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="g3log_usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    G3log usage
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API description
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="API_custom_formatting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API for custom log formatting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Configure, Build, Package, Install and Test
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="contributing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    License and contribution
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-easy-usage-in-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Easy usage in files
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-access-to-streaming-and-print_f-log-call-syntax" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Access to streaming and print_f log call syntax
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-conditional-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Conditional logging
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-design-by-contract-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Design-by-contract framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-handling-of-fatal" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Handling of fatal
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. Handling of fatal">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5b-overriding-and-customization-of-fatal-event-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5b. Overriding and customization of fatal event handling
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-default-and-custom-logging-levels" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Default and Custom logging levels
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. Default and Custom logging levels">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#7-log-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Log filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-3rd-party-and-custom-logging-sinks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 3rd party and custom logging sinks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-log-instantiation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. Log instantiation
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#continuos-integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Continuos Integration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#feedback" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Feedback
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<p><a href="./"><strong>introduction</strong></a> | <a href="g3log_usage/">detailed information</a> | <a href="building/">Configure &amp; Build</a> | <a href="API/">API description</a> | <a href="API_custom_formatting/">Custom log formatting</a></p>
+<h1 id="welcome-to-g3log">Welcome to g3log</h1>
+<p>G3log is an asynchronous logger with three main features: 
+1. Intuitive <code>LOG(...)</code> API
+2. <code>Design-by-contract</code> <code>CHECK(...)</code> functionality
+3. Fatal crash handling for graceful shutdown of the logged process without loosing any log details up to the point of the crash</p>
+<p>The super quick introduction to g3log can be seen in the steps 1 - 9 below. </p>
+<p>For more in-depth information please see the full usage description in <a href="g3log_usage/">g3log_usage.md</a>. The internal API for more advanced integration with g3log can be accessed in <a href="API/">API.md</a></p>
+<h2 id="1-easy-usage-in-files">1. Easy usage in files</h2>
+<p>Avoid deep dependency injection complexity and instead get access to the logger as easy as </p>
+<pre><code>#include &lt;g3log/g3log.hpp&gt;
+</code></pre>
+<h2 id="2-access-to-streaming-and-print_f-log-call-syntax">2. Access to streaming and print_f log call syntax</h2>
+<p>Both streaming syntax <code>LOG</code> and print_f <code>LOGF</code> syntax are available. </p>
+<pre><code>LOGF(INFO, &quot;Hi log %d&quot;, 123);
+LOG(INF) &lt;&lt; &quot;Hi log &quot; &lt;&lt; 123;
+
+</code></pre>
+<h2 id="3-conditional-logging">3. Conditional logging</h2>
+<pre><code>LOG_IF(INFO, (1 &lt; 2)) &lt;&lt; &quot;If true this message will be logged&quot;;
+LOGF_IF(INFO, (1 &lt; 2), &quot;If true, then this %s will be logged&quot;, &quot;message&quot;);
+</code></pre>
+<h2 id="4-design-by-contract-framework">4. Design-by-contract framework</h2>
+<pre><code>CHECK(less != more); // not fatal
+CHECK_F(less &gt; more, &quot;CHECK(false) will trigger a fatal message&quot;)
+</code></pre>
+<h2 id="5-handling-of-fatal">5. Handling of fatal</h2>
+<p>By default g3log will capture fatal events such as <code>LOG(FATAL)</code>, <code>CHECK(false)</code> and otherwise fatal signals such as: </p>
+<pre><code>    SIGABRT
+    SIGFPE
+    SIGILL
+    SIGSEGV
+    SIGTERM
+</code></pre>
+<p>When a fatal event happens the not-yet written log activity will be flushed to the logging sinks. Only when all logging activity up to the point of the fatal event has happend, will g3log allow the fatal event to proceed and exit the process. </p>
+<p>If <code>object</code> symbols are available the fatal handler will attempt to push the stacktrace up to the fatal reason to the logging sink. </p>
+<h4 id="5b-overriding-and-customization-of-fatal-event-handling">5b. Overriding and customization of fatal event handling</h4>
+<p>For overriding fatal error handling to use your own, or to add code <code>hooks</code> that you want to execute please see the <a href="API/">API.md</a> doc. </p>
+<h2 id="6-default-and-custom-logging-levels">6. Default and Custom logging levels</h2>
+<p>The default logging levels are <code>DEBUG</code>, <code>INFO</code>, <code>WARNING</code> and <code>FATAL</code>. You can define your own logging levels or completely replace the logging levels. Ref: <a href="API/">API.md</a></p>
+<h3 id="7-log-filtering">7. Log filtering</h3>
+<p>Log filtering is handled in g3log if dynamic logging levels are enabled
+in the configuration. See the <a href="API/">API.md</a> for information. Log filtering can also be handled through the sink as can be seen in <a href="https://github.com/KjellKod/g3sinks">github/Kjellod/g3sinks</a></p>
+<h2 id="8-3rd-party-and-custom-logging-sinks">8. 3rd party and custom logging sinks</h2>
+<p>The default logging sink has no external 3rd party dependencies. For more logging sinks please see <a href="https://github.com/KjellKod/g3sinks">github/Kjellod/g3sinks</a></p>
+<ul>
+<li>log rotate</li>
+<li>log to syslog</li>
+<li>log to colored terminal output</li>
+<li>log rotate with filter</li>
+</ul>
+<p>See the <a href="API/">API.md</a> for more information about the simple steps to creating your own logging sink.</p>
+<h2 id="9-log-instantiation">9. Log instantiation</h2>
+<p>With the default application name left as is (i.e. "g3log") a creation of the logger could look something like this: </p>
+<pre><code class="language-cpp">  const std::string directory = &quot;./&quot;;
+  const std::string name = &quot;TestLogFile&quot;;
+  auto worker = g3::LogWorker::createLogWorker();
+  auto handle = worker-&gt;addDefaultLogger(name, directory);
+</code></pre>
+<p>The resulting filename would be something like: </p>
+<pre><code>   ./TestLogFile.g3log.20160217-001406.log
+</code></pre>
+<h2 id="performance"><a name="performance">Performance</a></h2>
+<p>G3log aims to keep all background logging to sinks with as little log overhead as possible to the logging sink and with as small "worst case latency" as possible. For this reason g3log is a good logger for many systems that deal with critical tasks. Depending on platform the average logging overhead will differ. On my 2010 laptop the average call, when doing extreme performance testing, will be about ~2 us.</p>
+<p>The worst case latency is kept stable with no extreme peaks, in spite of any sudden extreme pressure.  I have a blog post regarding comparing worst case latency for g3log and other loggers which might be of interest.
+You can find it here: https://kjellkod.wordpress.com/2015/06/30/the-worlds-fastest-logger-vs-g3log/</p>
+<h2 id="continuos-integration"><a name="continuos_integration">Continuos Integration</a></h2>
+<p>The g3log repository is evaluating both github actions and CircleCI for executing test coverage, installation and document generation. For windows the repo is still relying on appveyor.  In case you want to look into change any of these setups the following files are the ones of interest. </p>
+<pre><code>1. appveyor --&gt; g3log/appveyor.yml
+2. circleCI --&gt; g3log/.circleci/config.yml
+3. github actions --&gt; g3log/.github/workflows/*.yml
+
+
+</code></pre>
+<h2 id="feedback"><a name="feedback">Feedback</a></h2>
+<p>If you like this logger (or not) it would be nice with some feedback. That way I can improve g3log and it is always nice to hear when and how someone is using it. </p>
+<p>If you have ANY questions or problems please do not hesitate in contacting me at 
+ <code>Hedstrom @ Kjellod. cc</code></p>
+<h1 id="say-thanks"><a name="say-thanks">Say Thanks</a></h1>
+<p>This logger is available for free and all of its source code is public domain.  A great way of saying thanks is to send a donation. It would go a long way not only to show your support but also to boost continued development.</p>
+<p><a href="https://www.paypal.me/g3log/25"><img alt="Donate" src="https://img.shields.io/badge/Donate-PayPal-green.svg" /></a></p>
+<ul>
+<li>$5 for a cup of coffee</li>
+<li>$25 for a late evening coding with takeout </li>
+</ul>
+<p>Cheers</p>
+<p>Kjell <em>(a.k.a. KjellKod)</em></p>
+<p><a href="./"><strong>introduction</strong></a> | <a href="g3log_usage/">detailed information</a> | <a href="building/">Configure &amp; Build</a> | <a href="API/">API description</a> | <a href="API_custom_formatting/">Custom log formatting</a></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": [], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
