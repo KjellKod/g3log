@@ -21,6 +21,7 @@
 #include <map>
 #include <memory>
 #include <mutex>
+#include <iomanip>
 #include <vector>
 
 #pragma comment(lib, "dbghelp.lib")
