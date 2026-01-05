@@ -105,6 +105,19 @@ namespace {
       std::string callInformation;
       if (SymFromAddr(GetCurrentProcess(), addr, &displacement64, symbol)) {
          callInformation.append(" ").append(std::string(symbol->Name, symbol->NameLen));
+         
+         IMAGEHLP_MODULE64 moduleInfo = { 0 };
+         moduleInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
+
+         if (SymGetModuleInfo64(GetCurrentProcess(), addr, &moduleInfo)) {
+             DWORD64 moduleBase = moduleInfo.BaseOfImage;
+             DWORD64 rva = addr - moduleBase;
+
+             std::stringstream ss;
+             ss << " [A:0x" << std::hex << std::setfill('0') << std::setw(8) << rva << "]\t" << std::dec;
+             frame_dump.append(ss.str());
+         }
+
          if (SymGetLineFromAddr64(GetCurrentProcess(), addr, &displacement, &line)) {
             lineInformation.append("\t").append(line.FileName).append(" L: ");
             lineInformation.append(std::to_string(line.LineNumber));
