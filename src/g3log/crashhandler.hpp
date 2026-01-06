@@ -73,6 +73,9 @@ namespace g3 {
       /** return calling thread's stackdump*/
       std::string stackdump(const char* dump = nullptr);
 
+       /** return calling thread's stackdump*/
+      std::string stackdump_platform ();
+
       /** Re-"throw" a fatal signal, previously caught. This will exit the application
        * This is an internal only function. Do not use it elsewhere. It is triggered
        * from g3log, g3LogWorker after flushing messages to file */
