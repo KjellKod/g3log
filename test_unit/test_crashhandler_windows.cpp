@@ -42,42 +42,17 @@ TEST(CrashHandler_Windows, ExceptionType) {
    EXPECT_EQ(stacktrace::exceptionIdToText(EXCEPTION_STACK_OVERFLOW), "EXCEPTION_STACK_OVERFLOW");
 }
 
-// Test that stackdump() produces non-empty output with expected structure
-TEST(CrashHandler_Windows, StackDumpBasicStructure) {
+// Verify stackdump() output format including RVA for post-mortem debugging.
+// Single stackdump() call to stay within the recursive-crash guard limit.
+TEST(CrashHandler_Windows, StackDumpOutputFormat) {
    std::string dump = stacktrace::stackdump();
 
-   // Stack dump should not be empty
    EXPECT_FALSE(dump.empty()) << "stackdump() returned empty string";
 
-   // Should contain "stack dump" entries with RVA
-   std::regex basic_pattern(R"(stack dump \[\d+\]\s+\[RVA:0x[0-9a-fA-F]{8}\])");
-   EXPECT_TRUE(std::regex_search(dump, basic_pattern))
-      << "Stack dump should contain 'stack dump [N] [RVA:0x...]' entries. Got:\n"
-      << dump;
-}
-
-// Test that stackdump() contains the Relative Virtual Address (RVA) format
-// RVA enables post-mortem debugging with tools like llvm-symbolizer
-// Reference: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format
-TEST(CrashHandler_Windows, StackDumpContainsRVA) {
-   std::string dump = stacktrace::stackdump();
-
-   // Should contain frame with RVA: stack dump [N] [RVA:0x########]
-   std::regex rva_pattern(R"(stack dump \[\d+\]\s+\[RVA:0x[0-9a-fA-F]{8}\])");
-   EXPECT_TRUE(std::regex_search(dump, rva_pattern))
-      << "Stack dump should contain frames with RVA in format "
-      << "'stack dump [N] [RVA:0x########]'. Got:\n"
-      << dump;
-}
-
-// Test that each stack frame line has expected components
-TEST(CrashHandler_Windows, StackDumpFrameFormat) {
-   std::string dump = stacktrace::stackdump();
-
-   // Each frame should have full format: "stack dump [N] [RVA:0x########]"
+   // Each frame should match: stack dump [N] [RVA:0x########]
    std::regex frame_pattern(R"(stack dump \[\d+\]\s+\[RVA:0x[0-9a-fA-F]{8}\])");
    EXPECT_TRUE(std::regex_search(dump, frame_pattern))
-      << "Stack dump should contain frame entries like "
+      << "Stack dump should contain frames like "
       << "'stack dump [0] [RVA:0x04c50a20]'. Got:\n"
       << dump;
 }
