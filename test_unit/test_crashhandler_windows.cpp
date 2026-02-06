@@ -46,6 +46,7 @@ TEST(CrashHandler_Windows, ExceptionType) {
 // Single stackdump() call to stay within the recursive-crash guard limit.
 TEST(CrashHandler_Windows, StackDumpOutputFormat) {
    std::string dump = stacktrace::stackdump();
+   std::cout << "stackdump output:\n" << dump << std::endl;
 
    EXPECT_FALSE(dump.empty()) << "stackdump() returned empty string";
 
