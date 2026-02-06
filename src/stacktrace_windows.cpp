@@ -22,6 +22,7 @@
 #include <memory>
 #include <mutex>
 #include <iomanip>
+#include <sstream>
 #include <vector>
 
 #pragma comment(lib, "dbghelp.lib")
@@ -106,17 +107,21 @@ namespace {
       std::string callInformation;
       if (SymFromAddr(GetCurrentProcess(), addr, &displacement64, symbol)) {
          callInformation.append(" ").append(std::string(symbol->Name, symbol->NameLen));
-         
-         IMAGEHLP_MODULE64 moduleInfo = { 0 };
+
+         // Calculate and output the Relative Virtual Address (RVA) for post-mortem debugging.
+         // The RVA can be used with tools like llvm-symbolizer to recover source locations
+         // from crash dumps, even with ASLR enabled.
+         // Reference: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#general-concepts
+         IMAGEHLP_MODULE64 moduleInfo = {0};
          moduleInfo.SizeOfStruct = sizeof(IMAGEHLP_MODULE64);
 
          if (SymGetModuleInfo64(GetCurrentProcess(), addr, &moduleInfo)) {
-             DWORD64 moduleBase = moduleInfo.BaseOfImage;
-             DWORD64 rva = addr - moduleBase;
+            DWORD64 moduleBase = moduleInfo.BaseOfImage;
+            DWORD64 rva = addr - moduleBase;
 
-             std::stringstream ss;
-             ss << " [A:0x" << std::hex << std::setfill('0') << std::setw(8) << rva << "]\t" << std::dec;
-             frame_dump.append(ss.str());
+            std::stringstream ss;
+            ss << " [RVA:0x" << std::hex << std::setfill('0') << std::setw(8) << rva << "]\t" << std::dec;
+            frame_dump.append(ss.str());
          }
 
          if (SymGetLineFromAddr64(GetCurrentProcess(), addr, &displacement, &line)) {

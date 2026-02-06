@@ -10,7 +10,9 @@
 
 #if (defined(WIN32) || defined(_WIN32) || defined(__WIN32__))
 #include <windows.h>
-#include "g3log/stacktrace_windows.hpp" 
+#include <regex>
+#include <string>
+#include "g3log/stacktrace_windows.hpp"
 
 
 TEST(CrashHandler_Windows, ExceptionType) {
@@ -38,6 +40,46 @@ TEST(CrashHandler_Windows, ExceptionType) {
    EXPECT_EQ(stacktrace::exceptionIdToText(EXCEPTION_PRIV_INSTRUCTION), "EXCEPTION_PRIV_INSTRUCTION");
    EXPECT_EQ(stacktrace::exceptionIdToText(EXCEPTION_SINGLE_STEP), "EXCEPTION_SINGLE_STEP");
    EXPECT_EQ(stacktrace::exceptionIdToText(EXCEPTION_STACK_OVERFLOW), "EXCEPTION_STACK_OVERFLOW");
+}
+
+// Test that stackdump() produces non-empty output with expected structure
+TEST(CrashHandler_Windows, StackDumpBasicStructure) {
+   std::string dump = stacktrace::stackdump();
+
+   // Stack dump should not be empty
+   EXPECT_FALSE(dump.empty()) << "stackdump() returned empty string";
+
+   // Should contain "stack dump" entries
+   EXPECT_NE(dump.find("stack dump"), std::string::npos)
+      << "Stack dump should contain 'stack dump' entries. Got:\n"
+      << dump;
+}
+
+// Test that stackdump() contains the Relative Virtual Address (RVA) format
+// RVA enables post-mortem debugging with tools like llvm-symbolizer
+// Reference: https://learn.microsoft.com/en-us/windows/win32/debug/pe-format
+TEST(CrashHandler_Windows, StackDumpContainsRVA) {
+   std::string dump = stacktrace::stackdump();
+
+   // Should contain RVA format: [RVA:0x followed by 8 hex digits and ]
+   // Example: [RVA:0x04c50a20]
+   std::regex rva_pattern(R"(\[RVA:0x[0-9a-fA-F]{8}\])");
+   EXPECT_TRUE(std::regex_search(dump, rva_pattern))
+      << "Stack dump should contain relative address in format [RVA:0x########].\n"
+      << "This is needed for post-mortem debugging with llvm-symbolizer.\n"
+      << "Got:\n"
+      << dump;
+}
+
+// Test that each stack frame line has expected components
+TEST(CrashHandler_Windows, StackDumpFrameFormat) {
+   std::string dump = stacktrace::stackdump();
+
+   // Each frame should have format: "stack dump [N]" where N is frame index
+   std::regex frame_pattern(R"(stack dump \[\d+\])");
+   EXPECT_TRUE(std::regex_search(dump, frame_pattern))
+      << "Stack dump should contain frame entries like 'stack dump [0]'. Got:\n"
+      << dump;
 }
 
 #endif  // defined WIN32
