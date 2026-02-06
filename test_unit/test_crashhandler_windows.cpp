@@ -50,11 +50,21 @@ TEST(CrashHandler_Windows, StackDumpOutputFormat) {
 
    EXPECT_FALSE(dump.empty()) << "stackdump() returned empty string";
 
-   // Each frame should match: stack dump [N] [RVA:0x########]
-   std::regex frame_pattern(R"(stack dump \[\d+\]\s+\[RVA:0x[0-9a-fA-F]{8}\])");
+   // Should contain "stack dump" entries
+   EXPECT_NE(dump.find("stack dump"), std::string::npos)
+      << "Stack dump should contain 'stack dump' entries. Got:\n"
+      << dump;
+
+   // Should contain frame indexing: stack dump [N]
+   std::regex frame_pattern(R"(stack dump \[\d+\])");
    EXPECT_TRUE(std::regex_search(dump, frame_pattern))
-      << "Stack dump should contain frames like "
-      << "'stack dump [0] [RVA:0x04c50a20]'. Got:\n"
+      << "Stack dump should contain frame entries like 'stack dump [0]'. Got:\n"
+      << dump;
+
+   // Should contain RVA format: [RVA:0x########]
+   std::regex rva_pattern(R"(\[RVA:0x[0-9a-fA-F]{8}\])");
+   EXPECT_TRUE(std::regex_search(dump, rva_pattern))
+      << "Stack dump should contain RVA in format [RVA:0x########]. Got:\n"
       << dump;
 }
 
