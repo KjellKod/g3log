@@ -62,6 +62,13 @@ IF(INSTALL_G3LOG)
       FILES ${CMAKE_CURRENT_BINARY_DIR}/g3logConfig.cmake
       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/g3log
    )
+   IF(INSTALL_G3LOG_TESTS)
+      FOREACH(test ${tests_to_run})
+         INSTALL( TARGETS ${test}
+                     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/g3log_tests
+         )
+      ENDFOREACH(test)
+   ENDIF()
 ENDIF()
 
 
