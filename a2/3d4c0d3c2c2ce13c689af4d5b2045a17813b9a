@@ -1,0 +1,19 @@
+src/g3log/sinkhandle.hpp
+  s_abb7376fa93021::t_02d608f8c69f77 47
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "a23d4c0d3c2c2ce13c689af4d5b2045a17813b9a",
+  "prompts": {},
+  "sessions": {
+    "s_abb7376fa93021": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fc9a5-405e-79f0-860e-a5951ec6bd11",
+        "model": "gpt-5.6-sol"
+      },
+      "human_author": "KjellKod <kjell.hedstrom@gmail.com>"
+    }
+  }
+}
