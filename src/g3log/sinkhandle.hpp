@@ -44,7 +44,7 @@ namespace g3 {
             typedef std::invoke_result_t<decltype(func), T, Args...> PromiseType;
             std::promise<PromiseType> promise;
             promise.set_exception(std::make_exception_ptr(e));
-            return std::move(promise.get_future());
+            return promise.get_future();
          }
       }
 
