@@ -61,7 +61,7 @@ By default g3log will capture fatal events such as `LOG(FATAL)`, `CHECK(false)` 
     SIGTERM
 ``` 
 
-When a fatal event happens the not-yet written log activity will be flushed to the logging sinks. Only when all logging activity up to the point of the fatal event has happend, will g3log allow the fatal event to proceed and exit the process. 
+When a fatal event happens the not-yet written log activity will be flushed to the logging sinks. Only when all logging activity up to the point of the fatal event has happened, will g3log allow the fatal event to proceed and exit the process. 
 
 If `object` symbols are available the fatal handler will attempt to push the stacktrace up to the fatal reason to the logging sink. 
 
